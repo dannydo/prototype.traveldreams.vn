@@ -1,0 +1,1043 @@
+#include "GameBoardManager.h"
+#include "cocos2d.h"
+
+GameBoardManager::GameBoardManager()
+{
+	m_ComboCountList[0] = m_ComboCountList[1] = m_ComboCountList[2] = 0;
+}
+
+void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int iLevel)
+{
+	// Load basic combo list
+	LoadBasicComboPatternList();
+
+	//
+
+	m_iRowNumber = iRowNumber;
+	m_iColumnNumber = iColumnNumber;
+
+	srand(time(NULL));
+
+	int iRow, iColumn;
+	for(iRow = 0; iRow < iRowNumber; iRow++)
+		for(iColumn = 0; iColumn < iColumnNumber; iColumn++)
+		{
+			if (iLevel == 1)
+			{
+			}
+			else if (iLevel == 2)
+			{
+				if ( iColumn >=3 && iColumn<=5 && (iRow <=1 || iRow>=iRowNumber-2) )
+				{
+					m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
+					continue;
+				}
+			}
+			else if (iLevel == 3)
+			{
+				if (iColumn == 4 || iRow == 4)
+				{
+					m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
+					continue;
+				}
+			}
+			else if (iLevel == 4)
+			{
+				if ((iColumn >= 3 && iColumn <=5) && (iRow >= 3 && iRow <=5))
+				{
+					m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
+					continue;
+				}
+			}		
+
+			m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = false;
+
+			m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % _MAX_GEM_ID_;
+
+			//m_BoardValueMatrix[1][1].m_iGemID=m_BoardValueMatrix[0][2].m_iGemID=m_BoardValueMatrix[1][3].m_iGemID=m_BoardValueMatrix[4][2].m_iGemID=m_BoardValueMatrix[5][2].m_iGemID=0;
+			//m_BoardValueMatrix[1][2].m_iGemID=m_BoardValueMatrix[2][2].m_iGemID=1;
+			
+			while ( (iRow>1 && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow-1][iColumn].m_iGemID && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow-2][iColumn].m_iGemID) ||
+					(iColumn >1 && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow][iColumn-1].m_iGemID && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow][iColumn-2].m_iGemID))
+			{
+				m_BoardValueMatrix[iRow][iColumn].m_iGemID = (m_BoardValueMatrix[iRow][iColumn].m_iGemID + 1) % _MAX_GEM_ID_;
+			}
+		}
+}
+/*
+bool GameBoardManager::DoAMove(int iSelectedRow, int iSelectedColumn,int iDeltaRow, int iDeltaColumn, std::vector<Cell>& destroyCells,
+		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells)
+{
+	int iSameValueCellCount;
+	bool bIsValidMove = false;
+	if (iSelectedRow >= 0) // move row
+	{
+		int iRow, iColumn, iGemID, iNewColumn;
+		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+		{
+			iSameValueCellCount = 1;
+			iGemID =  m_BoardValueMatrix[iSelectedRow][iColumn];
+			iNewColumn = (iColumn + iDeltaColumn + m_iColumnNumber) % m_iColumnNumber;
+			
+			int iRowBelow = iSelectedRow - 1;
+			while (iRowBelow >=0 && m_BoardValueMatrix[iRowBelow][iNewColumn] == iGemID)
+			{
+				iSameValueCellCount++;
+				iRowBelow--;
+			}
+
+			int iRowAbove = iSelectedRow + 1;
+			while (iRowAbove < m_iRowNumber && m_BoardValueMatrix[iRowAbove][iNewColumn] == iGemID)
+			{
+				iSameValueCellCount++;
+				iRowAbove++;
+			}
+
+			if (iSameValueCellCount >= 3)
+			{
+				bIsValidMove = true;
+				// calculate destroyed cells
+				destroyCells.push_back(Cell(iSelectedRow, iNewColumn));				
+
+				for(iRow = iSelectedRow - 1; iRow >iRowBelow; iRow--)
+				{
+					destroyCells.push_back(Cell(iRow, iNewColumn));					
+				}
+
+				for(iRow = iSelectedRow + 1; iRow < iRowAbove; iRow++)
+				{
+					destroyCells.push_back(Cell(iRow, iNewColumn));					
+				}				
+			}
+		}
+	}
+	else if (iSelectedColumn >= 0) // move column
+	{
+		int iRow, iColumn, iGemID, iNewRow, iSameValueCellCount;
+		for(iRow = 0; iRow < m_iRowNumber; iRow++)
+		{
+			iSameValueCellCount = 1;
+			iGemID =  m_BoardValueMatrix[iRow][iSelectedColumn];
+			iNewRow = (iRow + iDeltaRow + m_iRowNumber) % m_iRowNumber;			
+			int iColumnLeft = iSelectedColumn - 1;
+			while (iColumnLeft >=0 && m_BoardValueMatrix[iNewRow][iColumnLeft] == iGemID)
+			{
+				iSameValueCellCount++;
+				iColumnLeft--;
+			}
+
+			int iColumnRight = iSelectedColumn + 1;
+			while (iColumnRight < m_iColumnNumber && m_BoardValueMatrix[iNewRow][iColumnRight] == iGemID)
+			{
+				iSameValueCellCount++;
+				iColumnRight++;
+			}
+
+			if (iSameValueCellCount >= 3)
+			{
+				bIsValidMove = true;
+
+				// calculate destroyed cells
+				destroyCells.push_back(Cell(iNewRow, iSelectedColumn));
+
+				for(iColumn= iSelectedColumn- 1; iColumn >iColumnLeft; iColumn--)
+				{
+					destroyCells.push_back(Cell(iNewRow, iColumn));					
+				}
+
+				for(iColumn= iSelectedColumn+ 1; iColumn <iColumnRight; iColumn++)
+				{
+					destroyCells.push_back(Cell(iNewRow, iColumn));					
+				}
+			}
+		}
+	}
+
+	if (bIsValidMove)
+	{
+		int iRow, iColumn;
+		
+		// translate row or column
+		if (iSelectedRow >= 0)
+		{
+			int tempList[_BOARD_MAX_COLUMN_NUMBER_];
+			for(iColumn =0; iColumn < m_iColumnNumber; iColumn++)
+				tempList[iColumn] = m_BoardValueMatrix[iSelectedRow][iColumn];
+			for(iColumn =0; iColumn < m_iColumnNumber; iColumn++)
+				m_BoardValueMatrix[iSelectedRow][(iColumn+iDeltaColumn+m_iColumnNumber) % m_iColumnNumber] = tempList[iColumn];
+		}
+		else
+		{
+			int tempList[_BOARD_MAX_ROW_NUMBER_];
+			for(iRow =0; iRow < m_iRowNumber; iRow++)
+				tempList[iRow] = m_BoardValueMatrix[iRow][iSelectedColumn];
+			for(iRow =0; iRow < m_iRowNumber; iRow++)
+				m_BoardValueMatrix[ (iRow + iDeltaRow+m_iRowNumber) % m_iRowNumber][iSelectedColumn] = tempList[iRow];				
+		}
+
+		// remove cells
+		for(auto cell : destroyCells)
+			m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn] = -1;
+
+		// calculate move cells
+		for(iRow = 1; iRow < m_iRowNumber; iRow++)
+			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+			{
+				if (m_BoardValueMatrix[iRow][iColumn] >= 0 &&  m_BoardValueMatrix[iRow-1][iColumn] < 0)
+				{
+					originalMovedCells.push_back(Cell(iRow, iColumn));
+					int iNewRow = iRow-1;
+					while (iNewRow >=0 && m_BoardValueMatrix[iNewRow][iColumn] < 0)
+						iNewRow--;
+					iNewRow++;
+
+					m_BoardValueMatrix[iNewRow][iColumn] = m_BoardValueMatrix[iRow][iColumn];
+					m_BoardValueMatrix[iRow][iColumn] = -1;
+					targetMovedCells.push_back(Cell(iNewRow, iColumn));
+				}				
+			}
+
+		// generate new gems
+		for(iRow = 0; iRow < m_iRowNumber; iRow++)
+			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+				if (m_BoardValueMatrix[iRow][iColumn] < 0)
+				{
+					m_BoardValueMatrix[iRow][iColumn] = rand() % _MAX_GEM_ID_;
+					newCells.push_back(Cell(iRow, iColumn));
+				}
+	}	
+
+	return bIsValidMove;
+}
+*/
+
+bool GameBoardManager::RecheckAfterMove(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
+										std::vector<Cell>& destroyCells,
+		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells)
+{
+	int iRow, iColumn, iGemID;
+	int iSameValueCellCount;
+	bool bIsValidMove = false;
+
+	// temporary list		
+	for(iRow = 0; iRow < m_iRowNumber; iRow++)
+	{
+		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+		{
+			m_CheckedHorizotalMatrix[iRow][iColumn] = false;
+			m_CheckedVerticalMatrix[iRow][iColumn] = false;
+
+			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell)
+			{
+				if (iRow == iSelectedRow)
+				{	
+					//int iBlankCellCount = 0; //blank cell on the move
+					int iTranslationCell = 0;
+					int iSign = 1;
+
+					if (iDeltaColumn != 0)
+					{
+						iSign = iDeltaColumn/abs(iDeltaColumn);
+						iTranslationCell = 0;
+						for(int iStep=1; iStep<= abs(iDeltaColumn); iStep++)
+						{
+							iTranslationCell += iSign;
+							if (m_BoardValueMatrix[iRow][(iColumn + iTranslationCell + m_iColumnNumber)%m_iColumnNumber].m_bIsBlankCell)
+								iStep--;
+						}
+					
+						/*while (m_BoardValueMatrix[iRow][(iColumn + iDeltaColumn + m_iColumnNumber + iCheck)%m_iColumnNumber].m_bIsBlankCell)
+						{
+							iCheck += iStep;
+						}*/
+					}
+
+					m_TemporaryValueMatrix[iRow][(iColumn + m_iColumnNumber + iTranslationCell)%m_iColumnNumber] = m_BoardValueMatrix[iRow][iColumn];
+				}
+				else if (iColumn == iSelectedColumn)
+				{
+					//int iBlankCellCount = 0; //blank cell on the move
+					int iTranslationCell = 0;
+					int iSign = 1;
+					if (iDeltaRow != 0)
+					{
+						iSign = iDeltaRow/abs(iDeltaRow);									
+						iTranslationCell = 0;
+						for(int iStep=1; iStep<= abs(iDeltaRow); iStep++)
+						{
+							iTranslationCell += iSign;
+							if (m_BoardValueMatrix[(iRow + iTranslationCell + m_iRowNumber) % m_iRowNumber][iColumn].m_bIsBlankCell)
+								iStep--;
+						}
+
+						//while (m_BoardValueMatrix[(iRow + iDeltaRow + m_iRowNumber + iCheck) % m_iRowNumber][iColumn].m_bIsBlankCell)
+							//iCheck += iStep;
+					}
+
+					m_TemporaryValueMatrix[(iRow + m_iRowNumber + iTranslationCell) % m_iRowNumber][iColumn] = m_BoardValueMatrix[iRow][iColumn];
+				}
+				else
+					m_TemporaryValueMatrix[iRow][iColumn] = m_BoardValueMatrix[iRow][iColumn];
+			}
+			else{ //blank cell
+				m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
+				m_TemporaryValueMatrix[iRow][iColumn].m_iGemID = -1;
+			}
+		}
+	}
+
+	//std::vector<Cell> destroyHorizontalCells;
+
+	// check horizontal
+	for(iRow=0; iRow < m_iRowNumber; iRow++)
+		for(iColumn=0; iColumn < m_iColumnNumber; iColumn++)
+		{	
+			if (m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell
+				|| m_CheckedHorizotalMatrix[iRow][iColumn])
+				continue;
+			/*
+			bool bAlreadyInDestroyedList = false;
+			for(auto cell: destroyHorizontalCells)
+				if (cell.m_iRow == iRow && cell.m_iColumn == iColumn)
+				{
+					bAlreadyInDestroyedList = true;
+					break;
+				}
+			if (bAlreadyInDestroyedList)
+				continue;
+			*/
+			m_CheckedHorizotalMatrix[iRow][iColumn] = true;
+
+			iSameValueCellCount = 1;
+			iGemID =  m_TemporaryValueMatrix[iRow][iColumn].m_iGemID;			
+			/*int iRowBelow = iRow - 1;
+			while (iRowBelow >=0 && m_TemporaryValueMatrix[iRowBelow][iColumn].m_iGemID == iGemID)
+			{
+				iSameValueCellCount++;
+				iRowBelow--;
+			}
+			*/
+
+			int iRowAbove = iRow + 1;
+			while (iRowAbove < m_iRowNumber && m_TemporaryValueMatrix[iRowAbove][iColumn].m_iGemID == iGemID)
+			{
+				m_CheckedHorizotalMatrix[iRowAbove][iColumn] = true;
+
+				iSameValueCellCount++;
+				iRowAbove++;				
+			}
+
+			if (iSameValueCellCount >= 3)
+			{
+				bIsValidMove = true;
+				// calculate destroyed cells
+				destroyCells.push_back(Cell(iRow, iColumn));				
+				//destroyHorizontalCells.push_back(Cell(iRow, iColumn));		
+
+				if (iRow== 4 || iColumn == 4)
+					CCLOG("Check h cell null: %d, %d", iRow, iColumn);
+
+				/*for(int iRowIndex = iRow - 1; iRowIndex >iRowBelow; iRowIndex--)
+				{
+					destroyCells.push_back(Cell(iRowIndex, iColumn));
+					destroyHorizontalCells.push_back(Cell(iRowIndex, iColumn));	
+
+					if (iRowIndex== 4 || iColumn == 4)
+						CCLOG("Check h cell null -1: %d, %d", iRowIndex, iColumn);
+				}*/
+
+				for(int iRowIndex = iRow + 1; iRowIndex < iRowAbove; iRowIndex++)
+				{
+					destroyCells.push_back(Cell(iRowIndex, iColumn));
+					//destroyHorizontalCells.push_back(Cell(iRowIndex, iColumn));
+
+					if (iRowIndex== 4 || iColumn == 4)
+						CCLOG("Check h cell null + 1: %d, %d", iRowIndex, iColumn);
+				}				
+			}
+		}
+
+	// check verical
+	//std::vector<Cell> destroyVericalCells;
+
+	for(iRow=0; iRow < m_iRowNumber; iRow++)
+		for(iColumn=0; iColumn < m_iColumnNumber; iColumn++)
+		{		
+			if (m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell
+				|| m_CheckedVerticalMatrix[iRow][iColumn])
+				continue;
+
+			/*bool bAlreadyInDestroyedList = false;
+			for(auto cell: destroyVericalCells)
+				if (cell.m_iRow == iRow && cell.m_iColumn == iColumn)
+				{
+					bAlreadyInDestroyedList = true;
+					break;
+				}
+			if (bAlreadyInDestroyedList)
+				continue;
+			*/
+
+			m_CheckedVerticalMatrix[iRow][iColumn] = true;
+
+			iSameValueCellCount = 1;
+			iGemID =  m_TemporaryValueMatrix[iRow][iColumn].m_iGemID;			
+			/*int iColumnLeft = iColumn - 1;
+			while (iColumnLeft >=0 && m_TemporaryValueMatrix[iRow][iColumnLeft].m_iGemID == iGemID)
+			{
+				iSameValueCellCount++;
+				iColumnLeft--;
+			}*/
+
+			int iColumnRight = iColumn + 1;
+			while (iColumnRight < m_iColumnNumber && m_TemporaryValueMatrix[iRow][iColumnRight].m_iGemID == iGemID)
+			{
+				m_CheckedVerticalMatrix[iRow][iColumnRight] = true;
+
+				iSameValueCellCount++;
+				iColumnRight++;
+			}
+
+			if (iSameValueCellCount >= 3)
+			{
+				bIsValidMove = true;
+
+				// calculate destroyed cells
+				destroyCells.push_back(Cell(iRow, iColumn));
+				//destroyVericalCells.push_back(Cell(iRow, iColumn));
+
+				if (iRow== 4 || iColumn == 4)
+					CCLOG("Check v cell null: %d, %d", iRow, iColumn);
+
+				/*for(int iColumnIndex= iColumn- 1; iColumnIndex >iColumnLeft; iColumnIndex--)
+				{
+					destroyCells.push_back(Cell(iRow, iColumnIndex));
+					destroyVericalCells.push_back(Cell(iRow, iColumnIndex));
+
+					if (iRow== 4 || iColumnIndex == 4)
+						CCLOG("Check v cell null -1: %d, %d", iRow, iColumnIndex);
+				}
+				*/
+
+				for(int iColumnIndex= iColumn+ 1; iColumnIndex <iColumnRight; iColumnIndex++)
+				{
+					destroyCells.push_back(Cell(iRow, iColumnIndex));					
+					//destroyVericalCells.push_back(Cell(iRow, iColumnIndex));
+
+					if (iRow== 4 || iColumnIndex == 4)
+						CCLOG("Check v cell null +1: %d, %d", iRow, iColumnIndex);
+				}
+			}
+		}
+
+
+	if (bIsValidMove)
+	{
+		// for test
+		CountBasicCombo();
+
+
+
+		int iRow, iColumn;
+
+		if (iSelectedRow >= 0 || iSelectedColumn >= 0)
+			for(iRow = 0; iRow < m_iRowNumber; iRow++)
+				for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+					m_BoardValueMatrix[iRow][iColumn] = m_TemporaryValueMatrix[iRow][iColumn];
+				
+		// remove cells
+		std::vector<Cell> filterDestroyedCell; //destroyCells list may duplicate!
+		for(auto cell : destroyCells)
+		{
+			if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID >= 0)
+			{
+				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID = -1;
+				filterDestroyedCell.push_back(cell);
+			}
+		}
+		destroyCells = filterDestroyedCell;
+
+		// calculate move cells
+		for(iRow = 1; iRow < m_iRowNumber; iRow++)
+			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+			{
+				/* if (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 &&  m_BoardValueMatrix[iRow-1][iColumn].m_iGemID < 0
+					&& !m_BoardValueMatrix[iRow-1][iColumn].m_bIsBlankCell)
+				{
+					originalMovedCells.push_back(Cell(iRow, iColumn));
+					int iNewRow = iRow-1;
+					while (iNewRow >=0 && m_BoardValueMatrix[iNewRow][iColumn].m_iGemID < 0 &&  !m_BoardValueMatrix[iNewRow][iColumn].m_bIsBlankCell)
+						iNewRow--;
+					iNewRow++;
+
+					m_BoardValueMatrix[iNewRow][iColumn].m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
+					targetMovedCells.push_back(Cell(iNewRow, iColumn));
+				}*/
+				
+				if (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0)
+				{
+					// find destroyed cell below
+					bool bFoundDestroyedCell = false;
+					int iFindRowIndex = iRow -1;
+					int iCheckRowIndex = -1;
+					while (iFindRowIndex >= 0 && (( m_BoardValueMatrix[iFindRowIndex][iColumn].m_iGemID < 0 && !m_BoardValueMatrix[iFindRowIndex][iColumn].m_bIsBlankCell)
+						|| m_BoardValueMatrix[iFindRowIndex][iColumn].m_bIsBlankCell))
+					{
+						if ( m_BoardValueMatrix[iFindRowIndex][iColumn].m_iGemID < 0 && !m_BoardValueMatrix[iFindRowIndex][iColumn].m_bIsBlankCell)
+						{
+							bFoundDestroyedCell = true;
+							iCheckRowIndex = iFindRowIndex;
+						}
+						
+						iFindRowIndex--;
+					}
+
+					if (bFoundDestroyedCell)
+					{
+						originalMovedCells.push_back(Cell(iRow, iColumn));						
+
+						m_BoardValueMatrix[iCheckRowIndex][iColumn].m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
+						m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
+						targetMovedCells.push_back(Cell(iCheckRowIndex, iColumn));
+					}
+				}
+			}
+
+		// generate new gems
+		for(iRow = 0; iRow < m_iRowNumber; iRow++)
+			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+				if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
+				{
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % _MAX_GEM_ID_;
+					newCells.push_back(Cell(iRow, iColumn));
+				}
+	}	
+
+	return bIsValidMove;	
+}
+
+bool GameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
+		std::vector<Cell>& destroyCells, std::vector<ComboEffectCell>& activatedComboEffectCells, std::vector<Cell>& destroyedByEffectCells,
+		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells,
+		std::vector<ComboEffectCell>& newComboCells)
+{	
+	int iRow, iColumn, iGemID;
+	int iSameValueCellCount;
+	// bool bIsValidMove = false;
+
+	// temporary list		
+	for(iRow = 0; iRow < m_iRowNumber; iRow++)
+	{
+		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+		{
+			m_CheckedHorizotalMatrix[iRow][iColumn] = false;
+			m_CheckedVerticalMatrix[iRow][iColumn] = false;
+			m_FlagDestroyedMatrix[iRow][iColumn] = false;
+
+			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell)
+			{
+				if (iRow == iSelectedRow)
+				{	
+					//int iBlankCellCount = 0; //blank cell on the move
+					int iTranslationCell = 0;
+					int iSign = 1;
+
+					if (iDeltaColumn != 0)
+					{
+						iSign = iDeltaColumn/abs(iDeltaColumn);
+						iTranslationCell = 0;
+						for(int iStep=1; iStep<= abs(iDeltaColumn); iStep++)
+						{
+							iTranslationCell += iSign;
+							if (m_BoardValueMatrix[iRow][(iColumn + iTranslationCell + m_iColumnNumber)%m_iColumnNumber].m_bIsBlankCell)
+								iStep--;
+						}
+					
+					}
+
+					m_TemporaryValueMatrix[iRow][(iColumn + m_iColumnNumber + iTranslationCell)%m_iColumnNumber] = m_BoardValueMatrix[iRow][iColumn];
+				}
+				else if (iColumn == iSelectedColumn)
+				{
+					//int iBlankCellCount = 0; //blank cell on the move
+					int iTranslationCell = 0;
+					int iSign = 1;
+					if (iDeltaRow != 0)
+					{
+						iSign = iDeltaRow/abs(iDeltaRow);									
+						iTranslationCell = 0;
+						for(int iStep=1; iStep<= abs(iDeltaRow); iStep++)
+						{
+							iTranslationCell += iSign;
+							if (m_BoardValueMatrix[(iRow + iTranslationCell + m_iRowNumber) % m_iRowNumber][iColumn].m_bIsBlankCell)
+								iStep--;
+						}						
+					}
+
+					m_TemporaryValueMatrix[(iRow + m_iRowNumber + iTranslationCell) % m_iRowNumber][iColumn] = m_BoardValueMatrix[iRow][iColumn];
+				}
+				else
+					m_TemporaryValueMatrix[iRow][iColumn] = m_BoardValueMatrix[iRow][iColumn];
+			}
+			else{ //blank cell
+				m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
+				m_TemporaryValueMatrix[iRow][iColumn].m_iGemID = -1;
+			}
+		}
+	}
+
+	for(int i=0; i< _MAX_LINKED_BLOCK_COUNT_; i++)
+	{
+		m_LinkedBlockList[i].m_iCellCount = 0;
+	}	
+
+	bool bIsNewBlockCreated;
+	Cell currentCheckCell;
+	m_iLinkedBlockCount = 0;
+
+	for(iRow=0; iRow < m_iRowNumber; iRow++)
+	{
+		for(iColumn=0; iColumn < m_iColumnNumber; iColumn++)
+		{
+			if (!m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell) //not blank cell
+			{
+				currentCheckCell.m_iRow = iRow;
+				currentCheckCell.m_iColumn = iColumn;
+				bIsNewBlockCreated = true;
+				int iCurrentDestroyedCellIndex = destroyCells.size();
+				//bool bStopBlockLoop;
+
+				while (1)
+				{				
+					//bStopBlockLoop = true;
+					iGemID =  m_TemporaryValueMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn].m_iGemID;			
+
+					// horizontal check
+					if( !m_CheckedHorizotalMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn])
+					{				
+						m_CheckedHorizotalMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn] = true;
+						iSameValueCellCount = 1;						
+			
+						int iRowBelow = currentCheckCell.m_iRow - 1;
+						while (iRowBelow >=0 && m_TemporaryValueMatrix[iRowBelow][currentCheckCell.m_iColumn].m_iGemID == iGemID)
+						{
+							m_CheckedHorizotalMatrix[iRowBelow][currentCheckCell.m_iColumn] = true;
+
+							iSameValueCellCount++;
+							iRowBelow--;				
+						}
+
+						int iRowAbove = currentCheckCell.m_iRow + 1;
+						while (iRowAbove < m_iRowNumber && m_TemporaryValueMatrix[iRowAbove][currentCheckCell.m_iColumn].m_iGemID == iGemID)
+						{
+							m_CheckedHorizotalMatrix[iRowAbove][currentCheckCell.m_iColumn] = true;
+
+							iSameValueCellCount++;
+							iRowAbove++;				
+						}
+
+						if (iSameValueCellCount >= 3)
+						{
+							if (bIsNewBlockCreated)
+							{
+								m_LinkedBlockList[m_iLinkedBlockCount].m_iStartIndexInDestroyedList = destroyCells.size();
+								m_LinkedBlockList[m_iLinkedBlockCount].m_iGemID = m_TemporaryValueMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn].m_iGemID;
+								m_iLinkedBlockCount++;
+								
+								bIsNewBlockCreated = false;								
+							
+								// add current cell to list only when new block is created
+								if (!m_FlagDestroyedMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn])
+								{
+									m_FlagDestroyedMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn] = true;
+
+									destroyCells.push_back(Cell(currentCheckCell.m_iRow, currentCheckCell.m_iColumn));				
+									m_LinkedBlockList[m_iLinkedBlockCount-1].m_iCellCount++;
+
+									iCurrentDestroyedCellIndex++;
+								}
+							}
+
+							for(int iRowIndex = currentCheckCell.m_iRow - 1; iRowIndex > iRowBelow; iRowIndex--)
+							{
+								if (!m_FlagDestroyedMatrix[iRowIndex][currentCheckCell.m_iColumn])
+								{
+									m_FlagDestroyedMatrix[iRowIndex][currentCheckCell.m_iColumn] = true;
+
+									destroyCells.push_back(Cell(iRowIndex, currentCheckCell.m_iColumn));
+									m_LinkedBlockList[m_iLinkedBlockCount-1].m_iCellCount++;
+								}
+							}				
+																	
+							for(int iRowIndex = currentCheckCell.m_iRow + 1; iRowIndex < iRowAbove; iRowIndex++)
+							{
+								if (!m_FlagDestroyedMatrix[iRowIndex][currentCheckCell.m_iColumn])
+								{
+									m_FlagDestroyedMatrix[iRowIndex][currentCheckCell.m_iColumn] = true;
+
+									destroyCells.push_back(Cell(iRowIndex, currentCheckCell.m_iColumn));
+									m_LinkedBlockList[m_iLinkedBlockCount-1].m_iCellCount++;
+								}
+							}				
+						}
+					} //end horizontal check
+
+					// vertical check					
+					if( !m_CheckedVerticalMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn])
+					{
+						m_CheckedVerticalMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn] = true;
+						iSameValueCellCount = 1;
+
+						int iColumnLeft = currentCheckCell.m_iColumn - 1;
+						while (iColumnLeft >=0 && m_TemporaryValueMatrix[currentCheckCell.m_iRow][iColumnLeft].m_iGemID == iGemID)
+						{
+							m_CheckedVerticalMatrix[currentCheckCell.m_iRow][iColumnLeft] = true;
+
+							iSameValueCellCount++;
+							iColumnLeft--;
+						}
+
+						int iColumnRight = currentCheckCell.m_iColumn + 1;
+						while (iColumnRight < m_iColumnNumber && m_TemporaryValueMatrix[currentCheckCell.m_iRow][iColumnRight].m_iGemID == iGemID)
+						{
+							m_CheckedVerticalMatrix[currentCheckCell.m_iRow][iColumnRight] = true;
+
+							iSameValueCellCount++;
+							iColumnRight++;
+						}
+
+						if (iSameValueCellCount >= 3)
+						{
+							if (bIsNewBlockCreated)
+							{
+								m_LinkedBlockList[m_iLinkedBlockCount].m_iStartIndexInDestroyedList = destroyCells.size();
+								m_LinkedBlockList[m_iLinkedBlockCount].m_iGemID = m_TemporaryValueMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn].m_iGemID;
+								m_iLinkedBlockCount++;
+								
+								bIsNewBlockCreated = false;								
+
+								// add current cell to list only when new block is created
+								if (!m_FlagDestroyedMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn])
+								{
+									m_FlagDestroyedMatrix[currentCheckCell.m_iRow][currentCheckCell.m_iColumn] = true;
+
+									destroyCells.push_back(Cell(currentCheckCell.m_iRow, currentCheckCell.m_iColumn));				
+									m_LinkedBlockList[m_iLinkedBlockCount-1].m_iCellCount++;
+
+									iCurrentDestroyedCellIndex++;
+								}
+							}
+
+							// calculate destroyed cells							
+							for(int iColumnIndex= currentCheckCell.m_iColumn- 1; iColumnIndex > iColumnLeft; iColumnIndex--)
+							{
+								if (!m_FlagDestroyedMatrix[currentCheckCell.m_iRow][ iColumnIndex])
+								{
+									destroyCells.push_back(Cell(currentCheckCell.m_iRow, iColumnIndex));	
+									m_LinkedBlockList[m_iLinkedBlockCount-1].m_iCellCount++;
+								}
+							}
+
+							for(int iColumnIndex= currentCheckCell.m_iColumn+ 1; iColumnIndex <iColumnRight; iColumnIndex++)
+							{
+								if (!m_FlagDestroyedMatrix[currentCheckCell.m_iRow][ iColumnIndex])
+								{
+									destroyCells.push_back(Cell(currentCheckCell.m_iRow, iColumnIndex));	
+									m_LinkedBlockList[m_iLinkedBlockCount-1].m_iCellCount++;
+								}
+							}
+						}
+					} //end vertical check			
+
+					if (iCurrentDestroyedCellIndex == destroyCells.size()) //no new cells added to list ==> stop
+					{
+						break;
+					}
+					else{
+						currentCheckCell = destroyCells[iCurrentDestroyedCellIndex];
+						iCurrentDestroyedCellIndex++;
+					}
+				}
+			}
+		}
+	}
+
+
+	if (m_iLinkedBlockCount > 0)
+	{			
+		for(int i=0; i<m_iLinkedBlockCount; i++)
+		{
+			if (m_LinkedBlockList[i].m_iCellCount >3)
+			{
+				if (m_LinkedBlockList[i].m_iCellCount == 4)
+				{
+					m_ComboCountList[0]++;
+					m_LinkedBlockList[i].m_eGemComboType = _GCT_COMBO4_;
+				}
+				else if (m_LinkedBlockList[i].m_iCellCount >= 6)
+				{
+					m_ComboCountList[2]++;
+					m_LinkedBlockList[i].m_eGemComboType = _GCT_COMBO6_;					
+				}
+				else //5 cell in block
+				{
+					if (
+						(destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList].m_iRow == destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+1].m_iRow &&
+						destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+1].m_iRow == destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+2].m_iRow &&
+						destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+2].m_iRow == destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+3].m_iRow &&
+						destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+3].m_iRow == destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+4].m_iRow)
+						||
+						(destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList].m_iColumn == destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+1].m_iColumn &&
+						destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+1].m_iColumn == destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+2].m_iColumn &&
+						destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+2].m_iColumn == destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+3].m_iColumn &&
+						destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+3].m_iColumn == destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList+4].m_iColumn))
+					{
+						m_ComboCountList[1]++;
+						m_LinkedBlockList[i].m_eGemComboType = _GCT_COMBO5_;
+					}
+					else
+					{
+						m_ComboCountList[2]++;
+						m_LinkedBlockList[i].m_eGemComboType = _GCT_COMBO6_;
+					}
+				}			
+			}
+			else
+				m_LinkedBlockList[i].m_eGemComboType = _GCT_NONE_;
+		}
+		
+
+		// for test
+		//CountBasicCombo();
+
+		int iRow, iColumn;
+
+		if (iSelectedRow >= 0 || iSelectedColumn >= 0)
+			for(iRow = 0; iRow < m_iRowNumber; iRow++)
+				for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+					m_BoardValueMatrix[iRow][iColumn] = m_TemporaryValueMatrix[iRow][iColumn];
+				
+		// remove cells
+		std::vector<Cell> filterDestroyedCell; //destroyCells list may duplicate!
+		for(auto cell : destroyCells)
+		{
+			if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID >= 0)
+			{
+				if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType > _GCT_NONE_)
+					activatedComboEffectCells.push_back(ComboEffectCell(cell, m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType));
+
+				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID = -1;
+				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType = _GCT_NONE_;
+				filterDestroyedCell.push_back(cell);
+			}
+		}
+		destroyCells = filterDestroyedCell;
+
+		// active combo effect ==> destroy some cell!
+		// testing combo4 effect
+		for(auto cell : activatedComboEffectCells)
+		{
+			for(int iRow = cell.m_iRow-1; iRow <= cell.m_iRow+1; iRow++)
+				for(int iColumn = cell.m_iColumn-1; iColumn <= cell.m_iColumn+1; iColumn++)
+				{			
+					if (iRow >= 0 && iRow < m_iRowNumber && iColumn >=0 && iColumn < m_iColumnNumber &&
+						m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0)
+					{
+						m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
+						m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+
+						destroyedByEffectCells.push_back(Cell(iRow, iColumn));
+					}
+				}
+		}
+
+		// create new combo cells
+		for(int i=0; i< m_iLinkedBlockCount; i++)
+			if (m_LinkedBlockList[i].m_iCellCount > 3)
+			{
+				bool bFoundCellOnActiveDragLine = false;
+				Cell comboCell;
+				// find position to place combo cell
+				if (iSelectedRow >=0 || iSelectedColumn >=0)
+				{
+					for(int j=0; j< m_LinkedBlockList[i].m_iCellCount; j++)
+						if ( destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList + j].m_iRow == iSelectedRow
+							|| destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList + j].m_iColumn == iSelectedColumn)
+						{
+							bFoundCellOnActiveDragLine = true;
+							comboCell = destroyCells[m_LinkedBlockList[i].m_iStartIndexInDestroyedList + j];
+							break;
+						}
+				}
+				if (!bFoundCellOnActiveDragLine)
+				{
+					int iRandomIndex = (rand() % m_LinkedBlockList[i].m_iCellCount) + m_LinkedBlockList[i].m_iStartIndexInDestroyedList; 
+					comboCell = destroyCells[iRandomIndex];
+				}
+				
+				m_BoardValueMatrix[comboCell.m_iRow][comboCell.m_iColumn].m_iGemID = m_LinkedBlockList[i].m_iGemID;
+				m_BoardValueMatrix[comboCell.m_iRow][comboCell.m_iColumn].m_eGemComboType = m_LinkedBlockList[i].m_eGemComboType;
+
+				newComboCells.push_back(ComboEffectCell(comboCell, m_LinkedBlockList[i].m_eGemComboType, m_LinkedBlockList[i].m_iGemID) );
+			}
+
+		// calculate move cells
+		for(iRow = 1; iRow < m_iRowNumber; iRow++)
+			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+			{
+				/* if (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 &&  m_BoardValueMatrix[iRow-1][iColumn].m_iGemID < 0
+					&& !m_BoardValueMatrix[iRow-1][iColumn].m_bIsBlankCell)
+				{
+					originalMovedCells.push_back(Cell(iRow, iColumn));
+					int iNewRow = iRow-1;
+					while (iNewRow >=0 && m_BoardValueMatrix[iNewRow][iColumn].m_iGemID < 0 &&  !m_BoardValueMatrix[iNewRow][iColumn].m_bIsBlankCell)
+						iNewRow--;
+					iNewRow++;
+
+					m_BoardValueMatrix[iNewRow][iColumn].m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
+					targetMovedCells.push_back(Cell(iNewRow, iColumn));
+				}*/
+				
+				if (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0)
+				{
+					// find destroyed cell below
+					bool bFoundDestroyedCell = false;
+					int iFindRowIndex = iRow -1;
+					int iCheckRowIndex = -1;
+					while (iFindRowIndex >= 0 && (( m_BoardValueMatrix[iFindRowIndex][iColumn].m_iGemID < 0 && !m_BoardValueMatrix[iFindRowIndex][iColumn].m_bIsBlankCell)
+						|| m_BoardValueMatrix[iFindRowIndex][iColumn].m_bIsBlankCell))
+					{
+						if ( m_BoardValueMatrix[iFindRowIndex][iColumn].m_iGemID < 0 && !m_BoardValueMatrix[iFindRowIndex][iColumn].m_bIsBlankCell)
+						{
+							bFoundDestroyedCell = true;
+							iCheckRowIndex = iFindRowIndex;
+						}
+						
+						iFindRowIndex--;
+					}
+
+					if (bFoundDestroyedCell)
+					{
+						originalMovedCells.push_back(Cell(iRow, iColumn));						
+
+						m_BoardValueMatrix[iCheckRowIndex][iColumn] = m_BoardValueMatrix[iRow][iColumn];
+						m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
+						m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+						targetMovedCells.push_back(Cell(iCheckRowIndex, iColumn));
+					}
+				}
+			}
+
+		// generate new gems
+		for(iRow = 0; iRow < m_iRowNumber; iRow++)
+			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+				if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
+				{
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % _MAX_GEM_ID_;
+					newCells.push_back(Cell(iRow, iColumn));
+				}
+	}	
+
+	return (m_iLinkedBlockCount > 0);	
+}
+
+
+#include <istream>>
+#include <streambuf>
+
+struct membuf : std::streambuf
+{
+    membuf(char* begin, char* end) {
+        this->setg(begin, begin, end);
+	}
+};
+
+void GameBoardManager::LoadBasicComboPatternList()
+{
+	unsigned long iDataSize;
+	unsigned char* orginalData = cocos2d::CCFileUtils::sharedFileUtils()->getFileData("ComboBasicPattern.txt", "r", &iDataSize);
+	char* data = new char[iDataSize];
+	memcpy(data, orginalData, iDataSize);
+	membuf dataBuf(data, data + iDataSize);
+	std::istream inputStream(&dataBuf);
+
+	m_iBasicComboPatternCount = 0;
+	
+	int iRow, iColumn;
+	for(int iTypeID = 0; iTypeID <_COMBO_TYPE_COUNT_; iTypeID++)
+	{
+		int iCount;
+		//pattern count
+		inputStream >> iCount;
+
+		for(int iPatternIndex = m_iBasicComboPatternCount; iPatternIndex < m_iBasicComboPatternCount+iCount; iPatternIndex++)
+		{
+			m_BasicComboPatternList[iPatternIndex].m_iTypeID = iTypeID;
+			inputStream >> m_BasicComboPatternList[iPatternIndex].m_iRowNumber;
+			inputStream >> m_BasicComboPatternList[iPatternIndex].m_iColumnNumber;
+			
+			for(iRow = 0; iRow < m_BasicComboPatternList[iPatternIndex].m_iRowNumber; iRow++)
+				for(iColumn = 0; iColumn < m_BasicComboPatternList[iPatternIndex].m_iColumnNumber; iColumn++)
+				{
+					inputStream >>  m_BasicComboPatternList[iPatternIndex].m_Pattern[iRow][iColumn];
+				}
+		}
+
+		m_iBasicComboPatternCount += iCount;
+	}
+}
+
+void GameBoardManager::CountBasicCombo()
+{
+	int iRow, iColumn, iPatternIndex, iCheckingGemID, iCheckRow, iCheckColumn;
+	for(iRow = 0; iRow < m_iRowNumber; iRow++)
+		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+			for(iPatternIndex = 0; iPatternIndex < m_iBasicComboPatternCount; iPatternIndex++)
+		{
+			if (iRow + m_BasicComboPatternList[iPatternIndex].m_iRowNumber < m_iRowNumber
+				&& iColumn + m_BasicComboPatternList[iPatternIndex].m_iColumnNumber < m_iColumnNumber)
+			{
+				iCheckingGemID = -1;
+				BasicComboPattern& pattern = m_BasicComboPatternList[iPatternIndex];
+				bool bIsPatternMissMatch = false;
+
+				for(iCheckRow=0; iCheckRow < pattern.m_iRowNumber; iCheckRow++)
+					for(iCheckColumn=0; iCheckColumn < pattern.m_iColumnNumber; iCheckColumn++)
+					{
+						if (pattern.m_Pattern[iCheckRow][iCheckColumn] != 0)
+						{
+							if (m_TemporaryValueMatrix[iRow + iCheckRow][iColumn + iCheckColumn].m_bIsBlankCell)//miss-match		
+							{
+								bIsPatternMissMatch = true;
+							}
+							else
+							{
+								if (iCheckingGemID < 0)
+									iCheckingGemID = m_TemporaryValueMatrix[iRow + iCheckRow][iColumn + iCheckColumn].m_iGemID;
+								else if (iCheckingGemID != m_TemporaryValueMatrix[iRow + iCheckRow][iColumn + iCheckColumn].m_iGemID) //miss-match
+								{
+									bIsPatternMissMatch  = true;
+								}
+							}
+						}
+
+						if (bIsPatternMissMatch) //exit checking this pattern
+						{
+							iCheckRow = pattern.m_iRowNumber;
+							iCheckColumn = pattern.m_iColumnNumber;
+						}
+					}
+
+					if (!bIsPatternMissMatch)
+					{
+						m_ComboCountList[pattern.m_iTypeID]++;
+					}
+			}
+		}
+
+}
