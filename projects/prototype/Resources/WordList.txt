@@ -1,0 +1,41 @@
+10
+ACCUSE
+Buộc tội
+accuse.wav
+abc.wav
+INFLATION
+Sự lạm phát
+inflation.wav
+abc.wav
+AGRICULTURE
+Nông nghiệp
+agriculture.wav
+abc.wav
+PROTEST
+Sự phản đối
+protest.wav
+abc.wav
+ASTRONAUT
+Phi hành gia
+astronaut.wav
+abc.wav
+LEAK
+Lỗ thủng
+leak.wav
+abc.wav
+JUSTICE
+Sự công bằng
+justice.wav
+abc.wav
+HIJACK
+Vụ không tặc
+hijack.wav
+abc.wav
+SYMPATHY
+Sự thông cảm
+sympathy.wav
+abc.wav
+SUSPEND
+Đình chỉ
+suspend.wav
+abc.wav

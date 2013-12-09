@@ -114,7 +114,7 @@ void MainMenuLayer::menuItemSelected(CCObject* pSender)
     //HelloWorld *pGameLayer = HelloWorld::create();
 	//pGameLayer->initLevel(iLevel);
 	//pGameScene->addChild(pGameLayer);
-	CCDirector::sharedDirector()->replaceScene(pGameScene);
+	CCDirector::getInstance()->replaceScene(pGameScene);
 		
 }
 

@@ -2,7 +2,8 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
-#include "GameBoardManager.h"
+//#include "GameBoardManager.h"
+#include "NewGameBoardManager.h"
 #include "WordCollectBoardRenderNode.h"
 #include "ComboCountRenderNode.h"
 
@@ -60,6 +61,11 @@ protected:
 
 	void PlayEffect(std::vector<Cell>& destroyCells, std::vector<ComboEffectCell>& comboEffectCells, std::vector<Cell>& destroyedByEffectCells, std::vector<Cell>& originalMovedCells,
 		std::vector<Cell>& targetMovedCells,	std::vector<Cell>& newCells, std::vector<ComboEffectCell>& newComboCells);
+
+	void PlayEffect2(std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
+		std::vector<ComboEffectBundle*>& comboChainList,std::vector<ComboEffectCell>& newComboCells,
+		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<Cell>& newCells);
 	
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();
@@ -69,6 +75,10 @@ protected:
 
 	void HorizontalMoveUlti(float fDeltaX);
 	void VerticalMoveUlti(float fDeltaY);
+
+	void ActivateImageEffect(Node* pSender);
+
+	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float& fEffectDuration);
 private:
 	float m_fBoardLeftPosition, m_fBoardBottomPosition;
 	float m_fBoardLeftClipPosition, m_fBoardBottomClipPosition;
@@ -86,7 +96,7 @@ private:
 	CellView m_MovingCellMirrorList[_BOARD_MAX_LENGTH_];
 	int m_iMovingCellListLength;//this should be number of row or column
 
-	GameBoardManager m_GameBoardManager;
+	NewGameBoardManager m_GameBoardManager;
 	cocos2d::Size m_SymbolSize;
 
 	TouchMoveState m_eTouchMoveState;
@@ -103,7 +113,7 @@ private:
 	bool m_bIsCellDragPlaying;
 	TouchMoveState m_ePlayingDragEffect;
 
-	ComboCountRenderNode* m_pComboCountRenderNode;
+	ComboCountRenderNode* m_pComboCountRenderNode;	
 };
 
 #endif // __HELLOWORLD_SCENE_H__

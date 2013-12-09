@@ -39,6 +39,15 @@
     <ClCompile Include="..\Classes\ComboCountRenderNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\NewGameBoardManager.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GameWordManager.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\SoundManager.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -62,6 +71,18 @@
     <ClInclude Include="..\Classes\ComboCountRenderNode.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\NewGameBoardManager.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GameDataStructure.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GameWordManager.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\SoundManager.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">
@@ -70,6 +91,15 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Resources\ComboBasicPattern.txt">
+      <Filter>resource</Filter>
+    </Text>
+    <Text Include="..\Resources\WordList.txt">
+      <Filter>resource</Filter>
+    </Text>
+    <Text Include="..\Resources\WordList2.txt">
+      <Filter>resource</Filter>
+    </Text>
+    <Text Include="..\Resources\GameConfig.txt">
       <Filter>resource</Filter>
     </Text>
   </ItemGroup>

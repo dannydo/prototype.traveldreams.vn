@@ -19,7 +19,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     director->setOpenGLView(eglView);
 	
-	eglView->setDesignResolutionSize(500.f, 680.f, ResolutionPolicy::SHOW_ALL);
+	eglView->setDesignResolutionSize(640, 960.f, ResolutionPolicy::SHOW_ALL);
 
     // turn on display FPS
     director->setDisplayStats(true);
@@ -41,7 +41,8 @@ void AppDelegate::applicationDidEnterBackground() {
     Director::getInstance()->stopAnimation();
 
     // if you use SimpleAudioEngine, it must be pause
-    // SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
+	CocosDenshion::SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+     //SimpleAudioEngine::()->pauseBackgroundMusic();
 }
 
 // this function will be called when the app is active again
@@ -49,5 +50,6 @@ void AppDelegate::applicationWillEnterForeground() {
     Director::getInstance()->startAnimation();
 
     // if you use SimpleAudioEngine, it must resume here
-    // SimpleAudioEngine::sharedEngine()->resumeBackgroundMusic();
+	CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+     //SimpleAudioEngine::sharedEngine()->resumeBackgroundMusic();
 }

@@ -1,0 +1,22 @@
+;score of gem
+10
+;combo combine ratio
+1
+;combo effect ratio
+2
+3
+4
+2
+3
+4
+3
+4
+4
+;score main word
+50
+;ratio main word
+10
+;score sub word
+20
+;ratio sub word
+5

@@ -3,108 +3,7 @@
 
 #include <vector>
 
-#define _MAX_GEM_ID_	6
-#define _BOARD_MAX_ROW_NUMBER_	9
-#define _BOARD_MAX_COLUMN_NUMBER_	9
-#define _BOARD_MAX_LENGTH_	9 //max(row, column)
-#define	_BOARD_MAX_PATTERN_LENGTH_	5
-#define _COMBO_TYPE_COUNT_	3
-#define _MAX_LINKED_BLOCK_COUNT_	(_BOARD_MAX_ROW_NUMBER_*_BOARD_MAX_COLUMN_NUMBER_/4)
-
-enum GemComboType_e
-{
-	_GCT_NONE_,
-	_GCT_COMBO4_,
-	_GCT_COMBO5_,
-	_GCT_COMBO6_
-};
-
-struct Cell
-{
-	int m_iRow, m_iColumn;	
-	int m_iCharacter;
-			
-	Cell()
-	{
-		m_iRow = 0;
-		m_iColumn = 0;		
-	}
-
-	Cell (int iRow, int iColumn)
-	{
-		m_iRow = iRow;
-		m_iColumn = iColumn;		
-	}	
-
-	bool operator ==(const Cell &input)
-	{
-		return (m_iRow == input.m_iRow && m_iColumn == input.m_iColumn);
-	}
-
-	bool operator !=(const Cell &input)
-	{
-		return (m_iRow != input.m_iRow || m_iColumn != input.m_iColumn);
-	}
-};
-
-struct CellValue
-{
-public:
-	int m_iGemID;
-	bool m_bIsBlankCell;
-	GemComboType_e m_eGemComboType;
-	CellValue()
-	{
-		m_iGemID = -1;
-		m_bIsBlankCell = true;
-		m_eGemComboType = _GCT_NONE_;
-	}
-};
-
-struct BasicComboPattern
-{
-public:
-	int m_iTypeID;
-	int m_iRowNumber, m_iColumnNumber;
-	int m_Pattern[_BOARD_MAX_PATTERN_LENGTH_][_BOARD_MAX_PATTERN_LENGTH_];
-};
-
-struct LinkedBlockDescription
-{
-public:
-	int m_iCellCount;
-	int m_iStartIndexInDestroyedList;
-	int m_iGemID;
-	GemComboType_e m_eGemComboType;
-};
-
-struct ComboEffectCell : public Cell
-{
-public:
-	GemComboType_e m_eGemComboType;
-	int m_iGemID;
-
-	ComboEffectCell() : Cell(), m_eGemComboType(_GCT_NONE_)
-	{
-		m_iGemID = -1;
-	}
-
-	ComboEffectCell(Cell cell, GemComboType_e eGemComboType) : Cell(cell), m_eGemComboType(eGemComboType)
-	{
-		m_iGemID = -1;
-	}
-
-	ComboEffectCell(Cell cell, GemComboType_e eGemComboType, int iGemID) : Cell(cell), m_eGemComboType(eGemComboType), m_iGemID(iGemID)
-	{		
-	}
-};
-
-struct ActivatedComboInChain
-{
-public:
-	ComboEffectCell m_ComboEffectCell;
-	std::vector<Cell> m_DestroyCells;
-};
+#include "GameDataStructure.h"
 
 class GameBoardManager
 {
@@ -131,14 +30,18 @@ public:
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells, std::vector<ComboEffectCell>& newComboCells);
 
 	int GetComboCount(const int& iTypeID) { return m_ComboCountList[iTypeID];}
-private:
+protected:
+	void LoadGameConfig();
 	void LoadBasicComboPatternList();
 
 	void CountBasicCombo(); 
-private:
+protected:
+	GameConfig m_GameConfig;
+	LevelConfig m_LevelConfig;
+
 	int m_iRowNumber, m_iColumnNumber;
 	CellValue m_BoardValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
-	int m_iScore;
+	int m_iScore;// total score
 
 	// use this matrix to check board after move
 	CellValue m_TemporaryValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
@@ -151,9 +54,22 @@ private:
 
 	BasicComboPattern m_BasicComboPatternList[20];
 	int m_iBasicComboPatternCount;
+
+	// word manager
 	
 	// combo count based on type, just for test
 	int m_ComboCountList[_COMBO_TYPE_COUNT_];
+};
+
+
+#include <istream>>
+#include <streambuf>
+
+struct membuf : std::streambuf
+{
+    membuf(char* begin, char* end) {
+        this->setg(begin, begin, end);
+	}
 };
 
 #endif

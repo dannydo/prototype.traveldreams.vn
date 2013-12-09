@@ -3,8 +3,7 @@
 
 #include "cocos2d.h"
 #include "GameBoardManager.h"
-
-#define _WCBRN_WORD_LENGTH_	5
+#include "GameWordManager.h"
 
 using namespace cocos2d;
 
@@ -21,17 +20,29 @@ public:
 	void UpdateList();
 
 	void UnlockCharacter(int iCharacterID);
-	static std::string GetImageFileFromCharacterID(int iCharacterID);	
+	std::string GetImageFileFromCharacterID(char iCharacter);	
+	std::string GetImageFileFromCharacterID(int iCharacterID);	
 
 	int GetNextCharacterID();
+
+	bool onTouchBegan(Touch *pTouch, Event *pEvent) override;
 private:
-	void GenerateLabels();
-	int m_iNextCharacterID;
+	void LoadWords();
+	void GetWordIndex();
+
+	virtual bool init();	
+
+	void PlayVietnameseSpelling();
 private:	
 	//std::vector<CCLabelTTF*> m_LabelList;	
+	int m_iWordCount;	
+	Word m_WordList[_GDS_WORD_MAX_COUNT_];
 
-	Sprite* m_LabelList[_WCBRN_WORD_LENGTH_];
-	bool m_ActivedCharacterFlags[_WCBRN_WORD_LENGTH_];
+	int m_iWordIndex;
+	int m_iNextCharacterID;
+
+	Sprite* m_LabelList[_GDS_WORD_MAX_LENGTH_];
+	bool m_ActivedCharacterFlags[_GDS_WORD_MAX_LENGTH_];
 	SpriteBatchNode* m_pBatchNode;
 };
 

@@ -8,6 +8,9 @@ GameBoardManager::GameBoardManager()
 
 void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int iLevel)
 {
+	// Load game config
+	LoadGameConfig();
+
 	// Load basic combo list
 	LoadBasicComboPatternList();
 
@@ -525,6 +528,7 @@ bool GameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells,
 		std::vector<ComboEffectCell>& newComboCells)
 {	
+	
 	int iRow, iColumn, iGemID;
 	int iSameValueCellCount;
 	// bool bIsValidMove = false;
@@ -946,16 +950,51 @@ bool GameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn,
 	return (m_iLinkedBlockCount > 0);	
 }
 
-
-#include <istream>>
-#include <streambuf>
-
-struct membuf : std::streambuf
+void GameBoardManager::LoadGameConfig()
 {
-    membuf(char* begin, char* end) {
-        this->setg(begin, begin, end);
-	}
-};
+	unsigned long iDataSize;
+	unsigned char* orginalData = cocos2d::CCFileUtils::sharedFileUtils()->getFileData("GameConfig.txt", "r", &iDataSize);
+	char* data = new char[iDataSize];
+	memcpy(data, orginalData, iDataSize);
+	membuf dataBuf(data, data + iDataSize);
+	std::istream inputStream(&dataBuf);
+
+	std::string sComment;
+
+	// read score of gem
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iScoreOfGem;
+	std::getline( inputStream, sComment);
+
+	// read combo config
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iComboCombineRatio;
+	std::getline( inputStream, sComment);
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iCombEffectRatio4;
+	inputStream >> m_GameConfig.m_iCombEffectRatio5;
+	inputStream >> m_GameConfig.m_iCombEffectRatio6;
+	inputStream >> m_GameConfig.m_iCombEffectRatio4_4;
+	inputStream >> m_GameConfig.m_iCombEffectRatio4_5;
+	inputStream >> m_GameConfig.m_iCombEffectRatio4_6;
+	inputStream >> m_GameConfig.m_iCombEffectRatio5_5;
+	inputStream >> m_GameConfig.m_iCombEffectRatio5_6;
+	inputStream >> m_GameConfig.m_iCombEffectRatio6_6;
+	std::getline( inputStream, sComment);
+
+	// read word config
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iScoreOfMainWord;
+	std::getline( inputStream, sComment);
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iMainWordScoreRatio;
+	std::getline( inputStream, sComment);
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iScoreOfSubWord;
+	std::getline( inputStream, sComment);
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iSubWordScoreRatio;	
+}
 
 void GameBoardManager::LoadBasicComboPatternList()
 {

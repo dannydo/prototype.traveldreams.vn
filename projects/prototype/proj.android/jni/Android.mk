@@ -9,9 +9,11 @@ LOCAL_MODULE_FILENAME := libcocos2dcpp
 LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../Classes/AppDelegate.cpp \
 				   ../../Classes/GameBoardManager.cpp \
+				   ../../Classes/NewGameBoardManager.cpp \
 				   ../../Classes/WordCollectBoardRenderNode.cpp \
 				   ../../Classes/MainMenuScene.cpp \
 				   ../../Classes/ComboCountRenderNode.cpp \
+				   ../../Classes/SoundManager.cpp \
                    ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
