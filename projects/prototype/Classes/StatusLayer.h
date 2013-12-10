@@ -16,6 +16,7 @@ public:
 	void setCurrentScore(const int& iCurrentScore);
 	void setScoreForStar(const float& iScore1Star, const float& iScore2Star, const float& iScore3Star, const float& iMaxScoreLevel);
 	void setCurrentMove(const int& iCurrentMove);
+	void setSpeedUpdateScore(const int& iSpeedUpdateScore);
 
 private:
 	void loopUpdateScore();
@@ -44,7 +45,9 @@ private:
 	int m_iCurrentScore;
 	int m_iScoreOld;
 	int m_iCurrentMove;
+	int m_iDeltaUpdateScore;
 
+	float m_iSpeedUpdateScore;
 	float m_fRadiusCircle;
 	float m_iScore1Star;
 	float m_iScore2Star;

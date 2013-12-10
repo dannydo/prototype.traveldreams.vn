@@ -52,6 +52,8 @@ bool StatusLayer::init()
 	m_pStarYellow3->setVisible(false);
 	this->addChild(m_pStarYellow3);
 
+	m_iSpeedUpdateScore = 0.02;
+
 	return true;
 }
 
@@ -66,6 +68,7 @@ void StatusLayer::clippingNodeCircle()
     clipperMask->setStencil(m_pMarkCircle);
 	clipperMask->setContentSize(pYellowBar->getContentSize());
 	clipperMask->setPosition(Point(m_centerCircle.x, m_centerCircle.y + pYellowBar->getContentSize().height/2.0f));
+	m_pMarkCircle->setAnchorPoint(Point(0.5, 1));
     
 	this->addChild(clipperMask);
 }
@@ -80,7 +83,7 @@ void StatusLayer::updateScore()
 {
 	if (m_iCurrentScore != 0)
 	{
-		int bonus = _C_GEM_SCORE_;
+		int bonus = m_iDeltaUpdateScore;
 		m_iScoreOld = m_iScoreOld + bonus;
 		if (m_iScoreOld > m_iCurrentScore)
 		{
@@ -92,7 +95,6 @@ void StatusLayer::updateScore()
 
 		float angle = bonus/m_iMaxScoreLevel*180;
 		auto actionRotate = RotateBy::create(0.0f, angle);
-		m_pMarkCircle->setAnchorPoint(Point(0.5, 1));
 		m_pMarkCircle->runAction(actionRotate);
 
 		if (m_iScoreOld >= m_iScore1Star)
@@ -120,7 +122,7 @@ void StatusLayer::draw()
 void StatusLayer::sequenceUpdateScore()
 {
 	auto actionUpdateScore = CallFunc::create(this, callfunc_selector(StatusLayer::updateScore));
-	auto delay = DelayTime::create(0.05f);
+	auto delay = DelayTime::create(m_iSpeedUpdateScore);
 	auto actionLoopUpdateScore = CallFunc::create(this, callfunc_selector(StatusLayer::loopUpdateScore));
 	this->runAction(Sequence::create(actionUpdateScore, delay->clone(), actionLoopUpdateScore, NULL));
 }
@@ -135,6 +137,7 @@ void StatusLayer::loopUpdateScore()
 
 void StatusLayer::setCurrentScore(const int& iCurrentScore)
 {
+	m_iDeltaUpdateScore = (iCurrentScore - m_iCurrentScore)/10;
 	m_iCurrentScore = iCurrentScore;
 }
 
@@ -186,6 +189,11 @@ void StatusLayer::setCurrentMove(const int& iCurrentMove)
 	m_iCurrentMove = iCurrentMove;
 }
 
+void StatusLayer::setSpeedUpdateScore(const int& iSpeedUpdateScore)
+{
+	m_iSpeedUpdateScore = iSpeedUpdateScore;
+}
+
 std::vector<int> StatusLayer::generateArrayNumber(int iNumber)
 {
 	int iTemp = iNumber;
@@ -209,44 +217,13 @@ void StatusLayer::generateLayoutMove()
 	
 	while(!arrNumber.empty())
 	{
-		Sprite* sprite;
-		switch (arrNumber.back())
-		{
-			case 0:
-				sprite = Sprite::create("Score-Star/NumMoves/NumMoves_0.png");
-				break;
-			case 1:
-				sprite = Sprite::create("Score-Star/NumMoves/NumMoves_1.png");
-				break;
-			case 2:
-				sprite = Sprite::create("Score-Star/NumMoves/NumMoves_2.png");
-				break;
-			case 3:
-				sprite = Sprite::create("Score-Star/NumMoves/NumMoves_3.png");
-				break;
-			case 4:
-				sprite = Sprite::create("Score-Star/NumMoves/NumMoves_4.png");
-				break;
-			case 5:
-				sprite = Sprite::create("Score-Star/NumMoves/NumMoves_5.png");
-				break;
-			case 6:
-				sprite = Sprite::create("Score-Star/NumMoves/NumMoves_6.png");
-				break;
-			case 7:
-				sprite = Sprite::create("Score-Star/NumMoves/NumMoves_7.png");
-				break;
-			case 8:
-				sprite = Sprite::create("Score-Star/NumMoves/NumMoves_8.png");
-				break;
-			case 9:
-				sprite = Sprite::create("Score-Star/NumMoves/NumMoves_9.png");
-				break;
-		}
+		char sFileName[35];
+		sprintf(sFileName, "Score-Star/NumMoves/NumMoves_%d.png", arrNumber.back());
+		Sprite* sprite = Sprite::create(sFileName);
 		
 		height = sprite->getContentSize().height;
 		sprite->setPosition(Point(width, height/2.0f));
-		width = width + sprite->getContentSize().width - 3;
+		width = width + sprite->getContentSize().width - 5;
 		node->addChild(sprite);
 		arrNumber.pop_back();
 	}
@@ -268,44 +245,13 @@ void StatusLayer::generateLayoutScore(int iScore)
 	
 	while(!arrNumber.empty())
 	{
-		Sprite* sprite;
-		switch (arrNumber.back())
-		{
-			case 0:
-				sprite = Sprite::create("Score-Star/NumScore/NumScore_0.png");
-				break;
-			case 1:
-				sprite = Sprite::create("Score-Star/NumScore/NumScore_1.png");
-				break;
-			case 2:
-				sprite = Sprite::create("Score-Star/NumScore/NumScore_2.png");
-				break;
-			case 3:
-				sprite = Sprite::create("Score-Star/NumScore/NumScore_3.png");
-				break;
-			case 4:
-				sprite = Sprite::create("Score-Star/NumScore/NumScore_4.png");
-				break;
-			case 5:
-				sprite = Sprite::create("Score-Star/NumScore/NumScore_5.png");
-				break;
-			case 6:
-				sprite = Sprite::create("Score-Star/NumScore/NumScore_6.png");
-				break;
-			case 7:
-				sprite = Sprite::create("Score-Star/NumScore/NumScore_7.png");
-				break;
-			case 8:
-				sprite = Sprite::create("Score-Star/NumScore/NumScore_8.png");
-				break;
-			case 9:
-				sprite = Sprite::create("Score-Star/NumScore/NumScore_9.png");
-				break;
-		}
-		
+		char sFileName[35];
+		sprintf(sFileName, "Score-Star/NumScore/NumScore_%d.png", arrNumber.back());
+		Sprite* sprite = Sprite::create(sFileName);
+
 		height = sprite->getContentSize().height;
 		sprite->setPosition(Point(width, height/2.0f));
-		width = width + sprite->getContentSize().width - 12;
+		width = width + sprite->getContentSize().width - 17;
 		node->addChild(sprite);
 		arrNumber.pop_back();
 	}
