@@ -16,7 +16,7 @@ public:
 	void setCurrentScore(const int& iCurrentScore);
 	void setScoreForStar(const float& iScore1Star, const float& iScore2Star, const float& iScore3Star, const float& iMaxScoreLevel);
 	void setCurrentMove(const int& iCurrentMove);
-	void setSpeedUpdateScore(const int& iSpeedUpdateScore);
+	void setSpeedUpdateScore(const float& iSpeedUpdateScore);
 
 private:
 	void loopUpdateScore();

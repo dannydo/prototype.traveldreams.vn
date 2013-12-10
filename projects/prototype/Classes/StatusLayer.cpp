@@ -52,7 +52,7 @@ bool StatusLayer::init()
 	m_pStarYellow3->setVisible(false);
 	this->addChild(m_pStarYellow3);
 
-	m_iSpeedUpdateScore = 0.02;
+	m_iSpeedUpdateScore = 0.02f;
 
 	return true;
 }
@@ -137,7 +137,7 @@ void StatusLayer::loopUpdateScore()
 
 void StatusLayer::setCurrentScore(const int& iCurrentScore)
 {
-	m_iDeltaUpdateScore = (iCurrentScore - m_iCurrentScore)/10;
+	m_iDeltaUpdateScore = (iCurrentScore - m_iCurrentScore)/15;
 	m_iCurrentScore = iCurrentScore;
 }
 
@@ -189,9 +189,13 @@ void StatusLayer::setCurrentMove(const int& iCurrentMove)
 	m_iCurrentMove = iCurrentMove;
 }
 
-void StatusLayer::setSpeedUpdateScore(const int& iSpeedUpdateScore)
+void StatusLayer::setSpeedUpdateScore(const float& iSpeedUpdateScore)
 {
-	m_iSpeedUpdateScore = iSpeedUpdateScore;
+	m_iSpeedUpdateScore = 0.02f;
+	if (iSpeedUpdateScore > 0.01f)
+	{
+		m_iSpeedUpdateScore = iSpeedUpdateScore;
+	}
 }
 
 std::vector<int> StatusLayer::generateArrayNumber(int iNumber)
