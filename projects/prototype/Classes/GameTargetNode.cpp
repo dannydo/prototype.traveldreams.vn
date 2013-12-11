@@ -1,6 +1,7 @@
 #include "GameTargetNode.h"
 #include "MainMenuScene.h"
 #include "HelloWorldScene.h"
+#include "DictionaryNode.h"
 
 USING_NS_CC;
 
@@ -53,20 +54,26 @@ bool GameTargetNode::initLayout(char* pMainWord)
 		"Target-End-Game/Close_Button_Click.png",
 		CC_CALLBACK_0(GameTargetNode::menuCloseCallBack, this));
 
-	Menu* pMenuClose = Menu::create(pCloseItem, NULL);
-	pMenuClose->setPosition(Point(561, 790));
-	this->addChild(pMenuClose, 10);
+	m_pMenuClose = Menu::create(pCloseItem, NULL);
+	m_pMenuClose->setPosition(Point(561, 790));
+	this->addChild(m_pMenuClose, 10);
 
 	MenuItemImage* pDictItem = MenuItemImage::create(
 		"Target-End-Game/Dict_Button.png",
 		"Target-End-Game/Dict_Button_Click.png",
 		CC_CALLBACK_0(GameTargetNode::menuOpenDictCallBack, this));
 
-	Menu* pMenuDict = Menu::create(pDictItem, NULL);
-	pMenuDict->setPosition(Point(150, 380));
-	this->addChild(pMenuDict, 10);
+	m_pMenuDict = Menu::create(pDictItem, NULL);
+	m_pMenuDict->setPosition(Point(150, 380));
+	this->addChild(m_pMenuDict, 10);
 
 	return true;
+}
+
+void GameTargetNode::setEnableAction(const bool& bEnable)
+{
+	m_pMenuClose->setEnabled(bEnable);
+	m_pMenuDict->setEnabled(bEnable);
 }
 
 void GameTargetNode::menuPlayLevelCallBack()
@@ -83,5 +90,8 @@ void GameTargetNode::menuCloseCallBack()
 
 void GameTargetNode::menuOpenDictCallBack()
 {
-
+	DictionaryNode* pDictionary = DictionaryNode::create();
+	pDictionary->setPosition(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 50);
+	this->addChild(pDictionary, 10);
+	this->setEnableAction(false);
 }

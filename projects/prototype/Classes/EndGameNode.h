@@ -14,6 +14,7 @@ public:
 	bool initLose(const int& iScore, char* pMainWord);
 
 	void addYellowStar(int iYellowStar);
+	void setEnableAction(const bool& bEnable);
 
 private:
 	void menuNextLevelCallBack();
@@ -22,15 +23,19 @@ private:
 	void menuOpenDictCallBack();
 
 	std::vector<int> generateArrayNumber(int iNumber);
-	Node* generateLayoutScore(int iScore);
-	Node* generateLayoutStar();
-	Node* generateLayoutWord(char* mainWord, std::vector<char*> subWord);
+	cocos2d::Node* generateLayoutScore(int iScore);
+	cocos2d::Node* generateLayoutStar();
+	cocos2d::Node* generateLayoutWord(char* mainWord, std::vector<char*> subWord);
 
 	void loopUpdateStar();
 	void sequenceUpdateStar();
 	void updateStar();
 
-	Node* m_pStarNode;
+	cocos2d::Node* m_pStarNode;
+	cocos2d::Menu* m_pMenuClose;
+	cocos2d::Menu* m_pMenuDict;
+	cocos2d::Menu* m_pMenuWin;
+	cocos2d::Menu* m_pMenuLose;
 
 	int m_iYellowStar;
 	int m_iCountYellowStar;

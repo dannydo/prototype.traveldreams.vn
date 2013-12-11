@@ -1,6 +1,7 @@
 #include "EndGameNode.h"
 #include "MainMenuScene.h"
 #include "HelloWorldScene.h"
+#include "DictionaryNode.h"
 
 USING_NS_CC;
 
@@ -57,9 +58,11 @@ bool EndGameNode::initLose(const int& iScore, char* pMainWord)
 		"Target-End-Game/Retry_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuRetryLevelCallBack, this));
 
-	Menu* pMenuLose = Menu::create(pRetryLevel, NULL);
-	pMenuLose->setPosition(Point(this->getContentSize().width/2.0f, 385));
-	this->addChild(pMenuLose);
+	m_pMenuLose = Menu::create(pRetryLevel, NULL);
+	m_pMenuLose->setPosition(Point(this->getContentSize().width/2.0f, 385));
+	this->addChild(m_pMenuLose);
+
+	m_pMenuWin = NULL;
 
 	return true;
 }
@@ -96,9 +99,11 @@ bool EndGameNode::initWin(const int& iScore, char* pMainWord, std::vector<char*>
 		"Target-End-Game/Next_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuNextLevelCallBack, this));
 
-	Menu* pMenuWin = Menu::create(pNextLevel, NULL);
-	pMenuWin->setPosition(Point(this->getContentSize().width/2.0f, 385));
-	this->addChild(pMenuWin);
+	m_pMenuWin = Menu::create(pNextLevel, NULL);
+	m_pMenuWin->setPosition(Point(this->getContentSize().width/2.0f, 385));
+	this->addChild(m_pMenuWin);
+
+	m_pMenuLose = NULL;
 	
 	return true;
 }
@@ -120,21 +125,37 @@ bool EndGameNode::init()
 		"Target-End-Game/Close_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuCloseCallBack, this));
 
-	Menu* pMenuClose = Menu::create(pCloseItem, NULL);
-	pMenuClose->setPosition(Point(561, 790));
-	this->addChild(pMenuClose, 10);
+	m_pMenuClose = Menu::create(pCloseItem, NULL);
+	m_pMenuClose->setPosition(Point(561, 790));
+	this->addChild(m_pMenuClose, 10);
 
 	MenuItemImage* pDictItem = MenuItemImage::create(
 		"Target-End-Game/Dict_Button.png",
 		"Target-End-Game/Dict_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuOpenDictCallBack, this));
 
-	Menu* pMenuDict = Menu::create(pDictItem, NULL);
-	pMenuDict->setPosition(Point(150, 380));
-	this->addChild(pMenuDict, 10);
+	m_pMenuDict = Menu::create(pDictItem, NULL);
+	m_pMenuDict->setPosition(Point(150, 380));
+	this->addChild(m_pMenuDict, 10);
 
 	return true;
-}					   
+}
+
+void EndGameNode::setEnableAction(const bool& bEnable)
+{
+	m_pMenuClose->setEnabled(bEnable);
+	m_pMenuDict->setEnabled(bEnable);
+
+	if (m_pMenuWin != NULL)
+	{
+		m_pMenuWin->setEnabled(bEnable);
+	}
+
+	if (m_pMenuLose != NULL)
+	{
+		m_pMenuLose->setEnabled(bEnable);
+	}
+}
 
 std::vector<int> EndGameNode::generateArrayNumber(int iNumber)
 {
@@ -299,5 +320,8 @@ void EndGameNode::menuCloseCallBack()
 
 void EndGameNode::menuOpenDictCallBack()
 {
-
+	DictionaryNode* pDictionary = DictionaryNode::create();
+	pDictionary->setPosition(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 50);
+	this->addChild(pDictionary, 10);
+	this->setEnableAction(false);
 }
