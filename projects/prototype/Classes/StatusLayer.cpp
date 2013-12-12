@@ -112,6 +112,10 @@ void StatusLayer::updateScore()
 			m_pStarYellow3->setVisible(true);
 		}
 	}
+	else
+	{
+		this->generateLayoutScore(0);
+	}
 }
 
 void StatusLayer::draw()
@@ -202,10 +206,17 @@ std::vector<int> StatusLayer::generateArrayNumber(int iNumber)
 {
 	int iTemp = iNumber;
 	std::vector<int> arrNumber;
-	while(iTemp >= 1)
+	if (iNumber < 1)
 	{
-		arrNumber.push_back(iTemp%10);
-		iTemp = iTemp/10.0f;
+		arrNumber.push_back(0);
+	}
+	else
+	{
+		while(iTemp >= 1)
+		{
+			arrNumber.push_back(iTemp%10);
+			iTemp = iTemp/10.0f;
+		}
 	}
 
 	return arrNumber;
