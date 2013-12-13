@@ -112,7 +112,7 @@ void StatusLayer::updateScore()
 			m_pStarYellow3->setVisible(true);
 		}
 	}
-	else
+	else if (m_iCurrentScore == 0)
 	{
 		this->generateLayoutScore(0);
 	}
