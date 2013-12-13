@@ -81,14 +81,14 @@ void StatusLayer::update(float dt)
 
 void StatusLayer::updateScore()
 {
-	if (m_iCurrentScore != 0)
+	if (m_iCurrentScore != 0 && m_iScoreOld < m_iMaxScoreLevel)
 	{
 		int bonus = m_iDeltaUpdateScore;
 		m_iScoreOld = m_iScoreOld + bonus;
-		if (m_iScoreOld > m_iCurrentScore)
+		if (m_iScoreOld > m_iMaxScoreLevel)
 		{
-			m_iScoreOld = m_iCurrentScore;
-			bonus = m_iCurrentScore - m_iScoreOld; 
+			bonus = m_iMaxScoreLevel - (m_iScoreOld - bonus); 
+			m_iScoreOld = m_iMaxScoreLevel;
 		}
 
 		this->generateLayoutScore(m_iScoreOld);

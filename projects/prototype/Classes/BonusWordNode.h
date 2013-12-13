@@ -11,12 +11,23 @@ public:
 	bool init() override;
 
 	void addCharacterCollected(const char character);
-	//void setVisibleWordNodes(const bool& bVisible);
+	void addCharacterToWordNotification(const char character);
+	inline cocos2d::Node* getLayoutNotification() { return m_pLayoutNotificationNode; };
+	
+	cocos2d::Node* createButtonShowPopupBonus();
 
 private:
+	cocos2d::Node* createLayoutWord(const Word word);
+	void loopNotification();
+	void updateLayoutNotification();
+	void setVisibleNotification(const bool& bVisible);
+	void menuShowPopupCallBack();
+	
 	std::vector<Word> m_subWord;
-	cocos2d::Array* m_pSubWordNodes;
-	//std::vector<int> m_subWordEnable;
+	cocos2d::Node* m_pLayoutNotificationNode;
+	
+	int m_iNotification;
+	char m_cCharacter;
 };
 
 #endif;
