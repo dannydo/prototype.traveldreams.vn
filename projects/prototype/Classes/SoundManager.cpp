@@ -30,6 +30,19 @@ void SoundManager::StopBackgroundMusic()
 {		
 	//CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 }
+
+void SoundManager::PlayIntroMusic()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+	CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffectPC/intro.wav", true);
+#else
+	CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/intro.ogg", true);
+#endif
+}
+
+void SoundManager::StopIntroMusic()
+{
+}
 	
 
 void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, float fDelayTime)

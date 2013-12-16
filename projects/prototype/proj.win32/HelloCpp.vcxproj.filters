@@ -48,6 +48,21 @@
     <ClCompile Include="..\Classes\SoundManager.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\StatusLayer.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\DictionaryNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\EndGameNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GameTargetNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\BonusWordNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -83,6 +98,21 @@
     <ClInclude Include="..\Classes\SoundManager.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\StatusLayer.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\DictionaryNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\EndGameNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GameTargetNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\BonusWordNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">
@@ -100,6 +130,9 @@
       <Filter>resource</Filter>
     </Text>
     <Text Include="..\Resources\GameConfig.txt">
+      <Filter>resource</Filter>
+    </Text>
+    <Text Include="..\Resources\GenerateWordConfig.txt">
       <Filter>resource</Filter>
     </Text>
   </ItemGroup>

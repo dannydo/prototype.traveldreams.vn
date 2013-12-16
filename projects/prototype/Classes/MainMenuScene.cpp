@@ -1,6 +1,8 @@
 #include "MainMenuScene.h"
 #include "HelloWorldScene.h"
 #include "cocos2d.h"
+#include "GameTargetNode.h"
+#include "SoundManager.h"
 
 using namespace cocos2d;
 
@@ -11,7 +13,6 @@ bool MainMenuScene::init()
 		this->_layer = MainMenuLayer::create();
 		this->_layer->retain();
 		this->addChild(_layer);
-
 		return true;
 	}
 	else
@@ -95,6 +96,8 @@ bool MainMenuLayer::init()
 			_label->setPosition(ccp(winSizeX.width/2, winSizeX.height/2));
 			this->addChild(_label, 1);*/
 
+			SoundManager::PlayIntroMusic();
+
 		}while(0);
 		
 		return true;
@@ -109,13 +112,19 @@ void MainMenuLayer::menuItemSelected(CCObject* pSender)
 {
 	CCMenuItem* pMenuItem = (CCMenuItem*)pSender;
 	int iLevel = pMenuItem->getTag();
-	
+
+	GameWordManager* pGameWordManager = GameWordManager::getInstance();
+	pGameWordManager->GenerateWordForNewLevel();
+
+	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(const_cast<char*>(pGameWordManager->GetMainWord().m_sWord), iLevel);
+	this->addChild(pGameTargetNode, 10);
+	/*
 	CCScene *pGameScene = HelloWorld::createScene(iLevel); //CCScene::create();        
     //HelloWorld *pGameLayer = HelloWorld::create();
 	//pGameLayer->initLevel(iLevel);
 	//pGameScene->addChild(pGameLayer);
 	CCDirector::getInstance()->replaceScene(pGameScene);
-		
+	*/
 }
 
 MainMenuLayer::~MainMenuLayer()

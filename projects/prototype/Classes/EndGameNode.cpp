@@ -302,12 +302,18 @@ Node* EndGameNode::generateLayoutWord(char* mainWord, std::vector<char*> subWord
 
 void EndGameNode::menuNextLevelCallBack()
 {
+	GameWordManager* pGameWordManager = GameWordManager::getInstance();
+	pGameWordManager->GenerateWordForNewLevel();
+
 	CCScene *pGameScene = HelloWorld::createScene(m_iCurrentLevel+1);
 	CCDirector::getInstance()->replaceScene(pGameScene);
 }
 
 void EndGameNode::menuRetryLevelCallBack()
 {
+	GameWordManager* pGameWordManager = GameWordManager::getInstance();
+	pGameWordManager->GenerateWordForNewLevel();
+
 	CCScene *pGameScene = HelloWorld::createScene(m_iCurrentLevel);
 	CCDirector::getInstance()->replaceScene(pGameScene);
 }

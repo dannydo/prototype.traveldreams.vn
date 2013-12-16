@@ -60,7 +60,7 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 
 			m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % _MAX_GEM_ID_;
 
-			//m_BoardValueMatrix[1][1].m_iGemID=m_BoardValueMatrix[0][2].m_iGemID=m_BoardValueMatrix[1][3].m_iGemID=m_BoardValueMatrix[4][2].m_iGemID=m_BoardValueMatrix[5][2].m_iGemID=0;
+			//m_BoardValueMatrix[1][0].m_iGemID = m_BoardValueMatrix[1][1].m_iGemID=m_BoardValueMatrix[0][2].m_iGemID=m_BoardValueMatrix[1][3].m_iGemID=m_BoardValueMatrix[4][2].m_iGemID=m_BoardValueMatrix[5][2].m_iGemID=0;
 			//m_BoardValueMatrix[1][2].m_iGemID=m_BoardValueMatrix[2][2].m_iGemID=1;
 			
 			while ( (iRow>1 && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow-1][iColumn].m_iGemID && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow-2][iColumn].m_iGemID) ||

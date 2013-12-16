@@ -10,8 +10,8 @@ public:
 	static BonusWordNode* createLayout(const std::vector<Word> subWord);
 	bool init() override;
 
-	void addCharacterCollected(const char character);
-	void addCharacterToWordNotification(const char character);
+	void addCharacterCollected(const unsigned char character);
+	void addCharacterToWordNotification(const unsigned char character);
 	inline cocos2d::Node* getLayoutNotification() { return m_pLayoutNotificationNode; };
 	
 	cocos2d::Node* createButtonShowPopupBonus();

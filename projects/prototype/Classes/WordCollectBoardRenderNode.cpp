@@ -1,6 +1,8 @@
 #include "WordCollectBoardRenderNode.h"
 #include "GameBoardManager.h"
 #include "SoundManager.h"
+#include "GameWordManager.h"
+#include "DictionaryNode.h"
 
 WordCollectBoardRenderNode* WordCollectBoardRenderNode::create()
 {
@@ -19,15 +21,16 @@ WordCollectBoardRenderNode* WordCollectBoardRenderNode::create()
 
 WordCollectBoardRenderNode::WordCollectBoardRenderNode()
 {
-	m_iNextCharacterID = -1;	
-	for (int i=0; i< _GDS_WORD_MAX_LENGTH_; i++)
-		m_ActivedCharacterFlags[i] = false;
+	//m_iNextCharacterID = -1;	
+	//for (int i=0; i< _GDS_WORD_MAX_LENGTH_; i++)
+		//m_ActivedCharacterFlags[i] = false;
 }
 
-void WordCollectBoardRenderNode::draw()
+/*void WordCollectBoardRenderNode::draw()
 {
-}
+}*/
 
+/*
 void WordCollectBoardRenderNode::update(float dt)
 {
 }
@@ -76,41 +79,21 @@ void WordCollectBoardRenderNode::UpdateList()
 		{
 			m_LabelList.at(i)->setString("");
 		}
-	}*/
-}
+	}
+}*/
 
 bool WordCollectBoardRenderNode::init()
-{
-	LoadWords();
-	GetWordIndex();
-
+{	
 	// GenerateLabels
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResourceDemo.plist");
 	m_pBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
 
-	m_pBatchNode->setPosition(150.f, 820.f);
+	m_pBatchNode->setPosition(10.f, 866.f);
 	this->addChild(m_pBatchNode);
 
-	int iWordLength = strlen(m_WordList[m_iWordIndex].m_sWord);
-	for(int i=0; i< iWordLength; i++)
-	{
-		m_LabelList[i] =  //CCLabelTTF::create("", "Arial", 34);
-			Sprite::createWithSpriteFrameName( GetImageFileFromCharacterID(m_WordList[m_iWordIndex].m_sWord[i]).c_str());
-		m_LabelList[i]->setAnchorPoint(Point(0,0));
-		m_LabelList[i]->setColor( ccc3(50, 50, 50));
-		//pLabel->enableShadow(Size(10.f,10.f),0.8f,0.2f);
-		//m_LabelList[i]->enableStroke(ccc3(0,0,0), 2.f);		
-		m_LabelList[i]->setPosition(ccp(this->_position.x + i* 50.f, _position.y));
-		m_pBatchNode->addChild(m_LabelList[i]);
-	}	 
-
-	// draw meaning of word
-	LabelTTF* pMeaningLabel = CCLabelTTF::create("", "Arial", 24);
-	pMeaningLabel->setAnchorPoint(Point(0,0));
-	pMeaningLabel->setPosition(Point( 180.f, 780.f));
-	pMeaningLabel->setString(m_WordList[m_iWordIndex].m_sMeaning.c_str());
-	this->addChild(pMeaningLabel);
-
+	timeval now;
+	gettimeofday( &now, NULL);
+	m_iPreviousMainWordTapTime = now.tv_sec*1000 + now.tv_usec / 1000;
 
 	this->setTouchEnabled(true);	
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);	
@@ -119,44 +102,101 @@ bool WordCollectBoardRenderNode::init()
 	return true;
 }
 
-void WordCollectBoardRenderNode::UnlockCharacter(int iCharacterID)
+void WordCollectBoardRenderNode::GenerateLabels()
 {
-	int iWordLength = strlen(m_WordList[m_iWordIndex].m_sWord);
+	GameWordManager* pGameWordManager = GameWordManager::getInstance();
+	m_pMainWord = &pGameWordManager->GetMainWord();
 
-	if (iCharacterID >= 0 && iCharacterID < iWordLength && !m_ActivedCharacterFlags[iCharacterID])
+	
+
+	// create labels
+	int iWordLength = strlen(m_pMainWord->m_sWord);	
+	int iTotalLabelsWidth = 0;
+
+	for(int i=0; i< iWordLength; i++)
 	{
-		m_ActivedCharacterFlags[iCharacterID] = true;
-		m_LabelList[iCharacterID]->setColor( ccc3(255, 255, 255));
+		m_LabelList[i] =  //CCLabelTTF::create("", "Arial", 34);
+			Sprite::createWithSpriteFrameName( GetImageFileFromLetter(m_pMainWord->m_sWord[i]).c_str());
+		m_LabelList[i]->setAnchorPoint(Point(0,0));
+		m_LabelList[i]->setColor( ccc3(200, 200, 200));
+		m_LabelList[i]->setOpacity(100);
+		//pLabel->enableShadow(Size(10.f,10.f),0.8f,0.2f);
+		//m_LabelList[i]->enableStroke(ccc3(0,0,0), 2.f);		
 
-		Sprite* pSrite = Sprite::createWithSpriteFrameName( GetImageFileFromCharacterID( m_WordList[m_iWordIndex].m_sWord[iCharacterID]).c_str());
-		pSrite->setColor( ccc3(100, 100, 100));
-		pSrite->setPosition(ccp(this->_position.x + iCharacterID* 50.f, _position.y));
-		m_pBatchNode->addChild(pSrite);
+		iTotalLabelsWidth += m_LabelList[i]->getContentSize().width + 2.f;
+				
+		m_pBatchNode->addChild(m_LabelList[i], 2);
+	}	 
 
-		pSrite->runAction( ScaleTo::create( 0.35f, 4.f, 4.f));
-		pSrite->runAction( FadeOut::create(0.35f));
+	// create background
+	Sprite* pBackground;
+	if ( iTotalLabelsWidth < 240.f)
+		pBackground = Sprite::createWithSpriteFrameName("Main_Board_Small.png");
+	else if ( iTotalLabelsWidth < 410.f)
+		pBackground = Sprite::createWithSpriteFrameName("Main_Board_Medium.png");
+	else
+		pBackground = Sprite::createWithSpriteFrameName("Main_Board_Large.png");
+	pBackground->setAnchorPoint( Point(0,0));
+	pBackground->setPosition( Point( 0, 0));
+	m_pBatchNode->addChild(pBackground);
 
-		bool bAreAllCharacterUnlocked = true;		
-		for(int i=0; i< iWordLength; i++)
-		{
-			if (!m_ActivedCharacterFlags[i])
-			{
-				bAreAllCharacterUnlocked = false;
-				break;
-			}
-		}
-
-		if (bAreAllCharacterUnlocked)
-			onTouchBegan(NULL, NULL);
+	float fBackgroundWidth = pBackground->getContentSize().width;
+	m_fStartPositionX = (fBackgroundWidth - iTotalLabelsWidth) / 2.f;
+	
+	for(int i=0; i< iWordLength; i++)
+	{
+		if (i==0)
+			m_LabelXPositionList[0] = m_fStartPositionX;
+		else
+			m_LabelXPositionList[i] = m_LabelXPositionList[i-1] + m_LabelList[i-1]->getContentSize().width + 1.f;		
+		m_LabelList[i]->setPosition(ccp(m_LabelXPositionList[i], 38.f));
 	}
+
+	// draw meaning of word
+	LabelTTF* pMeaningLabel = CCLabelTTF::create("", "HelveticaNeueLTCom-Ex.ttf", 19); //"Arial", 17);
+	pMeaningLabel->setString(m_pMainWord->m_sMeaning.c_str());
+	pMeaningLabel->setAnchorPoint(Point(0,0));
+	//pMeaningLabel->setPosition(Point( 120.f, 860.f));
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+	pMeaningLabel->setPosition(Point( (fBackgroundWidth- pMeaningLabel->getContentSize().width)/2.f, 860.f));	
+#else
+	pMeaningLabel->setPosition(Point( (fBackgroundWidth- pMeaningLabel->getContentSize().width)/2.f, 878.f));
+#endif
+	pMeaningLabel->setColor(ccc3( 90, 90, 90));
+	pMeaningLabel->disableStroke();
+	this->addChild(pMeaningLabel);	
 }
 
-int WordCollectBoardRenderNode::GetNextCharacterID()
-{
-	/*for(int i=0; i< _WCBRN_WORD_LENGTH_; i++)
-		if (!m_ActivedCharacterFlags[i])
-			return i;
-	return -1;*/
+void WordCollectBoardRenderNode::UnlockCharacter(int iLetterIndex)
+{	
+	m_LabelList[iLetterIndex]->setColor( ccc3(255, 255, 255));
+	m_LabelList[iLetterIndex]->setOpacity(255);
+
+	Sprite* pSrite = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(m_pMainWord->m_sWord[iLetterIndex]).c_str());
+	pSrite->setColor( ccc3(100, 100, 100));
+	pSrite->setPosition(ccp( m_LabelXPositionList[iLetterIndex], _position.y));
+	m_pBatchNode->addChild(pSrite);
+		
+
+	pSrite->runAction( ScaleTo::create( 0.35f, 4.f, 4.f));
+	pSrite->runAction( FadeOut::create(0.35f));
+
+	bool bAreAllCharacterUnlocked = true;		
+	for(int i=0; i< m_pMainWord->m_iWordLength; i++)
+	{
+		if (!m_pMainWord->m_ActivatedCharacterFlags[i])
+		{
+			bAreAllCharacterUnlocked = false;
+			break;
+		}
+	}
+
+	if (bAreAllCharacterUnlocked)
+		onTouchBegan(NULL, NULL);	
+}
+
+/*int WordCollectBoardRenderNode::GetNextCharacterID()
+{	
 	m_iNextCharacterID++;
 	int iWordLength = strlen(m_WordList[m_iWordIndex].m_sWord);
 	if (m_iNextCharacterID >=0 && m_iNextCharacterID < iWordLength)
@@ -167,17 +207,24 @@ int WordCollectBoardRenderNode::GetNextCharacterID()
 
  std::string WordCollectBoardRenderNode::GetImageFileFromCharacterID(int iCharacterID)
  {
-	 return  GetImageFileFromCharacterID(m_WordList[m_iWordIndex].m_sWord[iCharacterID]);
- }
+	 return  GetImageFileFromCharacterID(m_pMainWord->m_sWord[iCharacterID]);
+ }*/
 
-std::string WordCollectBoardRenderNode::GetImageFileFromCharacterID(char iCharacter)
-{
+std::string WordCollectBoardRenderNode::GetImageFileFromLetter(unsigned char iLetter)
+{	
 	char sFileName[10];
-	sprintf(sFileName, "%c.png", ((unsigned char)iCharacter));
+	sprintf(sFileName, "%c.png", iLetter);
 	return std::string(sFileName);
 }
 
-void WordCollectBoardRenderNode::LoadWords()
+std::string WordCollectBoardRenderNode::GetImageInGemFileFromLetter(unsigned char iLetter)
+{
+	char sFileName[10];
+	sprintf(sFileName, "Gem_%c.png", ((unsigned char)iLetter));
+	return std::string(sFileName);
+}
+
+/*void WordCollectBoardRenderNode::LoadWords()
 {
 	unsigned long iDataSize;
 	unsigned char* orginalData = cocos2d::CCFileUtils::sharedFileUtils()->getFileData("WordList.txt", "r", &iDataSize);
@@ -211,7 +258,7 @@ void WordCollectBoardRenderNode::GetWordIndex()
 
 	UserDefault::getInstance()->setIntegerForKey("wordIndex", m_iWordIndex);
 }
-
+*/
 #include "SimpleAudioEngine.h"
 
 bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
@@ -221,15 +268,33 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 		touchPosition = pTouch->getLocation();
 	if (pTouch == NULL || touchPosition.y > 830)
 	{
-		//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("pew-pew-lei.wav");
-		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(
-			m_WordList[m_iWordIndex].m_sSoundFile.c_str());
+		timeval now;
+		gettimeofday(&now, NULL);
+		unsigned long iCurrentTime = now.tv_sec * 1000 + now.tv_usec/1000 ; //miliseconds
+		if (iCurrentTime - m_iPreviousMainWordTapTime < 400)
+		{
+			Size winSize = Director::getInstance()->getWinSize();
 
-		this->runAction(
-			Sequence::create( 
-				DelayTime::create(3.5f),
-				CallFunc::create(this, callfunc_selector(WordCollectBoardRenderNode::PlayVietnameseSpelling)),
-				NULL));
+			// show dictionary
+			DictionaryNode* pDictionary = DictionaryNode::create();
+			pDictionary->setPosition(winSize.width/2.0f, winSize.height/2.0f + 50);
+			this->getParent()->addChild(pDictionary, 20);			
+		}
+		else
+		{
+			//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("pew-pew-lei.wav");
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(
+				m_pMainWord->m_sSoundFile.c_str());
+
+			this->runAction(
+				Sequence::create( 
+					DelayTime::create(3.5f),
+					CallFunc::create(this, callfunc_selector(WordCollectBoardRenderNode::PlayVietnameseSpelling)),
+					NULL));
+
+			m_iPreviousMainWordTapTime = iCurrentTime;
+		}		
+
 		return true;
 	}
 	else
@@ -239,5 +304,5 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 void WordCollectBoardRenderNode::PlayVietnameseSpelling()
 {
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(
-		m_WordList[m_iWordIndex].m_sSoundVietnameseFile.c_str());
+		m_pMainWord->m_sSoundVietnameseFile.c_str());
 }

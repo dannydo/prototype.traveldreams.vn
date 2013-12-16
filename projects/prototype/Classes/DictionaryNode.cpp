@@ -40,4 +40,6 @@ void DictionaryNode::menuCloseCallBack()
 		parent->setEnableAction(true);
 		parent->removeChild(this);
 	}
+	else
+		getParent()->removeChild(this);
 }

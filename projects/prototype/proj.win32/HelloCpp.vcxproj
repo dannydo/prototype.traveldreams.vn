@@ -133,26 +133,36 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\Classes\BonusWordNode.cpp" />
     <ClCompile Include="..\Classes\ComboCountRenderNode.cpp" />
+    <ClCompile Include="..\Classes\DictionaryNode.cpp" />
+    <ClCompile Include="..\Classes\EndGameNode.cpp" />
     <ClCompile Include="..\Classes\GameBoardManager.cpp" />
+    <ClCompile Include="..\Classes\GameTargetNode.cpp" />
     <ClCompile Include="..\Classes\GameWordManager.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\MainMenuScene.cpp" />
     <ClCompile Include="..\Classes\NewGameBoardManager.cpp" />
     <ClCompile Include="..\Classes\SoundManager.cpp" />
+    <ClCompile Include="..\Classes\StatusLayer.cpp" />
     <ClCompile Include="..\Classes\WordCollectBoardRenderNode.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\AppDelegate.h" />
+    <ClInclude Include="..\Classes\BonusWordNode.h" />
     <ClInclude Include="..\Classes\ComboCountRenderNode.h" />
+    <ClInclude Include="..\Classes\DictionaryNode.h" />
+    <ClInclude Include="..\Classes\EndGameNode.h" />
     <ClInclude Include="..\Classes\GameBoardManager.h" />
     <ClInclude Include="..\Classes\GameDataStructure.h" />
+    <ClInclude Include="..\Classes\GameTargetNode.h" />
     <ClInclude Include="..\Classes\GameWordManager.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\MainMenuScene.h" />
     <ClInclude Include="..\Classes\NewGameBoardManager.h" />
     <ClInclude Include="..\Classes\SoundManager.h" />
+    <ClInclude Include="..\Classes\StatusLayer.h" />
     <ClInclude Include="..\Classes\WordCollectBoardRenderNode.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
@@ -184,6 +194,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
   <ItemGroup>
     <Text Include="..\Resources\ComboBasicPattern.txt" />
     <Text Include="..\Resources\GameConfig.txt" />
+    <Text Include="..\Resources\GenerateWordConfig.txt" />
     <Text Include="..\Resources\WordList.txt" />
     <Text Include="..\Resources\WordList2.txt" />
   </ItemGroup>

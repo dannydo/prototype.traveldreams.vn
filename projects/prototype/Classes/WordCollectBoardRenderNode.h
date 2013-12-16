@@ -14,36 +14,45 @@ private:
 public:
 	static WordCollectBoardRenderNode* create();
 
-	void draw() override;
-	void update(float dt) override;	
+	void GenerateLabels();//call this after generate level data
+	//void draw() override;
+	//void update(float dt) override;	
 
-	void UpdateList();
+	//void UpdateList();
 
-	void UnlockCharacter(int iCharacterID);
-	std::string GetImageFileFromCharacterID(char iCharacter);	
-	std::string GetImageFileFromCharacterID(int iCharacterID);	
+	void UnlockCharacter(int iLetterIndex);
+	std::string GetImageFileFromLetter(unsigned char iLetter);	
+	std::string GetImageInGemFileFromLetter(unsigned char iLetter);	
 
-	int GetNextCharacterID();
+	//int GetNextCharacterID();
 
 	bool onTouchBegan(Touch *pTouch, Event *pEvent) override;
 private:
-	void LoadWords();
-	void GetWordIndex();
+	//void LoadWords();
+	//void GetWordIndex();
 
-	virtual bool init();	
+	virtual bool init();		
 
 	void PlayVietnameseSpelling();
 private:	
 	//std::vector<CCLabelTTF*> m_LabelList;	
-	int m_iWordCount;	
+	/*int m_iWordCount;	
 	Word m_WordList[_GDS_WORD_MAX_COUNT_];
 
 	int m_iWordIndex;
 	int m_iNextCharacterID;
+	
+	bool m_ActivedCharacterFlags[_GDS_WORD_MAX_LENGTH_];*/
+	const Word* m_pMainWord;
 
 	Sprite* m_LabelList[_GDS_WORD_MAX_LENGTH_];
-	bool m_ActivedCharacterFlags[_GDS_WORD_MAX_LENGTH_];
+
+	float m_fStartPositionX;
+	float m_LabelXPositionList[_GDS_WORD_MAX_LENGTH_];
+
 	SpriteBatchNode* m_pBatchNode;
+
+	unsigned long m_iPreviousMainWordTapTime;
 };
 
 

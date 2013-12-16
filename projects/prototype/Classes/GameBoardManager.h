@@ -30,18 +30,17 @@ public:
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells, std::vector<ComboEffectCell>& newComboCells);
 
 	int GetComboCount(const int& iTypeID) { return m_ComboCountList[iTypeID];}
+	
 protected:
 	void LoadGameConfig();
 	void LoadBasicComboPatternList();
 
 	void CountBasicCombo(); 
 protected:
-	GameConfig m_GameConfig;
-	LevelConfig m_LevelConfig;
+	GameConfig m_GameConfig;	
 
 	int m_iRowNumber, m_iColumnNumber;
-	CellValue m_BoardValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
-	int m_iScore;// total score
+	CellValue m_BoardValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];	
 
 	// use this matrix to check board after move
 	CellValue m_TemporaryValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
@@ -60,7 +59,6 @@ protected:
 	// combo count based on type, just for test
 	int m_ComboCountList[_COMBO_TYPE_COUNT_];
 };
-
 
 #include <istream>>
 #include <streambuf>

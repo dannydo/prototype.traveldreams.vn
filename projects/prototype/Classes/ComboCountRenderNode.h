@@ -18,7 +18,6 @@ public:
 	void draw() override;
 	void update(float dt) override;	
 
-	void IncreaseMove();
 	void UpdateList(int iTypeID, int iComboCount);	
 private:
 	void GenerateLabels();
@@ -26,9 +25,6 @@ private:
 private:	
 	int m_ComboCountList[_COMBO_TYPE_COUNT_];	
 	LabelTTF* m_LabelList[_COMBO_TYPE_COUNT_];	
-
-	LabelTTF* m_pMoveCountLabel;
-	int m_iMoveCount;
 };
 
 

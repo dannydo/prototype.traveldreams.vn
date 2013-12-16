@@ -6,6 +6,8 @@
 #include "NewGameBoardManager.h"
 #include "WordCollectBoardRenderNode.h"
 #include "ComboCountRenderNode.h"
+#include "StatusLayer.h"
+#include "BonusWordNode.h"
 
 #define _MAX_CHARACTER_ID_	5
 
@@ -23,12 +25,14 @@ struct CellView
 {
 public:
 	Sprite* m_pSprite;
-	int m_iCharacterID;
+	//int m_iCharacterID;
+	unsigned char m_iLetter;
 
 	CellView()
 	{
 		m_pSprite = NULL;
-		m_iCharacterID = -1;
+		//m_iCharacterID = -1;
+		m_iLetter = 255;
 	}
 };
 
@@ -58,14 +62,11 @@ public:
 protected:
 	std::string GetImageFileFromGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
 	void AdjustPosition(float fDeltaX, float fDeltaY, int iRowMove, int iColumnMove);
-
-	void PlayEffect(std::vector<Cell>& destroyCells, std::vector<ComboEffectCell>& comboEffectCells, std::vector<Cell>& destroyedByEffectCells, std::vector<Cell>& originalMovedCells,
-		std::vector<Cell>& targetMovedCells,	std::vector<Cell>& newCells, std::vector<ComboEffectCell>& newComboCells);
-
+	
 	void PlayEffect2(std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList,std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells);
+		std::vector<Cell>& newCells, bool bIsNewMove);
 	
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();
@@ -79,6 +80,15 @@ protected:
 	void ActivateImageEffect(Node* pSender);
 
 	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float& fEffectDuration);
+
+	void ExecuteBonusWinGameEffect();
+	void ShowWinGamePopup();
+
+	void PlayBonusEndEffect( std::vector<ComboEffectCell>& convertedToComboCells,
+		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
+		std::vector<ComboEffectBundle*>& comboChainList,std::vector<ComboEffectCell>& newComboCells,
+		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<Cell>& newCells);
 private:
 	float m_fBoardLeftPosition, m_fBoardBottomPosition;
 	float m_fBoardLeftClipPosition, m_fBoardBottomClipPosition;
@@ -105,7 +115,6 @@ private:
 
 	WordCollectBoardRenderNode* m_pWordCollectBoardRenderNode;
 	int m_iMoveCount;
-
 	
 	Sprite* m_pTempSpriteForAction; // temporary sprite for action/effect
 	Touch* m_pSaveTouch;
@@ -113,7 +122,10 @@ private:
 	bool m_bIsCellDragPlaying;
 	TouchMoveState m_ePlayingDragEffect;
 
-	ComboCountRenderNode* m_pComboCountRenderNode;	
+	ComboCountRenderNode* m_pComboCountRenderNode;
+	StatusLayer* m_pStatusLayer;
+	BonusWordNode* m_pBonusWordNode;
+	Layer* m_pHUDLayer;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

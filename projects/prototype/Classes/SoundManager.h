@@ -29,6 +29,9 @@ public:
 	static void PlayBackgroundMusic();
 	static void StopBackgroundMusic();
 
+	static void PlayIntroMusic();
+	static void StopIntroMusic();
+
 	static void PlaySoundEffect(const SoundEffectType& eSoundEffectType, float fDelayTime = 0.f);	
 private:
 	void PlaySoundEffectUtil(Node* pNode, void* data);

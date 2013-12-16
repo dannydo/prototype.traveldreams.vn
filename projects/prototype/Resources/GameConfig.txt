@@ -13,10 +13,10 @@
 4
 4
 ;score main word
-50
+40
 ;ratio main word
 10
 ;score sub word
 20
 ;ratio sub word
-5
+8

@@ -62,11 +62,14 @@ Node* BonusWordNode::createLayoutWord(const Word word)
 
 	for(int i=0; i<len; i++)
 	{
-		char c[1];
+		char c[2];
 		c[0] = word.m_sWord[i];
+		c[1] = 0;
 
 		Label* pLabelNone = Label::createWithTTF("_", "fonts/ARLRDBD.ttf", 30);
+		//LabelTTF* pLabelNone = LabelTTF::create("_", "Arial", 30);
 		Label* pLabelSubWord = Label::createWithTTF(c, "fonts/ARLRDBD.ttf", 30);
+		//LabelTTF* pLabelSubWord = LabelTTF::create(c, "Arial", 30);
 		float delta = abs(pLabelNone->getContentSize().width - pLabelSubWord->getContentSize().width)/2.0f;
 
 		pLabelNone->setColor(ccc3(0, 0, 0));
@@ -93,15 +96,22 @@ Node* BonusWordNode::createLayoutWord(const Word word)
 	pNodeWord->setPosition(Point(-width/2.0f, 15));
 	pNode->addChild(pNodeWord, 2, 1);
 
-	Label* pLabelMeaningSubWord = Label::createWithTTF(word.m_sMeaning.c_str(), "fonts/HelveticaNeueLTCom-Ex.ttf", 20);
-	pLabelMeaningSubWord->setColor(ccc3(187, 187, 187));
+	LabelTTF* pLabelMeaningSubWord = LabelTTF::create(word.m_sMeaning.c_str(), "Arial", 20); //Label::createWithTTF(word.m_sMeaning.c_str(), "fonts/HelveticaNeueLTCom-Ex.ttf", 20);
+	pLabelMeaningSubWord->disableStroke();
+	pLabelMeaningSubWord->disableShadow();
+	pLabelMeaningSubWord->setAnchorPoint(Point(0,0));
+	pLabelMeaningSubWord->setColor(ccc3(130, 130, 130));
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+	pLabelMeaningSubWord->setPosition(Point(-pLabelMeaningSubWord->getContentSize().width/2.0f, -20));
+#else
 	pLabelMeaningSubWord->setPosition(Point(-pLabelMeaningSubWord->getContentSize().width/2.0f, 0));
+#endif
 	pNode->addChild(pLabelMeaningSubWord, 2);
 
 	return pNode;
 }
 
-void  BonusWordNode::addCharacterCollected(const char character)
+void  BonusWordNode::addCharacterCollected(const unsigned char character)
 {
 	for(int iIndex=0; iIndex<m_subWord.size(); iIndex++)
 	{
@@ -122,7 +132,7 @@ void  BonusWordNode::addCharacterCollected(const char character)
 	}
 }
 
-void BonusWordNode::addCharacterToWordNotification(const char character)
+void BonusWordNode::addCharacterToWordNotification(const unsigned char character)
 {
 	m_iNotification = 0;
 	m_cCharacter = character;

@@ -46,18 +46,42 @@ public:
 	int m_ScoreOfStars[3];
 };
 
+struct WordGenerateConfig
+{
+public:
+	int m_iMinimumRate; 
+	int m_iMaximumRate;
+	int m_iMaximumLettersAtTheSame;
+
+	// config of main word
+	int m_iInitRateOfMainLetter; //letter of main word
+	int m_iIncreasePercentAfterEachMoveOfMainLetter;
+	int m_iDecreasePercentAfterLetterDestroyedOfMainLetter;
+	int m_iDecreasePercentAfterLetterAppearedOfMainLetter;
+	int m_iRatioBetweenLettersOfMainWord; //in the same generation
+
+	//config of sub-words
+	int m_iFixRatioOfSubWords;
+	int m_iRatioBetweenLettersOfSubWord;
+
+	//config of trash-words
+	int m_iFixRatioOfTrashWords;
+	int m_iRatioBetweenLettersOfTrashWord;
+};
+
 enum GemComboType_e
 {
-	_GCT_NONE_,
-	_GCT_COMBO4_,
-	_GCT_COMBO5_,
-	_GCT_COMBO6_
+	_GCT_HAS_LETTER_ =-1,
+	_GCT_NONE_ = 0,
+	_GCT_COMBO4_ = 1,
+	_GCT_COMBO5_ = 2,
+	_GCT_COMBO6_ = 3
 };
 
 struct Cell
 {
 	int m_iRow, m_iColumn;	
-	int m_iCharacter;
+	//int m_iCharacter;
 			
 	Cell()
 	{
@@ -145,11 +169,16 @@ struct Word
 {
 public:	
 	char m_sWord[_GDS_WORD_MAX_LENGTH_];	
+	int m_iWordLength;
+
 	std::string m_sMeaning;
 	std::string m_sSoundFile;
 	std::string m_sSoundVietnameseFile;
 
-	bool m_ActivedCharacterFlags[_GDS_WORD_MAX_LENGTH_];
+	bool m_ActivatedCharacterFlags[_GDS_WORD_MAX_LENGTH_];
+	int m_iRemainInactivatedCharacterCount;
+	bool m_AppearedCharacterFlags[_GDS_WORD_MAX_LENGTH_];	
+	int m_iRemainNotAppearedCharacterCount;
 };
 
 

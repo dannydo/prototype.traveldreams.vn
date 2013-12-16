@@ -1,6 +1,7 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
 #include "MainMenuScene.h"
+#include "GameWordManager.h"
 
 USING_NS_CC;
 
@@ -10,6 +11,7 @@ AppDelegate::AppDelegate() {
 
 AppDelegate::~AppDelegate() 
 {
+	GameWordManager::getInstance()->releaseInstance();
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
@@ -22,13 +24,17 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	eglView->setDesignResolutionSize(640, 960.f, ResolutionPolicy::SHOW_ALL);
 
     // turn on display FPS
-    director->setDisplayStats(true);
+    //director->setDisplayStats(true);
 
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
 
+	// load word list
+	GameWordManager::getInstance()->LoadWords();
+	GameWordManager::getInstance()->LoadWordGenerateConfig();
+
     // create a scene. it's an autorelease object
-	auto scene =  MainMenuScene::create(); //HelloWorld::createScene();	
+	auto scene =  MainMenuScene::create(); //HelloWorld::createScene();		
 
     // run
     director->runWithScene(scene);
