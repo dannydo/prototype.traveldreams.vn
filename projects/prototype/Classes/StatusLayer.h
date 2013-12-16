@@ -9,7 +9,6 @@ public:
 	bool init() override;
 	void update(float dt) override;
 	void draw() override;
-	void updateScore();
 
 	CREATE_FUNC(StatusLayer);
 
@@ -19,13 +18,12 @@ public:
 	void setSpeedUpdateScore(const float& iSpeedUpdateScore);
 
 private:
-	void loopUpdateScore();
-	void sequenceUpdateScore();
 	void setPositionForStar(const float& iScoreStar, cocos2d::Sprite* pStar);
 	void clippingNodeCircle();
 	std::vector<int> generateArrayNumber(int iNumber);
 	void generateLayoutMove();
 	void generateLayoutScore(int iScore);
+	void updateScore();
 
 	cocos2d::SpriteBatchNode* m_pBatchNode;
 
@@ -45,7 +43,6 @@ private:
 	int m_iCurrentScore;
 	int m_iScoreOld;
 	int m_iCurrentMove;
-	int m_iDeltaUpdateScore;
 
 	float m_iSpeedUpdateScore;
 	float m_fRadiusCircle;
@@ -53,6 +50,7 @@ private:
 	float m_iScore2Star;
 	float m_iScore3Star;  
 	float m_iMaxScoreLevel;
+	float m_fDeltaTime;
 };
 
 #endif;

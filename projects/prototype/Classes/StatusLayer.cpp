@@ -52,7 +52,9 @@ bool StatusLayer::init()
 	m_pStarYellow3->setVisible(false);
 	this->addChild(m_pStarYellow3);
 
-	m_iSpeedUpdateScore = 0.02f;
+	m_fDeltaTime = 0;
+	m_iSpeedUpdateScore = 10;
+	this->scheduleUpdate();
 
 	return true;
 }
@@ -75,73 +77,71 @@ void StatusLayer::clippingNodeCircle()
 
 void StatusLayer::update(float dt)
 {	
-	this->generateLayoutMove();
-	this->sequenceUpdateScore();
+	m_fDeltaTime += dt;
+	if (m_fDeltaTime >= 0.1)
+	{
+		this->generateLayoutMove();
+		this->updateScore();
+	}
 }
 
 void StatusLayer::updateScore()
 {
-	if (m_iCurrentScore != 0 && m_iScoreOld < m_iMaxScoreLevel)
+	if (m_iCurrentScore != 0 && m_iScoreOld < m_iCurrentScore)
 	{
-		int bonus = m_iDeltaUpdateScore;
-		m_iScoreOld = m_iScoreOld + bonus;
-		if (m_iScoreOld > m_iMaxScoreLevel)
+		int bonus = m_fDeltaTime*m_iSpeedUpdateScore*10;
+		int temp = m_iScoreOld + bonus;
+
+		if (temp > m_iMaxScoreLevel)
 		{
-			bonus = m_iMaxScoreLevel - (m_iScoreOld - bonus); 
-			m_iScoreOld = m_iMaxScoreLevel;
+			bonus = m_iMaxScoreLevel - m_iScoreOld;
 		}
 
-		this->generateLayoutScore(m_iScoreOld);
-
-		float angle = bonus/m_iMaxScoreLevel*180;
-		auto actionRotate = RotateBy::create(0.0f, angle);
-		m_pMarkCircle->runAction(actionRotate);
-
-		if (m_iScoreOld >= m_iScore1Star)
-		{
-			m_pStarYellow1->setVisible(true);
+		if (temp > m_iCurrentScore)
+		{ 
+			temp = m_iCurrentScore;
 		}
 
-		if (m_iScoreOld >= m_iScore2Star)
-		{
-			m_pStarYellow2->setVisible(true);
-		}
+		this->generateLayoutScore(temp);
 
-		if (m_iScoreOld >= m_iScore3Star)
+		if (m_iScoreOld < m_iMaxScoreLevel)
 		{
-			m_pStarYellow3->setVisible(true);
+			float angle = bonus/m_iMaxScoreLevel*180;
+			auto actionRotate = RotateBy::create(0.0f, angle);
+			m_pMarkCircle->runAction(actionRotate);
+			m_iScoreOld = temp;
+
+			if (m_iScoreOld >= m_iScore1Star)
+			{
+				m_pStarYellow1->setVisible(true);
+			}
+
+			if (m_iScoreOld >= m_iScore2Star)
+			{
+				m_pStarYellow2->setVisible(true);
+			}
+
+			if (m_iScoreOld >= m_iScore3Star)
+			{
+				m_pStarYellow3->setVisible(true);
+			}
 		}
+		m_iScoreOld = temp;
 	}
 	else if (m_iCurrentScore == 0)
 	{
 		this->generateLayoutScore(0);
 	}
+	m_fDeltaTime = 0;
 }
 
 void StatusLayer::draw()
 {
 
 }
-
-void StatusLayer::sequenceUpdateScore()
-{
-	auto actionUpdateScore = CallFunc::create(this, callfunc_selector(StatusLayer::updateScore));
-	auto delay = DelayTime::create(m_iSpeedUpdateScore);
-	auto actionLoopUpdateScore = CallFunc::create(this, callfunc_selector(StatusLayer::loopUpdateScore));
-	this->runAction(Sequence::create(actionUpdateScore, delay->clone(), actionLoopUpdateScore, NULL));
-}
-
-void StatusLayer::loopUpdateScore()
-{
-	if (m_iScoreOld < m_iCurrentScore)
-	{
-		this->sequenceUpdateScore();
-	}
-}
-
+		
 void StatusLayer::setCurrentScore(const int& iCurrentScore)
 {
-	m_iDeltaUpdateScore = (iCurrentScore - m_iCurrentScore)/15;
 	m_iCurrentScore = iCurrentScore;
 }
 
@@ -195,11 +195,7 @@ void StatusLayer::setCurrentMove(const int& iCurrentMove)
 
 void StatusLayer::setSpeedUpdateScore(const float& iSpeedUpdateScore)
 {
-	m_iSpeedUpdateScore = 0.02f;
-	if (iSpeedUpdateScore > 0.01f)
-	{
-		m_iSpeedUpdateScore = iSpeedUpdateScore;
-	}
+	m_iSpeedUpdateScore = iSpeedUpdateScore;
 }
 
 std::vector<int> StatusLayer::generateArrayNumber(int iNumber)
