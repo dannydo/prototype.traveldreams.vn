@@ -3,6 +3,7 @@
 #include "cocos2d.h"
 #include "GameTargetNode.h"
 #include "SoundManager.h"
+#include "IntroductionLayer.h"
 
 using namespace cocos2d;
 
@@ -99,6 +100,17 @@ bool MainMenuLayer::init()
 			SoundManager::PlayIntroMusic();
 
 		}while(0);
+
+		//create menu
+		CCMenuItemImage* pIntroduction = CCMenuItemImage::create(
+			"Introduction/button_introduction.png",
+			"Introduction/button_introduction.png",
+			CC_CALLBACK_0(MainMenuLayer::menuOpenIntroduction, this));
+		pIntroduction->setPosition(ccp(35, 35));
+
+		CCMenu* pMenuIntroduction = CCMenu::create(pIntroduction , NULL);
+		pMenuIntroduction->setPosition(CCPointZero);
+		this->addChild(pMenuIntroduction);
 		
 		return true;
 	}
@@ -127,7 +139,13 @@ void MainMenuLayer::menuItemSelected(CCObject* pSender)
 	*/
 }
 
+void MainMenuLayer::menuOpenIntroduction()
+{
+	IntroductionScene* pIntroduction = IntroductionScene::create();
+	Director::getInstance()->replaceScene(pIntroduction);
+}
+
 MainMenuLayer::~MainMenuLayer()
 {
-	
+
 }

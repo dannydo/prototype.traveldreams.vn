@@ -14,6 +14,7 @@ public:
 	CREATE_FUNC(MainMenuLayer);
 
 	void menuItemSelected(Object* pSender);
+	void menuOpenIntroduction();
 
 	
 };
