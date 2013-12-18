@@ -312,7 +312,7 @@ void EndGameNode::menuNextLevelCallBack()
 void EndGameNode::menuRetryLevelCallBack()
 {
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
-	pGameWordManager->GenerateWordForNewLevel();
+	pGameWordManager->RetryCurrentLevel();
 
 	CCScene *pGameScene = HelloWorld::createScene(m_iCurrentLevel);
 	CCDirector::getInstance()->replaceScene(pGameScene);

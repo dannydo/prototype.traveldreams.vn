@@ -63,6 +63,9 @@
     <ClCompile Include="..\Classes\BonusWordNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\IntroductionLayer.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -113,6 +116,9 @@
     <ClInclude Include="..\Classes\BonusWordNode.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\IntroductionLayer.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">
@@ -133,6 +139,9 @@
       <Filter>resource</Filter>
     </Text>
     <Text Include="..\Resources\GenerateWordConfig.txt">
+      <Filter>resource</Filter>
+    </Text>
+    <Text Include="..\Classes\note.txt">
       <Filter>resource</Filter>
     </Text>
   </ItemGroup>

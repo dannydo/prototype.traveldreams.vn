@@ -34,6 +34,7 @@ public:
 	void LoadWordGenerateConfig();
 	void LoadWords();
 	void GenerateWordForNewLevel();
+	void RetryCurrentLevel();
 
 	inline const Word& GetMainWord() { return m_WordList[m_iMainWordIndex];}
 	int GetSubWordCount() { return _GDS_SUB_WORD_MAX_COUNT_;}
@@ -50,6 +51,8 @@ public:
 	int GetLengthOfMainWord();
 	int GetLengthOfSubWord();
 private:
+	void ResetDataForNewPlay();
+
 	bool GenerateLetterFromMainWord(unsigned char& sLetter);
 	bool GenerateLetterFromSubWords(unsigned char& sLetter);
 	bool GenerateLetterFromTrashCollection(unsigned char& sLetter);

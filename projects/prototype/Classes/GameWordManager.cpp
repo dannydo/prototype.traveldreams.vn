@@ -123,6 +123,18 @@ void GameWordManager::GenerateWordForNewLevel()
 		CCLOG( "Bonus word %d: %s", i, m_WordList[m_SubWordList[i]].m_sWord);
 	}	
 
+	// reset data
+	ResetDataForNewPlay();
+}
+
+void GameWordManager::RetryCurrentLevel()
+{
+	// reset data
+	ResetDataForNewPlay();
+}
+
+void GameWordManager::ResetDataForNewPlay()
+{
 	// reset flags of words
 	memset( m_WordList[m_iMainWordIndex].m_ActivatedCharacterFlags, 0, _GDS_WORD_MAX_LENGTH_);
 	memset( m_WordList[m_iMainWordIndex].m_AppearedCharacterFlags, 0, _GDS_WORD_MAX_LENGTH_);
@@ -179,7 +191,6 @@ void GameWordManager::GenerateWordForNewLevel()
 				m_SubWordLettersCollection.push_back( m_WordList[m_SubWordList[i]].m_sWord[j]);
 		}
 }
-
 
 bool GameWordManager::UnlockLetter(const unsigned char& iLetter, int& iUnlockedLetterIndexOfMainWord, std::vector<int> (&unlockedLettersIndexOfSubWords)[_GDS_SUB_WORD_MAX_COUNT_],
 								   bool& bIsMainWordJustUnlocked, bool (&justUnlockedSubWords)[_GDS_SUB_WORD_MAX_COUNT_])
