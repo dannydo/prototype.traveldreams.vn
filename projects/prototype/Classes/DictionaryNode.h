@@ -12,6 +12,9 @@ public:
 
 private:
 	void menuCloseCallBack();
+	void onTouchBackground(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
+
+	cocos2d::Sprite* m_pImgDictionary;
 };
 
 #endif;
