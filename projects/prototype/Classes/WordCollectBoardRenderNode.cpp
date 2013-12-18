@@ -277,7 +277,6 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 
 			// show dictionary
 			DictionaryNode* pDictionary = DictionaryNode::create();
-			pDictionary->setPosition(winSize.width/2.0f, winSize.height/2.0f + 50);
 			this->getParent()->addChild(pDictionary, 20);			
 		}
 		else

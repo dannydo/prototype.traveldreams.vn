@@ -8,17 +8,16 @@ class GameTargetNode : public cocos2d::Node
 public:
 	static GameTargetNode* createLayout(char* pMainWord, const int& iCurrentLevel);
 	bool initLayout(char* pMainWord);
-	void setEnableAction(const bool& bEnable);
 
 private:
 	void menuPlayLevelCallBack();
 	void menuCloseCallBack();
 	void menuOpenDictCallBack();
+	void onTouchBackground(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
 
 	int m_iCurrentLevel;
 
-	cocos2d::Menu* m_pMenuDict;
-	cocos2d::Menu* m_pMenuClose;
+	cocos2d::Sprite* m_pBackgroundBoard; 
 };
 
 #endif;

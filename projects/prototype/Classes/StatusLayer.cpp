@@ -100,6 +100,10 @@ void StatusLayer::updateScore()
 		if (temp > m_iCurrentScore)
 		{ 
 			temp = m_iCurrentScore;
+			if (temp < m_iMaxScoreLevel)
+			{
+				bonus = m_iCurrentScore - m_iScoreOld;
+			}
 		}
 
 		this->generateLayoutScore(temp);

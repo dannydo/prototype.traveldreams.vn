@@ -58,11 +58,9 @@ bool EndGameNode::initLose(const int& iScore, char* pMainWord)
 		"Target-End-Game/Retry_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuRetryLevelCallBack, this));
 
-	m_pMenuLose = Menu::create(pRetryLevel, NULL);
-	m_pMenuLose->setPosition(Point(this->getContentSize().width/2.0f, 385));
-	this->addChild(m_pMenuLose);
-
-	m_pMenuWin = NULL;
+	Menu* pMenuLose = Menu::create(pRetryLevel, NULL);
+	pMenuLose->setPosition(Point(this->getContentSize().width/2.0f, 385));
+	this->addChild(pMenuLose);
 
 	return true;
 }
@@ -99,11 +97,9 @@ bool EndGameNode::initWin(const int& iScore, char* pMainWord, std::vector<char*>
 		"Target-End-Game/Next_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuNextLevelCallBack, this));
 
-	m_pMenuWin = Menu::create(pNextLevel, NULL);
-	m_pMenuWin->setPosition(Point(this->getContentSize().width/2.0f, 385));
-	this->addChild(m_pMenuWin);
-
-	m_pMenuLose = NULL;
+	Menu* pMenuWin = Menu::create(pNextLevel, NULL);
+	pMenuWin->setPosition(Point(this->getContentSize().width/2.0f, 385));
+	this->addChild(pMenuWin);
 	
 	return true;
 }
@@ -117,6 +113,10 @@ bool EndGameNode::init()
 	
 	LayerColor* pBackground = LayerColor::create(ccc4(191, 103, 241, 229));
 	pBackground->setContentSize(CCSizeMake(640, 960));
+	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
+	listener->setSwallowTouches(true);
+	listener->onTouchBegan = [](Touch* touch, Event* event) { return true;  };
+	EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, pBackground);
 	this->addChild(pBackground);
 	this->setContentSize(pBackground->getContentSize());
 
@@ -125,36 +125,20 @@ bool EndGameNode::init()
 		"Target-End-Game/Close_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuCloseCallBack, this));
 
-	m_pMenuClose = Menu::create(pCloseItem, NULL);
-	m_pMenuClose->setPosition(Point(561, 790));
-	this->addChild(m_pMenuClose, 10);
+	Menu* pMenuClose = Menu::create(pCloseItem, NULL);
+	pMenuClose->setPosition(Point(561, 790));
+	this->addChild(pMenuClose, 10);
 
 	MenuItemImage* pDictItem = MenuItemImage::create(
 		"Target-End-Game/Dict_Button.png",
 		"Target-End-Game/Dict_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuOpenDictCallBack, this));
 
-	m_pMenuDict = Menu::create(pDictItem, NULL);
-	m_pMenuDict->setPosition(Point(150, 380));
-	this->addChild(m_pMenuDict, 10);
+	Menu* pMenuDict = Menu::create(pDictItem, NULL);
+	pMenuDict->setPosition(Point(150, 380));
+	this->addChild(pMenuDict, 10);
 
 	return true;
-}
-
-void EndGameNode::setEnableAction(const bool& bEnable)
-{
-	m_pMenuClose->setEnabled(bEnable);
-	m_pMenuDict->setEnabled(bEnable);
-
-	if (m_pMenuWin != NULL)
-	{
-		m_pMenuWin->setEnabled(bEnable);
-	}
-
-	if (m_pMenuLose != NULL)
-	{
-		m_pMenuLose->setEnabled(bEnable);
-	}
 }
 
 std::vector<int> EndGameNode::generateArrayNumber(int iNumber)
@@ -327,7 +311,5 @@ void EndGameNode::menuCloseCallBack()
 void EndGameNode::menuOpenDictCallBack()
 {
 	DictionaryNode* pDictionary = DictionaryNode::create();
-	pDictionary->setPosition(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 50);
 	this->addChild(pDictionary, 10);
-	this->setEnableAction(false);
 }

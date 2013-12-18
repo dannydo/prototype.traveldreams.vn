@@ -28,12 +28,16 @@ bool GameTargetNode::initLayout(char* pMainWord)
 
 	LayerColor* pBackground = LayerColor::create(ccc4(191, 103, 241, 229));
 	pBackground->setContentSize(CCSizeMake(640, 960));
+	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
+	listener->setSwallowTouches(true);
+	listener->onTouchBegan = [this](Touch* touch, Event* event) { this->onTouchBackground(touch, event); return true;  };
+	EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, pBackground);
 	this->addChild(pBackground);
 	this->setContentSize(pBackground->getContentSize());
 
-	Sprite* pBackgroundWin = Sprite::create("Target-End-Game/Target_Board.png");
-	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 80));
-	this->addChild(pBackgroundWin);
+	m_pBackgroundBoard = Sprite::create("Target-End-Game/Target_Board.png");
+	m_pBackgroundBoard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 80));
+	this->addChild(m_pBackgroundBoard);
 
 	Label* pLabelMainWord = Label::createWithTTF(pMainWord, "fonts/ARLRDBD.ttf", 32);
 	pLabelMainWord->setColor(ccc3(0, 0, 0));
@@ -54,27 +58,21 @@ bool GameTargetNode::initLayout(char* pMainWord)
 		"Target-End-Game/Close_Button_Click.png",
 		CC_CALLBACK_0(GameTargetNode::menuCloseCallBack, this));
 
-	m_pMenuClose = Menu::create(pCloseItem, NULL);
-	m_pMenuClose->setPosition(Point(561, 790));
-	this->addChild(m_pMenuClose, 10);
+	Menu* pMenuClose = Menu::create(pCloseItem, NULL);
+	pMenuClose->setPosition(Point(561, 790));
+	this->addChild(pMenuClose, 10);
 
 	MenuItemImage* pDictItem = MenuItemImage::create(
 		"Target-End-Game/Dict_Button.png",
 		"Target-End-Game/Dict_Button_Click.png",
 		CC_CALLBACK_0(GameTargetNode::menuOpenDictCallBack, this));
 
-	m_pMenuDict = Menu::create(pDictItem, NULL);
-	m_pMenuDict->setPosition(Point(150, 380));
-	this->addChild(m_pMenuDict, 10);
+	Menu* pMenuDict = Menu::create(pDictItem, NULL);
+	pMenuDict->setPosition(Point(150, 380));
+	this->addChild(pMenuDict, 10);
 
 	return true;
-}
-
-void GameTargetNode::setEnableAction(const bool& bEnable)
-{
-	m_pMenuClose->setEnabled(bEnable);
-	m_pMenuDict->setEnabled(bEnable);
-}
+}		
 
 void GameTargetNode::menuPlayLevelCallBack()
 {
@@ -91,7 +89,23 @@ void GameTargetNode::menuCloseCallBack()
 void GameTargetNode::menuOpenDictCallBack()
 {
 	DictionaryNode* pDictionary = DictionaryNode::create();
-	pDictionary->setPosition(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 50);
 	this->addChild(pDictionary, 10);
-	this->setEnableAction(false);
+}
+
+void GameTargetNode::onTouchBackground(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
+{
+	Point location = pTouch->getLocationInView();
+	location = Director::sharedDirector()->convertToGL(location);
+
+	if (location.x >= m_pBackgroundBoard->getPositionX() - m_pBackgroundBoard->getContentSize().width/2.0f + 20 && 
+		location.x <= m_pBackgroundBoard->getPositionX() + m_pBackgroundBoard->getContentSize().width/2.0f - 20 &&
+		location.y >= m_pBackgroundBoard->getPositionY() - m_pBackgroundBoard->getContentSize().height/2.0f + 20 &&
+		location.y <= m_pBackgroundBoard->getPositionY() + m_pBackgroundBoard->getContentSize().height/2.0f - 10)
+	{
+		pEvent->stopPropagation();
+		 return;
+	}
+
+	this->getParent()->removeChild(this);
+	pEvent->stopPropagation();
 }
