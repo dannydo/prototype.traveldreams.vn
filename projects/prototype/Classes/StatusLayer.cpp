@@ -10,47 +10,50 @@ bool StatusLayer::init()
 		return false;
 	}
 
-	Sprite* background = Sprite::create("Score-Star/Board.png");
+	m_SpriteNumberMove = new Array();
+	m_SpriteNumberMove->initWithCapacity(0);
+
+	m_SpriteNumberScore = new Array();
+	m_SpriteNumberScore->initWithCapacity(0);
+
+	m_pSpriteBatchNode = SpriteBatchNode::create("Score-Star/Score-Star.pvr.ccz");
+	this->addChild(m_pSpriteBatchNode);
+	SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("Score-Star/Score-Star.plist");
+
+	Sprite* background = Sprite::createWithSpriteFrameName("Board.png");
 	background->setPosition(Point(background->getContentSize().width/2.0f, background->getContentSize().height/2.0f));
-	this->addChild(background);
+	m_pSpriteBatchNode->addChild(background);
 	this->setContentSize(background->getContentSize());
 
 	m_iCurrentScore = 0;
 	m_iScoreOld = 0;
-	m_pScore = Node::create();
-	m_pScore->setPosition(Point(background->getContentSize().width/2.0f, 37));
-	this->addChild(m_pScore);
-
 	m_iCurrentMove = 0;
-	m_pMove = Node::create();
-	m_pMove->setPosition(Point(background->getContentSize().width/2.0f, 95));
-	this->addChild(m_pMove);
 
 	m_centerCircle = Point(117, 88);
 	m_fRadiusCircle = 90.0f;
 
 	this->clippingNodeCircle();
 
-	m_pStarBlack1 = Sprite::create("Score-Star/Gray_Star.png");
-	this->addChild(m_pStarBlack1);
+	m_pStarBlack1 = Sprite::createWithSpriteFrameName("Gray_Star.png");
+	m_pSpriteBatchNode->addChild(m_pStarBlack1);
 
-	m_pStarBlack2 = Sprite::create("Score-Star/Gray_Star.png");
-	this->addChild(m_pStarBlack2);
+	m_pStarBlack2 = Sprite::createWithSpriteFrameName("Gray_Star.png");
+	m_pSpriteBatchNode->addChild(m_pStarBlack2);
 
-	m_pStarBlack3 = Sprite::create("Score-Star/Gray_Star.png");
-	this->addChild(m_pStarBlack3);
+	m_pStarBlack3 = Sprite::createWithSpriteFrameName("Gray_Star.png");
+	m_pSpriteBatchNode->addChild(m_pStarBlack3);
 
-	m_pStarYellow1 = Sprite::create("Score-Star/Gold_Star.png");
+	m_pStarYellow1 = Sprite::createWithSpriteFrameName("Gold_Star.png");
 	m_pStarYellow1->setVisible(false);
-	this->addChild(m_pStarYellow1);
+	m_pSpriteBatchNode->addChild(m_pStarYellow1);
 
-	m_pStarYellow2 = Sprite::create("Score-Star/Gold_Star.png");
+	m_pStarYellow2 = Sprite::createWithSpriteFrameName("Gold_Star.png");
 	m_pStarYellow2->setVisible(false);
-	this->addChild(m_pStarYellow2);
+	m_pSpriteBatchNode->addChild(m_pStarYellow2);
 
-	m_pStarYellow3 = Sprite::create("Score-Star/Gold_Star.png");
+	m_pStarYellow3 = Sprite::createWithSpriteFrameName("Gold_Star.png");
 	m_pStarYellow3->setVisible(false);
-	this->addChild(m_pStarYellow3);
+	m_pSpriteBatchNode->addChild(m_pStarYellow3);
 
 	m_fDeltaTime = 0;
 	m_iSpeedUpdateScore = 10;
@@ -229,25 +232,26 @@ void StatusLayer::generateLayoutMove()
 	int height;
 	Node* node = Node::create();
 	int iTotal = arrNumber.size();
+
+	while(m_SpriteNumberMove->count() > 0)
+	{
+		m_pSpriteBatchNode->removeChild((Sprite*)m_SpriteNumberMove->getObjectAtIndex(0), false);
+		m_SpriteNumberMove->removeObjectAtIndex(0);
+	}
 	
 	while(!arrNumber.empty())
 	{
 		char sFileName[35];
-		sprintf(sFileName, "Score-Star/NumMoves/NumMoves_%d.png", arrNumber.back());
-		Sprite* sprite = Sprite::create(sFileName);
+		sprintf(sFileName, "NumMoves_%d.png", arrNumber.back());
+		Sprite* sprite = Sprite::createWithSpriteFrameName(sFileName);
 		
 		height = sprite->getContentSize().height;
-		sprite->setPosition(Point(width, height/2.0f));
+		sprite->setPosition(Point(137 - iTotal*18 + width, 101 + height/2.0f));
 		width = width + sprite->getContentSize().width - 5;
-		node->addChild(sprite);
+		m_pSpriteBatchNode->addChild(sprite);
 		arrNumber.pop_back();
+		m_SpriteNumberMove->addObject(sprite);
 	}
-
-	this->removeChild(m_pMove);
-	m_pMove = node;									   
-	m_pMove->setContentSize(CCSizeMake(width, height));
-	m_pMove->setPosition(Point(117 - width/2.0f + width/(2.0f*iTotal), 100));
-	this->addChild(m_pMove);
 }
 
 void StatusLayer::generateLayoutScore(int iScore)
@@ -257,23 +261,24 @@ void StatusLayer::generateLayoutScore(int iScore)
 	int height;
 	Node* node = Node::create();
 	int iTotal = arrNumber.size();
+
+	while(m_SpriteNumberScore->count() > 0)
+	{
+		m_pSpriteBatchNode->removeChild((Sprite*)m_SpriteNumberScore->getObjectAtIndex(0), false);
+		m_SpriteNumberScore->removeObjectAtIndex(0);
+	}
 	
 	while(!arrNumber.empty())
 	{
 		char sFileName[35];
-		sprintf(sFileName, "Score-Star/NumScore/NumScore_%d.png", arrNumber.back());
-		Sprite* sprite = Sprite::create(sFileName);
+		sprintf(sFileName, "NumScore_%d.png", arrNumber.back());
+		Sprite* sprite = Sprite::createWithSpriteFrameName(sFileName);
 
 		height = sprite->getContentSize().height;
-		sprite->setPosition(Point(width, height/2.0f));
+		sprite->setPosition(Point(127 - iTotal*8 + width, 42 + height/2.0f));
 		width = width + sprite->getContentSize().width - 17;
-		node->addChild(sprite);
+		m_pSpriteBatchNode->addChild(sprite);
 		arrNumber.pop_back();
+		m_SpriteNumberScore->addObject(sprite);
 	}
-
-	this->removeChild(m_pScore);
-	m_pScore = node;									   
-	m_pScore->setContentSize(CCSizeMake(width, height));
-	m_pScore->setPosition(Point(117 - width/2.0f + width/(2.0f*iTotal), 42));
-	this->addChild(m_pScore);
 }
