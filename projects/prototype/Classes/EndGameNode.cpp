@@ -164,7 +164,7 @@ Node* EndGameNode::generateLayoutScore(int iScore)
 	
 	while(!arrNumber.empty())
 	{
-		char sFileName[35];
+		char sFileName[50];
 		sprintf(sFileName, "Target-End-Game/NumScore/NumScore_%d.png", arrNumber.back());
 		Sprite* sprite = Sprite::create(sFileName);
 
