@@ -71,13 +71,13 @@ Scene* HelloWorld::createScene(int iLevel)
 	std::vector<Word> subWordList;
 	for(int i=0; i< pGameWordManager->GetSubWordCount(); i++)
 		subWordList.push_back( pGameWordManager->GetSubWord(i));
-	boardLayer->m_pBonusWordNode = BonusWordNode::createLayout(subWordList);
-	boardLayer->m_pBonusWordNode->setPosition( 320.f, 620.f);
+	boardLayer->m_pBonusWordNode = BonusWordNodeNew::createLayout(subWordList);
+	boardLayer->m_pBonusWordNode->setPosition( 314.f, 756.f);
 	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pBonusWordNode, 10);
 
-	Node* btnShowPopup = boardLayer->m_pBonusWordNode->createButtonShowPopupBonus();
+	/*Node* btnShowPopup = boardLayer->m_pBonusWordNode->createButtonShowPopupBonus();
 	btnShowPopup->setPosition(-80, 300);
-	boardLayer->m_pHUDLayer->addChild(btnShowPopup);
+	boardLayer->m_pHUDLayer->addChild(btnShowPopup);*/
 
     // return the scene
     return scene;
@@ -214,6 +214,7 @@ void HelloWorld::initLevel(int iLevel)
 	// init graphic for gameBoard
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResourceDemo.plist");
 	m_pBoardBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
+	//m_pBoardBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);
 	this->addChild(m_pBoardBatchNode);
 
 
@@ -235,7 +236,7 @@ void HelloWorld::initLevel(int iLevel)
 				pSprite = Sprite::createWithSpriteFrameName( "brick.png");
 				//pSprite->setAnchorPoint(ccp(0,0));
 				pSprite->setPosition( ccp(m_fBoardLeftPosition + iColumn * m_SymbolSize.width, m_fBoardBottomPosition + iRow * m_SymbolSize.height));
-				pSprite->setScale(0.65f);
+				pSprite->setScale(0.929f);
 				m_pBoardBatchNode->addChild(pSprite, 10);
 
 				continue;
@@ -498,7 +499,7 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 
 	if (m_eTouchMoveState == _TMS_BEGIN_IDENTIFY_)
 	{				
-		if (abs(fDeltaX) > 5.f)
+		if (fabs(fDeltaX) > 5.f)
 		{
 			m_eTouchMoveState = _TMS_MOVE_HORIZONTAL_;
 
@@ -511,7 +512,7 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 					m_MovingCellMirrorList[iColumn].m_pSprite->setPosition(m_MovingCellList[iColumn].m_pSprite->getPosition());
 			}
 		}
-		else if (abs(fDeltaY) > 5.f)
+		else if (fabs(fDeltaY) > 5.f)
 		{
 			m_eTouchMoveState = _TMS_MOVE_VERTICAL_;
 
@@ -930,38 +931,30 @@ void HelloWorld::OnEndDragEffect()
 void HelloWorld::CheckBoardStateAfterMove()
 {
 	bool bMoveIsValid = false;
+	m_ComputeMoveResult.Reset(false);
 
-	/*std::vector<Cell> destroyCells;
-	std::vector<ComboEffectCell> comboEffectCells;
-	std::vector<Cell> destroyedByEffectCells;
-	std::vector<Cell> originalMovedCells;
-	std::vector<Cell> targetMovedCells;
-	std::vector<Cell> newCells;
-	std::vector<ComboEffectCell> newComboCells;*/	
-	//if (m_GameBoardManager.RecheckAfterMoveV2( -1, -1, -1, -1, destroyCells, comboEffectCells, destroyedByEffectCells, originalMovedCells, targetMovedCells, newCells, newComboCells))
-
-	std::vector<Cell> basicMatchingDestroyedCells;
-	std::vector<DoubleComboEffectBundle> doubleComboList;
-	std::vector<ComboEffectBundle*> comboChainList;
-	std::vector<ComboEffectCell> newComboCells;
-	std::vector<Cell> originalMovedCells;
-	std::vector<Cell> targetMovedCells;
-	std::vector<Cell> newCells;
-
-	if (m_GameBoardManager.RecheckAfterMoveV2( -1, -1, -1, -1, basicMatchingDestroyedCells, doubleComboList, comboChainList, newComboCells, originalMovedCells, targetMovedCells, newCells))
+	if (m_GameBoardManager.RecheckAfterMoveV2( -1, -1, -1, -1, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_DoubleComboList, 
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells))
 	{
-		PlayEffect2(basicMatchingDestroyedCells, doubleComboList, comboChainList, newComboCells, originalMovedCells, targetMovedCells, newCells, false);
+		PlayEffect2( m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_DoubleComboList, 
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells, false);
 	}
 	else
 	{
 		m_bIsEffectPlaying = false;
 
 		//check end game
-		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked()) // complete objective ==> win
-		
-			//if (false)
+		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked()) // complete objective ==> win		
+		//if (true)
+		//if (false)
 		{
-			ExecuteBonusWinGameEffect();
+			// play sound effect 
+			SoundManager::PlaySoundEffect(_SET_COMPLETE_WORD_);
+
+			m_bIsEffectPlaying = true;//stop all interaction on board from now
+
+			ShowMainWordUnlockEffect();
+			//ExecuteBonusWinGameEffect();						
 		}
 		else  if (m_GameBoardManager.GetCurrentMove() == 0) // out of move ==> lose
 		{
@@ -969,31 +962,31 @@ void HelloWorld::CheckBoardStateAfterMove()
 				const_cast<char*>(m_GameBoardManager.GetGameWordManager()->GetMainWord().m_sWord), m_GameBoardManager.GetCurrentLevel());
 			m_pHUDLayer->addChild( pEndGameNode, 10);
 
+			SoundManager::PlaySoundEffect(_SET_LOSE);
+
 		}
 	}
 }
 
 void HelloWorld::ExecuteBonusWinGameEffect()
 {
-	std::vector<ComboEffectCell> convertedComboCells;
-	std::vector<Cell> basicMatchingDestroyedCells;
-	std::vector<DoubleComboEffectBundle> doubleComboList;
-	std::vector<ComboEffectBundle*> comboChainList;
-	std::vector<ComboEffectCell> newComboCells;
-	std::vector<Cell> originalMovedCells;
-	std::vector<Cell> targetMovedCells;
-	std::vector<Cell> newCells;
+	m_ComputeMoveResult.Reset(true);
 
 	//if (m_GameBoardManager.GetCurrentMove() > 0)
-	if (m_GameBoardManager.ExecuteEndGameBonus(convertedComboCells, basicMatchingDestroyedCells, doubleComboList, comboChainList, newComboCells, originalMovedCells, targetMovedCells, newCells))
+	if (m_GameBoardManager.ExecuteEndGameBonus(m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_DoubleComboList, 
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells))
 	{
-		PlayBonusEndEffect(convertedComboCells, basicMatchingDestroyedCells, doubleComboList, comboChainList, newComboCells, originalMovedCells, targetMovedCells, newCells);
+		PlayBonusEndEffect(m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_DoubleComboList, 
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells);
 
 		m_pStatusLayer->setCurrentMove( m_GameBoardManager.GetCurrentMove());
 		//m_pStatusLayer->update(0);
 	}
 	else
-		ShowWinGamePopup();
+	{
+		//ShowWinGamePopup();
+		ShowLevelCompleteEffect();
+	}
 }
 
 void HelloWorld::ShowWinGamePopup()
@@ -1561,8 +1554,8 @@ void HelloWorld::PlayEffect2(std::vector<Cell>& basicMatchingDestroyedCells, std
 
 		for(int i=0; i< 2; i++)
 		{		
-			if (iLetter < 255)
-				iLetter = iLetter;
+			//if (iLetter < 255)
+			//	iLetter = iLetter;
 
 			Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn),
 				(iLetter != 255)?_GCT_HAS_LETTER_:_GCT_NONE_ ).c_str());
@@ -1746,7 +1739,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 		if (m_GameBoardManager.GetGameWordManager()->UnlockLetter( m_BoardViewMatrix[iRow][iColumn].m_iLetter, iUnlockedLetterIndexOfMainWord, unlockedLettersIndexOfSubWords,
 																	bIsMainWordJustUnlocked, justUnlockedSubWords))
 		{
-			m_pBonusWordNode->addCharacterCollected(m_BoardViewMatrix[iRow][iColumn].m_iLetter);
+			m_pBonusWordNode->addLetter(m_BoardViewMatrix[iRow][iColumn].m_iLetter);
 
 			if (iUnlockedLetterIndexOfMainWord >=0)
 				m_pWordCollectBoardRenderNode->UnlockCharacter(iUnlockedLetterIndexOfMainWord);
@@ -1768,19 +1761,24 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 				{
 					m_GameBoardManager.IncreaseScoreForUnlockSubWord(i);
 				}			
-		}
+
+			// play sound effect 
+			SoundManager::PlaySoundEffect(_SET_GET_CHARACTER_);
+		}		
 	}
 
 	
-	/*if ( m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite != NULL)
+	if ( m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite != NULL)
 	{
 		m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite->runAction(
 			Sequence::create(
-				DelayTime::create(fDelay + fEffectDuration),
+				DelayTime::create(fDelay),
 				RemoveSelf::create( true),
 				//FadeOut::create(0.01f),
 				NULL));
-	}*/
+
+		m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = NULL;
+	}
 
 	m_BoardViewMatrix[iRow][iColumn].m_pSprite = NULL;
 	m_BoardViewMatrix[iRow][iColumn].m_iLetter = 255; //-1;
@@ -2066,7 +2064,7 @@ void HelloWorld::PlayBonusEndEffect( std::vector<ComboEffectCell>& convertedToCo
 			{			
 				CCLOG("%d, %c:", iLetter, (unsigned char)iLetter);
 				Sprite* pCharacterSprite = Sprite::createWithSpriteFrameName(
-					m_pWordCollectBoardRenderNode->GetImageFileFromLetter(iLetter).c_str());
+					m_pWordCollectBoardRenderNode->GetImageInGemFileFromLetter(iLetter).c_str());
 				
 				//pCharacterSprite->setScale(0.75f);
 				//pCharacterSprite->setAnchorPoint(ccp(0,0));
@@ -2115,4 +2113,142 @@ void HelloWorld::PlayBonusEndEffect( std::vector<ComboEffectCell>& convertedToCo
 					CCDelayTime::create(fDelayTime + fDestroyTime * (iMaxComboPhase+1)+ fMoveTime *5),
 					CCCallFunc::create( this, callfunc_selector( HelloWorld::ExecuteBonusWinGameEffect)),
 					NULL));		
+}
+
+
+void HelloWorld::ShowMainWordUnlockEffect()
+{
+	m_pEndGameEffectLayer = LayerColor::create(ccc4( 0,0,0, 100));
+	this->getParent()->addChild(m_pEndGameEffectLayer);
+
+	SpriteBatchNode* pSpriteBatchNode = SpriteBatchNode::create("ResourceDemo.pvr.ccz");
+	m_pEndGameEffectLayer->addChild(pSpriteBatchNode);
+
+	// play unlock main word effect
+	float fScaleRatio = 1.75f;
+	float fDisplayEffectTime = 0.25f;
+	float fDelayPerLetter = 0.06f;
+
+	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+	
+
+	float fWordGraphicLength = 0;
+	Sprite* letterSpriteList[_GDS_WORD_MAX_LENGTH_];
+
+	for(int i=0; i< mainWord.m_iWordLength; i++)
+	{
+		letterSpriteList[i] = Sprite::createWithSpriteFrameName(  m_pWordCollectBoardRenderNode->GetImageFileFromLetter(mainWord.m_sWord[i]).c_str());
+		letterSpriteList[i]->setAnchorPoint(Point(0,0));
+		letterSpriteList[i]->setScale(fScaleRatio);
+
+		fWordGraphicLength += letterSpriteList[i]->getContentSize().width * fScaleRatio + 2.f;
+	}
+
+	Size winSize = Director::getInstance()->getWinSize();
+	float fLetterStartPosX = (winSize.width - fWordGraphicLength) /2.f;
+	float fLetterPosY = (winSize.height - letterSpriteList[0]->getContentSize().height)/2.f;
+	float fPositionXIncrement = fLetterStartPosX;
+
+	for(int i=0; i< mainWord.m_iWordLength; i++)
+	{
+		letterSpriteList[i]->setPosition( Point(fPositionXIncrement, fLetterPosY));
+		letterSpriteList[i]->setOpacity(30);
+		letterSpriteList[i]->setScale(5.f);
+		pSpriteBatchNode->addChild(letterSpriteList[i]);
+
+		letterSpriteList[i]->runAction( 
+			Sequence::create(
+				DelayTime::create( i*fDelayPerLetter),
+				EaseOut::create( FadeTo::create(fDisplayEffectTime, 255) ,2.f) ,
+				NULL));
+		letterSpriteList[i]->runAction( 
+			Sequence::create(
+				DelayTime::create( i*fDelayPerLetter),
+				EaseOut::create( ScaleTo::create( fDisplayEffectTime, fScaleRatio, fScaleRatio), 2.f), 
+				NULL));		
+
+		fPositionXIncrement += letterSpriteList[i]->getContentSize().width * fScaleRatio + 2.f;
+	}
+
+	m_pWordCollectBoardRenderNode->PlaySpellingSound();
+	
+	pSpriteBatchNode->runAction(
+		Sequence::create(
+			DelayTime::create( mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.f),
+			FadeOut::create(0.5f),
+			RemoveSelf::create(),
+			NULL));
+
+	this->runAction(
+		Sequence::create(
+			DelayTime::create( mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.5f),
+			CallFunc::create( this,  callfunc_selector(HelloWorld::StartWinBonusPhase)),
+			NULL));
+
+}
+
+using namespace cocos2d::extension::armature;
+
+void HelloWorld::StartWinBonusPhase()
+{
+	m_pEndGameEffectLayer->setColor(ccc3(255,255,255));
+	m_pEndGameEffectLayer->setOpacity(0);
+
+	//! Load data synchorinize (should replace load async in the future
+    ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/EatingTime/EatingTime.ExportJson");
+	
+	//play
+	Armature* pAmarture = Armature::create("EatingTime");
+	pAmarture->getAnimation()->playByIndex(0);		
+	pAmarture->setBlendFunc(BlendFunc::ALPHA_NON_PREMULTIPLIED);	
+	m_pEndGameEffectLayer->addChild(pAmarture);
+
+	Size winSize = Director::getInstance()->getWinSize();	
+	pAmarture->setPosition( winSize.width/2.f, winSize.height/2.f);
+
+	float fAnimDuration = pAmarture->getAnimation()->getRawDuration() / 60.f;
+
+	pAmarture->runAction(
+		Sequence::create(
+			DelayTime::create( fAnimDuration),
+			RemoveSelf::create(),
+			NULL));
+
+	this->runAction(
+		Sequence::create(
+			DelayTime::create( fAnimDuration + 0.5f),
+			CallFunc::create( this,  callfunc_selector(HelloWorld::ExecuteBonusWinGameEffect)),
+			NULL));
+	
+}
+
+void HelloWorld::ShowLevelCompleteEffect()
+{
+	//! Load data synchorinize (should replace load async in the future
+    ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/WordClear/WordClear.ExportJson");
+	
+	//play
+	Armature* pAmarture = Armature::create("WordClear");
+	pAmarture->getAnimation()->playByIndex(0);	
+	pAmarture->setBlendFunc(BlendFunc::ALPHA_NON_PREMULTIPLIED);	
+	m_pEndGameEffectLayer->addChild(pAmarture);
+
+	Size winSize = Director::getInstance()->getWinSize();	
+	pAmarture->setPosition( winSize.width/2.f, winSize.height/2.f );
+
+	float fAnimDuration = pAmarture->getAnimation()->getRawDuration() / 60.f;
+
+	pAmarture->runAction(
+		Sequence::create(
+			DelayTime::create( fAnimDuration + 0.02f),
+			RemoveSelf::create(),
+			NULL));
+
+	this->runAction(
+		Sequence::create(
+			DelayTime::create( fAnimDuration),
+			CallFunc::create( this,  callfunc_selector(HelloWorld::ShowWinGamePopup)),
+			NULL));
+
+	SoundManager::PlaySoundEffect(_SET_WIN_);
 }

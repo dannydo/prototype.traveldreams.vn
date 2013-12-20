@@ -66,6 +66,9 @@
     <ClCompile Include="..\Classes\IntroductionLayer.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\BonusWordNodeNew.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -117,6 +120,9 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\IntroductionLayer.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\BonusWordNodeNew.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

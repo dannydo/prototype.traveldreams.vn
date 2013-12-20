@@ -134,6 +134,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\BonusWordNode.cpp" />
+    <ClCompile Include="..\Classes\BonusWordNodeNew.cpp" />
     <ClCompile Include="..\Classes\ComboCountRenderNode.cpp" />
     <ClCompile Include="..\Classes\DictionaryNode.cpp" />
     <ClCompile Include="..\Classes\EndGameNode.cpp" />
@@ -152,6 +153,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
   <ItemGroup>
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\BonusWordNode.h" />
+    <ClInclude Include="..\Classes\BonusWordNodeNew.h" />
     <ClInclude Include="..\Classes\ComboCountRenderNode.h" />
     <ClInclude Include="..\Classes\DictionaryNode.h" />
     <ClInclude Include="..\Classes\EndGameNode.h" />

@@ -18,13 +18,7 @@ public:
 
 	inline bool IsBlankCell(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell;}
 
-	// only iSelectedRow or iSelectedColumn > 1 at one time
-	/*bool DoAMove(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn, std::vector<Cell>& destroyCells,
-		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells);*/
-	bool RecheckAfterMove(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
-		std::vector<Cell>& destroyCells,
-		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells);
-
+	// only iSelectedRow or iSelectedColumn > 1 at one time	
 	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& destroyCells, std::vector<ComboEffectCell>& activatedComboEffectCells, std::vector<Cell>& destroyedByEffectCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells, std::vector<ComboEffectCell>& newComboCells);

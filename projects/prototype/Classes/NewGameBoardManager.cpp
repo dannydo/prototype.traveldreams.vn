@@ -548,6 +548,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	int iRow, iColumn, iGemID;
 	int iSameValueCellCount;
 	// bool bIsValidMove = false;
+	bool bHasExistingCombo = false;
 
 	// create temporary list to compute result for shifting move
 	for(iRow = 0; iRow < m_iRowNumber; iRow++)
@@ -557,7 +558,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 			m_CheckedHorizotalMatrix[iRow][iColumn] = false;
 			m_CheckedVerticalMatrix[iRow][iColumn] = false;
 			m_FlagDestroyedMatrix[iRow][iColumn] = false;
-			m_TemporaryValueMatrix[iRow][iColumn] = m_BoardValueMatrix[iRow][iColumn];		
+			m_TemporaryValueMatrix[iRow][iColumn] = m_BoardValueMatrix[iRow][iColumn];					
 		}
 	}	
 
@@ -600,6 +601,8 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		{
 			if ( m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
 			{
+				bHasExistingCombo = true;
+
 				bool bFoundDoubleCombo = false;
 				Cell nextCell;			
 				if (iRow < m_iRowNumber-1 && m_TemporaryValueMatrix[iRow+1][iColumn].m_eGemComboType)
@@ -820,7 +823,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		}
 	}
 
-	if (m_iLinkedBlockCount > 0 || doubleComboList.size() > 0 || convertedToComboCells.size()>0)
+	if (m_iLinkedBlockCount > 0 || doubleComboList.size() > 0 || convertedToComboCells.size()>0 || bHasExistingCombo)
 	{
 		// for test
 		//CountBasicCombo();
@@ -860,7 +863,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		}	
 		
 
-		// add converted combo from bonus to list
+		// add converted combo from bonus and existing combo to list
 		for(auto cell: convertedToComboCells)
 		{
 			if (m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType != _GCT_NONE_)
@@ -872,6 +875,21 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 
 				comboChainList.push_back(pTriggeredComboEffectBundle);
 			}
+		}
+
+		if (convertedToComboCells.size() == 0  && doubleComboList.size()==0 && bHasExistingCombo)
+		{
+			for(iRow = 0; iRow < m_iRowNumber; iRow++)
+				for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+					if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
+					{
+						ComboEffectBundle* pTriggeredComboEffectBundle = new ComboEffectBundle();
+						pTriggeredComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = _CET_EXPLOSION_; //only implement explosion now
+						pTriggeredComboEffectBundle->m_ComboEffectDescription.m_Position = Cell(iRow, iColumn);
+						pTriggeredComboEffectBundle->m_iPhase = comboChainList.size(); //0;														
+
+						comboChainList.push_back(pTriggeredComboEffectBundle);
+					}
 		}
 
 		// trigger combo chain from effect of triggered combos

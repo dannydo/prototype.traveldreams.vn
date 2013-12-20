@@ -31,10 +31,6 @@ WordCollectBoardRenderNode::WordCollectBoardRenderNode()
 }*/
 
 /*
-void WordCollectBoardRenderNode::update(float dt)
-{
-}
-
 void WordCollectBoardRenderNode::UpdateList()
 {
 	/*
@@ -82,6 +78,12 @@ void WordCollectBoardRenderNode::UpdateList()
 	}
 }*/
 
+void WordCollectBoardRenderNode::update(float dt)
+{
+	if (m_pCharacter->getAnimation()->getIsComplete())
+		m_pCharacter->getAnimation()->playByIndex(0);
+}
+
 bool WordCollectBoardRenderNode::init()
 {	
 	// GenerateLabels
@@ -94,6 +96,16 @@ bool WordCollectBoardRenderNode::init()
 	timeval now;
 	gettimeofday( &now, NULL);
 	m_iPreviousMainWordTapTime = now.tv_sec*1000 + now.tv_usec / 1000;
+
+	// preload character animation
+	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/PigHero/PigHero.ExportJson");
+
+	m_pCharacter = Armature::create("PigHero");
+	m_pCharacter->setBlendFunc(BlendFunc::ALPHA_NON_PREMULTIPLIED);	
+	m_pCharacter->getAnimation()->playByIndex(0);
+	m_pCharacter->setAnchorPoint(Point(0,0));
+	m_pCharacter->setPosition( 5.f, 740.f);
+	this->addChild(m_pCharacter);
 
 	this->setTouchEnabled(true);	
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);	
@@ -118,8 +130,8 @@ void WordCollectBoardRenderNode::GenerateLabels()
 		m_LabelList[i] =  //CCLabelTTF::create("", "Arial", 34);
 			Sprite::createWithSpriteFrameName( GetImageFileFromLetter(m_pMainWord->m_sWord[i]).c_str());
 		m_LabelList[i]->setAnchorPoint(Point(0,0));
-		m_LabelList[i]->setColor( ccc3(200, 200, 200));
-		m_LabelList[i]->setOpacity(100);
+		m_LabelList[i]->setColor( ccc3(180, 180, 180));
+		m_LabelList[i]->setOpacity(80);
 		//pLabel->enableShadow(Size(10.f,10.f),0.8f,0.2f);
 		//m_LabelList[i]->enableStroke(ccc3(0,0,0), 2.f);		
 
@@ -174,13 +186,13 @@ void WordCollectBoardRenderNode::UnlockCharacter(int iLetterIndex)
 
 	Sprite* pSrite = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(m_pMainWord->m_sWord[iLetterIndex]).c_str());
 	pSrite->setColor( ccc3(100, 100, 100));
-	pSrite->setPosition(ccp( m_LabelXPositionList[iLetterIndex], _position.y));
+	pSrite->setPosition(ccp( m_LabelXPositionList[iLetterIndex], 20.f)); //_position.y));
 	m_pBatchNode->addChild(pSrite);
 		
 
 	pSrite->runAction( ScaleTo::create( 0.35f, 4.f, 4.f));
 	pSrite->runAction( FadeOut::create(0.35f));
-
+	
 	bool bAreAllCharacterUnlocked = true;		
 	for(int i=0; i< m_pMainWord->m_iWordLength; i++)
 	{
@@ -191,8 +203,15 @@ void WordCollectBoardRenderNode::UnlockCharacter(int iLetterIndex)
 		}
 	}
 
-	if (bAreAllCharacterUnlocked)
-		onTouchBegan(NULL, NULL);	
+	//if (bAreAllCharacterUnlocked)
+		//onTouchBegan(NULL, NULL);	*/
+
+	PlayCharacterAnim(2, bAreAllCharacterUnlocked);
+}
+
+void WordCollectBoardRenderNode::PlayCharacterAnim(int iAnimIndex, bool bIsLoop)
+{
+	m_pCharacter->getAnimation()->playByIndex(2, -1, -1, bIsLoop);
 }
 
 /*int WordCollectBoardRenderNode::GetNextCharacterID()
@@ -282,14 +301,7 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 		else
 		{
 			//CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("pew-pew-lei.wav");
-			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(
-				m_pMainWord->m_sSoundFile.c_str());
-
-			this->runAction(
-				Sequence::create( 
-					DelayTime::create(3.5f),
-					CallFunc::create(this, callfunc_selector(WordCollectBoardRenderNode::PlayVietnameseSpelling)),
-					NULL));
+			PlaySpellingSound();
 
 			m_iPreviousMainWordTapTime = iCurrentTime;
 		}		
@@ -299,6 +311,20 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 	else
 		return false;
 }
+
+void WordCollectBoardRenderNode::PlaySpellingSound()
+{
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(
+		m_pMainWord->m_sSoundFile.c_str());
+
+	this->runAction(
+		Sequence::create( 
+			DelayTime::create(3.5f),
+			CallFunc::create(this, callfunc_selector(WordCollectBoardRenderNode::PlayVietnameseSpelling)),
+			NULL));
+
+}
+
 
 void WordCollectBoardRenderNode::PlayVietnameseSpelling()
 {

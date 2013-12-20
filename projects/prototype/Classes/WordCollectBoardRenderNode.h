@@ -4,8 +4,12 @@
 #include "cocos2d.h"
 #include "GameBoardManager.h"
 #include "GameWordManager.h"
+#include "cocos-ext.h"
 
 using namespace cocos2d;
+USING_NS_CC_EXT;
+
+using namespace cocos2d::extension::armature;
 
 class WordCollectBoardRenderNode : public Layer //CCNodeRGBA
 {
@@ -16,7 +20,7 @@ public:
 
 	void GenerateLabels();//call this after generate level data
 	//void draw() override;
-	//void update(float dt) override;	
+	void update(float dt) override;	
 
 	//void UpdateList();
 
@@ -27,6 +31,8 @@ public:
 	//int GetNextCharacterID();
 
 	bool onTouchBegan(Touch *pTouch, Event *pEvent) override;
+
+	void PlaySpellingSound();
 private:
 	//void LoadWords();
 	//void GetWordIndex();
@@ -34,6 +40,8 @@ private:
 	virtual bool init();		
 
 	void PlayVietnameseSpelling();
+
+	void PlayCharacterAnim(int iAnimIndex, bool bIsLoop = false);
 private:	
 	//std::vector<CCLabelTTF*> m_LabelList;	
 	/*int m_iWordCount;	
@@ -53,6 +61,8 @@ private:
 	SpriteBatchNode* m_pBatchNode;
 
 	unsigned long m_iPreviousMainWordTapTime;
+
+	Armature* m_pCharacter;
 };
 
 

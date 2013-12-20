@@ -19,7 +19,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/StatusLayer.cpp \
 				   ../../Classes/DictionaryNode.cpp \
 				   ../../Classes/GameWordManager.cpp \
-				   ../../Classes/BonusWordNode.cpp \
+				   ../../Classes/BonusWordNodeNew.cpp \
+				   ../../Classes/IntroductionLayer.cpp \
                    ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

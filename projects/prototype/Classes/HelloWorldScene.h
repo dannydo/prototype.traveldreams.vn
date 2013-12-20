@@ -2,16 +2,21 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "cocos-ext.h"
+
 //#include "GameBoardManager.h"
 #include "NewGameBoardManager.h"
 #include "WordCollectBoardRenderNode.h"
 #include "ComboCountRenderNode.h"
 #include "StatusLayer.h"
-#include "BonusWordNode.h"
+//#include "BonusWordNode.h"
+#include "BonusWordNodeNew.h"
+
 
 #define _MAX_CHARACTER_ID_	5
 
 using namespace cocos2d;
+USING_NS_CC_EXT;
 
 enum TouchMoveState
 {
@@ -33,6 +38,32 @@ public:
 		m_pSprite = NULL;
 		//m_iCharacterID = -1;
 		m_iLetter = 255;
+	}
+};
+
+struct ComputeMoveResult
+{
+public:
+	std::vector<ComboEffectCell> m_ConvertedComboCells;
+	std::vector<Cell> m_BasicMatchingDestroyedCells;
+	std::vector<DoubleComboEffectBundle> m_DoubleComboList;
+	std::vector<ComboEffectBundle*> m_ComboChainList;
+	std::vector<ComboEffectCell> m_NewComboCells;
+	std::vector<Cell> m_OriginalMovedCells;
+	std::vector<Cell> m_TargetMovedCells;
+	std::vector<Cell> m_NewCells;
+
+	void Reset(bool bResetConvertedCombo = false)
+	{
+		if (bResetConvertedCombo)
+			m_ConvertedComboCells.clear();
+		m_BasicMatchingDestroyedCells.clear();
+		m_DoubleComboList.clear();
+		m_ComboChainList.clear();
+		m_NewComboCells.clear();
+		m_OriginalMovedCells.clear();
+		m_TargetMovedCells.clear();
+		m_NewCells.clear();
 	}
 };
 
@@ -81,14 +112,20 @@ protected:
 
 	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float& fEffectDuration);
 
-	void ExecuteBonusWinGameEffect();
-	void ShowWinGamePopup();
 
+	// execute win game effect flow
+	void ShowMainWordUnlockEffect();
+	void StartWinBonusPhase();
+
+	void ExecuteBonusWinGameEffect();	
 	void PlayBonusEndEffect( std::vector<ComboEffectCell>& convertedToComboCells,
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList,std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells);
+
+	void ShowLevelCompleteEffect();
+	void ShowWinGamePopup();
 private:
 	float m_fBoardLeftPosition, m_fBoardBottomPosition;
 	float m_fBoardLeftClipPosition, m_fBoardBottomClipPosition;
@@ -124,8 +161,16 @@ private:
 
 	ComboCountRenderNode* m_pComboCountRenderNode;
 	StatusLayer* m_pStatusLayer;
-	BonusWordNode* m_pBonusWordNode;
+	BonusWordNodeNew* m_pBonusWordNode;
 	Layer* m_pHUDLayer;
+
+	// 
+	ComputeMoveResult m_ComputeMoveResult;
+
+	// special region for end game effect
+	cocos2d::LayerColor* m_pEndGameEffectLayer;
+	
+
 };
 
 #endif // __HELLOWORLD_SCENE_H__
