@@ -165,7 +165,7 @@ Node* EndGameNode::generateLayoutScore(int iScore)
 	while(!arrNumber.empty())
 	{
 		char sFileName[35];
-		sprintf(sFileName, "Score-Star/NumScore/NumScore_%d.png", arrNumber.back());
+		sprintf(sFileName, "Target-End-Game/NumScore/NumScore_%d.png", arrNumber.back());
 		Sprite* sprite = Sprite::create(sFileName);
 
 		height = sprite->getContentSize().height;
