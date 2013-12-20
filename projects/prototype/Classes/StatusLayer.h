@@ -25,7 +25,9 @@ private:
 	void generateLayoutScore(int iScore);
 	void updateScore();
 
-	cocos2d::SpriteBatchNode* m_pBatchNode;
+	cocos2d::SpriteBatchNode* m_pSpriteBatchNode;
+	cocos2d::Array* m_SpriteNumberMove;
+	cocos2d::Array* m_SpriteNumberScore;
 
 	cocos2d::Sprite* m_pStarYellow1;
 	cocos2d::Sprite* m_pStarYellow2;
@@ -34,9 +36,6 @@ private:
 	cocos2d::Sprite* m_pStarBlack2;
 	cocos2d::Sprite* m_pStarBlack3;
 	cocos2d::Sprite* m_pMarkCircle;
-
-	cocos2d::Node* m_pMove;
-	cocos2d::Node* m_pScore;
 
 	cocos2d::Point m_centerCircle;
 
