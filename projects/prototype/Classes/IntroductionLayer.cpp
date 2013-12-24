@@ -72,19 +72,19 @@ bool IntroductionLayer::init()
 		"Introduction/btn_close.png",
 		"Introduction/btn_close.png",
 		CC_CALLBACK_0(IntroductionLayer::menuCloseIntroduction, this));
-	pCloseItem->setPosition(ccp(30, winSize.height-30));
+	pCloseItem->setPosition(ccp(40, winSize.height-40));
 
 	MenuItemImage* pNextItem = MenuItemImage::create(
 		"Introduction/btn_next.png",
 		"Introduction/btn_next.png",
 		CC_CALLBACK_0(IntroductionLayer::menuNextImage, this));
-	pNextItem->setPosition(ccp(winSize.width-30, winSize.height/2.0f + 30));
+	pNextItem->setPosition(ccp(winSize.width-40, winSize.height/2.0f + 60));
 
 	MenuItemImage* pPrevItem = MenuItemImage::create(
 		"Introduction/btn_prev.png",
 		"Introduction/btn_prev.png",
 		CC_CALLBACK_0(IntroductionLayer::menuPreviousImage, this));
-	pPrevItem->setPosition(ccp(winSize.width-30, winSize.height/2.0f - 30));
+	pPrevItem->setPosition(ccp(winSize.width-40, winSize.height/2.0f - 60));
 
 	m_pMenuIntroduction = CCMenu::create(pCloseItem , pNextItem, pPrevItem, NULL);
 	m_pMenuIntroduction->setPosition(CCPointZero);
