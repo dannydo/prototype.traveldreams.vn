@@ -1,5 +1,5 @@
 #include "IntroductionLayer.h"
-#include "MainMenuScene.h"
+#include "WorldMapScene.h"
 
 USING_NS_CC;
 
@@ -99,8 +99,8 @@ bool IntroductionLayer::init()
 
 void IntroductionLayer::menuCloseIntroduction()
 {
-	MainMenuScene* mainMenu =  MainMenuScene::create();
-	Director::getInstance()->replaceScene(mainMenu);
+	WorldMapScene* pWorldMap =  WorldMapScene::create();
+	Director::getInstance()->replaceScene(pWorldMap);
 }
 
 void IntroductionLayer::menuNextImage()

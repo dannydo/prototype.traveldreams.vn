@@ -1,5 +1,5 @@
 #include "GameTargetNode.h"
-#include "MainMenuScene.h"
+#include "LevelMapScene.h"
 #include "HelloWorldScene.h"
 #include "DictionaryNode.h"
 
@@ -82,8 +82,7 @@ void GameTargetNode::menuPlayLevelCallBack()
 
 void GameTargetNode::menuCloseCallBack()
 {
-	MainMenuScene* mainMenu =  MainMenuScene::create();
-	Director::getInstance()->replaceScene(mainMenu);
+	this->getParent()->removeChild(this);
 }
 
 void GameTargetNode::menuOpenDictCallBack()

@@ -1,5 +1,5 @@
 #include "EndGameNode.h"
-#include "MainMenuScene.h"
+#include "LevelMapScene.h"
 #include "HelloWorldScene.h"
 #include "DictionaryNode.h"
 
@@ -304,8 +304,8 @@ void EndGameNode::menuRetryLevelCallBack()
 
 void EndGameNode::menuCloseCallBack()
 {
-	MainMenuScene* mainMenu =  MainMenuScene::create();
-	Director::getInstance()->replaceScene(mainMenu);
+	LevelMapScene* pLevelMap =  LevelMapScene::create();
+	Director::getInstance()->replaceScene(pLevelMap);
 }
 
 void EndGameNode::menuOpenDictCallBack()

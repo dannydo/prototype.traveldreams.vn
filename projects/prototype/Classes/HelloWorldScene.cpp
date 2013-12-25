@@ -1,6 +1,7 @@
-#include "HelloWorldScene.h"
+﻿#include "HelloWorldScene.h"
 #include "SoundManager.h"
 #include "EndGameNode.h"
+#include "LevelMapScene.h"
 
 USING_NS_CC;
 
@@ -279,11 +280,9 @@ void HelloWorld::initLevel(int iLevel)
 	SoundManager::PlayBackgroundMusic();
 }
 
-#include "MainMenuScene.h"
-
 void HelloWorld::menuCloseCallback(Object* pSender)
 {
-	auto scene =  MainMenuScene::create(); //HelloWorld::createScene();	
+	auto scene =  LevelMapScene::create(); //HelloWorld::createScene();	
 
     // run
 	Director::getInstance()->replaceScene(scene);

@@ -33,9 +33,6 @@
     <ClCompile Include="..\Classes\WordCollectBoardRenderNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\MainMenuScene.cpp">
-      <Filter>Classes\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\ComboCountRenderNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
@@ -69,6 +66,15 @@
     <ClCompile Include="..\Classes\BonusWordNodeNew.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\WorldMapScene.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\LevelMapScene.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\MainMenuScene.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -84,9 +90,6 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\WordCollectBoardRenderNode.h">
-      <Filter>Classes\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\MainMenuScene.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\ComboCountRenderNode.h">
@@ -123,6 +126,15 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\BonusWordNodeNew.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\WorldMapScene.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\LevelMapScene.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\MainMenuScene.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

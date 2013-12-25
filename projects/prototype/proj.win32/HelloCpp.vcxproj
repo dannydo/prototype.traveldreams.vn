@@ -143,11 +143,13 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\GameWordManager.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\IntroductionLayer.cpp" />
+    <ClCompile Include="..\Classes\LevelMapScene.cpp" />
     <ClCompile Include="..\Classes\MainMenuScene.cpp" />
     <ClCompile Include="..\Classes\NewGameBoardManager.cpp" />
     <ClCompile Include="..\Classes\SoundManager.cpp" />
     <ClCompile Include="..\Classes\StatusLayer.cpp" />
     <ClCompile Include="..\Classes\WordCollectBoardRenderNode.cpp" />
+    <ClCompile Include="..\Classes\WorldMapScene.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,11 +165,13 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\GameWordManager.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\IntroductionLayer.h" />
+    <ClInclude Include="..\Classes\LevelMapScene.h" />
     <ClInclude Include="..\Classes\MainMenuScene.h" />
     <ClInclude Include="..\Classes\NewGameBoardManager.h" />
     <ClInclude Include="..\Classes\SoundManager.h" />
     <ClInclude Include="..\Classes\StatusLayer.h" />
     <ClInclude Include="..\Classes\WordCollectBoardRenderNode.h" />
+    <ClInclude Include="..\Classes\WorldMapScene.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
