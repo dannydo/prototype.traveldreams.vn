@@ -24,7 +24,7 @@ public:
 
 	//void UpdateList();
 
-	void UnlockCharacter(int iLetterIndex);
+	void UnlockCharacter(const float& fDelayTime, const int& iLetterIndex);
 	std::string GetImageFileFromLetter(unsigned char iLetter);	
 	std::string GetImageInGemFileFromLetter(unsigned char iLetter);	
 
@@ -33,6 +33,8 @@ public:
 	bool onTouchBegan(Touch *pTouch, Event *pEvent) override;
 
 	void PlaySpellingSound();
+
+	void PlayUnlockLetterEffect(const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position);
 private:
 	//void LoadWords();
 	//void GetWordIndex();

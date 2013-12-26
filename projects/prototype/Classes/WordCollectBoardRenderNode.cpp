@@ -91,7 +91,7 @@ bool WordCollectBoardRenderNode::init()
 	m_pBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
 
 	m_pBatchNode->setPosition(10.f, 866.f);
-	this->addChild(m_pBatchNode);
+	this->addChild(m_pBatchNode, 10);
 
 	timeval now;
 	gettimeofday( &now, NULL);
@@ -179,7 +179,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	this->addChild(pMeaningLabel);	
 }
 
-void WordCollectBoardRenderNode::UnlockCharacter(int iLetterIndex)
+void WordCollectBoardRenderNode::UnlockCharacter(const float& fDelayTime, const int& iLetterIndex)
 {	
 	m_LabelList[iLetterIndex]->setColor( ccc3(255, 255, 255));
 	m_LabelList[iLetterIndex]->setOpacity(255);
@@ -190,8 +190,14 @@ void WordCollectBoardRenderNode::UnlockCharacter(int iLetterIndex)
 	m_pBatchNode->addChild(pSrite);
 		
 
-	pSrite->runAction( ScaleTo::create( 0.35f, 4.f, 4.f));
-	pSrite->runAction( FadeOut::create(0.35f));
+	pSrite->runAction( 
+		Sequence::createWithTwoActions(
+			DelayTime::create( fDelayTime),
+			ScaleTo::create( 0.35f, 4.f, 4.f)));
+	pSrite->runAction( 
+		Sequence::createWithTwoActions(
+			DelayTime::create( fDelayTime),
+			FadeOut::create(0.35f)));
 	
 	bool bAreAllCharacterUnlocked = true;		
 	for(int i=0; i< m_pMainWord->m_iWordLength; i++)
@@ -314,8 +320,16 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 
 void WordCollectBoardRenderNode::PlaySpellingSound()
 {
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(
-		m_pMainWord->m_sSoundFile.c_str());
+	char sSoundFile[40];
+	
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+	sprintf(sSoundFile, "EnglishSoundPC/%s.wav", m_pMainWord->m_sSoundFile.c_str());
+#else
+	sprintf(sSoundFile, "EnglishSound/%s.ogg", m_pMainWord->m_sSoundFile.c_str());
+#endif
+
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
+		//m_pMainWord->m_sSoundFile.c_str());
 
 	this->runAction(
 		Sequence::create( 
@@ -330,4 +344,22 @@ void WordCollectBoardRenderNode::PlayVietnameseSpelling()
 {
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(
 		m_pMainWord->m_sSoundVietnameseFile.c_str());
+}
+
+void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position)
+{
+	Sprite* pSrite = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(iLetter).c_str());
+	//pSrite->setColor( ccc3(100, 100, 100));
+	pSrite->setPosition( Point(position.x - 10.f, position.y-866.f) ); //_position.y));
+	m_pBatchNode->addChild(pSrite);
+		
+	pSrite->runAction(
+		Sequence::create(
+			DelayTime::create(fDelayEffectTime),
+			ScaleTo::create(0.22f, 3.f, 3.f),
+			ScaleTo::create(0.17f, 0.8f, 0.8f),
+			//EaseBackIn::create( 	ScaleTo::create(0.3f, 2.f, 2.f)),
+			MoveTo::create(	1.f, Point(70.f, -73.f)),
+			RemoveSelf::create(),
+			NULL));
 }

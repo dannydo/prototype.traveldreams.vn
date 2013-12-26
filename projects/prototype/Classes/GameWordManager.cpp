@@ -386,6 +386,7 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 {
 	bool bIsLetterFromMainWord = false, bIsLetterFromSubWord = false;
 	bool bIsCompleted = false; 
+	sOuputLetter = 255;
 
 	if (eComboType == GemComboType_e::_GCT_COMBO5_ || eComboType == GemComboType_e::_GCT_COMBO6_)
 	{

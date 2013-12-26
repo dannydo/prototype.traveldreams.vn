@@ -246,15 +246,15 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	// ************* create double combo ****************************************************	
 	std::vector<ComboEffectBundle*> chainEffectFromDoubleCombo;
 	
-	/*for(iRow=0; iRow < m_iRowNumber; iRow++)
+	for(iRow=0; iRow < m_iRowNumber; iRow++)
 	{
 		for(iColumn=0; iColumn < m_iColumnNumber; iColumn++)
 		{
 			if ( m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
 			{
 				bHasExistingCombo = true;
-
-				bool bFoundDoubleCombo = false;
+				break;
+				/*bool bFoundDoubleCombo = false;
 				Cell nextCell;			
 				if (iRow < m_iRowNumber-1 && m_TemporaryValueMatrix[iRow+1][iColumn].m_eGemComboType)
 				{
@@ -290,12 +290,14 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 					pComboEffectBundle->m_ComboEffectDescription.m_Position = doubleCombo.m_CreationInfo.m_Position;
 									
 					chainEffectFromDoubleCombo.push_back(pComboEffectBundle);
-				}
+				}*/
 			}
 		}
+		if (bHasExistingCombo)
+			break;
 	}
 	
-	*/
+	
 	// ************* create block for basic matching ******************************************
 	bool bIsNewBlockCreated;
 	CreateBlockForBasicMatching( bIsNewBlockCreated, basicMatchingDestroyedCells);

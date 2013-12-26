@@ -220,6 +220,14 @@ void HelloWorld::initLevel(int iLevel)
 	//m_pBoardBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);
 	this->addChild(m_pBoardBatchNode);
 
+	// init batch node for combo effect (used later)
+	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ComboEffect/combo.plist");
+	m_pComboEffectBatchNode = CCSpriteBatchNode::create("ComboEffect/combo.pvr.ccz");
+	this->addChild(m_pComboEffectBatchNode);
+
+	// cache anim
+	auto animCache = AnimationCache::getInstance();    
+    animCache->addAnimationsWithFile("ComboEffect/combo4Animations.plist");
 
 	// get symbol size
 	CCSprite* pSprite;
@@ -994,7 +1002,7 @@ void HelloWorld::ExecuteBonusWinGameEffect()
 	if (m_GameBoardManager.ExecuteEndGameBonus(m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_DoubleComboList, 
 			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells))
 	{
-		PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_DoubleComboList, 
+		PlayEffect2( true, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_DoubleComboList, 
 			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells, false);
 
 		m_pStatusLayer->setCurrentMove( m_GameBoardManager.GetCurrentMove());
@@ -1325,7 +1333,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	m_bIsEffectPlaying = true;	
 
 	float fDelayTime = 0.2f;
-	float fDestroyTime = 0.25f;
+	float fDestroyTime = 0.3f;
 	float fMoveTime = 0.24f; //25f;
 	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
 	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
@@ -1460,6 +1468,22 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			iMaxComboPhase = pComboEffect->m_iPhase;
 
 		// play effect
+		auto pComboEffectSprite = Sprite::createWithSpriteFrameName("Com4_Ex_00000.png");
+		auto pCombo4Anim = AnimationCache::getInstance()->getAnimation("effect");		
+
+		pComboEffectSprite->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
+					m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height));
+		m_pComboEffectBatchNode->addChild(pComboEffectSprite);
+
+		pComboEffectSprite->runAction( 
+			Sequence::create( 
+				DelayTime::create(fDelayTime + pComboEffect->m_iPhase* fDestroyTime),
+				Animate::create( pCombo4Anim),
+				RemoveSelf::create(),
+				NULL));
+
+		// ******************************
+		/*
 		Sprite* pComboEffectSprite;
 
 		if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_DOUBLE_EXPLOSION_)
@@ -1495,6 +1519,9 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				EaseOut::create( FadeOut::create( fDestroyTime), 2.f),				
 				RemoveSelf::create( true),				
 				NULL));		
+		*/
+
+
 
 		// destroy cells by combo
 		for(auto cell: pComboEffect->m_DestroyedCells)
@@ -1572,7 +1599,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 						NULL));			
 				
 				//
-				Sprite* pLetterSprite = AddLetterToGem( cell, cell.m_eGemComboType);
+				Sprite* pLetterSprite = AddLetterToGem( cell);
 				if (pLetterSprite != NULL)
 				{
 					pLetterSprite->setOpacity(0);
@@ -1665,6 +1692,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 							NULL));
 
 				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
+				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iLetter = 255; //reset letter of gem
 			}
 			//pSprite->setScale(0.65f);
 					
@@ -1816,7 +1844,10 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 {
 	// NOTE: following code to hot fix error cause by cells destroy by double combo and other effect!!!
 	if (m_BoardViewMatrix[iRow][iColumn].m_pSprite == NULL)
+	{
+		m_BoardViewMatrix[iRow][iColumn].m_iLetter = 255;
 		return;
+	}
 
 	m_BoardViewMatrix[iRow][iColumn].m_pSprite->runAction(
 		Sequence::create( 
@@ -1827,7 +1858,13 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 			NULL));
 
 	if (m_BoardViewMatrix[iRow][iColumn].m_iLetter < 255)
-	{
+	{		
+		m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect(fDelay, m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
+			ccp(m_fBoardLeftPosition + iColumn  * m_SymbolSize.width, 
+					m_fBoardBottomPosition + iRow * m_SymbolSize.height));
+
+
+
 		int iUnlockedLetterIndexOfMainWord;
 		std::vector<int> unlockedLettersIndexOfSubWords[_GDS_SUB_WORD_MAX_COUNT_];
 		bool bIsMainWordJustUnlocked;
@@ -1839,7 +1876,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 			m_pBonusWordNode->addLetter(m_BoardViewMatrix[iRow][iColumn].m_iLetter);
 
 			if (iUnlockedLetterIndexOfMainWord >=0)
-				m_pWordCollectBoardRenderNode->UnlockCharacter(iUnlockedLetterIndexOfMainWord);
+				m_pWordCollectBoardRenderNode->UnlockCharacter(fDelay, iUnlockedLetterIndexOfMainWord);
 
 			// increase score
 			if (iUnlockedLetterIndexOfMainWord >=0)
@@ -1882,10 +1919,10 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 	m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = NULL;
 }
 
-Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const GemComboType_e& eGemComboType)
+Sprite* HelloWorld::AddLetterToGem(const ComboEffectCell& cell)
 {
 	unsigned char iLetter;
-	if (m_GameBoardManager.GetGameWordManager()->GenerateNewLetter( iLetter, eGemComboType))	
+	if (m_GameBoardManager.GetGameWordManager()->GenerateNewLetter( iLetter, cell.m_eGemComboType))	
 	{			
 		CCLOG("%d, %c:", iLetter, (unsigned char)iLetter);
 		Sprite* pCharacterSprite = Sprite::createWithSpriteFrameName(
@@ -1896,7 +1933,7 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const GemComboType_e& eGemC
 		//pCharacterSprite->setPosition(ccp( 25.f, 25.f));
 		pCharacterSprite->setPosition(ccp( 42.f, 42.f));
 
-		switch(m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn))
+		switch(cell.m_iGemID)
 		{
 			case 0: //Orange
 				pCharacterSprite->setColor(ccc3(252, 234, 160));

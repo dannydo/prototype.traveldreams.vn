@@ -100,7 +100,7 @@ protected:
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells, bool bIsNewMove);
 	
-	Sprite* AddLetterToGem(const Cell& cell, const GemComboType_e& eGemComboType);
+	Sprite* AddLetterToGem(const ComboEffectCell& cell);
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();
 
@@ -132,6 +132,7 @@ private:
 	float m_fBoardLeftPosition, m_fBoardBottomPosition;
 	float m_fBoardLeftClipPosition, m_fBoardBottomClipPosition;
 	cocos2d::CCSpriteBatchNode* m_pBoardBatchNode;
+	cocos2d::CCSpriteBatchNode* m_pComboEffectBatchNode;
 	//cocos2d::CCSprite* m_BoardSpriteMatrix[ _BOARD_MAX_ROW_NUMBER_*3][ _BOARD_MAX_COLUMN_NUMBER_*3];
 	/*cocos2d::CCSprite* m_BoardSpriteMatrixLeft[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
 	cocos2d::CCSprite* m_BoardSpriteMatrixTop[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
