@@ -11,6 +11,7 @@ public:
 
 	static BonusWordNodeNew* createLayout(const std::vector<Word> bonusWords);
 	bool init() override;
+	void update(float dt) override;
 
 	void addLetter(const unsigned char letter);
 
@@ -20,11 +21,15 @@ private:
 	void setVisibleWordNode(const bool& bVisible);
 	cocos2d::Node* createNodeBonusWord(Word word);
 
-
 	cocos2d::Array* m_LabelLetterDisplays;
 
 	std::vector<Word> m_bonusWords;
 	std::vector<std::vector<int>> m_WordLetterIndex;
+
+	float m_fTimeAutoHiddenPopup;
+	float m_fDeltaUpdate;
+
+	bool m_bRunningCollectWord;
 };
 
 #endif;
