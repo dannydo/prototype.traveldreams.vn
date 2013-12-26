@@ -92,6 +92,8 @@ void GameWordManager::LoadWords()
 		inputStream >> m_WordList[iWordIndex].m_sSoundVietnameseFile;		
 		//std::getline(inputStream, m_WordList[iWordIndex].m_sSoundFile);
 		//std::getline(inputStream, m_WordList[iWordIndex].m_sSoundVietnameseFile);
+
+		inputStream >> m_WordList[iWordIndex].m_sFlashCardImage;
 	}
 }
 

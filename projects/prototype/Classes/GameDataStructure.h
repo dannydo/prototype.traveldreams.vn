@@ -194,6 +194,7 @@ public:
 	std::string m_sMeaning;
 	std::string m_sSoundFile;
 	std::string m_sSoundVietnameseFile;
+	std::string m_sFlashCardImage;
 
 	bool m_ActivatedCharacterFlags[_GDS_WORD_MAX_LENGTH_];
 	int m_iRemainInactivatedCharacterCount;

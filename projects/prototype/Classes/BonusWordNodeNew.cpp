@@ -47,8 +47,22 @@ bool BonusWordNodeNew::init()
 	}		
 
 	this->setAnchorPoint(Point(0.5, 0));
+	this->scheduleUpdate();
+	m_fDeltaUpdate = 0.0f;
+	m_fTimeAutoHiddenPopup = 3.0f;
+	m_bRunningCollectWord = false;
 
 	return true;
+}
+
+void BonusWordNodeNew::update(float dt)
+{
+	m_fDeltaUpdate += dt;
+	if (m_fDeltaUpdate >= m_fTimeAutoHiddenPopup && m_bRunningCollectWord == false)
+	{
+		this->setVisibleWordNode(false);
+		m_fDeltaUpdate = 0.0f;
+	}
 }
 
 void BonusWordNodeNew::addLetter(const unsigned char letter)
@@ -64,7 +78,7 @@ void BonusWordNodeNew::addLetter(const unsigned char letter)
 			{
 				m_WordLetterIndex[iIndexWord][iIndex] = 1;
 				LabelTTF* plabelLetter = (LabelTTF*)pNodeWord->getChildByTag(iIndex);
-				plabelLetter->setColor(ccc3(255, 0, 0));
+				plabelLetter->setColor(ccc3(0, 0, 0));
 			}
 		}
 
@@ -89,8 +103,8 @@ Node* BonusWordNodeNew::createNodeBonusWord(Word word)
 		letter[1] = 0;
 		indexLetter.push_back(0);
 		
-		LabelTTF* pLabelLetter = LabelTTF::create(letter, "Arial", 20);
-		pLabelLetter->setColor(ccc3(0, 0, 0));
+		LabelTTF* pLabelLetter = LabelTTF::create(letter, "Arial", 18);
+		pLabelLetter->setColor(ccc3(130, 130, 130));
 		pLabelLetter->setPosition(Point(width + pLabelLetter->getContentSize().width/2.0f, 0));
 
 		width = width + pLabelLetter->getContentSize().width + 2;
@@ -99,11 +113,11 @@ Node* BonusWordNodeNew::createNodeBonusWord(Word word)
 
 	m_WordLetterIndex.push_back(indexLetter);
 	pNodeWord->setTag(0);
-	pNodeWord->setPosition(Point(-width/2.0f, 22));
+	pNodeWord->setPosition(Point(-width/2.0f, 20));
 	
 	LabelTTF* pLabelMeaning = LabelTTF::create(word.m_sMeaning.c_str(), "Arial", 14);
 	pLabelMeaning->setColor(ccc3(130, 130, 130));
-	pLabelMeaning->setPosition(Point(0, 0));
+	pLabelMeaning->setPosition(Point(0, -8));
 
 	if (width < pLabelMeaning->getContentSize().width)
 	{
@@ -149,11 +163,13 @@ Node* BonusWordNodeNew::createNodeBonusWord(Word word)
 void BonusWordNodeNew::updateLetterDisplay(int iIndexWord)
 {
 	Word word = m_bonusWords[iIndexWord];
+	bool bFInish = true;
 
 	for (int iIndex=0; iIndex<m_WordLetterIndex[iIndexWord].size(); iIndex++)
 	{
 		if (m_WordLetterIndex[iIndexWord][iIndex] == 0)
 		{
+			bFInish = false;
 			char letter[2];
 			letter[0] = toupper(word.m_sWord[iIndex]);
 			letter[1] = 0;
@@ -162,10 +178,19 @@ void BonusWordNodeNew::updateLetterDisplay(int iIndexWord)
 			break;
 		}
 	}
+
+	if (bFInish)
+	{
+		LabelTTF* labelLetter =(LabelTTF*)m_LabelLetterDisplays->getObjectAtIndex(iIndexWord);
+		labelLetter->setString("✓");
+	}
 }
 
 void BonusWordNodeNew::popupBonusWordCallBack(Object* pSender)
 {
+	m_fTimeAutoHiddenPopup = 3.0f;
+	m_fDeltaUpdate = 0.0f;
+
 	Node* pNode = (Node*)pSender;
 	Node* pPopupWord = pNode->getParent()->getParent()->getChildByTag(0);
 	

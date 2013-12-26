@@ -3,39 +3,49 @@ ACCUSE
 Buộc tội
 accuse
 abc.wav
+accuse.jpg
 INFLATION
 Sự lạm phát
 inflation
 abc.wav
+inflation.jpg
 AGRICULTURE
 Nông nghiệp
 agriculture
 abc.wav
+agriculture.jpg
 PROTEST
 Sự phản đối
 protest
 abc.wav
+protest.jpg
 ASTRONAUT
 Phi hành gia
 astronaut
 abc.wav
+astronaut.jpg
 LEAK
 Lỗ thủng
 leak
 abc.wav
+leak.jpg
 JUSTICE
 Sự công bằng
 justice
 abc.wav
+justice.jpg
 HIJACK
 Vụ không tặc
 hijack
 abc.wav
+hijack.jpg
 SYMPATHY
 Sự thông cảm
 sympathy
 abc.wav
+sympathy.jpg
 SUSPEND
 Đình chỉ
 suspend
 abc.wav
+suspend.jpg
