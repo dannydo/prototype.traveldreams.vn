@@ -60,6 +60,10 @@ public:
 	inline const LevelConfig& GetLevelConfig() { return m_LevelConfig;}
 	inline const int& GetCurrentLevel() { return m_iCurrentLevel;}
 
+
+	bool IsRowLocked(const int& iRow);
+	bool IsColumnLocked(const int& iColumn);
+
 	void GenerateGameBoard(int iRowNumber, int iColumnNumber, int iLevel);
 
 	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
@@ -93,7 +97,15 @@ public:
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells);		
 protected:
+	// Execute move util methods
+	void CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn);
+	void CreateBlockForBasicMatching(bool& bIsNewBlockCreated, std::vector<Cell>& basicMatchingDestroyedCells);
+	void RemoveCellsByBasicMatching( std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectBundle*>& comboChainList);
+	void CreateComboCells(const std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectCell>& newComboCells);
+
 	void ExecuteComboChain(std::vector<ComboEffectBundle*>& comboChainList);
+
+	void CalculateMoveCells(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells);
 
 	int GetBonusScoreForUnlockMainWord(bool bIncludeIndividualLetters=false);
 	int GetBonusScoreForUnlockSubWord(const int& iSubWordID, bool bIncludeIndividualLetters=false);

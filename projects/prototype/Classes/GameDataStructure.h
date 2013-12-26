@@ -78,6 +78,16 @@ enum GemComboType_e
 	_GCT_COMBO6_ = 3
 };
 
+enum ObstacleType_e
+{
+	_OT_NONE_ = 0,
+	_OT_LOCK_ROW_,
+	_OT_LOCK_COLUMN_,
+	_OT_LOCK_ROW_AND_COLUMN_,
+	_OT_SHIELDED_ALIEN_,
+	_OT_FROGEN_ALIEN_
+};
+
 struct Cell
 {
 	int m_iRow, m_iColumn;	
@@ -112,11 +122,21 @@ public:
 	int m_iGemID;
 	bool m_bIsBlankCell;
 	GemComboType_e m_eGemComboType;
+	ObstacleType_e m_eObstacleType;
+
 	CellValue()
 	{
 		m_iGemID = -1;
 		m_bIsBlankCell = true;
 		m_eGemComboType = _GCT_NONE_;
+		m_eObstacleType = _OT_NONE_;
+	}
+
+	void Reset()
+	{
+		m_iGemID = -1;
+		m_eGemComboType = _GCT_NONE_;
+		m_eObstacleType = _OT_NONE_;
 	}
 };
 

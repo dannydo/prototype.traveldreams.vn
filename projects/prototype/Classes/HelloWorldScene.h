@@ -94,11 +94,13 @@ protected:
 	std::string GetImageFileFromGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
 	void AdjustPosition(float fDeltaX, float fDeltaY, int iRowMove, int iColumnMove);
 	
-	void PlayEffect2(std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
+	void PlayEffect2(const bool& bIsBonusEndGamePhase,  std::vector<ComboEffectCell>& convertedToComboCells, 
+		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList,std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells, bool bIsNewMove);
 	
+	Sprite* AddLetterToGem(const Cell& cell, const GemComboType_e& eGemComboType);
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();
 
@@ -118,11 +120,11 @@ protected:
 	void StartWinBonusPhase();
 
 	void ExecuteBonusWinGameEffect();	
-	void PlayBonusEndEffect( std::vector<ComboEffectCell>& convertedToComboCells,
+	/*void PlayBonusEndEffect( std::vector<ComboEffectCell>& convertedToComboCells,
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList,std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells);
+		std::vector<Cell>& newCells);*/
 
 	void ShowLevelCompleteEffect();
 	void ShowWinGamePopup();

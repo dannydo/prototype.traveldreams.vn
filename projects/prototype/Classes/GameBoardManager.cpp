@@ -21,6 +21,12 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 
 	srand(time(NULL));
 
+	// test obstacle
+	if (iLevel == 1)
+	{
+		 //m_BoardValueMatrix[2][2].m_eObstacleType = m_BoardValueMatrix[3][3].m_eObstacleType = m_BoardValueMatrix[4][4].m_eObstacleType = m_BoardValueMatrix[5][5].m_eObstacleType  = m_BoardValueMatrix[6][6].m_eObstacleType = _OT_LOCK_ROW_AND_COLUMN_;
+	}
+
 	int iRow, iColumn;
 	for(iRow = 0; iRow < iRowNumber; iRow++)
 		for(iColumn = 0; iColumn < iColumnNumber; iColumn++)

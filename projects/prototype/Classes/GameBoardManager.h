@@ -15,10 +15,11 @@ public:
 	inline int GetColumnNumber() { return m_iColumnNumber;}
 	inline int GetCellValue(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_iGemID;}
 	inline GemComboType_e GetCellGemComboType(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_eGemComboType;}
+	inline ObstacleType_e GetCellObstacleType(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_eObstacleType;}
 
 	inline bool IsBlankCell(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell;}
 
-	// only iSelectedRow or iSelectedColumn > 1 at one time	
+	// only iSelectedRow or iSelectedColumn 0 1 at one time	 (iDeltaRow and iDeltaColumn != 0 corresponding)
 	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& destroyCells, std::vector<ComboEffectCell>& activatedComboEffectCells, std::vector<Cell>& destroyedByEffectCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells, std::vector<ComboEffectCell>& newComboCells);

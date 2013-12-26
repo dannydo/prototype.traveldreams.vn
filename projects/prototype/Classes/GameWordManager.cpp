@@ -382,6 +382,81 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<unsig
 	}
 }
 
+bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemComboType_e& eComboType)
+{
+	bool bIsLetterFromMainWord = false, bIsLetterFromSubWord = false;
+	bool bIsCompleted = false; 
+
+	if (eComboType == GemComboType_e::_GCT_COMBO5_ || eComboType == GemComboType_e::_GCT_COMBO6_)
+	{
+		// priopritized for main words then bonus, then trash words
+		bIsCompleted = GenerateLetterFromMainWord( sOuputLetter);
+		bIsLetterFromMainWord = bIsCompleted;
+		
+		if (!bIsCompleted)
+		{
+			bIsCompleted = GenerateLetterFromSubWords( sOuputLetter);			
+			bIsLetterFromSubWord = bIsCompleted;
+		}
+
+		if (!bIsCompleted)
+			bIsCompleted = GenerateLetterFromTrashCollection( sOuputLetter);			
+		
+		// note: if all letter are appeared but trash collection is empty???
+	}
+	else
+	{
+		bool bShouldGenerateLetter = false;		
+
+		srand(time(NULL));
+
+		// generate letters from main word		
+		bShouldGenerateLetter = SuccessWithPercentRatio(m_iMainWordGenerateRate);
+		if (bShouldGenerateLetter)
+		{
+			bIsCompleted = GenerateLetterFromMainWord(sOuputLetter);		
+			bIsLetterFromMainWord = bIsCompleted;
+		}				
+	
+
+		// generate letters from sub words		
+		if (!bIsCompleted)		
+		{
+			bShouldGenerateLetter = SuccessWithPercentRatio(m_iSubWordGenerateRate);
+			if (bShouldGenerateLetter)
+			{
+				bIsCompleted = GenerateLetterFromSubWords(sOuputLetter);
+				bIsLetterFromSubWord = bIsCompleted;
+			}				
+		}
+
+		// generate letters from trash words		
+		if (!bIsCompleted)		
+		{			
+			bShouldGenerateLetter = SuccessWithPercentRatio(m_iTrashWordGenerateRate);
+			if (bShouldGenerateLetter)
+			{
+				bIsCompleted = GenerateLetterFromTrashCollection(sOuputLetter);				
+			}
+		}		
+
+	}
+
+	if (bIsLetterFromMainWord)
+		m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate-m_WordGenerateConfig.m_iDecreasePercentAfterLetterAppearedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);
+
+	// update letter count
+	if (bIsCompleted)
+		m_iCountOfLettersOnBoard ++;		
+
+	return bIsCompleted;
+}
+
+void GameWordManager::UpdateParamForNewMove()
+{
+	m_iMainWordGenerateRate = MIN( m_iMainWordGenerateRate + m_WordGenerateConfig.m_iIncreasePercentAfterEachMoveOfMainLetter, m_WordGenerateConfig.m_iMaximumRate);			
+}
+
 bool GameWordManager::GenerateLetterFromMainWord(unsigned char& sLetter)
 {
 	sLetter = 255;
