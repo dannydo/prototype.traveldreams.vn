@@ -426,21 +426,23 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 		if (!bIsCompleted)		
 		{
 			bShouldGenerateLetter = SuccessWithPercentRatio(m_iSubWordGenerateRate);
-			if (bShouldGenerateLetter)
+			if (bShouldGenerateLetter || m_TrashLettersCollection.size()==0)
 			{
 				bIsCompleted = GenerateLetterFromSubWords(sOuputLetter);
 				bIsLetterFromSubWord = bIsCompleted;
+
+				AddLetterToTrashCollection(sOuputLetter);
 			}				
 		}
 
 		// generate letters from trash words		
 		if (!bIsCompleted)		
 		{			
-			bShouldGenerateLetter = SuccessWithPercentRatio(m_iTrashWordGenerateRate);
-			if (bShouldGenerateLetter)
-			{
+			//bShouldGenerateLetter = SuccessWithPercentRatio(m_iTrashWordGenerateRate);
+			//if (bShouldGenerateLetter)
+			//{
 				bIsCompleted = GenerateLetterFromTrashCollection(sOuputLetter);				
-			}
+			//}
 		}		
 
 	}

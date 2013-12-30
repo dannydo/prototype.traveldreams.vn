@@ -8,7 +8,7 @@ enum ComboEffectType
 {
 	_CET_BASIC_MATCHING_,
 	_CET_EXPLOSION_,
-	_CET_DIRECTION_LINE_, //direction?
+	_CET_DESTROY_COLOR_, //direction?
 	_CET_DOUBLE_EXPLOSION_
 };
 
@@ -17,6 +17,7 @@ struct ComboEffectDescription
 public:
 	Cell m_Position;
 	ComboEffectType m_eComboEffectType;
+	int m_iGemID;
 };
 
 enum DoubleComboType
@@ -97,6 +98,8 @@ public:
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells);		
 protected:
+	inline ComboEffectType GetComboEffectTypeFromComboType(GemComboType_e eGemComboType);
+
 	// Execute move util methods
 	void CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn);
 	void CreateBlockForBasicMatching(bool& bIsNewBlockCreated, std::vector<Cell>& basicMatchingDestroyedCells);

@@ -165,7 +165,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	}
 
 	// draw meaning of word
-	LabelTTF* pMeaningLabel = CCLabelTTF::create("", "HelveticaNeueLTCom-Ex.ttf", 19); //"Arial", 17);
+	LabelTTF* pMeaningLabel = CCLabelTTF::create("", "HelveticaNeueLTCom-Ex.ttf", 19); //"Arial", 17);//
 	pMeaningLabel->setString(m_pMainWord->m_sMeaning.c_str());
 	pMeaningLabel->setAnchorPoint(Point(0,0));
 	//pMeaningLabel->setPosition(Point( 120.f, 860.f));
@@ -176,7 +176,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 #endif
 	pMeaningLabel->setColor(ccc3( 90, 90, 90));
 	pMeaningLabel->disableStroke();
-	this->addChild(pMeaningLabel);	
+	this->addChild(pMeaningLabel, 20);	
 }
 
 void WordCollectBoardRenderNode::UnlockCharacter(const float& fDelayTime, const int& iLetterIndex)
@@ -217,7 +217,10 @@ void WordCollectBoardRenderNode::UnlockCharacter(const float& fDelayTime, const 
 
 void WordCollectBoardRenderNode::PlayCharacterAnim(int iAnimIndex, bool bIsLoop)
 {
-	m_pCharacter->getAnimation()->playByIndex(2, -1, -1, bIsLoop);
+	if (!bIsLoop)
+		m_pCharacter->getAnimation()->playByIndex(2, -1, -1,false);
+	else
+		m_pCharacter->getAnimation()->playByIndex(3, -1, -1,true);
 }
 
 /*int WordCollectBoardRenderNode::GetNextCharacterID()

@@ -4,10 +4,10 @@
 <dict>
 	<key>animations</key>
 	<dict>
-		<key>effect</key>
+		<key>effectCombo4</key>
 		<dict>
 			<key>delay</key>
-			<real>0.018</real>
+			<real>0.019</real>
 			<key>frames</key>
 			<array>
 				<string>Com4_Ex_00000.png</string>

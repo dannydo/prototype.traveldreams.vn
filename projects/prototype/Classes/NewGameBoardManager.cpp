@@ -159,40 +159,72 @@ void NewGameBoardManager::ExecuteComboChain(std::vector<ComboEffectBundle*>& com
 		pComboInChain = comboChainList.at(iComboIndexInChain);
 		Cell position = pComboInChain->m_ComboEffectDescription.m_Position;
 
-		// demo explosion effects
-		int iRowDelta, iColumnDelta;
-		if (pComboInChain->m_ComboEffectDescription.m_eComboEffectType == _CET_DOUBLE_EXPLOSION_)
-			iRowDelta = iColumnDelta = 2;
-		else
-			iRowDelta = iColumnDelta = 1;
+		if (pComboInChain->m_ComboEffectDescription.m_eComboEffectType == _CET_EXPLOSION_ || pComboInChain->m_ComboEffectDescription.m_eComboEffectType == _CET_DOUBLE_EXPLOSION_)
+		{
+			// demo explosion effects
+			int iRowDelta, iColumnDelta;
+			if (pComboInChain->m_ComboEffectDescription.m_eComboEffectType == _CET_DOUBLE_EXPLOSION_)
+				iRowDelta = iColumnDelta = 2;
+			else
+				iRowDelta = iColumnDelta = 1;
 
-		// trigger explostion effect: temporary implementation
-		for(int iRow = position.m_iRow-iRowDelta; iRow <= position.m_iRow+iRowDelta; iRow++)
-			for(int iColumn = position.m_iColumn-iColumnDelta; iColumn <= position.m_iColumn+iColumnDelta; iColumn++)
-		{			
-			if (iRow >= 0 && iRow < m_iRowNumber && iColumn >=0 && iColumn < m_iColumnNumber &&
-				m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0)
-			{				
-				// this may trigger another combo ?
-				if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >=0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
-				{
-					ComboEffectBundle* pNextTriggeredCombo = new ComboEffectBundle();
-					pNextTriggeredCombo->m_ComboEffectDescription.m_eComboEffectType = _CET_EXPLOSION_;
-					pNextTriggeredCombo->m_ComboEffectDescription.m_Position = Cell(iRow, iColumn);
-					pNextTriggeredCombo->m_iPhase =  pComboInChain->m_iPhase + 1;
+			// trigger explostion effect: temporary implementation
+			for(int iRow = position.m_iRow-iRowDelta; iRow <= position.m_iRow+iRowDelta; iRow++)
+				for(int iColumn = position.m_iColumn-iColumnDelta; iColumn <= position.m_iColumn+iColumnDelta; iColumn++)
+			{			
+				if (iRow >= 0 && iRow < m_iRowNumber && iColumn >=0 && iColumn < m_iColumnNumber &&
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0)
+				{				
+					// this may trigger another combo ?
+					if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >=0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
+					{
+						ComboEffectBundle* pNextTriggeredCombo = new ComboEffectBundle();
+						pNextTriggeredCombo->m_ComboEffectDescription.m_eComboEffectType =  GetComboEffectTypeFromComboType(m_BoardValueMatrix[iRow][iColumn].m_eGemComboType); // _CET_EXPLOSION_;
+						pNextTriggeredCombo->m_ComboEffectDescription.m_Position = Cell(iRow, iColumn);
+						pNextTriggeredCombo->m_ComboEffectDescription.m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
+						pNextTriggeredCombo->m_iPhase =  pComboInChain->m_iPhase + 1;
 
-					pComboInChain->m_TriggeredComboEfectBundleList.push_back(pNextTriggeredCombo);
+						pComboInChain->m_TriggeredComboEfectBundleList.push_back(pNextTriggeredCombo);
 								
-					// add it to chain to trigger later
-					comboChainList.push_back(pNextTriggeredCombo);
-				}		
+						// add it to chain to trigger later
+						comboChainList.push_back(pNextTriggeredCombo);
+					}		
 
-				m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+					m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
 
-				pComboInChain->m_DestroyedCells.push_back(Cell(iRow, iColumn));
-			}
-		}	
+					pComboInChain->m_DestroyedCells.push_back(Cell(iRow, iColumn));
+				}
+			}	
+		}
+		else if (pComboInChain->m_ComboEffectDescription.m_eComboEffectType == _CET_DESTROY_COLOR_)
+		{
+			int iGemID = pComboInChain->m_ComboEffectDescription.m_iGemID;
+			for(int iRow = 0; iRow <= m_iRowNumber; iRow++)
+				for(int iColumn = 0; iColumn <= m_iColumnNumber; iColumn++)
+			{			
+				if ( !m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID == iGemID)
+				{				
+					// this may trigger another combo ?
+					if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >=0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
+					{
+						ComboEffectBundle* pNextTriggeredCombo = new ComboEffectBundle();
+						pNextTriggeredCombo->m_ComboEffectDescription.m_eComboEffectType =  GetComboEffectTypeFromComboType(m_BoardValueMatrix[iRow][iColumn].m_eGemComboType); // _CET_EXPLOSION_;
+						pNextTriggeredCombo->m_ComboEffectDescription.m_Position = Cell(iRow, iColumn);
+						pNextTriggeredCombo->m_ComboEffectDescription.m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
+						pNextTriggeredCombo->m_iPhase =  pComboInChain->m_iPhase + 1;
 
+						pComboInChain->m_TriggeredComboEfectBundleList.push_back(pNextTriggeredCombo);
+								
+						// add it to chain to trigger later
+						comboChainList.push_back(pNextTriggeredCombo);
+					}		
+
+					m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+
+					pComboInChain->m_DestroyedCells.push_back(Cell(iRow, iColumn));
+				}
+			}	
+		}
 		iComboIndexInChain++;
 	}
 }
@@ -332,6 +364,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 				ComboEffectBundle* pTriggeredComboEffectBundle = new ComboEffectBundle();
 				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = _CET_EXPLOSION_; //only implement explosion now
 				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_Position = cell;
+				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_iGemID = m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID;
 				pTriggeredComboEffectBundle->m_iPhase = comboChainList.size(); //0;														
 
 				comboChainList.push_back(pTriggeredComboEffectBundle);
@@ -345,8 +378,10 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 					if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
 					{
 						ComboEffectBundle* pTriggeredComboEffectBundle = new ComboEffectBundle();
-						pTriggeredComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = _CET_EXPLOSION_; //only implement explosion now
+						pTriggeredComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = GetComboEffectTypeFromComboType(m_BoardValueMatrix[iRow][iColumn].m_eGemComboType);
+							//_CET_EXPLOSION_; //only implement explosion now
 						pTriggeredComboEffectBundle->m_ComboEffectDescription.m_Position = Cell(iRow, iColumn);
+						pTriggeredComboEffectBundle->m_ComboEffectDescription.m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
 						pTriggeredComboEffectBundle->m_iPhase = comboChainList.size(); //0;														
 
 						comboChainList.push_back(pTriggeredComboEffectBundle);
@@ -639,8 +674,10 @@ void NewGameBoardManager::RemoveCellsByBasicMatching( std::vector<Cell>& basicMa
 			if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType != _GCT_NONE_)
 			{				
 				ComboEffectBundle* pTriggeredComboEffectBundle = new ComboEffectBundle();
-				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = _CET_EXPLOSION_; //only implement explosion now
+				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = GetComboEffectTypeFromComboType(m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType);
+					//_CET_EXPLOSION_; //only implement explosion now
 				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_Position = cell;
+				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_iGemID = m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID;
 				pTriggeredComboEffectBundle->m_iPhase = comboChainList.size(); //0;														
 
 				comboChainList.push_back(pTriggeredComboEffectBundle);
@@ -852,4 +889,18 @@ int NewGameBoardManager::GetEarnedStars()
 		return 1;
 	else
 		return 0;
+}
+
+ComboEffectType NewGameBoardManager::GetComboEffectTypeFromComboType(GemComboType_e eGemComboType)
+{
+	switch(eGemComboType)
+	{
+		default:
+		case _GCT_COMBO4_:
+			return _CET_EXPLOSION_;
+		case _GCT_COMBO5_:
+			return _CET_DESTROY_COLOR_;
+		case _GCT_COMBO6_:
+			return _CET_DOUBLE_EXPLOSION_;
+	}
 }

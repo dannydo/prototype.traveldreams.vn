@@ -35,15 +35,15 @@ public:
 	void PlaySpellingSound();
 
 	void PlayUnlockLetterEffect(const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position);
+
+	void PlayCharacterAnim(int iAnimIndex, bool bIsLoop = false);
 private:
 	//void LoadWords();
 	//void GetWordIndex();
 
 	virtual bool init();		
 
-	void PlayVietnameseSpelling();
-
-	void PlayCharacterAnim(int iAnimIndex, bool bIsLoop = false);
+	void PlayVietnameseSpelling();	
 private:	
 	//std::vector<CCLabelTTF*> m_LabelList;	
 	/*int m_iWordCount;	

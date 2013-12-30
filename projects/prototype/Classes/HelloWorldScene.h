@@ -92,7 +92,7 @@ public:
 	void visit() override;
 protected:
 	std::string GetImageFileFromGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
-	void AdjustPosition(float fDeltaX, float fDeltaY, int iRowMove, int iColumnMove);
+	void AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, int iRowMove, int iColumnMove);
 	
 	void PlayEffect2(const bool& bIsBonusEndGamePhase,  std::vector<ComboEffectCell>& convertedToComboCells, 
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
@@ -110,8 +110,9 @@ protected:
 	void HorizontalMoveUlti(float fDeltaX);
 	void VerticalMoveUlti(float fDeltaY);
 
+	void PlayCombo4Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
+	void PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
 	void ActivateImageEffect(Node* pSender);
-
 	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float& fEffectDuration);
 
 
