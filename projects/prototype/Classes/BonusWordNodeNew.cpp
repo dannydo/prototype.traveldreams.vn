@@ -77,12 +77,15 @@ void BonusWordNodeNew::addLetter(const unsigned char letter)
 	
 }
 
-float BonusWordNodeNew::displayEffect()
+float BonusWordNodeNew::displayEffect(const float& fTimeDelay)
 {
 	m_iCountWord = -1;
 	m_bRunningCollectWord = false;
 	float fDelay = this->calculatorDelayTime();
-	this->updateLetterCollectForWord();
+	
+	auto actionUpdateLetter = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::updateLetterCollectForWord));
+	auto delay = DelayTime::create(fTimeDelay);
+	this->runAction(Sequence::create(delay->clone(), actionUpdateLetter, NULL));
 
 	return fDelay;
 }
@@ -106,9 +109,9 @@ float BonusWordNodeNew::calculatorDelayTime()
 					if (bShowBonusWord)
 					{
 						bShowBonusWord = false;
-						fDelay += 0.2f;
+						fDelay += 0.7f;
 					}
-					fDelay += 0.2f;
+					fDelay += 0.25f;
 					letters[iIndex] = 1;
 				}
 			}
@@ -126,7 +129,7 @@ float BonusWordNodeNew::calculatorDelayTime()
 
 		if (isFinish)
 		{
-			fDelay += 1.05f;
+			fDelay += 1.1f;
 		}
 	}
 
@@ -151,6 +154,7 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 	Word word = m_bonusWords[m_iCountWord];
 	Node* pNodeWord = this->getChildByTag(m_iCountWord)->getChildByTag(0)->getChildByTag(0)->getChildByTag(0);
 	bool isDelay = false;
+	bool isFirstDelay = false;
 	m_bRunningCollectWord = true;
 
 	if (m_iCountLetterWord < strlen(word.m_sWord))
@@ -160,6 +164,11 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 			if (tolower(m_letters[m_iCountLetter]) == tolower(word.m_sWord[m_iCountLetterWord]) && m_WordLetterIndex[m_iCountWord][m_iCountLetterWord] == 0)
 			{
 				isDelay = true;
+				Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
+				if (pMark->getTag() == -1)
+				{
+					isFirstDelay = true;
+				}
 				m_WordLetterIndex[m_iCountWord][m_iCountLetterWord] = 1;
 				this->playEffectLetter((LabelTTF*)pNodeWord->getChildByTag(m_iCountLetterWord));
 			}
@@ -188,12 +197,22 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 
 	if (isDelay)
 	{
-		auto delay = DelayTime::create(0.2f);
+		DelayTime* delay;
+		Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
+		if (isFirstDelay)
+		{
+			delay = DelayTime::create(0.7f);
+		}
+		else
+		{
+			delay = DelayTime::create(0.25f);
+		}
+
 		auto actionLoopUpdate = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::updateLetterCollectForWord));
 		if (this->checkFinishCollectWord(m_iCountWord))
 		{
 			auto actionEffect = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::playEffectFinishCollectWord));
-			auto delayEffect = DelayTime::create(1.05f);
+			auto delayEffect = DelayTime::create(1.1f);
 			this->runAction(Sequence::create(delay->clone(), actionEffect, delayEffect->clone(), actionLoopUpdate, NULL));
 		}
 		else
@@ -216,12 +235,12 @@ void BonusWordNodeNew::playEffectLetter(LabelTTF* pLabel)
 		auto actionMove = MoveTo::create(0.2f, Point(-9, 0));
 		pMark->runAction(actionMove);
 
-		auto actionSacleEffect = ScaleBy::create(0.09f, 1.5f, 1.5f);
-		pLabel->runAction(Sequence::create(DelayTime::create(0.2f)->clone(), actionSacleEffect, actionSacleEffect->reverse(), NULL));
+		auto actionSacleEffect = ScaleBy::create(0.1f, 2.0f, 2.0f);
+		pLabel->runAction(Sequence::create(DelayTime::create(0.3f)->clone(), actionSacleEffect, actionSacleEffect->reverse(), NULL));
 	}
 	else
 	{
-		auto actionSacleEffect = ScaleBy::create(0.09f, 1.5f, 1.5f);
+		auto actionSacleEffect = ScaleBy::create(0.1f, 2.0f, 2.0f);
 		pLabel->runAction(Sequence::create(actionSacleEffect, actionSacleEffect->reverse(), NULL));
 	}
 

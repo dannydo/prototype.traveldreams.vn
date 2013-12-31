@@ -14,7 +14,7 @@ public:
 	void update(float dt) override;
 
 	void addLetter(const unsigned char letter);
-	float displayEffect();
+	float displayEffect(const float& fTimeDelay);
 	void closeBonusWord();
 
 private:
