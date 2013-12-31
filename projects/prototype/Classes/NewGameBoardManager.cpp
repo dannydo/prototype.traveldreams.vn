@@ -139,7 +139,7 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 		ExecuteComboChain(comboChainList);
 
 		// create combo cells	
-		CreateComboCells( basicMatchingDestroyedCells, newComboCells);
+		CreateComboCells( iSelectedRow, iSelectedColumn, basicMatchingDestroyedCells, newComboCells);
 
 		// calculate move cells and create new cells
 		CalculateMoveCells( originalMovedCells, targetMovedCells, newCells);
@@ -392,7 +392,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		ExecuteComboChain(comboChainList);
 
 		// create combo cells	
-		CreateComboCells( basicMatchingDestroyedCells, newComboCells);
+		CreateComboCells(-1, -1, basicMatchingDestroyedCells, newComboCells);
 
 		// calculate move cells and create new cells
 		CalculateMoveCells( originalMovedCells, targetMovedCells, newCells);
@@ -688,7 +688,7 @@ void NewGameBoardManager::RemoveCellsByBasicMatching( std::vector<Cell>& basicMa
 	}	
 }
 
-void NewGameBoardManager::CreateComboCells(const std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectCell>& newComboCells)
+void NewGameBoardManager::CreateComboCells(const int& iSelectedRow, const int& iSelectedColumn, const std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectCell>& newComboCells)
 {
 	if (m_iLinkedBlockCount > 0)
 	{
@@ -734,8 +734,8 @@ void NewGameBoardManager::CreateComboCells(const std::vector<Cell>& basicMatchin
 				bool bFoundCellOnActiveDragLine = false;
 				Cell comboCell;
 				// find position to place combo cell
-				//if (iSelectedRow >=0 || iSelectedColumn >=0)
-				/*{
+				if (iSelectedRow >=0 || iSelectedColumn >=0)
+				{
 					for(int j=0; j< linkedBlock.m_iCellCount; j++)
 						if ( basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + j].m_iRow == iSelectedRow
 							|| basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + j].m_iColumn == iSelectedColumn)
@@ -744,7 +744,7 @@ void NewGameBoardManager::CreateComboCells(const std::vector<Cell>& basicMatchin
 							comboCell = basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + j];
 							break;
 						}
-				}*/
+				}
 				if (!bFoundCellOnActiveDragLine)
 				{
 					int iRandomIndex = (rand() % linkedBlock.m_iCellCount) + linkedBlock.m_iStartIndexInDestroyedList; 

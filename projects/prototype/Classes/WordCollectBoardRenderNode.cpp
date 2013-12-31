@@ -289,7 +289,7 @@ float WordCollectBoardRenderNode::PlayUnlockLettersAnimation(float fDelayTime)
 		}	
 
 	if (fTotalTime > 0)
-		fTotalTime  += fDisplayPerLetter *2;
+		fTotalTime  += fDisplayPerLetter *2 + fDelayTime;
 
 	// reset flags
 	memset( m_NewUnlockedLetterFlags, 0, sizeof(m_NewUnlockedLetterFlags));

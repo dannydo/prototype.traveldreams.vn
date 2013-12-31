@@ -6,7 +6,7 @@
 
 #define _GDS_WORD_MAX_LENGTH_		12
 #define _GDS_WORD_MAX_COUNT_		20
-#define _GDS_SUB_WORD_MAX_COUNT_	3
+#define _GDS_SUB_WORD_MAX_COUNT_	2
 
 #define _MAX_GEM_ID_	6
 #define _BOARD_MAX_ROW_NUMBER_	9

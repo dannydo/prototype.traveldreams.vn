@@ -119,6 +119,7 @@ protected:
 	// unlock letter flow
 	void PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime);
 	void PlayUnlockLettersOfBonusWordsAnimation();
+	void EndUnlockLetterAnimation();
 
 	// execute win game effect flow
 	void ShowMainWordUnlockEffect();

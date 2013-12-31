@@ -74,7 +74,7 @@ Scene* HelloWorld::createScene(int iLevel)
 	for(int i=0; i< pGameWordManager->GetSubWordCount(); i++)
 		subWordList.push_back( pGameWordManager->GetSubWord(i));
 	boardLayer->m_pBonusWordNode = BonusWordNodeNew::createLayout(subWordList);
-	boardLayer->m_pBonusWordNode->setPosition( 314.f, 756.f);
+	boardLayer->m_pBonusWordNode->setPosition( 243.f, 756.f);
 	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pBonusWordNode, 10);
 
 	/*Node* btnShowPopup = boardLayer->m_pBonusWordNode->createButtonShowPopupBonus();
@@ -535,7 +535,7 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 
 	if (m_eTouchMoveState == _TMS_BEGIN_IDENTIFY_)
 	{				
-		if (fabs(fDeltaX) > 5.f)
+		if ( fabs(fDeltaX) > fabs(fDeltaY) &&  fabs(fDeltaX) > 5.f)
 		{
 			m_eTouchMoveState = _TMS_MOVE_HORIZONTAL_;
 
@@ -548,7 +548,7 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 					m_MovingCellMirrorList[iColumn].m_pSprite->setPosition(m_MovingCellList[iColumn].m_pSprite->getPosition());
 			}
 		}
-		else if (fabs(fDeltaY) > 5.f)
+		else if (fabs(fDeltaX) < fabs(fDeltaY) && fabs(fDeltaY) > 5.f)
 		{
 			m_eTouchMoveState = _TMS_MOVE_VERTICAL_;
 
@@ -2607,15 +2607,15 @@ void HelloWorld::PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime)
 
 void HelloWorld::PlayUnlockLettersOfBonusWordsAnimation()
 {
-	float fDisplayTime = m_pBonusWordNode->displayEffect();
+	float fDisplayTime = m_pBonusWordNode->displayEffect(0.8f);
 	if (fDisplayTime > 0)
 	{
-		m_pWordCollectBoardRenderNode->PlayCharacterAnim(5, false);
+		m_pWordCollectBoardRenderNode->PlayCharacterAnim(6, false);
 
 		this->runAction(
 			Sequence::create(
-			DelayTime::create( fDisplayTime),
-				CallFunc::create( this,  callfunc_selector(HelloWorld::PlayUnlockLettersOfBonusWordsAnimation)),
+			DelayTime::create( fDisplayTime + 0.8f),
+				CallFunc::create( this,  callfunc_selector(HelloWorld::EndUnlockLetterAnimation)),
 				NULL));
 	}
 	else
