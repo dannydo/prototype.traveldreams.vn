@@ -447,6 +447,10 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 
 	}
 
+	// NOTE: hot fix
+	if (sOuputLetter == 255)
+		bIsCompleted = false;
+
 	if (bIsLetterFromMainWord)
 		m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate-m_WordGenerateConfig.m_iDecreasePercentAfterLetterAppearedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);
 
