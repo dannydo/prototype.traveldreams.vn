@@ -24,7 +24,7 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 	// test obstacle
 	if (iLevel == 2)
 	{
-		 m_BoardValueMatrix[2][2].m_eObstacleType = m_BoardValueMatrix[3][3].m_eObstacleType = m_BoardValueMatrix[4][4].m_eObstacleType = m_BoardValueMatrix[5][5].m_eObstacleType  = m_BoardValueMatrix[6][6].m_eObstacleType = _OT_LOCK_ROW_AND_COLUMN_;
+		 //m_BoardValueMatrix[2][2].m_eObstacleType = m_BoardValueMatrix[3][3].m_eObstacleType = m_BoardValueMatrix[4][4].m_eObstacleType = m_BoardValueMatrix[5][5].m_eObstacleType  = m_BoardValueMatrix[6][6].m_eObstacleType = _OT_LOCK_ROW_AND_COLUMN_;
 	}
 
 	int iRow, iColumn;
@@ -36,12 +36,12 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 			}
 			else if (iLevel == 2)
 			{
-				/*if ( iColumn >=3 && iColumn<=4 && (iRow <=1 || iRow>=iRowNumber-2) )
+				if ( iColumn >=3 && iColumn<=4 && (iRow <=1 || iRow>=iRowNumber-2) )
 				{
 					m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
 					m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
 					continue;
-				}*/
+				}
 			}
 			else if (iLevel == 3)
 			{

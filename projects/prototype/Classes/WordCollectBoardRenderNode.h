@@ -24,7 +24,10 @@ public:
 
 	//void UpdateList();
 
-	void UnlockCharacter(const float& fDelayTime, const int& iLetterIndex);
+	//void UnlockCharacter(const float& fDelayTime, const int& iLetterIndex);
+	void UnlockLetter(const int& iLetterIndex);
+	float PlayUnlockLettersAnimation(float fDelayTime);
+
 	std::string GetImageFileFromLetter(unsigned char iLetter);	
 	std::string GetImageInGemFileFromLetter(unsigned char iLetter);	
 
@@ -61,10 +64,14 @@ private:
 	float m_LabelXPositionList[_GDS_WORD_MAX_LENGTH_];
 
 	SpriteBatchNode* m_pBatchNode;
+	DrawNode* m_pColorNode;
 
 	unsigned long m_iPreviousMainWordTapTime;
+	unsigned long m_iUnlockedLetterEffectEndTime;
 
 	Armature* m_pCharacter;
+
+	bool m_NewUnlockedLetterFlags[_GDS_WORD_MAX_LENGTH_];
 };
 
 

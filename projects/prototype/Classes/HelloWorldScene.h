@@ -116,6 +116,10 @@ protected:
 	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float& fEffectDuration);
 
 
+	// unlock letter flow
+	void PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime);
+	void PlayUnlockLettersOfBonusWordsAnimation();
+
 	// execute win game effect flow
 	void ShowMainWordUnlockEffect();
 	void StartWinBonusPhase();
@@ -162,6 +166,7 @@ private:
 	bool m_bIsEffectPlaying;
 	bool m_bIsCellDragPlaying;
 	TouchMoveState m_ePlayingDragEffect;
+	bool m_bIsEndGamePhase;
 
 	ComboCountRenderNode* m_pComboCountRenderNode;
 	StatusLayer* m_pStatusLayer;

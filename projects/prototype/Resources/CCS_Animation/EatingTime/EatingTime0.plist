@@ -29,9 +29,9 @@
 			<key>format</key>
 			<integer>0</integer>
 			<key>textureFileName</key>
-			<string>EatingTime.pvr.ccz</string>
+			<string>EatingTime0.png</string>
 			<key>realTextureFileName</key>
-			<string>EatingTime.pvr.ccz</string>
+			<string>EatingTime0.png</string>
 			<key>size</key>
 			<string>{1024,1024}</string>
 		</dict>

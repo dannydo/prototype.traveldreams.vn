@@ -26,8 +26,7 @@ Scene* HelloWorld::createScene(int iLevel)
     scene->addChild(boardLayer);
 
 	//
-	boardLayer->m_pWordCollectBoardRenderNode = WordCollectBoardRenderNode::create();	
-	scene->addChild(boardLayer->m_pWordCollectBoardRenderNode);
+	boardLayer->m_pWordCollectBoardRenderNode = WordCollectBoardRenderNode::create();		
 
 	// extra layer for score/stars...	
 	boardLayer->m_pStatusLayer = StatusLayer::create();
@@ -81,6 +80,9 @@ Scene* HelloWorld::createScene(int iLevel)
 	/*Node* btnShowPopup = boardLayer->m_pBonusWordNode->createButtonShowPopupBonus();
 	btnShowPopup->setPosition(-80, 300);
 	boardLayer->m_pHUDLayer->addChild(btnShowPopup);*/
+
+	//
+	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pWordCollectBoardRenderNode, 11);
 
     // return the scene
     return scene;
@@ -168,6 +170,7 @@ bool HelloWorld::init()
 	m_bIsEffectPlaying = false;
 	m_bIsCellDragPlaying = false;
 	m_pSaveTouch = NULL;
+	m_bIsEndGamePhase = false;
 
 	this->setTouchEnabled(true);	
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
@@ -974,10 +977,8 @@ void HelloWorld::CheckBoardStateAfterMove()
 			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells, false);
 	}
 	else
-	{
-		m_bIsEffectPlaying = false;
-
-		//check end game
+	{		
+		/*//check end game
 		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked()) // complete objective ==> win		
 		//if (true)
 		//if (false)
@@ -986,18 +987,25 @@ void HelloWorld::CheckBoardStateAfterMove()
 			SoundManager::PlaySoundEffect(_SET_COMPLETE_WORD_);
 
 			m_bIsEffectPlaying = true;//stop all interaction on board from now
+			m_bIsEndGamePhase = true; 
 
 			ShowMainWordUnlockEffect();
 			//ExecuteBonusWinGameEffect();						
 		}
 		else  if (m_GameBoardManager.GetCurrentMove() == 0) // out of move ==> lose
 		{
+			m_bIsEndGamePhase = true; 
+
 			EndGameNode* pEndGameNode = EndGameNode::createLayoutLose( m_GameBoardManager.GetCurrentScore(), 
 				const_cast<char*>(m_GameBoardManager.GetGameWordManager()->GetMainWord().m_sWord), m_GameBoardManager.GetCurrentLevel());
 			m_pHUDLayer->addChild( pEndGameNode, 10);
 
 			SoundManager::PlaySoundEffect(_SET_LOSE);
 
+		}
+		else //game is not end yet*/
+		{
+			PlayUnlockLettersOfMainWordAnimation(0.f);			
 		}
 	}
 }
@@ -1018,8 +1026,7 @@ void HelloWorld::ExecuteBonusWinGameEffect()
 	}
 	else
 	{
-		//ShowWinGamePopup();
-		ShowLevelCompleteEffect();
+		PlayUnlockLettersOfBonusWordsAnimation();
 	}
 }
 
@@ -1887,7 +1894,8 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 		m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect(fDelay, m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
 			ccp(m_fBoardLeftPosition + iColumn  * m_SymbolSize.width, 
 					m_fBoardBottomPosition + iRow * m_SymbolSize.height));
-
+		
+		m_pWordCollectBoardRenderNode->PlayCharacterAnim(2, false);
 
 
 		int iUnlockedLetterIndexOfMainWord;
@@ -1901,7 +1909,8 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 			m_pBonusWordNode->addLetter(m_BoardViewMatrix[iRow][iColumn].m_iLetter);
 
 			if (iUnlockedLetterIndexOfMainWord >=0)
-				m_pWordCollectBoardRenderNode->UnlockCharacter(fDelay, iUnlockedLetterIndexOfMainWord);
+				m_pWordCollectBoardRenderNode->UnlockLetter(iUnlockedLetterIndexOfMainWord);
+				//m_pWordCollectBoardRenderNode->UnlockCharacter(fDelay, iUnlockedLetterIndexOfMainWord);
 
 			// increase score
 			if (iUnlockedLetterIndexOfMainWord >=0)
@@ -1923,9 +1932,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 
 			// play sound effect 
 			SoundManager::PlaySoundEffect(_SET_GET_CHARACTER_);
-		}		
-		else
-			m_pWordCollectBoardRenderNode->PlayCharacterAnim(2, false);
+		}							
 	}
 
 	
@@ -2332,10 +2339,13 @@ Sprite* HelloWorld::AddLetterToGem(const ComboEffectCell& cell)
 
 void HelloWorld::ShowMainWordUnlockEffect()
 {
+	m_pWordCollectBoardRenderNode->PlayCharacterAnim(3, true);
+
+	
 	m_pEndGameEffectLayer = LayerColor::create(ccc4( 0,0,0, 100));
 	this->getParent()->addChild(m_pEndGameEffectLayer);
 
-	float fDisplayEffectTime = 2.f;
+	/*float fDisplayEffectTime = 2.f;
 	float fDelayTime = 0.35f;
 
 	FlashCardNode* pFlashCard = FlashCardNode::createLayout( m_GameBoardManager.GetGameWordManager()->GetMainWord());
@@ -2349,9 +2359,9 @@ void HelloWorld::ShowMainWordUnlockEffect()
 			CallFunc::create( this,  callfunc_selector(HelloWorld::StartWinBonusPhase)),
 			NULL));
 
-	m_pWordCollectBoardRenderNode->PlaySpellingSound();
+	m_pWordCollectBoardRenderNode->PlaySpellingSound();*/
 
-	/*
+	
 	SpriteBatchNode* pSpriteBatchNode = SpriteBatchNode::create("ResourceDemo.pvr.ccz");
 	m_pEndGameEffectLayer->addChild(pSpriteBatchNode);
 
@@ -2414,7 +2424,7 @@ void HelloWorld::ShowMainWordUnlockEffect()
 		Sequence::create(
 			DelayTime::create( mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.5f),
 			CallFunc::create( this,  callfunc_selector(HelloWorld::StartWinBonusPhase)),
-			NULL));*/
+			NULL));
 
 }
 
@@ -2573,4 +2583,62 @@ void HelloWorld::PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float f
 	}
 
 	SoundManager::PlaySoundEffect(_SET_COMBINE_DOUBLE_COMBO_, fDelayTime-0.15f);
+}
+
+// unlock letter flow
+void HelloWorld::PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime)
+{
+	float fDisplayTime = m_pWordCollectBoardRenderNode->PlayUnlockLettersAnimation(fDelayTime);
+	if (fDisplayTime > 0)
+	{
+		m_pWordCollectBoardRenderNode->PlayCharacterAnim(5, false);
+
+		this->runAction(
+			Sequence::create(
+			DelayTime::create( fDisplayTime),
+				CallFunc::create( this,  callfunc_selector(HelloWorld::PlayUnlockLettersOfBonusWordsAnimation)),
+				NULL));
+	}
+	else
+	{
+		PlayUnlockLettersOfBonusWordsAnimation();
+	}
+}
+
+void HelloWorld::PlayUnlockLettersOfBonusWordsAnimation()
+{
+	m_bIsEffectPlaying = false;
+
+	if (m_bIsEndGamePhase)
+	{
+		//ShowWinGamePopup();
+		ShowLevelCompleteEffect();
+	}
+	else
+	{
+		//check end game
+		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked()) // complete objective ==> win		
+		//if (true)
+		//if (false)
+		{
+			// play sound effect 
+			SoundManager::PlaySoundEffect(_SET_COMPLETE_WORD_);
+
+			m_bIsEffectPlaying = true;//stop all interaction on board from now
+			m_bIsEndGamePhase = true; 
+
+			ShowMainWordUnlockEffect();
+			//ExecuteBonusWinGameEffect();						
+		}
+		else  if (m_GameBoardManager.GetCurrentMove() == 0) // out of move ==> lose
+		{
+			m_bIsEndGamePhase = true; 
+
+			EndGameNode* pEndGameNode = EndGameNode::createLayoutLose( m_GameBoardManager.GetCurrentScore(), 
+				const_cast<char*>(m_GameBoardManager.GetGameWordManager()->GetMainWord().m_sWord), m_GameBoardManager.GetCurrentLevel());
+			m_pHUDLayer->addChild( pEndGameNode, 10);
+
+			SoundManager::PlaySoundEffect(_SET_LOSE);
+		}
+	}
 }

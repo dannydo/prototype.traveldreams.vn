@@ -252,7 +252,7 @@
                   "fi": 128,
                   "twE": 0,
                   "tweenFrame": true,
-                  "color": [{
+                  "color":[{
                     "a": 255,
                     "r": 255,
                     "g": 255,

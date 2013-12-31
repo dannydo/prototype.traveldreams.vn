@@ -86,6 +86,8 @@ void WordCollectBoardRenderNode::update(float dt)
 
 bool WordCollectBoardRenderNode::init()
 {	
+	m_pColorNode = NULL;
+		 
 	// GenerateLabels
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResourceDemo.plist");
 	m_pBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
@@ -96,13 +98,14 @@ bool WordCollectBoardRenderNode::init()
 	timeval now;
 	gettimeofday( &now, NULL);
 	m_iPreviousMainWordTapTime = now.tv_sec*1000 + now.tv_usec / 1000;
+	m_iUnlockedLetterEffectEndTime = m_iPreviousMainWordTapTime;
 
 	// preload character animation
 	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/PigHero/PigHero.ExportJson");
 
 	m_pCharacter = Armature::create("PigHero");
 	m_pCharacter->setBlendFunc(BlendFunc::ALPHA_NON_PREMULTIPLIED);	
-	m_pCharacter->getAnimation()->playByIndex(0);
+	m_pCharacter->getAnimation()->playByIndex(4);//0);
 	m_pCharacter->setAnchorPoint(Point(0,0));
 	m_pCharacter->setPosition( 5.f, 740.f);
 	this->addChild(m_pCharacter);
@@ -120,6 +123,18 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	m_pMainWord = &pGameWordManager->GetMainWord();
 
 	
+	
+	m_pColorNode = DrawNode::create();
+	CCPoint vertex[] = { ccp(0,0), ccp(1000,0), ccp(1000,1000), ccp(0,1000) };
+	m_pColorNode->drawPolygon(vertex, 4, ccc4f(0, 0, 0, 0.5f), 0, ccc4f(0, 0, 0, 0.5f) );
+	this->addChild(m_pColorNode, 9);
+
+	Sprite* pTip = Sprite::create("tip-msg.png");
+	pTip->setScale(1.2f);
+	pTip->setPosition(Point( 310.f, 830.f));
+	m_pColorNode->addChild(pTip);
+
+
 
 	// create labels
 	int iWordLength = strlen(m_pMainWord->m_sWord);	
@@ -177,9 +192,12 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	pMeaningLabel->setColor(ccc3( 90, 90, 90));
 	pMeaningLabel->disableStroke();
 	this->addChild(pMeaningLabel, 20);	
+
+	// reset flags
+	memset( m_NewUnlockedLetterFlags, 0, sizeof(m_NewUnlockedLetterFlags));
 }
 
-void WordCollectBoardRenderNode::UnlockCharacter(const float& fDelayTime, const int& iLetterIndex)
+/*void WordCollectBoardRenderNode::UnlockCharacter(const float& fDelayTime, const int& iLetterIndex)
 {	
 	m_LabelList[iLetterIndex]->setColor( ccc3(255, 255, 255));
 	m_LabelList[iLetterIndex]->setOpacity(255);
@@ -207,18 +225,82 @@ void WordCollectBoardRenderNode::UnlockCharacter(const float& fDelayTime, const 
 			bAreAllCharacterUnlocked = false;
 			break;
 		}
-	}
-
-	//if (bAreAllCharacterUnlocked)
-		//onTouchBegan(NULL, NULL);	*/
+	}	
 
 	PlayCharacterAnim(2, bAreAllCharacterUnlocked);
+}
+*/
+void WordCollectBoardRenderNode::UnlockLetter(const int& iLetterIndex)
+{
+	if (iLetterIndex >= 0 && iLetterIndex < m_pMainWord->m_iWordLength)
+		m_NewUnlockedLetterFlags[iLetterIndex] = true;
+}
+
+float WordCollectBoardRenderNode::PlayUnlockLettersAnimation(float fDelayTime)
+{
+	timeval now;
+	gettimeofday( &now, NULL);
+	unsigned long currentMilliseconds = now.tv_sec*1000 + now.tv_usec / 1000;
+	float fRemainWaitTime = 0;
+	if (m_iUnlockedLetterEffectEndTime > currentMilliseconds)
+		fRemainWaitTime = (m_iUnlockedLetterEffectEndTime - currentMilliseconds) / 1000.f;
+	if (fDelayTime < fRemainWaitTime)
+		fDelayTime = fRemainWaitTime;
+	fDelayTime += 0.8f;
+	
+
+	float fDisplayPerLetter = 0.25f;
+	float fDelayPerLetter = 0.22f;
+	float fTotalTime = 0.f;
+	for(int iLetterIndex=0; iLetterIndex< m_pMainWord->m_iWordLength; iLetterIndex++)
+		if (m_NewUnlockedLetterFlags[iLetterIndex])
+		{
+			//m_LabelList[iLetterIndex]->setColor( ccc3(255, 255, 255));
+			//m_LabelList[iLetterIndex]->setOpacity(255);
+
+			m_LabelList[iLetterIndex]->runAction(
+				Sequence::createWithTwoActions(
+					DelayTime::create( fDelayTime + fTotalTime ),
+					TintTo::create(fDisplayPerLetter, 255,255,255)));
+			m_LabelList[iLetterIndex]->runAction(
+				Sequence::createWithTwoActions(
+					DelayTime::create( fDelayTime + fTotalTime),
+					FadeTo::create(fDisplayPerLetter, 255)));
+
+			Sprite* pSrite = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(m_pMainWord->m_sWord[iLetterIndex]).c_str());			
+			//pSrite->setColor( ccc3(100, 100, 100));
+			pSrite->setOpacity(0.f);
+			pSrite->setPosition(ccp( m_LabelXPositionList[iLetterIndex] + pSrite->getContentSize().width/2.f, 38.f + pSrite->getContentSize().height/2.f)); //_position.y));
+			m_pBatchNode->addChild(pSrite);
+		
+
+			pSrite->runAction( 
+				Sequence::createWithTwoActions(
+					DelayTime::create( fDelayTime + fTotalTime),
+					ScaleTo::create( fDisplayPerLetter, 2.5f, 2.5f)));
+			pSrite->runAction( 
+				Sequence::create(
+					DelayTime::create( fDelayTime + fTotalTime),
+					FadeTo::create( 0.001f, 255),
+					FadeOut::create( fDisplayPerLetter),
+					NULL));
+				
+			fTotalTime += fDelayPerLetter;
+		}	
+
+	if (fTotalTime > 0)
+		fTotalTime  += fDisplayPerLetter *2;
+
+	// reset flags
+	memset( m_NewUnlockedLetterFlags, 0, sizeof(m_NewUnlockedLetterFlags));
+
+	return fTotalTime;
 }
 
 void WordCollectBoardRenderNode::PlayCharacterAnim(int iAnimIndex, bool bIsLoop)
 {
 	if (!bIsLoop)
-		m_pCharacter->getAnimation()->playByIndex(2, -1, -1,false);
+		m_pCharacter->getAnimation()->playByIndex(iAnimIndex, -1, -1,false);
 	else
 		m_pCharacter->getAnimation()->playByIndex(3, -1, -1,true);
 }
@@ -291,6 +373,12 @@ void WordCollectBoardRenderNode::GetWordIndex()
 
 bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 {
+	if (m_pColorNode != NULL)
+	{
+		m_pColorNode->runAction(RemoveSelf::create());
+		m_pColorNode = NULL;
+	}
+
 	Point touchPosition;
 	if (pTouch)
 		touchPosition = pTouch->getLocation();
@@ -362,7 +450,12 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const float& fDelayEffec
 			ScaleTo::create(0.22f, 3.f, 3.f),
 			ScaleTo::create(0.17f, 0.8f, 0.8f),
 			//EaseBackIn::create( 	ScaleTo::create(0.3f, 2.f, 2.f)),
-			MoveTo::create(	1.f, Point(70.f, -73.f)),
+			MoveTo::create(	1.0f, Point(70.f, -73.f)),
 			RemoveSelf::create(),
 			NULL));
+
+
+	timeval now;
+	gettimeofday( &now, NULL);
+	m_iUnlockedLetterEffectEndTime = now.tv_sec*1000 + now.tv_usec / 1000 + (fDelayEffectTime + 0.22f + 0.17f + 1.f) * 1000;	
 }
