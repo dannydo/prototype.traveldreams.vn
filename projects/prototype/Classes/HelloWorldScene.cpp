@@ -2607,6 +2607,27 @@ void HelloWorld::PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime)
 
 void HelloWorld::PlayUnlockLettersOfBonusWordsAnimation()
 {
+	float fDisplayTime = m_pBonusWordNode->displayEffect();
+	if (fDisplayTime > 0)
+	{
+		m_pWordCollectBoardRenderNode->PlayCharacterAnim(5, false);
+
+		this->runAction(
+			Sequence::create(
+			DelayTime::create( fDisplayTime),
+				CallFunc::create( this,  callfunc_selector(HelloWorld::PlayUnlockLettersOfBonusWordsAnimation)),
+				NULL));
+	}
+	else
+	{
+		EndUnlockLetterAnimation();
+	}
+
+	
+}
+
+void HelloWorld::EndUnlockLetterAnimation()
+{
 	m_bIsEffectPlaying = false;
 
 	if (m_bIsEndGamePhase)
