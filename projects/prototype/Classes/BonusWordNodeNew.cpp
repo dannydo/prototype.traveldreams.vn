@@ -126,7 +126,7 @@ float BonusWordNodeNew::calculatorDelayTime()
 
 		if (isFinish)
 		{
-			fDelay += 1.1f;
+			fDelay += 1.05f;
 		}
 	}
 
@@ -188,12 +188,12 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 
 	if (isDelay)
 	{
-		auto delay = DelayTime::create(0.3f);
+		auto delay = DelayTime::create(0.2f);
 		auto actionLoopUpdate = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::updateLetterCollectForWord));
 		if (this->checkFinishCollectWord(m_iCountWord))
 		{
 			auto actionEffect = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::playEffectFinishCollectWord));
-			auto delayEffect = DelayTime::create(1.1f);
+			auto delayEffect = DelayTime::create(1.05f);
 			this->runAction(Sequence::create(delay->clone(), actionEffect, delayEffect->clone(), actionLoopUpdate, NULL));
 		}
 		else
@@ -216,12 +216,12 @@ void BonusWordNodeNew::playEffectLetter(LabelTTF* pLabel)
 		auto actionMove = MoveTo::create(0.2f, Point(-9, 0));
 		pMark->runAction(actionMove);
 
-		auto actionSacleEffect = ScaleBy::create(0.1f, 1.5f, 1.5f);
+		auto actionSacleEffect = ScaleBy::create(0.09f, 1.5f, 1.5f);
 		pLabel->runAction(Sequence::create(DelayTime::create(0.2f)->clone(), actionSacleEffect, actionSacleEffect->reverse(), NULL));
 	}
 	else
 	{
-		auto actionSacleEffect = ScaleBy::create(0.1f, 1.5f, 1.5f);
+		auto actionSacleEffect = ScaleBy::create(0.09f, 1.5f, 1.5f);
 		pLabel->runAction(Sequence::create(actionSacleEffect, actionSacleEffect->reverse(), NULL));
 	}
 
