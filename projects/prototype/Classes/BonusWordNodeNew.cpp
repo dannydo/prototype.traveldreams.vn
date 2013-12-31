@@ -1,4 +1,5 @@
 #include "BonusWordNodeNew.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 
@@ -37,16 +38,21 @@ bool BonusWordNodeNew::init()
 
 	m_LabelLetterDisplays = new Array();
 	m_LabelLetterDisplays->initWithCapacity(0);
+
+	m_pMarks = new Array();
+	m_pMarks->initWithCapacity(0);
+
+	int iHeight = 0;
 	
 	for (int iIndex=0; iIndex<m_bonusWords.size(); iIndex++)
 	{
 		Node* pNode = this->createNodeBonusWord(m_bonusWords[iIndex]);
-		pNode->setPosition(Point(iIndex*80+pNode->getContentSize().width/2.0f, 0));
+		pNode->setPosition(Point(0, iHeight));
+		iHeight += pNode->getContentSize().height + 25;
 		this->addChild(pNode, 0, iIndex);
-		this->setContentSize(CCSizeMake(iIndex*80 + pNode->getContentSize().width, pNode->getContentSize().height));
 	}		
 
-	this->setAnchorPoint(Point(0.5, 0));
+	this->setAnchorPoint(Point(0.5f, 0.0f));
 	this->scheduleUpdate();
 	m_fDeltaUpdate = 0.0f;
 	m_fTimeAutoHiddenPopup = 3.0f;
@@ -60,29 +66,233 @@ void BonusWordNodeNew::update(float dt)
 	m_fDeltaUpdate += dt;
 	if (m_fDeltaUpdate >= m_fTimeAutoHiddenPopup && m_bRunningCollectWord == false)
 	{
-		this->setVisibleWordNode(false);
+		this->closeBonusWord();
 		m_fDeltaUpdate = 0.0f;
 	}
 }
 
 void BonusWordNodeNew::addLetter(const unsigned char letter)
 {
-	for (int iIndexWord=0; iIndexWord<m_bonusWords.size(); iIndexWord++)
-	{
-		Word word = m_bonusWords[iIndexWord];
-		Node* pNodeWord = this->getChildByTag(iIndexWord)->getChildByTag(0)->getChildByTag(0);
+	m_letters.push_back(letter);
+	
+}
 
-		for (int iIndex=0; iIndex<m_WordLetterIndex[iIndexWord].size(); iIndex++)
+float BonusWordNodeNew::displayEffect()
+{
+	m_iCountWord = -1;
+	m_bRunningCollectWord = false;
+	float fDelay = this->calculatorDelayTime();
+	this->updateLetterCollectForWord();
+
+	return fDelay;
+}
+
+float BonusWordNodeNew::calculatorDelayTime()
+{
+	float fDelay = 0.0f;
+	
+	for(int iIndexWord=0; iIndexWord<m_bonusWords.size(); iIndexWord++)
+	{
+		std::vector<int> letters = m_WordLetterIndex[iIndexWord];
+
+		Word word = m_bonusWords[iIndexWord];
+		bool bShowBonusWord = true;
+		for(int iIndex=0; iIndex<strlen(word.m_sWord); iIndex++)
 		{
-			if (tolower(letter) == tolower(word.m_sWord[iIndex]) && m_WordLetterIndex[iIndexWord][iIndex] == 0)
+			for(int iIndexLetter=0; iIndexLetter<m_letters.size(); iIndexLetter++)
 			{
-				m_WordLetterIndex[iIndexWord][iIndex] = 1;
-				LabelTTF* plabelLetter = (LabelTTF*)pNodeWord->getChildByTag(iIndex);
-				plabelLetter->setColor(ccc3(0, 0, 0));
+				if (tolower(m_letters[iIndexLetter]) == tolower(word.m_sWord[iIndex]) && m_WordLetterIndex[iIndexWord][iIndex] == 0)
+				{
+					if (bShowBonusWord)
+					{
+						bShowBonusWord = false;
+						fDelay += 0.2f;
+					}
+					fDelay += 0.2f;
+					letters[iIndex] = 1;
+				}
 			}
 		}
 
-		this->updateLetterDisplay(iIndexWord);
+		bool isFinish = true;
+		for(int iIndex=0; iIndex<letters.size(); iIndex++)
+		{
+			if(letters[iIndex] == 0)
+			{
+				isFinish = false;
+				break;
+			}
+		}
+
+		if (isFinish)
+		{
+			fDelay += 1.1f;
+		}
+	}
+
+	return fDelay;
+}
+
+void BonusWordNodeNew::updateLetterCollectForWord()
+{
+	if (m_bRunningCollectWord == false)
+	{
+		m_iCountWord++;
+		m_iCountLetterWord = 0;
+		m_iCountLetter = 0;
+	}
+
+	if (m_iCountWord > m_bonusWords.size() - 1)
+	{
+		this->emptyArrayLetter();
+		return;
+	}
+
+	Word word = m_bonusWords[m_iCountWord];
+	Node* pNodeWord = this->getChildByTag(m_iCountWord)->getChildByTag(0)->getChildByTag(0)->getChildByTag(0);
+	bool isDelay = false;
+	m_bRunningCollectWord = true;
+
+	if (m_iCountLetterWord < strlen(word.m_sWord))
+	{
+		if (m_iCountLetter < m_letters.size())
+		{
+			if (tolower(m_letters[m_iCountLetter]) == tolower(word.m_sWord[m_iCountLetterWord]) && m_WordLetterIndex[m_iCountWord][m_iCountLetterWord] == 0)
+			{
+				isDelay = true;
+				m_WordLetterIndex[m_iCountWord][m_iCountLetterWord] = 1;
+				this->playEffectLetter((LabelTTF*)pNodeWord->getChildByTag(m_iCountLetterWord));
+			}
+
+			m_iCountLetter++;
+		}
+		else
+		{
+			m_iCountLetter = 0;
+			m_iCountLetterWord++;
+		}
+	}
+	else
+	{
+		m_bRunningCollectWord = false;
+		this->updateLetterDisplay();
+
+		Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
+		if (pMark->getTag() != -1)
+		{
+			pMark->setTag(-1);
+			auto actionMove = MoveTo::create(0.2f, Point(-pMark->getContentSize().width, 0));
+			pMark->runAction(actionMove);
+		}
+	}
+
+	if (isDelay)
+	{
+		auto delay = DelayTime::create(0.3f);
+		auto actionLoopUpdate = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::updateLetterCollectForWord));
+		if (this->checkFinishCollectWord(m_iCountWord))
+		{
+			auto actionEffect = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::playEffectFinishCollectWord));
+			auto delayEffect = DelayTime::create(1.1f);
+			this->runAction(Sequence::create(delay->clone(), actionEffect, delayEffect->clone(), actionLoopUpdate, NULL));
+		}
+		else
+		{
+			this->runAction(Sequence::create(delay->clone(), actionLoopUpdate, NULL));
+		}
+	}
+	else
+	{
+		this->updateLetterCollectForWord();
+	}
+}
+
+void BonusWordNodeNew::playEffectLetter(LabelTTF* pLabel)
+{
+	Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
+	if (pMark->getTag() == -1)
+	{
+		pMark->setTag(m_iCountWord);
+		auto actionMove = MoveTo::create(0.2f, Point(-9, 0));
+		pMark->runAction(actionMove);
+
+		auto actionSacleEffect = ScaleBy::create(0.1f, 1.5f, 1.5f);
+		pLabel->runAction(Sequence::create(DelayTime::create(0.2f)->clone(), actionSacleEffect, actionSacleEffect->reverse(), NULL));
+	}
+	else
+	{
+		auto actionSacleEffect = ScaleBy::create(0.1f, 1.5f, 1.5f);
+		pLabel->runAction(Sequence::create(actionSacleEffect, actionSacleEffect->reverse(), NULL));
+	}
+
+	pLabel->setColor(ccc3(0, 0, 0));
+}
+
+bool  BonusWordNodeNew::checkFinishCollectWord(const int& iIndexWord)
+{
+	for(int iIndex=0; iIndex<m_WordLetterIndex[iIndexWord].size(); iIndex++)
+	{
+		if(m_WordLetterIndex[iIndexWord][iIndex] == 0)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void BonusWordNodeNew::playEffectFinishCollectWord()
+{
+	Word word = m_bonusWords[m_iCountWord];
+	Size winSize = Director::sharedDirector()->getWinSize();
+	Node* pNode = this->getChildByTag(m_iCountWord);
+	Node* pNodeWord = this->getChildByTag(m_iCountWord)->getChildByTag(0)->getChildByTag(0)->getChildByTag(0);
+	pNodeWord->setVisible(false);
+
+	m_pLabelEffectFinish = LabelTTF::create("", "Arial", 24);
+	m_pLabelEffectFinish->setString(word.m_sWord);
+	m_pLabelEffectFinish->setPosition(Point(m_pLabelEffectFinish->getContentSize().width/2.0f, pNode->getPositionY()));
+	m_pLabelEffectFinish->setColor(ccc3(0, 0, 0));
+	
+	this->addChild(m_pLabelEffectFinish);
+
+	auto actionSacle = ScaleBy::create(1.0f, 5.0f, 5.0f);
+	auto actionRemove = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::removeLabelFinishColectWord));
+	auto actionFadeOut = FadeOut::create(1.0f);
+	auto actionMove = MoveBy::create(1.0f, Point(0, -300));
+	m_pLabelEffectFinish->runAction(Sequence::create(actionSacle, actionRemove, NULL));
+	m_pLabelEffectFinish->runAction(actionFadeOut);
+	m_pLabelEffectFinish->runAction(actionMove);
+
+	Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
+	if (pMark->getTag() != -1)
+	{
+		pMark->setTag(-1);
+		auto actionMove = MoveTo::create(0.2f, Point(-pMark->getContentSize().width, 0));
+		pMark->runAction(actionMove);
+	}
+
+	char sSoundFile[40];
+	#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+		sprintf(sSoundFile, "EnglishSoundPC/%s.wav", word.m_sSoundFile.c_str());
+	#else
+		sprintf(sSoundFile, "EnglishSound/%s.ogg", word.m_sSoundFile.c_str());
+	#endif
+	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
+}
+
+void BonusWordNodeNew::removeLabelFinishColectWord()
+{
+	this->removeChild(m_pLabelEffectFinish);
+	Node* pNodeWord = this->getChildByTag(m_iCountWord)->getChildByTag(0)->getChildByTag(0)->getChildByTag(0);
+	pNodeWord->setVisible(true);
+}
+
+void BonusWordNodeNew::emptyArrayLetter()
+{
+	while(!m_letters.empty())
+	{
+		m_letters.pop_back();
 	}
 }
 
@@ -91,55 +301,11 @@ Node* BonusWordNodeNew::createNodeBonusWord(Word word)
 	Node* pLayoutNode = Node::create();
 
 	Node* pNodeWord = Node::create();
-	Sprite* pBackground = Sprite::create("Bonus-Word/Bonus_Board_Small.png");
-	pBackground->setPosition(Point(0, 9));
-	
-	int width = 0;
-	std::vector<int> indexLetter;
-	for(int i=0; i<strlen(word.m_sWord); i++)
-	{
-		char letter[2];
-		letter[0] = word.m_sWord[i];
-		letter[1] = 0;
-		indexLetter.push_back(0);
-		
-		LabelTTF* pLabelLetter = LabelTTF::create(letter, "Arial", 18);
-		pLabelLetter->setColor(ccc3(130, 130, 130));
-		pLabelLetter->setPosition(Point(width + pLabelLetter->getContentSize().width/2.0f, 0));
-
-		width = width + pLabelLetter->getContentSize().width + 2;
-		pNodeWord->addChild(pLabelLetter, 0, i);
-	}
-
-	m_WordLetterIndex.push_back(indexLetter);
-	pNodeWord->setTag(0);
-	pNodeWord->setPosition(Point(-width/2.0f, 20));
-	
-	LabelTTF* pLabelMeaning = LabelTTF::create(word.m_sMeaning.c_str(), "Arial", 14);
-	pLabelMeaning->setColor(ccc3(130, 130, 130));
-	pLabelMeaning->setPosition(Point(0, -8));
-
-	if (width < pLabelMeaning->getContentSize().width)
-	{
-		width = pLabelMeaning->getContentSize().width;
-	}
-
-	auto actionScale = ScaleBy::create(0.0f, (width + 24)/pBackground->getContentSize().width , 0.65);
-	pBackground->runAction(actionScale);
-
-	Node* pPopupWord = Node::create();
-	pPopupWord->addChild(pBackground);
-	pPopupWord->addChild(pLabelMeaning);
-	pPopupWord->addChild(pNodeWord);
-	pPopupWord->setPosition(Point(0, 40));
-	pPopupWord->setVisible(false);
-	
-	pLayoutNode->addChild(pPopupWord, 0, 0);
 
 	char letter[2];
 	letter[0] = toupper(word.m_sWord[0]);
 	letter[1] = 0;
-	LabelTTF* pLabelLetter = LabelTTF::create(letter, "Arial", 28);
+	LabelTTF* pLabelLetter = LabelTTF::create(letter, "Arial", 24);
 	pLabelLetter->setColor(ccc3(0, 0, 0));
 	m_LabelLetterDisplays->addObject(pLabelLetter);
 	
@@ -157,59 +323,134 @@ Node* BonusWordNodeNew::createNodeBonusWord(Word word)
 	pLayoutNode->addChild(pMenuDisplay);
 	pLayoutNode->setContentSize(pDisplay->getContentSize());
 
+	
+	
+	int width = 0;
+	std::vector<int> indexLetter;
+	for(int i=0; i<strlen(word.m_sWord); i++)
+	{
+		char letter[2];
+		letter[0] = word.m_sWord[i];
+		letter[1] = 0;
+		indexLetter.push_back(0);
+		
+		LabelTTF* pLabelLetter = LabelTTF::create(letter, "Arial", 24);
+		pLabelLetter->setColor(ccc3(130, 130, 130));
+		pLabelLetter->setPosition(Point(width + pLabelLetter->getContentSize().width/2.0f, 0));
+
+		width = width + pLabelLetter->getContentSize().width + 2;
+		pNodeWord->addChild(pLabelLetter, 0, i);
+	}
+
+	m_WordLetterIndex.push_back(indexLetter);
+	pNodeWord->setTag(0);
+	pNodeWord->setPosition(Point::ZERO);
+
+	Sprite* pBackground = Sprite::create("Bonus-Word/Bonus_Board_Small.png");
+	pBackground->setPosition(Point(0, 0));
+	pBackground->setScaleX((width + 24)/pBackground->getContentSize().width);
+	pBackground->setPosition(Point(width/2.0f, 0));
+
+	Node* pPopupWord = Node::create();
+	pPopupWord->addChild(pBackground);
+	pPopupWord->addChild(pNodeWord);
+	pPopupWord->setPosition(Point(-8, 0));
+
+	Sprite* m_pMark = Sprite::create("Bonus-Word/Bonus_Board_Small.png");
+	m_pMark->setPosition(Point(0, 0));
+	m_pMark->setTag(-1);
+	m_pMark->setScaleX((width + 24)/m_pMark->getContentSize().width);
+	m_pMark->setAnchorPoint(Point(0.0f, 0.5f));
+	m_pMark->setPosition(Point(-m_pMark->getContentSize().width, 0));
+
+	m_pMarks->addObject(m_pMark);
+	
+	ClippingNode* clipperMask = ClippingNode::create();
+    clipperMask->addChild(pPopupWord, 0, 0);
+    clipperMask->setStencil(m_pMark);
+	clipperMask->setContentSize(m_pMark->getContentSize());
+	pLayoutNode->addChild(clipperMask, 0, 0);
+
 	return pLayoutNode;
 }
 
-void BonusWordNodeNew::updateLetterDisplay(int iIndexWord)
+void BonusWordNodeNew::updateLetterDisplay()
 {
-	Word word = m_bonusWords[iIndexWord];
+	Word word = m_bonusWords[m_iCountWord];
 	bool bFInish = true;
 
-	for (int iIndex=0; iIndex<m_WordLetterIndex[iIndexWord].size(); iIndex++)
+	for (int iIndex=0; iIndex<m_WordLetterIndex[m_iCountWord].size(); iIndex++)
 	{
-		if (m_WordLetterIndex[iIndexWord][iIndex] == 0)
+		if (m_WordLetterIndex[m_iCountWord][iIndex] == 0)
 		{
 			bFInish = false;
 			char letter[2];
 			letter[0] = toupper(word.m_sWord[iIndex]);
 			letter[1] = 0;
-			LabelTTF* labelLetter =(LabelTTF*)m_LabelLetterDisplays->getObjectAtIndex(iIndexWord);
+			LabelTTF* labelLetter =(LabelTTF*)m_LabelLetterDisplays->getObjectAtIndex(m_iCountWord);
 			labelLetter->setString(letter);
 			break;
 		}
 	}
-
-	if (bFInish)
+															 
+	if (bFInish)																	  
 	{
-		LabelTTF* labelLetter =(LabelTTF*)m_LabelLetterDisplays->getObjectAtIndex(iIndexWord);
+		LabelTTF* labelLetter =(LabelTTF*)m_LabelLetterDisplays->getObjectAtIndex(m_iCountWord);
 		labelLetter->setString("✓");
 	}
 }
 
 void BonusWordNodeNew::popupBonusWordCallBack(Object* pSender)
 {
-	m_fTimeAutoHiddenPopup = 3.0f;
-	m_fDeltaUpdate = 0.0f;
+	if (m_bRunningCollectWord == false)
+	{
+		m_fTimeAutoHiddenPopup = 3.0f;
+		m_fDeltaUpdate = 0.0f;
+		this->closeBonusWord();
 
-	Node* pNode = (Node*)pSender;
-	Node* pPopupWord = pNode->getParent()->getParent()->getChildByTag(0);
-	
-	if (pPopupWord->isVisible())
-	{
-		pPopupWord->setVisible(false);
-		this->setVisibleWordNode(false);
-	}
-	else
-	{
-		this->setVisibleWordNode(false);
-		pPopupWord->setVisible(true);
+		Node* pNode = (Node*)pSender;
+		Node* pParent = pNode->getParent()->getParent();
+		LabelTTF* pLabel = (LabelTTF*)m_LabelLetterDisplays->getObjectAtIndex(pParent->getTag());
+		pLabel->setVisible(false);
+		
+		Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(pParent->getTag());
+		if (pMark->getTag() == -1)
+		{
+			pMark->setTag(pParent->getTag());
+			auto actionMove = MoveTo::create(0.2f, Point(-9, 0));
+			auto actionMoveRevrse = MoveTo::create(0.2f, Point(-pMark->getContentSize().width, 0));
+			auto actionUpdateTag =  CallFuncN::create(this, callfuncN_selector(BonusWordNodeNew::updateTagSpriteMark));
+			pMark->runAction(Sequence::create(actionMove,  NULL));
+
+			char sSoundFile[40];
+			#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+				sprintf(sSoundFile, "EnglishSoundPC/%s.wav", m_bonusWords[pParent->getTag()].m_sSoundFile.c_str());
+			#else
+				sprintf(sSoundFile, "EnglishSound/%s.ogg", m_bonusWords[pParent->getTag()].m_sSoundFile.c_str());
+			#endif
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
+		}
 	}
 }
 
-void BonusWordNodeNew::setVisibleWordNode(const bool& bVisible)
+void BonusWordNodeNew::updateTagSpriteMark(Node* pSender)
 {
-	for (int iIndexWord=0; iIndexWord<m_bonusWords.size(); iIndexWord++)
+	Sprite* pSprite = (Sprite*)pSender;
+	LabelTTF* pLabel = (LabelTTF*)m_LabelLetterDisplays->getObjectAtIndex(pSprite->getTag());
+	pLabel->setVisible(true);
+	pSprite->setTag(-1);
+}
+
+void BonusWordNodeNew::closeBonusWord()
+{
+	for(int iIndex=0; iIndex<m_pMarks->count(); iIndex++)
 	{
-		this->getChildByTag(iIndexWord)->getChildByTag(0)->setVisible(bVisible);
+		Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(iIndex);
+		if (pMark->getTag() != -1)
+		{
+			auto actionUpdateTag =  CallFuncN::create(this, callfuncN_selector(BonusWordNodeNew::updateTagSpriteMark));
+			auto actionMove = MoveTo::create(0.2f, Point(-pMark->getContentSize().width, 0));
+			pMark->runAction(Sequence::create(actionMove, actionUpdateTag, NULL));
+		}
 	}
 }
