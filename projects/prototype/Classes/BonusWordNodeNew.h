@@ -39,6 +39,7 @@ private:
 
 	std::vector<Word> m_bonusWords;
 	std::vector<std::vector<int>> m_WordLetterIndex;
+	std::vector<int> m_CompletedUnlockBonusWprds;
 	std::vector<unsigned char> m_letters;
 
 	int m_iCountWord;

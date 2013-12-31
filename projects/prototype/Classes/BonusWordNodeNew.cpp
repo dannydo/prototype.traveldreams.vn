@@ -50,7 +50,9 @@ bool BonusWordNodeNew::init()
 		pNode->setPosition(Point(0, iHeight));
 		iHeight += pNode->getContentSize().height + 25;
 		this->addChild(pNode, 0, iIndex);
-	}		
+		m_CompletedUnlockBonusWprds.push_back(0);
+		m_CompletedUnlockBonusWprds.push_back(0);
+	}
 
 	this->setAnchorPoint(Point(0.5f, 0.0f));
 	this->scheduleUpdate();
@@ -117,19 +119,23 @@ float BonusWordNodeNew::calculatorDelayTime()
 			}
 		}
 
-		bool isFinish = true;
-		for(int iIndex=0; iIndex<letters.size(); iIndex++)
+		if (m_CompletedUnlockBonusWprds[iIndexWord] == 0)
 		{
-			if(letters[iIndex] == 0)
+			bool isFinish = true;
+			for(int iIndex=0; iIndex<letters.size(); iIndex++)
 			{
-				isFinish = false;
-				break;
+				if(letters[iIndex] == 0)
+				{
+					isFinish = false;
+					break;
+				}
 			}
-		}
 
-		if (isFinish)
-		{
-			fDelay += 1.1f;
+			if (isFinish)
+			{
+				m_CompletedUnlockBonusWprds[iIndexWord] = 1;
+				fDelay += 1.1f;
+			}
 		}
 	}
 
