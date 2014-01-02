@@ -144,6 +144,11 @@ float BonusWordNodeNew::calculatorDelayTime()
 
 void BonusWordNodeNew::updateLetterCollectForWord()
 {
+	if (m_bonusWords.size() < 1)
+	{
+		return;
+	}
+
 	if (m_bRunningCollectWord == false)
 	{
 		m_iCountWord++;

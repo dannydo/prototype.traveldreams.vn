@@ -111,7 +111,7 @@ void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 	int iLevel = pMenuItem->getTag();
 
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
-	pGameWordManager->GenerateWordForNewLevel();
+	pGameWordManager->GenerateWordForNewLevel(iLevel);
 
 	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(const_cast<char*>(pGameWordManager->GetMainWord().m_sWord), iLevel);
 	this->addChild(pGameTargetNode, 10);

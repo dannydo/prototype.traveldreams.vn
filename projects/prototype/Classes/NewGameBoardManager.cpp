@@ -18,8 +18,16 @@ void NewGameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, i
 	// compute score/star for this level
 	m_LevelConfig.m_ScoreOfStars[0] = GetBonusScoreForUnlockMainWord(true);
 	int iTotalSubWordScore = 0;
-	for(int i=0; i< m_pGameWordManager->GetSubWordCount(); i++)
-		iTotalSubWordScore += GetBonusScoreForUnlockSubWord(i, true);
+
+	// NOTE: temporary hardcode
+	if (m_pGameWordManager->GetSubWordCount() > 0)
+	{
+		for(int i=0; i< m_pGameWordManager->GetSubWordCount(); i++)
+			iTotalSubWordScore += GetBonusScoreForUnlockSubWord(i, true);
+	}
+	else
+		iTotalSubWordScore = m_LevelConfig.m_ScoreOfStars[0]/1.5f;
+
 	m_LevelConfig.m_ScoreOfStars[1] = m_LevelConfig.m_ScoreOfStars[0] + iTotalSubWordScore /2;
 	m_LevelConfig.m_ScoreOfStars[2] = m_LevelConfig.m_ScoreOfStars[0] + iTotalSubWordScore;
 }

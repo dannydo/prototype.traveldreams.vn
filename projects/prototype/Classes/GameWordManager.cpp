@@ -97,10 +97,23 @@ void GameWordManager::LoadWords()
 	}
 }
 
-void GameWordManager::GenerateWordForNewLevel()
+void GameWordManager::GenerateWordForNewLevel(int iLevel)
 {
+	// begin hard code level 1
+	m_bAddDirectLetterOfMainWordToTrash = false;
+	m_iSubWordCount = _GDS_SUB_WORD_MAX_COUNT_;
+
 	int iPreviousWordIndex = UserDefault::getInstance()->getIntegerForKey("wordIndex", -1);
 	m_iMainWordIndex = (iPreviousWordIndex + 1) % m_iWordCount;
+
+	if(iLevel == 1)
+	{
+		m_bAddDirectLetterOfMainWordToTrash = true;
+		m_iSubWordCount = 0;
+		m_iMainWordIndex = 5;
+		
+	}
+	// end hard code level 1
 
 	UserDefault::getInstance()->setIntegerForKey("wordIndex", m_iMainWordIndex);
 
@@ -114,7 +127,7 @@ void GameWordManager::GenerateWordForNewLevel()
 
 	srand(time(NULL ));
 	int iRandomIndex;
-	for(int i=0; i< _GDS_SUB_WORD_MAX_COUNT_; i++)
+	for(int i=0; i< m_iSubWordCount; i++)
 	{
 		iRandomIndex = rand() % iWordRemainCount;
 		m_SubWordList[i] = wordIndexList[iRandomIndex];
@@ -143,7 +156,7 @@ void GameWordManager::ResetDataForNewPlay()
 	m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount = m_WordList[m_iMainWordIndex].m_iWordLength;
 	m_WordList[m_iMainWordIndex].m_iRemainNotAppearedCharacterCount = m_WordList[m_iMainWordIndex].m_iWordLength;
 
-	for(int i=0; i< _GDS_SUB_WORD_MAX_COUNT_; i++)
+	for(int i=0; i< m_iSubWordCount; i++)
 	{
 		// note: currently, already-appear-flag only used on main word
 		memset( m_WordList[m_SubWordList[i]].m_ActivatedCharacterFlags, 0, _GDS_WORD_MAX_LENGTH_);
@@ -166,7 +179,7 @@ void GameWordManager::ResetDataForNewPlay()
 
 	// create sub-word letters collection
 	m_SubWordLettersCollection.clear();
-	for(int i=0; i < _GDS_SUB_WORD_MAX_COUNT_; i++)
+	for(int i=0; i < m_iSubWordCount; i++)
 		for(int j=0; j< m_WordList[m_SubWordList[i]].m_iWordLength; j++)
 		{
 			bool bAlreadyInList = false;
@@ -232,7 +245,7 @@ bool GameWordManager::UnlockLetter(const unsigned char& iLetter, int& iUnlockedL
 	if (iUnlockedLetterIndexOfMainWord >=0)
 		m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate- m_WordGenerateConfig.m_iDecreasePercentAfterLetterDestroyedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);
 
-	for(int i=0; i < _GDS_SUB_WORD_MAX_COUNT_; i++)
+	for(int i=0; i < m_iSubWordCount; i++)
 	{
 		int iSubWordID = m_SubWordList[i];
 		for(int j=0; j < m_WordList[iSubWordID].m_iWordLength; j++)		
@@ -395,13 +408,18 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 		// priopritized for main words then bonus, then trash words
 		bIsCompleted = GenerateLetterFromMainWord( sOuputLetter);
 		bIsLetterFromMainWord = bIsCompleted;
+		if (bIsLetterFromMainWord && m_bAddDirectLetterOfMainWordToTrash)
+		{
+			AddLetterToTrashCollection(sOuputLetter);
+		}
 		
 		if (!bIsCompleted)
 		{
 			bIsCompleted = GenerateLetterFromSubWords( sOuputLetter);			
 			bIsLetterFromSubWord = bIsCompleted;
 
-			AddLetterToTrashCollection(sOuputLetter);
+			if (bIsCompleted)
+				AddLetterToTrashCollection(sOuputLetter);
 		}
 
 		if (!bIsCompleted)
@@ -417,10 +435,15 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 
 		// generate letters from main word		
 		bShouldGenerateLetter = SuccessWithPercentRatio(m_iMainWordGenerateRate);
-		if (bShouldGenerateLetter)
+		if (bShouldGenerateLetter || (m_bAddDirectLetterOfMainWordToTrash && m_TrashLettersCollection.size()==0))
 		{
 			bIsCompleted = GenerateLetterFromMainWord(sOuputLetter);		
 			bIsLetterFromMainWord = bIsCompleted;
+
+			if (bIsLetterFromMainWord && m_bAddDirectLetterOfMainWordToTrash)
+			{
+				AddLetterToTrashCollection(sOuputLetter);
+			}
 		}				
 	
 
@@ -433,7 +456,8 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 				bIsCompleted = GenerateLetterFromSubWords(sOuputLetter);
 				bIsLetterFromSubWord = bIsCompleted;
 
-				AddLetterToTrashCollection(sOuputLetter);
+				if (bIsCompleted)
+					AddLetterToTrashCollection(sOuputLetter);
 			}				
 		}
 

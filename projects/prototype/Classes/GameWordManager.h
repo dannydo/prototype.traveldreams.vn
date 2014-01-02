@@ -33,11 +33,11 @@ private:
 public:	
 	void LoadWordGenerateConfig();
 	void LoadWords();
-	void GenerateWordForNewLevel();
+	void GenerateWordForNewLevel(int iLevel);
 	void RetryCurrentLevel();
 
 	inline const Word& GetMainWord() { return m_WordList[m_iMainWordIndex];}
-	int GetSubWordCount() { return _GDS_SUB_WORD_MAX_COUNT_;}
+	int GetSubWordCount() { return m_iSubWordCount;}
 	inline const Word& GetSubWord(const int& iSubWordIndex) {  return m_WordList[m_SubWordList[iSubWordIndex]];}
 	bool IsMainWordUnlocked() { return (m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount == 0);}
 
@@ -72,6 +72,7 @@ private:
 	//int m_iMainWordLength;
 
 	int m_SubWordList[_GDS_SUB_WORD_MAX_COUNT_];
+	int m_iSubWordCount;
 	//int m_SubWordLength[_GDS_SUB_WORD_MAX_COUNT_];
 
 	// current state
@@ -81,6 +82,8 @@ private:
 	int m_iMainWordGenerateRate;
 	int m_iSubWordGenerateRate;
 	int m_iTrashWordGenerateRate;
+
+	bool m_bAddDirectLetterOfMainWordToTrash;
 
 	// 
 	std::vector<unsigned char> m_SubWordLettersCollection;
