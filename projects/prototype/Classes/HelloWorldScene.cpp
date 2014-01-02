@@ -223,6 +223,11 @@ void HelloWorld::initLevel(int iLevel)
 	//m_pBoardBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);
 	this->addChild(m_pBoardBatchNode);
 
+	// move hint
+	m_pMoveHintNode = Sprite::createWithSpriteFrameName("Gem_A.png");
+	m_pMoveHintNode->setOpacity(0);
+	m_pBoardBatchNode->addChild(m_pMoveHintNode);
+
 	// init batch node for combo effect (used later)
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ComboEffect/combo.plist");
 	m_pComboEffectBatchNode = CCSpriteBatchNode::create("ComboEffect/combo.pvr.ccz");
@@ -477,6 +482,7 @@ bool HelloWorld::onTouchBegan(Touch *pTouch, Event *pEvent)
 		m_SelectedCell = Cell(iRow, iColumn );
 		m_eTouchMoveState = _TMS_BEGIN_IDENTIFY_;
 		m_StartTouchPosition = touchPosition;
+		m_iSaveLastCellMoveDelta = 0;
 	}
 
 	return true;
@@ -496,6 +502,14 @@ void HelloWorld::onTouchEnded(Touch* pTouch, Event* pEvent)
 		(m_eTouchMoveState == _TMS_MOVE_VERTICAL_ &&  m_GameBoardManager.IsColumnLocked(m_SelectedCell.m_iColumn)))
 	{
 		bIsBlocked = true;		
+	}
+
+	if ( m_HintSprites.size() >0 )
+	{
+		for(auto sprite:m_HintSprites)
+			sprite->removeFromParentAndCleanup(true);
+		
+		m_HintSprites.clear();
 	}
 
 	Point currentPosition = pTouch->getLocation();
@@ -627,6 +641,8 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 
 	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
 	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
+
+	m_ComputeMoveResult.Reset(false);
 
 	if (m_eTouchMoveState == _TMS_MOVE_HORIZONTAL_)
 	{
@@ -1044,7 +1060,7 @@ void HelloWorld::ShowWinGamePopup()
 	m_pHUDLayer->addChild( pEndGameNode, 10);
 }
 
-void HelloWorld::UpdatePostionOfSprite(const int& iRow,const int& iColumn, bool bIsMirror)
+/*void HelloWorld::UpdatePostionOfSprite(const int& iRow,const int& iColumn, bool bIsMirror)
 {
 	if (!bIsMirror)
 		m_BoardViewMatrix[iRow][iColumn].m_pSprite->setPosition( ccp(m_fBoardLeftPosition + (iColumn-
@@ -1052,7 +1068,7 @@ void HelloWorld::UpdatePostionOfSprite(const int& iRow,const int& iColumn, bool 
 	else
 		m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite->setPosition( ccp(m_fBoardLeftPosition + (iColumn-
 			m_GameBoardManager.GetColumnNumber()) * m_SymbolSize.width, m_fBoardBottomPosition + (iRow-m_GameBoardManager.GetRowNumber()) * m_SymbolSize.height));
-}
+}*/
 
 void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 {
@@ -1195,6 +1211,81 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 			}
 		}
 	}
+
+
+	// draw hint
+	fMoveUnit = fDeltaX/m_SymbolSize.width;
+				
+	fMoveUnit = round(fMoveUnit);
+
+	iMoveUnit = (int)fMoveUnit;
+	if ( iMoveUnit == m_iSaveLastCellMoveDelta || iMoveUnit == 0 )
+	{		
+		if ( iMoveUnit == 0  && iMoveUnit != m_iSaveLastCellMoveDelta && m_HintSprites.size() >0 )
+		{
+			for(auto sprite:m_HintSprites)
+				sprite->removeFromParentAndCleanup(true);
+		
+			m_HintSprites.clear();
+		}
+		return;
+	}
+
+	if ( m_HintSprites.size() >0 )
+	{
+		for(auto sprite:m_HintSprites)
+			sprite->removeFromParentAndCleanup(true);
+		
+		m_HintSprites.clear();
+	}
+
+	
+	m_iSaveLastCellMoveDelta = iMoveUnit;
+
+	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
+	iSign = 1;
+	if (iMoveUnit != 0)
+		iSign = -iMoveUnit/ abs(iMoveUnit);
+	int iTranslationCell = 0;
+	
+	m_ComputeMoveResult.Reset(false);
+	if ( m_GameBoardManager.FastCheckBlocks( m_SelectedCell.m_iRow, -1, -1, iMoveUnit, m_ComputeMoveResult.m_BasicMatchingDestroyedCells))
+	{		
+		m_pMoveHintNode = Sprite::createWithSpriteFrameName("Gem_A.png");
+		m_pMoveHintNode->setOpacity(0);
+		m_pBoardBatchNode->addChild(m_pMoveHintNode);
+
+		for(auto cell : m_ComputeMoveResult.m_BasicMatchingDestroyedCells)
+		{
+			Sprite* pHintSprite = Sprite::createWithSpriteFrameName("Orange_Border.png");
+			//pHintSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height));
+			Size size = m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->getContentSize();
+			if (cell.m_iRow != m_SelectedCell.m_iRow)
+				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pHintSprite);
+			else
+			{
+				iTranslationCell = 0;
+				for(int iStep=1; iStep <= abs(iMoveUnit); iStep++)
+				{
+					iTranslationCell += iSign;
+					if (m_GameBoardManager.IsBlankCell( m_SelectedCell.m_iRow, (cell.m_iColumn + iTranslationCell + iNumberOfColumn) % iNumberOfColumn))
+					{
+						iStep--;
+					}
+				}
+
+				m_BoardViewMatrix[cell.m_iRow][ (cell.m_iColumn+ iNumberOfColumn + iTranslationCell) % iNumberOfColumn ].m_pSprite->addChild(pHintSprite);
+			}
+
+			pHintSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
+			
+			m_HintSprites.push_back(pHintSprite);
+
+			//m_pBoardBatchNode->addChild(pHintSprite);
+			//m_pMoveHintNode->addChild(pHintSprite);
+		}
+
+	}
 }
 
 void HelloWorld::VerticalMoveUlti(float fDeltaY)
@@ -1332,6 +1423,82 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 				m_MovingCellMirrorList[iRow].m_pSprite->setPosition(m_MovingCellList[iRow].m_pSprite->getPosition());
 			}*/
 		}
+	}
+
+
+
+	// draw hint
+	fMoveUnit = fDeltaY/m_SymbolSize.height;
+				
+	fMoveUnit = round(fMoveUnit);
+
+	iMoveUnit = (int)fMoveUnit;
+	if ( iMoveUnit == m_iSaveLastCellMoveDelta || iMoveUnit == 0 )
+	{		
+		if ( iMoveUnit == 0  && iMoveUnit != m_iSaveLastCellMoveDelta && m_HintSprites.size() >0 )
+		{
+			for(auto sprite:m_HintSprites)
+				sprite->removeFromParentAndCleanup(true);
+		
+			m_HintSprites.clear();
+		}
+		return;
+	}
+
+	if ( m_HintSprites.size() >0 )
+	{
+		for(auto sprite:m_HintSprites)
+			sprite->removeFromParentAndCleanup(true);
+		
+		m_HintSprites.clear();
+	}
+
+	
+	m_iSaveLastCellMoveDelta = iMoveUnit;
+
+	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
+	iSign = 1;
+	if (iMoveUnit != 0)
+		iSign = -iMoveUnit/ abs(iMoveUnit);
+	int iTranslationCell = 0;
+	
+	m_ComputeMoveResult.Reset(false);
+	if ( m_GameBoardManager.FastCheckBlocks( -1, m_SelectedCell.m_iColumn, iMoveUnit, -1, m_ComputeMoveResult.m_BasicMatchingDestroyedCells))
+	{		
+		m_pMoveHintNode = Sprite::createWithSpriteFrameName("Gem_A.png");
+		m_pMoveHintNode->setOpacity(0);
+		m_pBoardBatchNode->addChild(m_pMoveHintNode);
+
+		for(auto cell : m_ComputeMoveResult.m_BasicMatchingDestroyedCells)
+		{
+			Sprite* pHintSprite = Sprite::createWithSpriteFrameName("Orange_Border.png");
+			//pHintSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height));
+			Size size = m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->getContentSize();
+			if (cell.m_iColumn != m_SelectedCell.m_iColumn)
+				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pHintSprite);
+			else
+			{
+				iTranslationCell = 0;
+				for(int iStep=1; iStep <= abs(iMoveUnit); iStep++)
+				{
+					iTranslationCell += iSign;
+					if (m_GameBoardManager.IsBlankCell( (cell.m_iRow + iTranslationCell + iNumberOfRow) % iNumberOfRow,  m_SelectedCell.m_iColumn))
+					{
+						iStep--;
+					}
+				}
+
+				m_BoardViewMatrix[ (cell.m_iRow+ iNumberOfRow + iTranslationCell) % iNumberOfRow][cell.m_iColumn].m_pSprite->addChild(pHintSprite);
+			}
+
+			pHintSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
+			
+			m_HintSprites.push_back(pHintSprite);
+
+			//m_pBoardBatchNode->addChild(pHintSprite);
+			//m_pMoveHintNode->addChild(pHintSprite);
+		}
+
 	}
 }
 

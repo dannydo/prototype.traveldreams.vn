@@ -138,7 +138,9 @@ private:
 	float m_fBoardLeftPosition, m_fBoardBottomPosition;
 	float m_fBoardLeftClipPosition, m_fBoardBottomClipPosition;
 	cocos2d::CCSpriteBatchNode* m_pBoardBatchNode;
+	cocos2d::Sprite* m_pMoveHintNode;
 	cocos2d::CCSpriteBatchNode* m_pComboEffectBatchNode;
+
 	//cocos2d::CCSprite* m_BoardSpriteMatrix[ _BOARD_MAX_ROW_NUMBER_*3][ _BOARD_MAX_COLUMN_NUMBER_*3];
 	/*cocos2d::CCSprite* m_BoardSpriteMatrixLeft[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
 	cocos2d::CCSprite* m_BoardSpriteMatrixTop[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
@@ -158,6 +160,9 @@ private:
 	TouchMoveState m_eTouchMoveState;
 	Cell m_SelectedCell;
 	Point m_StartTouchPosition;
+
+	int m_iSaveLastCellMoveDelta;
+	std::vector<Sprite*> m_HintSprites;
 
 	WordCollectBoardRenderNode* m_pWordCollectBoardRenderNode;
 	int m_iMoveCount;

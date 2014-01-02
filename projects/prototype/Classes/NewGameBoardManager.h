@@ -73,6 +73,9 @@ public:
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells);		
 
+	bool FastCheckBlocks( int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
+		std::vector<Cell>& basicMatchingDestroyedCells);
+
 	int DecreaseMove() { return (m_iCurrentMove--);}
 
 	// score and stars
