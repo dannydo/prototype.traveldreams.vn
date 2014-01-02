@@ -461,7 +461,12 @@ void BonusWordNodeNew::popupBonusWordCallBack(Object* pSender)
 void BonusWordNodeNew::updateTagSpriteMark(Node* pSender)
 {
 	Sprite* pSprite = (Sprite*)pSender;
-	LabelTTF* pLabel = (LabelTTF*)m_LabelLetterDisplays->getObjectAtIndex(pSprite->getTag());
+	int iIndex = pSprite->getTag();
+	if (iIndex < 0)
+	{
+		return;
+	}
+	LabelTTF* pLabel = (LabelTTF*)m_LabelLetterDisplays->getObjectAtIndex(iIndex);
 	pLabel->setVisible(true);
 	pSprite->setTag(-1);
 }

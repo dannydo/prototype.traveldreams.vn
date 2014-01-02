@@ -156,18 +156,18 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	}	 
 
 	// create background
-	Sprite* pBackground;
+	//Sprite* pBackground;
 	if ( iTotalLabelsWidth < 240.f)
-		pBackground = Sprite::createWithSpriteFrameName("Main_Board_Small.png");
+		m_pBackground = Sprite::createWithSpriteFrameName("Main_Board_Small.png");
 	else if ( iTotalLabelsWidth < 410.f)
-		pBackground = Sprite::createWithSpriteFrameName("Main_Board_Medium.png");
+		m_pBackground = Sprite::createWithSpriteFrameName("Main_Board_Medium.png");
 	else
-		pBackground = Sprite::createWithSpriteFrameName("Main_Board_Large.png");
-	pBackground->setAnchorPoint( Point(0,0));
-	pBackground->setPosition( Point( 0, 0));
-	m_pBatchNode->addChild(pBackground);
+		m_pBackground = Sprite::createWithSpriteFrameName("Main_Board_Large.png");
+	m_pBackground->setAnchorPoint( Point(0,0));
+	m_pBackground->setPosition( Point( 0, 0));
+	m_pBatchNode->addChild(m_pBackground);
 
-	float fBackgroundWidth = pBackground->getContentSize().width;
+	float fBackgroundWidth = m_pBackground->getContentSize().width;
 	m_fStartPositionX = (fBackgroundWidth - iTotalLabelsWidth) / 2.f;
 	
 	for(int i=0; i< iWordLength; i++)
@@ -289,7 +289,16 @@ float WordCollectBoardRenderNode::PlayUnlockLettersAnimation(float fDelayTime)
 		}	
 
 	if (fTotalTime > 0)
+	{
+		m_pBackground->runAction(
+			Sequence::create(
+				DelayTime::create( fDelayTime - 0.37f),
+				ScaleTo::create( 0.08f, 1.1f, 1.1f),
+				ScaleTo::create( 0.08f, 1.f, 1.f),
+				NULL));
+
 		fTotalTime  += fDisplayPerLetter *2 + fDelayTime;
+	}
 
 	// reset flags
 	memset( m_NewUnlockedLetterFlags, 0, sizeof(m_NewUnlockedLetterFlags));
@@ -441,14 +450,16 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const float& fDelayEffec
 {
 	Sprite* pSrite = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(iLetter).c_str());
 	//pSrite->setColor( ccc3(100, 100, 100));
+	pSrite->setScale(0.f);
 	pSrite->setPosition( Point(position.x - 10.f, position.y-866.f) ); //_position.y));
 	m_pBatchNode->addChild(pSrite);
 		
 	pSrite->runAction(
 		Sequence::create(
 			DelayTime::create(fDelayEffectTime),
-			ScaleTo::create(0.22f, 3.f, 3.f),
-			ScaleTo::create(0.17f, 0.8f, 0.8f),
+			ScaleTo::create(0.1f, 4.6f, 4.6f),
+			ScaleTo::create(0.2f, 0.8f, 0.8f),
+			ScaleTo::create(0.14f, 0.8f, 0.8f),
 			//EaseBackIn::create( 	ScaleTo::create(0.3f, 2.f, 2.f)),
 			MoveTo::create(	1.0f, Point(70.f, -73.f)),
 			RemoveSelf::create(),

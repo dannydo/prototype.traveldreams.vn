@@ -400,6 +400,8 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 		{
 			bIsCompleted = GenerateLetterFromSubWords( sOuputLetter);			
 			bIsLetterFromSubWord = bIsCompleted;
+
+			AddLetterToTrashCollection(sOuputLetter);
 		}
 
 		if (!bIsCompleted)
@@ -448,7 +450,7 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 	}
 
 	// NOTE: hot fix
-	if (sOuputLetter == 255)
+	if (sOuputLetter == 255 && bIsCompleted)
 		bIsCompleted = false;
 
 	if (bIsLetterFromMainWord)

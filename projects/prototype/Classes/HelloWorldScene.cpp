@@ -2614,7 +2614,7 @@ void HelloWorld::PlayUnlockLettersOfBonusWordsAnimation()
 
 		this->runAction(
 			Sequence::create(
-			DelayTime::create( fDisplayTime + 0.8f),
+			DelayTime::create( fDisplayTime + 0.1f),
 				CallFunc::create( this,  callfunc_selector(HelloWorld::EndUnlockLetterAnimation)),
 				NULL));
 	}

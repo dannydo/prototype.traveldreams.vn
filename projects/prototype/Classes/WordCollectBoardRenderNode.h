@@ -64,6 +64,7 @@ private:
 	float m_LabelXPositionList[_GDS_WORD_MAX_LENGTH_];
 
 	SpriteBatchNode* m_pBatchNode;
+	Sprite* m_pBackground;
 	DrawNode* m_pColorNode;
 
 	unsigned long m_iPreviousMainWordTapTime;
