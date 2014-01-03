@@ -189,6 +189,9 @@ void FlashCardLayer::createNodeSlideShow()
 	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 	char sFileName[35];
 
+	m_pSlideShow->removeAllChildren();
+	m_pFlashCardDisplay->removeAllChildren();
+
 	if (m_iIndexFlashCard > 1 && m_iIndexFlashCard < m_iTotalFlashCard)
 	{
 		sprintf(sFileName, "FlashCard/%d.jpg", m_iIndexFlashCard-1);
