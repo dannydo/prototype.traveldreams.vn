@@ -14,6 +14,7 @@ public:
 private:
 	void menuPlayChapterCallBack();
 	void menuOpenIntroductionCallBack();
+	void menuOpenFlashCardCallBack();
 };
 
 class WorldMapScene : public cocos2d::CCScene

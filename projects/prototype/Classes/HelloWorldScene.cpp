@@ -2335,8 +2335,6 @@ Sprite* HelloWorld::AddLetterToGem(const ComboEffectCell& cell)
 }
 */
 
-#include "FlashCardNode.h"
-
 void HelloWorld::ShowMainWordUnlockEffect()
 {
 	m_pWordCollectBoardRenderNode->PlayCharacterAnim(3, true);

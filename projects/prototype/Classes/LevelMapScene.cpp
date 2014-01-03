@@ -4,6 +4,7 @@
 #include "GameTargetNode.h"
 #include "SoundManager.h"
 #include "WorldMapScene.h"
+#include "FlashCardScene.h"
 
 using namespace cocos2d;
 
@@ -29,6 +30,11 @@ LevelMapScene::~LevelMapScene()
 		_layer->release();
 		_layer = NULL;
 	}
+}
+
+LevelMapLayer::~LevelMapLayer()
+{
+	
 }
 
 bool LevelMapLayer::init()
@@ -89,8 +95,14 @@ bool LevelMapLayer::init()
 			"World-Map/mask-button-back.png",
 			CC_CALLBACK_0(LevelMapLayer::menuBackToWorldMap, this));
 		pBackItem->setPosition(ccp(56, 49));
+
+		CCMenuItemImage* pFlashCard = CCMenuItemImage::create(
+		"World-Map/mask-button-flash-card.png",
+		"World-Map/mask-button-flash-card.png",
+		CC_CALLBACK_0(LevelMapLayer::menuOpenFlashCardCallBack, this));
+		pFlashCard->setPosition(ccp(365, 52));
 			
-		CCMenu* pMenu = CCMenu::create( pLevel1Item, pLevel2Item, pLevel3Item, pLevel4Item, pBackItem, NULL);
+		CCMenu* pMenu = CCMenu::create( pLevel1Item, pLevel2Item, pLevel3Item, pLevel4Item, pBackItem, pFlashCard, NULL);
 		pMenu->setPosition(CCPointZero);
 			
 		this->addChild(pMenu, 1);
@@ -123,7 +135,9 @@ void LevelMapLayer::menuBackToWorldMap()
 	Director::getInstance()->replaceScene(pWorldMap);
 }
 
-LevelMapLayer::~LevelMapLayer()
+void LevelMapLayer::menuOpenFlashCardCallBack()
 {
-	
+	FlashCardScene* pFlashCard = FlashCardScene::create();
+	pFlashCard->getLayer()->setNameClassParent("WorldMapScene");
+	Director::getInstance()->replaceScene(pFlashCard);
 }
