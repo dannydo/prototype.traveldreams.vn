@@ -83,7 +83,6 @@ void StatusLayer::update(float dt)
 	m_fDeltaTime += dt;
 	if (m_fDeltaTime >= 0.1)
 	{
-		this->generateLayoutMove();
 		this->updateScore();
 	}
 }
@@ -198,6 +197,7 @@ void StatusLayer::setPositionForStar(const float& iScoreStar, Sprite* pStar)
 void StatusLayer::setCurrentMove(const int& iCurrentMove)
 {
 	m_iCurrentMove = iCurrentMove;
+	this->generateLayoutMove();
 }
 
 void StatusLayer::setSpeedUpdateScore(const float& iSpeedUpdateScore)
