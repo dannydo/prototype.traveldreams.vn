@@ -110,8 +110,11 @@ void GameWordManager::GenerateWordForNewLevel(int iLevel)
 	{
 		m_bAddDirectLetterOfMainWordToTrash = true;
 		m_iSubWordCount = 0;
-		m_iMainWordIndex = 5;
-		
+		m_iMainWordIndex = 5;		
+	}
+	else if(iLevel == 2)
+	{		
+		m_iMainWordIndex = 7;		
 	}
 	// end hard code level 1
 

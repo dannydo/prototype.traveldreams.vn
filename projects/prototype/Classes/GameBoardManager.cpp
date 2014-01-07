@@ -31,10 +31,10 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 	for(iRow = 0; iRow < iRowNumber; iRow++)
 		for(iColumn = 0; iColumn < iColumnNumber; iColumn++)
 		{
-			if (iLevel == 1)
+			if (iLevel == 2)
 			{
 			}
-			else if (iLevel == 2)
+			else if (iLevel == 3)
 			{
 				if ( iColumn >=3 && iColumn<=4 && (iRow <=1 || iRow>=iRowNumber-2) )
 				{
@@ -43,7 +43,7 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 					continue;
 				}
 			}
-			else if (iLevel == 3)
+			else if (iLevel == 4)
 			{
 				if (( iRow<=1 &&  (iColumn<=1 || iColumn>= iColumnNumber-2)) || (iRow>=iRowNumber-2 &&  (iColumn <=1 || iColumn>= iColumnNumber-2)))
 				{
@@ -52,7 +52,7 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 					continue;
 				}
 			}
-			else if (iLevel == 4)
+			else if (iLevel == 5)
 			{
 				if ((iColumn >= 3 && iColumn <=4) && (iRow >= 3 && iRow <=4))
 				{
@@ -61,7 +61,7 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 					continue;
 				}
 			}		
-
+			
 			m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = false;
 
 			m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % _MAX_GEM_ID_;

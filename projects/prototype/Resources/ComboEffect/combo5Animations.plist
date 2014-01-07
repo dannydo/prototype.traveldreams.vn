@@ -4,12 +4,13 @@
 <dict>
 	<key>animations</key>
 	<dict>
-		<key>effectCombo5</key>
+		<key>effectCombo5_Bolt</key>
 		<dict>
 			<key>delay</key>
-			<real>0.033</real>
+			<real>0.04</real>
 			<key>frames</key>
 			<array>
+				<string>Bolt 2_00000_1.png</string>
 				<string>Bolt 2_00000.png</string>
 				<string>Bolt 2_00001.png</string>
 				<string>Bolt 2_00002.png</string>
@@ -22,8 +23,30 @@
 				<string>Bolt 2_00009.png</string>
 				<string>Bolt 2_00010.png</string>
 				<string>Bolt 2_00011.png</string>
-				<string>Bolt 2_00012.png</string>
-				<string>Bolt 2_00013.png</string>				
+				<string>Bolt 2_00012.png</string>					
+			</array>
+		</dict>		
+		<key>effectCombo5_Flare</key>
+		<dict>
+			<key>delay</key>
+			<real>0.05</real>
+			<key>frames</key>
+			<array>
+				<string>Flare_00000_1.png</string>
+				<string>Flare_00000.png</string>
+				<string>Flare_00001.png</string>
+				<string>Flare_00002.png</string>
+				<string>Flare_00003.png</string>
+				<string>Flare_00004.png</string>
+				<string>Flare_00005.png</string>
+				<string>Flare_00006.png</string>
+				<string>Flare_00007.png</string>
+				<string>Flare_00008.png</string>
+				<string>Flare_00009.png</string>
+				<string>Flare_00010.png</string>
+				<string>Flare_00011.png</string>
+				<string>Flare_00012.png</string>
+				<string>Flare_00013.png</string>				
 			</array>
 		</dict>		
 	</dict>

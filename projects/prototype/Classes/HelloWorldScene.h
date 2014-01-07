@@ -48,10 +48,12 @@ public:
 	std::vector<Cell> m_BasicMatchingDestroyedCells;
 	std::vector<DoubleComboEffectBundle> m_DoubleComboList;
 	std::vector<ComboEffectBundle*> m_ComboChainList;
+	std::vector<ComboEffectBundle*> m_TriggeredCombo5ChainList;
 	std::vector<ComboEffectCell> m_NewComboCells;
 	std::vector<Cell> m_OriginalMovedCells;
 	std::vector<Cell> m_TargetMovedCells;
 	std::vector<Cell> m_NewCells;
+
 
 	void Reset(bool bResetConvertedCombo = false)
 	{
@@ -60,6 +62,7 @@ public:
 		m_BasicMatchingDestroyedCells.clear();
 		m_DoubleComboList.clear();
 		m_ComboChainList.clear();
+		m_TriggeredCombo5ChainList.clear();
 		m_NewComboCells.clear();
 		m_OriginalMovedCells.clear();
 		m_TargetMovedCells.clear();
@@ -96,8 +99,8 @@ protected:
 	
 	void PlayEffect2(const bool& bIsBonusEndGamePhase,  std::vector<ComboEffectCell>& convertedToComboCells, 
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList,std::vector<ComboEffectCell>& newComboCells,
-		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
+		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells, bool bIsNewMove);
 	
 	Sprite* AddLetterToGem(const ComboEffectCell& cell);

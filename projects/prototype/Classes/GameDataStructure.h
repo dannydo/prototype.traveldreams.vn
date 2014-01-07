@@ -75,7 +75,8 @@ enum GemComboType_e
 	_GCT_NONE_ = 0,
 	_GCT_COMBO4_ = 1,
 	_GCT_COMBO5_ = 2,
-	_GCT_COMBO6_ = 3
+	_GCT_COMBO6_ = 3,
+	_GCT_COMBO5_WAITING_TRIGGER_ = 4
 };
 
 enum ObstacleType_e
@@ -177,13 +178,13 @@ public:
 	{		
 	}
 };
-
+/*
 struct ActivatedComboInChain
 {
 public:
 	ComboEffectCell m_ComboEffectCell;
 	std::vector<Cell> m_DestroyCells;
-};
+};*/
 
 struct Word
 {

@@ -8,7 +8,7 @@ enum ComboEffectType
 {
 	_CET_BASIC_MATCHING_,
 	_CET_EXPLOSION_,
-	_CET_DESTROY_COLOR_, //direction?
+	_CET_DESTROY_COLOR_,
 	_CET_DOUBLE_EXPLOSION_
 };
 
@@ -29,9 +29,16 @@ struct ComboEffectBundle
 {
 public:
 	std::vector<Cell> m_DestroyedCells;
-	std::vector<ComboEffectBundle*> m_TriggeredComboEfectBundleList;
+	//std::vector<ComboEffectBundle*> m_TriggeredComboEfectBundleList;
 	ComboEffectDescription m_ComboEffectDescription;
-	int m_iPhase;
+	int m_iNormalChainPhase;
+	int m_iActivatedByCombo5Phase;
+
+	ComboEffectBundle()
+	{
+		m_iNormalChainPhase = 0;
+		m_iActivatedByCombo5Phase = 0;
+	}
 };
 
 struct DoubleComboCreationInfo
@@ -69,7 +76,8 @@ public:
 
 	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle>& doubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList,std::vector<ComboEffectCell>& newComboCells,
+		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
+		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells);		
 
@@ -97,7 +105,8 @@ public:
 	bool ExecuteEndGameBonus(
 		std::vector<ComboEffectCell>& convertedToComboCells,
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle>& doubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList,std::vector<ComboEffectCell>& newComboCells,
+		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
+		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells);		
 protected:
@@ -115,6 +124,9 @@ protected:
 
 	int GetBonusScoreForUnlockMainWord(bool bIncludeIndividualLetters=false);
 	int GetBonusScoreForUnlockSubWord(const int& iSubWordID, bool bIncludeIndividualLetters=false);
+
+
+	void TriggerWaitingCombo5List(std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList);
 protected:
 	GameWordManager* m_pGameWordManager;
 
@@ -122,6 +134,8 @@ protected:
 	int m_iCurrentLevel;
 	int m_iCurrentScore;// current score
 	int m_iCurrentMove;
+
+	std::vector<ComboEffectDescription> m_WaitingTriggerCombo5List;
 };
 
 

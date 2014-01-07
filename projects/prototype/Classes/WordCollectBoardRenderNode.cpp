@@ -131,7 +131,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 
 	Sprite* pTip = Sprite::create("tip-msg.png");
 	pTip->setScale(1.2f);
-	pTip->setPosition(Point( 310.f, 830.f));
+	pTip->setPosition(Point( 310.f, 790.f));
 	m_pColorNode->addChild(pTip);
 
 
@@ -458,8 +458,8 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const float& fDelayEffec
 		Sequence::create(
 			DelayTime::create(fDelayEffectTime),
 			ScaleTo::create(0.1f, 4.6f, 4.6f),
-			ScaleTo::create(0.2f, 0.8f, 0.8f),
-			ScaleTo::create(0.14f, 0.8f, 0.8f),
+			ScaleTo::create(0.2f, 1.f, 0.8f),
+			ScaleTo::create(0.14f, 1.f, 0.8f),
 			//EaseBackIn::create( 	ScaleTo::create(0.3f, 2.f, 2.f)),
 			MoveTo::create(	1.0f, Point(70.f, -73.f)),
 			RemoveSelf::create(),

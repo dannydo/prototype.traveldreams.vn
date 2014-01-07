@@ -7,7 +7,7 @@
 		<key>effectCombo4</key>
 		<dict>
 			<key>delay</key>
-			<real>0.019</real>
+			<real>0.026</real>
 			<key>frames</key>
 			<array>
 				<string>Com4_Ex_00000.png</string>
@@ -26,8 +26,7 @@
 				<string>Com4_Ex_00013.png</string>
 				<string>Com4_Ex_00014.png</string>
 				<string>Com4_Ex_00015.png</string>
-				<string>Com4_Ex_00016.png</string>
-				<string>Com4_Ex_00017.png</string>
+				<string>Com4_Ex_00016.png</string>				
 			</array>
 		</dict>		
 	</dict>

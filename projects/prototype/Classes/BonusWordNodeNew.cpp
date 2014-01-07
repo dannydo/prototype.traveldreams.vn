@@ -88,7 +88,7 @@ float BonusWordNodeNew::displayEffect(const float& fTimeDelay)
 	auto actionUpdateLetter = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::updateLetterCollectForWord));
 	auto delay = DelayTime::create(fTimeDelay);
 	this->runAction(Sequence::create(delay->clone(), actionUpdateLetter, NULL));
-
+	 
 	return fDelay;
 }
 
