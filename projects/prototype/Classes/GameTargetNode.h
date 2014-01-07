@@ -2,12 +2,13 @@
 #define _GAME_TARGET_H_
 
 #include "cocos2d.h"
+#include "GameDataStructure.h"
 
 class GameTargetNode : public cocos2d::Node
 {
 public:
-	static GameTargetNode* createLayout(char* pMainWord, const int& iCurrentLevel);
-	bool initLayout(char* pMainWord);
+	static GameTargetNode* createLayout(const Word& pMainWord, const int& iCurrentLevel);
+	bool initLayout(const Word& pMainWord);
 
 private:
 	void menuPlayLevelCallBack();

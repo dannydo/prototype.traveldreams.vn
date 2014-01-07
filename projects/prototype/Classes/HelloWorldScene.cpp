@@ -1056,14 +1056,14 @@ void HelloWorld::ExecuteBonusWinGameEffect()
 
 void HelloWorld::ShowWinGamePopup()
 {
-	std::vector<char*> subWordList;
+	std::vector<const Word> subWordList;
 	for(int i=0; i < m_GameBoardManager.GetGameWordManager()->GetSubWordCount(); i++)
 	{
-		subWordList.push_back(const_cast<char*>( m_GameBoardManager.GetGameWordManager()->GetSubWord(i).m_sWord));
+		subWordList.push_back(m_GameBoardManager.GetGameWordManager()->GetSubWord(i));
 	}
 
 	EndGameNode* pEndGameNode = EndGameNode::createLayoutWin( m_GameBoardManager.GetCurrentScore(),
-		const_cast<char*>(m_GameBoardManager.GetGameWordManager()->GetMainWord().m_sWord), subWordList, m_GameBoardManager.GetCurrentLevel());
+		m_GameBoardManager.GetGameWordManager()->GetMainWord(), subWordList, m_GameBoardManager.GetCurrentLevel());
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStars());
 	m_pHUDLayer->addChild( pEndGameNode, 10);
 }
@@ -2973,7 +2973,7 @@ void HelloWorld::EndUnlockLetterAnimation()
 			m_bIsEndGamePhase = true; 
 
 			EndGameNode* pEndGameNode = EndGameNode::createLayoutLose( m_GameBoardManager.GetCurrentScore(), 
-				const_cast<char*>(m_GameBoardManager.GetGameWordManager()->GetMainWord().m_sWord), m_GameBoardManager.GetCurrentLevel());
+				m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
 			m_pHUDLayer->addChild( pEndGameNode, 10);
 
 			SoundManager::PlaySoundEffect(_SET_LOSE);

@@ -29,6 +29,13 @@ private:
 	void removeLabelFinishColectWord();
 	float calculatorDelayTime();
 	void updateTagSpriteMark(Node* pSender);
+
+	void playEffectUnlockFirstLetter(const int& iIndexLetterWord, cocos2d::LabelTTF* pLabelLetter);
+	void playEffectColorLetter(Node* pSender); 
+	void setVisibleTrueLayoutBonusWord();
+
+	cocos2d::Node* m_pEffecFirstUnlockLetter;
+	cocos2d::LayerColor* m_pBackgroundEffectLayer;
 	
 	cocos2d::Node* createNodeBonusWord(Word word);
 

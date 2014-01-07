@@ -2,16 +2,17 @@
 #define _END_GAME_H_
 
 #include "cocos2d.h"
+#include "GameDataStructure.h"
 
 class EndGameNode : public cocos2d::Node
 {
 public:
-	static EndGameNode* createLayoutWin(const int& iScore, char* pMainWord, std::vector<char*> pSubWord, const int& iCurrentLevel);
-	static EndGameNode* createLayoutLose(const int& iScore, char* pMainWord, const int& iCurrentLevel);
+	static EndGameNode* createLayoutWin(const int& iScore, const Word& pMainWord, std::vector<const Word> pSubWord, const int& iCurrentLevel);
+	static EndGameNode* createLayoutLose(const int& iScore, const Word& pMainWord, const int& iCurrentLevel);
 
 	bool init() override;
-	bool initWin(const int& iScore, char* pMainWord, std::vector<char*> pSubWord);
-	bool initLose(const int& iScore, char* pMainWord);
+	bool initWin(const int& iScore, const Word& pMainWord, std::vector<const Word> pSubWord);
+	bool initLose(const int& iScore, const Word& pMainWord);
 
 	void addYellowStar(int iYellowStar);
 
@@ -24,7 +25,7 @@ private:
 	std::vector<int> generateArrayNumber(int iNumber);
 	cocos2d::Node* generateLayoutScore(int iScore);
 	cocos2d::Node* generateLayoutStar();
-	cocos2d::Node* generateLayoutWord(char* mainWord, std::vector<char*> subWord);
+	cocos2d::Node* generateLayoutSubWord(std::vector<const Word> subWord);
 
 	void loopUpdateStar();
 	void sequenceUpdateStar();

@@ -128,7 +128,7 @@ void MainMenuLayer::menuItemSelected(CCObject* pSender)
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
 	pGameWordManager->GenerateWordForNewLevel(iLevel);
 
-	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(const_cast<char*>(pGameWordManager->GetMainWord().m_sWord), iLevel);
+	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel);
 	this->addChild(pGameTargetNode, 10);
 	/*
 	CCScene *pGameScene = HelloWorld::createScene(iLevel); //CCScene::create();        

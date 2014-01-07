@@ -5,7 +5,7 @@
 
 USING_NS_CC;
 
-EndGameNode* EndGameNode::createLayoutLose(const int& iScore, char* pMainWord, const int& iCurrentLevel)
+EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& pMainWord, const int& iCurrentLevel)
 {
 	EndGameNode* pEndGameNode = new EndGameNode();
 	if(pEndGameNode->initLose(iScore, pMainWord))
@@ -19,7 +19,7 @@ EndGameNode* EndGameNode::createLayoutLose(const int& iScore, char* pMainWord, c
 	return NULL;
 }
 
-EndGameNode* EndGameNode::createLayoutWin(const int& iScore, char* pMainWord, std::vector<char*> pSubWord, const int& iCurrentLevel)
+EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& pMainWord, std::vector<const Word> pSubWord, const int& iCurrentLevel)
 {
 	EndGameNode* pEndGameNode = new EndGameNode();
 	if(pEndGameNode->initWin(iScore, pMainWord, pSubWord))
@@ -33,25 +33,26 @@ EndGameNode* EndGameNode::createLayoutWin(const int& iScore, char* pMainWord, st
 	return NULL;
 }
 
-bool EndGameNode::initLose(const int& iScore, char* pMainWord)
+bool EndGameNode::initLose(const int& iScore, const Word& pMainWord)
 {
 	if (!this->init())
 	{
 		return false;
 	}
 
-	Sprite* pBackgroundWin = Sprite::create("Target-End-Game/Fail_Board.png");
-	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 80));
-	this->addChild(pBackgroundWin);
+	Sprite* pBackgroundFail = Sprite::create("Target-End-Game/Fail_Board.png");
+	pBackgroundFail->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f));
+	this->addChild(pBackgroundFail);
 
-	std::vector<char*> subWord;
-	Node* pWordNode = this->generateLayoutWord(pMainWord, subWord);
-	pWordNode->setPosition(Point(this->getContentSize().width/2.0f - pWordNode->getContentSize().width/2.0f, 555));
-	this->addChild(pWordNode);
+	Sprite* pBackgroundTargetCard = Sprite::create("Target-End-Game/Fail_Card.png");
+	pBackgroundTargetCard->setPosition(Point(320, 535));
+	this->addChild(pBackgroundTargetCard);
 
-	Node* pScoreNode = this->generateLayoutScore(iScore);
-	pScoreNode->setPosition(Point(382 - pScoreNode->getContentSize().width/2.0f, 455));
-	this->addChild(pScoreNode);
+	Label* pLabelMainWord = Label::createWithTTF(pMainWord.m_sWord, "fonts/ARLRDBD.ttf", 32);
+	pLabelMainWord->setColor(ccc3(0, 0, 0));
+	pLabelMainWord->setAnchorPoint(Point(0.5f, 0.0f));
+	pLabelMainWord->setPosition(Point(315, 580));
+	this->addChild(pLabelMainWord);
 
 	MenuItemImage* pRetryLevel = MenuItemImage::create(
 		"Target-End-Game/Retry_Button.png",
@@ -59,13 +60,13 @@ bool EndGameNode::initLose(const int& iScore, char* pMainWord)
 		CC_CALLBACK_0(EndGameNode::menuRetryLevelCallBack, this));
 
 	Menu* pMenuLose = Menu::create(pRetryLevel, NULL);
-	pMenuLose->setPosition(Point(this->getContentSize().width/2.0f, 385));
+	pMenuLose->setPosition(Point(this->getContentSize().width/2.0f, 305));
 	this->addChild(pMenuLose);
 
 	return true;
 }
 
-bool EndGameNode::initWin(const int& iScore, char* pMainWord, std::vector<char*> pSubWord)
+bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, std::vector<const Word> pSubWord)
 {
 	if (!this->init())
 	{
@@ -77,20 +78,31 @@ bool EndGameNode::initWin(const int& iScore, char* pMainWord, std::vector<char*>
 	this->addChild(pBackgroundShine);
 
 	Sprite* pBackgroundWin = Sprite::create("Target-End-Game/Win_Board.png");
-	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 80));
+	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f));
 	this->addChild(pBackgroundWin);
 
 	m_pStarNode = this->generateLayoutStar();
-	m_pStarNode->setPosition(Point(228, 728));
+	m_pStarNode->setPosition(Point(228, 755));
 	this->addChild(m_pStarNode);
 
-	Node* pWordNode = this->generateLayoutWord(pMainWord, pSubWord);
-	pWordNode->setPosition(Point(this->getContentSize().width/2.0f - pWordNode->getContentSize().width/2.0f, 555));
-	this->addChild(pWordNode);
-
 	Node* pScoreNode = this->generateLayoutScore(iScore);
-	pScoreNode->setPosition(Point(382 - pScoreNode->getContentSize().width/2.0f, 455));
+	pScoreNode->setPosition(Point(320, 698));
+
 	this->addChild(pScoreNode);
+
+	Sprite* pBackgroundTargetCard = Sprite::create("Target-End-Game/Win_Card.png");
+	pBackgroundTargetCard->setPosition(Point(320, 535));
+	this->addChild(pBackgroundTargetCard);
+
+	Label* pLabelMainWord = Label::createWithTTF(pMainWord.m_sWord, "fonts/ARLRDBD.ttf", 32);
+	pLabelMainWord->setColor(ccc3(0, 0, 0));
+	pLabelMainWord->setAnchorPoint(Point(0.5f, 0.0f));
+	pLabelMainWord->setPosition(Point(315, 580));
+	this->addChild(pLabelMainWord);
+
+	Node* pSubWordNode = this->generateLayoutSubWord(pSubWord);
+	pSubWordNode->setPosition(Point(320, 375));
+	this->addChild(pSubWordNode);
 
 	MenuItemImage* pNextLevel = MenuItemImage::create(
 		"Target-End-Game/Next_Button.png",
@@ -98,7 +110,7 @@ bool EndGameNode::initWin(const int& iScore, char* pMainWord, std::vector<char*>
 		CC_CALLBACK_0(EndGameNode::menuNextLevelCallBack, this));
 
 	Menu* pMenuWin = Menu::create(pNextLevel, NULL);
-	pMenuWin->setPosition(Point(this->getContentSize().width/2.0f, 385));
+	pMenuWin->setPosition(Point(this->getContentSize().width/2.0f, 305));
 	this->addChild(pMenuWin);
 	
 	return true;
@@ -124,19 +136,17 @@ bool EndGameNode::init()
 		"Target-End-Game/Close_Button.png",
 		"Target-End-Game/Close_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuCloseCallBack, this));
-
-	Menu* pMenuClose = Menu::create(pCloseItem, NULL);
-	pMenuClose->setPosition(Point(561, 790));
-	this->addChild(pMenuClose, 10);
+	pCloseItem->setPosition(Point(561, 790));
 
 	MenuItemImage* pDictItem = MenuItemImage::create(
 		"Target-End-Game/Dict_Button.png",
 		"Target-End-Game/Dict_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuOpenDictCallBack, this));
+	pDictItem->setPosition(Point(150, 300));
 
-	Menu* pMenuDict = Menu::create(pDictItem, NULL);
-	pMenuDict->setPosition(Point(150, 380));
-	this->addChild(pMenuDict, 10);
+	Menu* pMenu = Menu::create(pDictItem, pCloseItem, NULL);
+	pMenu->setPosition(Point::ZERO);
+	this->addChild(pMenu, 10);
 
 	return true;
 }
@@ -174,7 +184,9 @@ Node* EndGameNode::generateLayoutScore(int iScore)
 		pNode->addChild(sprite);
 		arrNumber.pop_back();
 	}
-	pNode->setContentSize(CCSizeMake(width, height));
+	pNode->setContentSize(CCSizeMake(width - 18, height));
+	pNode->setAnchorPoint(Point(0.5f, 0.5f));
+	pNode->setScale(1.2f);
 
 	return pNode;
 }
@@ -244,42 +256,23 @@ void EndGameNode::updateStar()
 	}
 }
 
-Node* EndGameNode::generateLayoutWord(char* mainWord, std::vector<char*> subWord)
+Node* EndGameNode::generateLayoutSubWord(std::vector<const Word> subWord)
 {
 	Node* pNode = Node::create();
-
-	pNode->setContentSize(CCSizeMake(345, 64));
-
-	Label* pMainWord = Label::createWithTTF(mainWord, "fonts/ARLRDBD.ttf", 34);
-	pMainWord->setColor(ccc3(0, 255, 255));
-	pMainWord->setPosition(Point(pNode->getContentSize().width/2.0f-pMainWord->getContentSize().width/2.0f, 30));
-	pNode->addChild(pMainWord);
-	
-	int iIndex=0;
+	int iWidth = 0;
 	while(!subWord.empty())
 	{
-		Label* pSubWord = Label::createWithTTF(subWord.back(), "fonts/ARLRDBD.ttf", 24);
+		Label* pSubWord = Label::createWithTTF(subWord.back().m_sWord, "fonts/ARLRDBD.ttf", 24);
+		pSubWord->setPosition(Point(iWidth, 0));
 		pSubWord->setColor(ccc3(0, 0, 0));
-
-		Point point;
-		if (iIndex == 0)
-		{
-			point = Point(-pSubWord->getContentSize().width/2.0f, 0);
-		}
-		else if (iIndex == 1)
-		{
-			point = Point(pNode->getContentSize().width/2.0f-pSubWord->getContentSize().width/2.0f, 0);
-		}
-		else if (iIndex == 2)
-		{
-			point = Point(pNode->getContentSize().width - pSubWord->getContentSize().width/2.0f - 20, 0);
-		}
-
-		subWord.pop_back();
-		iIndex++;
-		pSubWord->setPosition(point);
 		pNode->addChild(pSubWord);
+
+		iWidth += pSubWord->getContentSize().width + 60;
+		subWord.pop_back();
 	}
+
+	pNode->setContentSize(CCSizeMake(iWidth-60, 20));
+	pNode->setAnchorPoint(Point(0.5f, 0.5f));
 
 	return pNode;
 }
