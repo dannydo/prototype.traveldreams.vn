@@ -81,6 +81,12 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, std::vector<
 	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f));
 	this->addChild(pBackgroundWin);
 
+	std::string sPath = "FlashCard/";
+	sPath.append(pMainWord.m_sFlashCardImage);
+	Sprite* pFlashCard = Sprite::create(sPath.c_str());
+	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 31));
+	this->addChild(pFlashCard, 10);
+
 	m_pStarNode = this->generateLayoutStar();
 	m_pStarNode->setPosition(Point(228, 755));
 	this->addChild(m_pStarNode);
