@@ -7,7 +7,7 @@ USING_NS_CC;
 
 Scene* HelloWorld::createScene(int iLevel)
 {
-	if ( iLevel > 4)
+	if ( iLevel > 5)
 		iLevel = 1;
     // 'scene' is an autorelease object
     auto scene = Scene::create();
@@ -1129,7 +1129,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 					iStep--;
 				}
 			}
-			if (iSign < 0)
+			if (iSign < 0 && iTranslatedOriginCell > 0)
 				iTranslatedOriginCell -= m_iMovingCellListLength;
 			iTranslatedMirrorCell = iTranslatedOriginCell;	
 							
@@ -1359,7 +1359,7 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 				}
 			}
 
-			if (iSign < 0)
+			if (iSign < 0 && iTranslatedOriginCell > 0)
 				iTranslatedOriginCell -= m_iMovingCellListLength;
 			iTranslatedMirrorCell = iTranslatedOriginCell;	
 
