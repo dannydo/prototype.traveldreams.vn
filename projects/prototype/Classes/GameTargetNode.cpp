@@ -5,7 +5,7 @@
 
 USING_NS_CC;
 
-GameTargetNode* GameTargetNode::createLayout(char* pMainWord, const int& iCurrentLevel)
+GameTargetNode* GameTargetNode::createLayout(const Word& pMainWord, const int& iCurrentLevel)
 {
 	GameTargetNode* pGameTargetNode = new GameTargetNode();
 	if(pGameTargetNode->initLayout(pMainWord))
@@ -19,7 +19,7 @@ GameTargetNode* GameTargetNode::createLayout(char* pMainWord, const int& iCurren
 	return NULL;
 }
 
-bool GameTargetNode::initLayout(char* pMainWord)
+bool GameTargetNode::initLayout(const Word& pMainWord)
 {
 	if (!Node::init())
 	{
@@ -36,40 +36,40 @@ bool GameTargetNode::initLayout(char* pMainWord)
 	this->setContentSize(pBackground->getContentSize());
 
 	m_pBackgroundBoard = Sprite::create("Target-End-Game/Target_Board.png");
-	m_pBackgroundBoard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 80));
+	m_pBackgroundBoard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f));
 	this->addChild(m_pBackgroundBoard);
 
-	Label* pLabelMainWord = Label::createWithTTF(pMainWord, "fonts/ARLRDBD.ttf", 32);
+	Sprite* pTargetCard = Sprite::create("Target-End-Game/Target_Card.png");
+	pTargetCard->setPosition(Point(320, 535));
+	this->addChild(pTargetCard);
+
+	Label* pLabelMainWord = Label::createWithTTF(pMainWord.m_sWord, "fonts/ARLRDBD.ttf", 32);
 	pLabelMainWord->setColor(ccc3(0, 0, 0));
-	pLabelMainWord->setPosition(Point(225, 580));
+	pLabelMainWord->setAnchorPoint(Point(0.5f, 0.0f));
+	pLabelMainWord->setPosition(Point(315, 580));
 	this->addChild(pLabelMainWord);
 
 	MenuItemImage* pPlayLevel = MenuItemImage::create(
 		"Target-End-Game/Play_Button.png",
 		"Target-End-Game/Play_Button_Click.png",
 		CC_CALLBACK_0(GameTargetNode::menuPlayLevelCallBack, this));
-
-	Menu* pMenuPlay = Menu::create(pPlayLevel, NULL);
-	pMenuPlay->setPosition(Point(this->getContentSize().width/2.0f, 385));
-	this->addChild(pMenuPlay);
+	pPlayLevel->setPosition(Point(this->getContentSize().width/2.0f, 305));
 
 	MenuItemImage* pCloseItem = MenuItemImage::create(
 		"Target-End-Game/Close_Button.png",
 		"Target-End-Game/Close_Button_Click.png",
 		CC_CALLBACK_0(GameTargetNode::menuCloseCallBack, this));
-
-	Menu* pMenuClose = Menu::create(pCloseItem, NULL);
-	pMenuClose->setPosition(Point(561, 790));
-	this->addChild(pMenuClose, 10);
+	pCloseItem->setPosition(Point(561, 790));
 
 	MenuItemImage* pDictItem = MenuItemImage::create(
 		"Target-End-Game/Dict_Button.png",
 		"Target-End-Game/Dict_Button_Click.png",
 		CC_CALLBACK_0(GameTargetNode::menuOpenDictCallBack, this));
+	pDictItem->setPosition(Point(150, 300));
 
-	Menu* pMenuDict = Menu::create(pDictItem, NULL);
-	pMenuDict->setPosition(Point(150, 380));
-	this->addChild(pMenuDict, 10);
+	Menu* pMenu = Menu::create(pPlayLevel, pCloseItem, pDictItem, NULL);
+	pMenu->setPosition(Point::ZERO);
+	this->addChild(pMenu, 10);
 
 	return true;
 }		

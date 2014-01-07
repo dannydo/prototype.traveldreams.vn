@@ -49,6 +49,7 @@ bool BonusWordNodeNew::init()
 		Node* pNode = this->createNodeBonusWord(m_bonusWords[iIndex]);
 		pNode->setPosition(Point(0, iHeight));
 		iHeight += pNode->getContentSize().height + 25;
+		pNode->setVisible(false);
 		this->addChild(pNode, 0, iIndex);
 		m_CompletedUnlockBonusWprds.push_back(0);
 		m_CompletedUnlockBonusWprds.push_back(0);
@@ -59,6 +60,11 @@ bool BonusWordNodeNew::init()
 	m_fDeltaUpdate = 0.0f;
 	m_fTimeAutoHiddenPopup = 3.0f;
 	m_bRunningCollectWord = false;
+	m_pEffecFirstUnlockLetter = NULL;
+
+	m_pBackgroundEffectLayer = LayerColor::create(ccc4( 0,0,0, 100));
+	m_pBackgroundEffectLayer->setVisible(false);
+	this->addChild(m_pBackgroundEffectLayer);
 
 	return true;
 }
@@ -76,7 +82,7 @@ void BonusWordNodeNew::update(float dt)
 void BonusWordNodeNew::addLetter(const unsigned char letter)
 {
 	m_letters.push_back(letter);
-	
+	m_pBackgroundEffectLayer->setPosition(Point(-this->getPositionX(), -this->getPositionY()));
 }
 
 float BonusWordNodeNew::displayEffect(const float& fTimeDelay)
@@ -104,17 +110,47 @@ float BonusWordNodeNew::calculatorDelayTime()
 		bool bShowBonusWord = true;
 		for(int iIndex=0; iIndex<strlen(word.m_sWord); iIndex++)
 		{
+			bool isFirstUnlockLetter = true;
+			for(int iIndexWordLetter=0; iIndexWordLetter<m_WordLetterIndex[iIndexWord].size(); iIndexWordLetter++)
+			{
+				if (m_WordLetterIndex[iIndexWord][iIndexWordLetter] == 1)
+				{
+					isFirstUnlockLetter = false;
+					break;
+				}
+			}
+
 			for(int iIndexLetter=0; iIndexLetter<m_letters.size(); iIndexLetter++)
 			{
 				if (tolower(m_letters[iIndexLetter]) == tolower(word.m_sWord[iIndex]) && m_WordLetterIndex[iIndexWord][iIndex] == 0)
 				{
-					if (bShowBonusWord)
+					if (isFirstUnlockLetter)
 					{
-						bShowBonusWord = false;
-						fDelay += 0.7f;
+						if (bShowBonusWord)
+						{
+							bShowBonusWord = false;
+							fDelay += 0.95f;
+							fDelay += 1.65f;
+						}
+						else
+						{
+							fDelay += 0.25f;
+						}
+						letters[iIndex] = 1;
 					}
-					fDelay += 0.25f;
-					letters[iIndex] = 1;
+					else
+					{
+						if (bShowBonusWord)
+						{
+							bShowBonusWord = false;
+							fDelay += 0.7f;
+						}
+						else
+						{
+							fDelay += 0.25f;
+						}
+						letters[iIndex] = 1;
+					}
 				}
 			}
 		}
@@ -134,7 +170,7 @@ float BonusWordNodeNew::calculatorDelayTime()
 			if (isFinish)
 			{
 				m_CompletedUnlockBonusWprds[iIndexWord] = 1;
-				fDelay += 1.1f;
+				fDelay += 3.3f;
 			}
 		}
 	}
@@ -154,6 +190,9 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 		m_iCountWord++;
 		m_iCountLetterWord = 0;
 		m_iCountLetter = 0;
+
+		this->removeChild(m_pEffecFirstUnlockLetter);
+		m_pEffecFirstUnlockLetter = NULL;
 	}
 
 	if (m_iCountWord > m_bonusWords.size() - 1)
@@ -163,7 +202,8 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 	}
 
 	Word word = m_bonusWords[m_iCountWord];
-	Node* pNodeWord = this->getChildByTag(m_iCountWord)->getChildByTag(0)->getChildByTag(0)->getChildByTag(0);
+	Node* pNode = this->getChildByTag(m_iCountWord);
+	Node* pNodeWord = pNode->getChildByTag(0)->getChildByTag(0)->getChildByTag(0);
 	bool isDelay = false;
 	bool isFirstDelay = false;
 	m_bRunningCollectWord = true;
@@ -175,13 +215,25 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 			if (tolower(m_letters[m_iCountLetter]) == tolower(word.m_sWord[m_iCountLetterWord]) && m_WordLetterIndex[m_iCountWord][m_iCountLetterWord] == 0)
 			{
 				isDelay = true;
-				Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
-				if (pMark->getTag() == -1)
+				if (pNode->isVisible() == false)
 				{
-					isFirstDelay = true;
+					if (m_pEffecFirstUnlockLetter == NULL)
+					{
+						isFirstDelay = true;
+					}
+					m_WordLetterIndex[m_iCountWord][m_iCountLetterWord] = 1;
+					this->playEffectUnlockFirstLetter(m_iCountLetterWord, (LabelTTF*)pNodeWord->getChildByTag(m_iCountLetterWord));
 				}
-				m_WordLetterIndex[m_iCountWord][m_iCountLetterWord] = 1;
-				this->playEffectLetter((LabelTTF*)pNodeWord->getChildByTag(m_iCountLetterWord));
+				else
+				{
+					Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
+					if (pMark->getTag() == -1)
+					{
+						isFirstDelay = true;
+					}
+					m_WordLetterIndex[m_iCountWord][m_iCountLetterWord] = 1;
+					this->playEffectLetter((LabelTTF*)pNodeWord->getChildByTag(m_iCountLetterWord));
+				}
 			}
 
 			m_iCountLetter++;
@@ -196,34 +248,87 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 	{
 		m_bRunningCollectWord = false;
 		this->updateLetterDisplay();
-
-		Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
-		if (pMark->getTag() != -1)
+		if (pNode->isVisible() == false && m_pEffecFirstUnlockLetter != NULL)
 		{
-			pMark->setTag(-1);
-			auto actionMove = MoveTo::create(0.2f, Point(-pMark->getContentSize().width, 0));
-			pMark->runAction(actionMove);
+			auto actionScale = ScaleBy::create(0.7f, 0.0f, 0.0f);
+			auto actionMove = MoveTo::create(0.7f, pNode->getPosition());
+			auto actionSetVisibelNode = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::setVisibleTrueLayoutBonusWord));
+
+			m_pEffecFirstUnlockLetter->runAction(Sequence::create(DelayTime::create(0.7f)->clone(), actionScale, NULL));
+			m_pEffecFirstUnlockLetter->runAction(Sequence::create(DelayTime::create(0.7f)->clone(), actionMove, actionSetVisibelNode, NULL));
+
+			isFirstDelay = true;
+			isDelay = true;
+		}
+		else
+		{
+			Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
+			if (pMark->getTag() != -1)
+			{
+				pMark->setTag(-1);
+				auto actionMove = MoveTo::create(0.2f, Point(-pMark->getContentSize().width, 0));
+				pMark->runAction(actionMove);
+			}
 		}
 	}
 
 	if (isDelay)
 	{
 		DelayTime* delay;
-		Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
-		if (isFirstDelay)
+		if (pNode->isVisible() == false)
 		{
-			delay = DelayTime::create(0.7f);
+			if (isFirstDelay)
+			{
+				if (m_bRunningCollectWord)
+				{
+					delay = DelayTime::create(0.95f);
+				}
+				else
+				{
+					delay = DelayTime::create(1.65f);
+				}
+			}
+			else
+			{
+				if (m_bRunningCollectWord)
+				{
+					delay = DelayTime::create(0.45f);
+				}
+				else
+				{
+					delay = DelayTime::create(1.65f);
+				}
+			}
 		}
 		else
 		{
-			delay = DelayTime::create(0.25f);
+			Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
+			if (isFirstDelay)
+			{
+				delay = DelayTime::create(0.7f);
+			}
+			else
+			{
+				delay = DelayTime::create(0.25f);
+			}
 		}
 
 		auto actionLoopUpdate = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::updateLetterCollectForWord));
 		if (this->checkFinishCollectWord(m_iCountWord))
 		{
+			if (pNode->isVisible() == false && m_pEffecFirstUnlockLetter != NULL)
+			{
+				auto actionScale = ScaleBy::create(0.7f, 0.0f, 0.0f);
+				auto actionMove = MoveTo::create(0.7f, pNode->getPosition());
+				auto actionSetVisibelNode = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::setVisibleTrueLayoutBonusWord));
+
+				m_pEffecFirstUnlockLetter->runAction(Sequence::create(DelayTime::create(0.7f)->clone(), actionScale, NULL));
+				m_pEffecFirstUnlockLetter->runAction(Sequence::create(DelayTime::create(0.7f)->clone(), actionMove, actionSetVisibelNode, NULL));
+				delay = DelayTime::create(1.65f);
+			}
+
 			auto actionEffect = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::playEffectFinishCollectWord));
-			auto delayEffect = DelayTime::create(1.1f);
+			auto delayEffect = DelayTime::create(3.3f);
 			this->runAction(Sequence::create(delay->clone(), actionEffect, delayEffect->clone(), actionLoopUpdate, NULL));
 		}
 		else
@@ -273,25 +378,26 @@ bool  BonusWordNodeNew::checkFinishCollectWord(const int& iIndexWord)
 
 void BonusWordNodeNew::playEffectFinishCollectWord()
 {
+	m_pBackgroundEffectLayer->setVisible(true);
 	Word word = m_bonusWords[m_iCountWord];
 	Size winSize = Director::sharedDirector()->getWinSize();
 	Node* pNode = this->getChildByTag(m_iCountWord);
 	Node* pNodeWord = this->getChildByTag(m_iCountWord)->getChildByTag(0)->getChildByTag(0)->getChildByTag(0);
 	pNodeWord->setVisible(false);
 
-	m_pLabelEffectFinish = LabelTTF::create("", "Arial", 24);
+	m_pLabelEffectFinish = LabelTTF::create("", "Arial", 90);
 	m_pLabelEffectFinish->setString(word.m_sWord);
-	m_pLabelEffectFinish->setPosition(Point(m_pLabelEffectFinish->getContentSize().width/2.0f, pNode->getPositionY()));
-	m_pLabelEffectFinish->setColor(ccc3(0, 0, 0));
+	m_pLabelEffectFinish->setScale(0.3f);
+	m_pLabelEffectFinish->setPosition(Point(m_pLabelEffectFinish->getContentSize().width/2.0f*0.3, pNode->getPositionY()));
+	m_pLabelEffectFinish->setColor(ccc3(255, 255, 255));
 	
 	this->addChild(m_pLabelEffectFinish);
 
-	auto actionSacle = ScaleBy::create(1.0f, 5.0f, 5.0f);
+	auto actionSacle = ScaleBy::create(1.0f, 3.0f, 3.0f);
 	auto actionRemove = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::removeLabelFinishColectWord));
 	auto actionFadeOut = FadeOut::create(1.0f);
-	auto actionMove = MoveBy::create(1.0f, Point(0, -300));
-	m_pLabelEffectFinish->runAction(Sequence::create(actionSacle, actionRemove, NULL));
-	m_pLabelEffectFinish->runAction(actionFadeOut);
+	auto actionMove = MoveTo::create(1.0f, Point(320-this->getPositionX(), -300));
+	m_pLabelEffectFinish->runAction(Sequence::create(actionSacle, DelayTime::create(1.0f)->clone(), actionFadeOut, actionRemove, NULL));
 	m_pLabelEffectFinish->runAction(actionMove);
 
 	Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
@@ -316,6 +422,7 @@ void BonusWordNodeNew::removeLabelFinishColectWord()
 	this->removeChild(m_pLabelEffectFinish);
 	Node* pNodeWord = this->getChildByTag(m_iCountWord)->getChildByTag(0)->getChildByTag(0)->getChildByTag(0);
 	pNodeWord->setVisible(true);
+	m_pBackgroundEffectLayer->setVisible(false);
 }
 
 void BonusWordNodeNew::emptyArrayLetter()
@@ -353,14 +460,12 @@ Node* BonusWordNodeNew::createNodeBonusWord(Word word)
 	pLayoutNode->addChild(pMenuDisplay);
 	pLayoutNode->setContentSize(pDisplay->getContentSize());
 
-	
-	
 	int width = 0;
 	std::vector<int> indexLetter;
-	for(int i=0; i<strlen(word.m_sWord); i++)
+	for(int iIndex=0; iIndex<strlen(word.m_sWord); iIndex++)
 	{
 		char letter[2];
-		letter[0] = word.m_sWord[i];
+		letter[0] = word.m_sWord[iIndex];
 		letter[1] = 0;
 		indexLetter.push_back(0);
 		
@@ -369,7 +474,7 @@ Node* BonusWordNodeNew::createNodeBonusWord(Word word)
 		pLabelLetter->setPosition(Point(width + pLabelLetter->getContentSize().width/2.0f, 0));
 
 		width = width + pLabelLetter->getContentSize().width + 2;
-		pNodeWord->addChild(pLabelLetter, 0, i);
+		pNodeWord->addChild(pLabelLetter, 0, iIndex);
 	}
 
 	m_WordLetterIndex.push_back(indexLetter);
@@ -488,4 +593,72 @@ void BonusWordNodeNew::closeBonusWord()
 			pMark->runAction(Sequence::create(actionMove, actionUpdateTag, NULL));
 		}
 	}
+}
+
+void BonusWordNodeNew::playEffectUnlockFirstLetter(const int& iIndexLetterWord, LabelTTF* pLabelLetter)
+{
+	bool bIsDelay = false;
+	if (m_pEffecFirstUnlockLetter == NULL)
+	{
+		m_pBackgroundEffectLayer->setVisible(true);
+		bIsDelay= true;
+		m_pEffecFirstUnlockLetter = Node::create();
+		Word word = m_bonusWords[m_iCountWord];
+		int width = 0;
+		std::vector<int> indexLetter;
+		for(int iIndex=0; iIndex<strlen(word.m_sWord); iIndex++)
+		{
+			char letter[2];
+			letter[0] = word.m_sWord[iIndex];
+			letter[1] = 0;
+			indexLetter.push_back(0);
+		
+			LabelTTF* pLabelLetter = LabelTTF::create(letter, "Arial", 90);
+			pLabelLetter->setColor(ccc3(4, 167, 252));
+			pLabelLetter->setPosition(Point(width + pLabelLetter->getContentSize().width/2.0f, 0));
+			width = width + pLabelLetter->getContentSize().width + 2;
+			m_pEffecFirstUnlockLetter->addChild(pLabelLetter, 0, iIndex);
+		}
+
+		m_pEffecFirstUnlockLetter->setAnchorPoint(Point(0.5f, 0.5f));
+		m_pEffecFirstUnlockLetter->setContentSize(CCSizeMake(width, 20));
+		m_pEffecFirstUnlockLetter->setPosition(Point(320-this->getPositionX(), -300));
+		m_pEffecFirstUnlockLetter->setScale(0.3f);
+		this->addChild(m_pEffecFirstUnlockLetter);
+
+		auto actionScale = ScaleBy::create(0.5f, 3.0f, 3.0f);
+		m_pEffecFirstUnlockLetter->runAction(actionScale);
+	}
+
+	if (m_pEffecFirstUnlockLetter != NULL)
+	{
+		pLabelLetter->setColor(ccc3(0, 0, 0));
+		DelayTime* delay;
+		if (bIsDelay)
+		{
+			delay = DelayTime::create(0.5f);
+		}
+		else
+		{
+			delay = DelayTime::create(0.0f);
+		}
+
+		LabelTTF* pLabel = (LabelTTF*)m_pEffecFirstUnlockLetter->getChildByTag(iIndexLetterWord);
+		auto actionEffectColor =  CallFuncN::create(this, callfuncN_selector(BonusWordNodeNew::playEffectColorLetter));
+		auto actionSacleEffect = ScaleBy::create(0.1f, 2.0f, 2.0f);
+		pLabel->runAction(Sequence::create(delay->clone(), actionEffectColor, actionSacleEffect, actionSacleEffect->reverse(), NULL));
+	}
+}
+
+void BonusWordNodeNew::playEffectColorLetter(Node* pSender)
+{
+	LabelTTF* pLabel = (LabelTTF*)pSender;
+	pLabel->setColor(ccc3(255, 255, 255));
+}
+
+void BonusWordNodeNew::setVisibleTrueLayoutBonusWord()
+{
+	Node* pNode = this->getChildByTag(m_iCountWord);
+	pNode->setVisible(true);
+	m_pBackgroundEffectLayer->setVisible(false);
 }
