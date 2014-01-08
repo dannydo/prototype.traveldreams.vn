@@ -8,9 +8,9 @@ USING_NS_CC;
 GameTargetNode* GameTargetNode::createLayout(const Word& pMainWord, const int& iCurrentLevel)
 {
 	GameTargetNode* pGameTargetNode = new GameTargetNode();
+	pGameTargetNode->m_iCurrentLevel = iCurrentLevel;
 	if(pGameTargetNode->initLayout(pMainWord))
 	{
-		pGameTargetNode->m_iCurrentLevel = iCurrentLevel;
 		pGameTargetNode->autorelease();
 		return pGameTargetNode;
 	}
@@ -39,11 +39,29 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	m_pBackgroundBoard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f));
 	this->addChild(m_pBackgroundBoard);
 
-	Sprite* pTargetCard = Sprite::create("Target-End-Game/Target_Card.png");
-	pTargetCard->setPosition(Point(320, 535));
-	this->addChild(pTargetCard);
+	//Sprite* pTargetCard = Sprite::create("Target-End-Game/Target_Card.png");
+	//pTargetCard->setPosition(Point(320, 537));
+	//this->addChild(pTargetCard);
 
-	Label* pLabelMainWord = Label::createWithTTF(pMainWord.m_sWord, "fonts/ARLRDBD.ttf", 32);
+	Sprite* pBackgroundTargetCard = Sprite::create("Target-End-Game/Win_Card.png");
+	pBackgroundTargetCard->setPosition(Point(320, 535));
+	this->addChild(pBackgroundTargetCard);
+
+	std::string sPath = "FlashCard/";
+	sPath.append(pMainWord.m_sFlashCardImage);
+	Sprite* pFlashCard = Sprite::create(sPath.c_str());
+	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 31));
+	this->addChild(pFlashCard, 10);
+
+	char sLevel[5];
+	Label* pLabelLevel = Label::createWithTTF(itoa(m_iCurrentLevel, sLevel, 10), "fonts/ARLRDBD.ttf", 52);
+	pLabelLevel->setColor(ccc3(255, 0, 0));
+	pLabelLevel->setAnchorPoint(Point(0.0f, 0.0f));
+	pLabelLevel->setPosition(Point(350, 745));	   
+	pLabelLevel->setRotationX(15);
+	this->addChild(pLabelLevel);
+
+	Label* pLabelMainWord = Label::createWithTTF("???", "fonts/ARLRDBD.ttf", 32);
 	pLabelMainWord->setColor(ccc3(0, 0, 0));
 	pLabelMainWord->setAnchorPoint(Point(0.5f, 0.0f));
 	pLabelMainWord->setPosition(Point(315, 580));
