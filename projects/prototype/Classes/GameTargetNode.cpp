@@ -55,9 +55,9 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 
 	char sLevel[5];
 	Label* pLabelLevel = Label::createWithTTF(itoa(m_iCurrentLevel, sLevel, 10), "fonts/ARLRDBD.ttf", 52);
-	pLabelLevel->setColor(ccc3(255, 0, 0));
+	pLabelLevel->setColor(ccc3(219, 160, 74));
 	pLabelLevel->setAnchorPoint(Point(0.0f, 0.0f));
-	pLabelLevel->setPosition(Point(350, 745));	   
+	pLabelLevel->setPosition(Point(350, 745));
 	pLabelLevel->setRotationX(15);
 	this->addChild(pLabelLevel);
 
