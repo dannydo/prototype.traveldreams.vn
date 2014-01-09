@@ -1,9 +1,19 @@
 10
+LEAK
+Lỗ thủng
+leak
+abc.wav
+leak.jpg
 ACCUSE
 Buộc tội
 accuse
 abc.wav
 accuse.jpg
+PROTEST
+Sự phản đối
+protest
+abc.wav
+protest.jpg
 INFLATION
 Sự lạm phát
 inflation
@@ -14,21 +24,11 @@ Nông nghiệp
 agriculture
 abc.wav
 agriculture.jpg
-PROTEST
-Sự phản đối
-protest
-abc.wav
-protest.jpg
 ASTRONAUT
 Phi hành gia
 astronaut
 abc.wav
 astronaut.jpg
-LEAK
-Lỗ thủng
-leak
-abc.wav
-leak.jpg
 JUSTICE
 Sự công bằng
 justice

@@ -21,7 +21,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/GameWordManager.cpp \
 				   ../../Classes/BonusWordNodeNew.cpp \
 				   ../../Classes/IntroductionLayer.cpp \
-				   ../../Classes/FlashCardNode.cpp \
+				   ../../Classes/FlashCardScene.cpp \
 				   ../../Classes/LevelMapScene.cpp \
 				   ../../Classes/WorldMapScene.cpp \
                    ../../Classes/HelloWorldScene.cpp

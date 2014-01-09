@@ -66,6 +66,9 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 		case _SET_GET_START_:
 			sFileName = "SoundEffectPC/GetStar.wav";
 			break;
+		case _SET_BONUS_WORD_APPEAR_:
+			sFileName = "SoundEffectPC/openS.wav";
+			break;
 		case _SET_COMPLETE_WORD_:
 			sFileName = "SoundEffectPC/CompleteWord.wav";
 			break;
@@ -100,6 +103,9 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 			break;
 		case _SET_GET_START_:
 			sFileName = "SoundEffect/GetStar.ogg";
+			break;
+		case _SET_BONUS_WORD_APPEAR_:
+			sFileName = "SoundEffect/openS.ogg";
 			break;
 		case _SET_COMPLETE_WORD_:
 			sFileName = "SoundEffect/CompleteWord.ogg";

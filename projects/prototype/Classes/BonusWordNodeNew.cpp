@@ -1,5 +1,6 @@
 #include "BonusWordNodeNew.h"
 #include "SimpleAudioEngine.h"
+#include "SoundManager.h"
 
 USING_NS_CC;
 
@@ -628,6 +629,9 @@ void BonusWordNodeNew::playEffectUnlockFirstLetter(const int& iIndexLetterWord, 
 
 		auto actionScale = ScaleBy::create(0.5f, 3.0f, 3.0f);
 		m_pEffecFirstUnlockLetter->runAction(actionScale);
+
+		// sound effect
+		SoundManager::PlaySoundEffect(_SET_BONUS_WORD_APPEAR_);
 	}
 
 	if (m_pEffecFirstUnlockLetter != NULL)

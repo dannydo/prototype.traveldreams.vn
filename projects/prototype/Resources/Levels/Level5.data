@@ -1,0 +1,23 @@
+;size map
+7	7
+;number of move
+25
+;number of color
+6
+;score of stars
+15000	23000	30000
+;map matrix
+0	0	0	0	0	0	0
+0	1	1	1	1	1	1
+0	1	1	1	1	1	1
+0	1	1	1	1	1	1
+0	1	1	1	1	1	1
+0	1	1	1	1	1	1
+0	1	1	1	1	1	1
+;main word
+LEAK
+0
+;bonus word
+0
+;obstacle list: count, list
+0

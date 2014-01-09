@@ -7,11 +7,11 @@
 class EndGameNode : public cocos2d::Node
 {
 public:
-	static EndGameNode* createLayoutWin(const int& iScore, const Word& pMainWord, std::vector<const Word> pSubWord, const int& iCurrentLevel);
+	static EndGameNode* createLayoutWin(const int& iScore, const Word& pMainWord, const std::vector<Word>& pSubWord, const int& iCurrentLevel);
 	static EndGameNode* createLayoutLose(const int& iScore, const Word& pMainWord, const int& iCurrentLevel);
 
 	bool init() override;
-	bool initWin(const int& iScore, const Word& pMainWord, std::vector<const Word> pSubWord);
+	bool initWin(const int& iScore, const Word& pMainWord, const std::vector<Word>& pSubWord);
 	bool initLose(const int& iScore, const Word& pMainWord);
 
 	void addYellowStar(int iYellowStar);
@@ -25,7 +25,7 @@ private:
 	std::vector<int> generateArrayNumber(int iNumber);
 	cocos2d::Node* generateLayoutScore(int iScore);
 	cocos2d::Node* generateLayoutStar();
-	cocos2d::Node* generateLayoutSubWord(std::vector<const Word> subWord);
+	cocos2d::Node* generateLayoutSubWord(const std::vector<Word>& subWord);
 
 	void loopUpdateStar();
 	void sequenceUpdateStar();

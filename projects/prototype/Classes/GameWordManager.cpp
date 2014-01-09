@@ -1,6 +1,8 @@
 #include "GameWordManager.h"
 #include "cocos2d.h"
 #include "GameBoardManager.h"
+#include "GameConfigManager.h"
+
 
 using namespace cocos2d;
 
@@ -65,6 +67,10 @@ void GameWordManager::LoadWordGenerateConfig()
 	std::getline(inputStream, sTemp);		
 	inputStream >> m_WordGenerateConfig.m_iRatioBetweenLettersOfTrashWord;
 	std::getline(inputStream, sTemp);	
+
+
+	delete[] data;
+	delete[] orginalData;
 }
 
 void GameWordManager::LoadWords()
@@ -95,12 +101,43 @@ void GameWordManager::LoadWords()
 
 		inputStream >> m_WordList[iWordIndex].m_sFlashCardImage;
 	}
+
+	delete[] data;
+	delete[] orginalData;
+}
+
+int GameWordManager::GetWordIndexFromContent(const std::string& sWord)
+{
+	for(int iWordIndex=0; iWordIndex < m_iWordCount; iWordIndex++)
+	{
+		if (m_WordList[iWordIndex].m_sWord == sWord)
+			return iWordIndex;
+	}
+	// error, word not found
+	assert(0);
+
+	return 0;
 }
 
 void GameWordManager::GenerateWordForNewLevel(int iLevel)
 {
+	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(iLevel);
+	m_iMainWordIndex = m_pLevelConfig->m_iMainWordID;
+
+	m_iSubWordCount = m_pLevelConfig->m_iBonusWordsCount;
+	for(int i=0; i< m_iSubWordCount; i++)
+	{		
+		m_SubWordList[i] = m_pLevelConfig->m_BonusWordIDList[i];				
+
+		// log for test
+		//CCLOG( "Bonus word %d: %s", i, m_WordList[m_SubWordList[i]].m_sWord);
+	}
+
+	if (m_iSubWordCount == 0 && !m_pLevelConfig->m_bIsMainWordExistedOnBoard)		
+		m_bAddDirectLetterOfMainWordToTrash = true;	
+
 	// begin hard code level 1
-	m_bAddDirectLetterOfMainWordToTrash = false;
+	/*m_bAddDirectLetterOfMainWordToTrash = false;
 	m_iSubWordCount = _GDS_SUB_WORD_MAX_COUNT_;
 
 	int iPreviousWordIndex = UserDefault::getInstance()->getIntegerForKey("wordIndex", -1);
@@ -140,7 +177,7 @@ void GameWordManager::GenerateWordForNewLevel(int iLevel)
 		// log for test
 		CCLOG( "Bonus word %d: %s", i, m_WordList[m_SubWordList[i]].m_sWord);
 	}	
-
+	*/
 	// reset data
 	ResetDataForNewPlay();
 }
@@ -173,7 +210,10 @@ void GameWordManager::ResetDataForNewPlay()
 	m_iCountOfLettersOnBoard = 0;
 
 	// reset ratio
-	m_iMainWordGenerateRate = m_WordGenerateConfig.m_iInitRateOfMainLetter;
+	if (m_pLevelConfig->m_bIsMainWordExistedOnBoard)
+		m_iMainWordGenerateRate = 0;
+	else
+		m_iMainWordGenerateRate = m_WordGenerateConfig.m_iInitRateOfMainLetter;
 	m_iSubWordGenerateRate = m_WordGenerateConfig.m_iFixRatioOfSubWords;
 	m_iTrashWordGenerateRate = m_WordGenerateConfig.m_iFixRatioOfTrashWords;
 
@@ -409,11 +449,14 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 	if (eComboType == GemComboType_e::_GCT_COMBO5_ || eComboType == GemComboType_e::_GCT_COMBO6_)
 	{
 		// priopritized for main words then bonus, then trash words
-		bIsCompleted = GenerateLetterFromMainWord( sOuputLetter);
-		bIsLetterFromMainWord = bIsCompleted;
-		if (bIsLetterFromMainWord && m_bAddDirectLetterOfMainWordToTrash)
+		if (!m_pLevelConfig->m_bIsMainWordExistedOnBoard)
 		{
-			AddLetterToTrashCollection(sOuputLetter);
+			bIsCompleted = GenerateLetterFromMainWord( sOuputLetter);
+			bIsLetterFromMainWord = bIsCompleted;
+			if (bIsLetterFromMainWord && m_bAddDirectLetterOfMainWordToTrash)
+			{
+				AddLetterToTrashCollection(sOuputLetter);
+			}
 		}
 		
 		if (!bIsCompleted)
@@ -437,18 +480,20 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 		srand(time(NULL));
 
 		// generate letters from main word		
-		bShouldGenerateLetter = SuccessWithPercentRatio(m_iMainWordGenerateRate);
-		if (bShouldGenerateLetter || (m_bAddDirectLetterOfMainWordToTrash && m_TrashLettersCollection.size()==0))
+		if (!m_pLevelConfig->m_bIsMainWordExistedOnBoard)
 		{
-			bIsCompleted = GenerateLetterFromMainWord(sOuputLetter);		
-			bIsLetterFromMainWord = bIsCompleted;
-
-			if (bIsLetterFromMainWord && m_bAddDirectLetterOfMainWordToTrash)
+			bShouldGenerateLetter = SuccessWithPercentRatio(m_iMainWordGenerateRate);
+			if (bShouldGenerateLetter || (m_bAddDirectLetterOfMainWordToTrash && m_TrashLettersCollection.size()==0))
 			{
-				AddLetterToTrashCollection(sOuputLetter);
-			}
-		}				
-	
+				bIsCompleted = GenerateLetterFromMainWord(sOuputLetter);		
+				bIsLetterFromMainWord = bIsCompleted;
+
+				if (bIsLetterFromMainWord && m_bAddDirectLetterOfMainWordToTrash)
+				{
+					AddLetterToTrashCollection(sOuputLetter);
+				}
+			}				
+		}	
 
 		// generate letters from sub words		
 		if (!bIsCompleted)		

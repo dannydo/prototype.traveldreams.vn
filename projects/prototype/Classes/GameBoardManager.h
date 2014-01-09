@@ -4,12 +4,13 @@
 #include <vector>
 
 #include "GameDataStructure.h"
+#include "GameConfigManager.h"
 
 class GameBoardManager
 {
 public:
 	GameBoardManager();
-	void GenerateGameBoard(int iRowNumber, int iColumnNumber, int iLevel);
+	void GenerateGameBoard(int iLevel);
 
 	inline int GetRowNumber() { return m_iRowNumber;}
 	inline int GetColumnNumber() { return m_iColumnNumber;}
@@ -27,12 +28,13 @@ public:
 	int GetComboCount(const int& iTypeID) { return m_ComboCountList[iTypeID];}
 	
 protected:
-	void LoadGameConfig();
+	//void LoadGameConfig();
 	void LoadBasicComboPatternList();
 
 	void CountBasicCombo(); 
 protected:
-	GameConfig m_GameConfig;	
+	const GameConfig& m_GameConfig;	
+	const LevelConfig* m_pLevelConfig;	
 
 	int m_iRowNumber, m_iColumnNumber;
 	CellValue m_BoardValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];	

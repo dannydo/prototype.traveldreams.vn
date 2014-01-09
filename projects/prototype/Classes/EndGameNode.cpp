@@ -19,7 +19,7 @@ EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& pMainW
 	return NULL;
 }
 
-EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& pMainWord, std::vector<const Word> pSubWord, const int& iCurrentLevel)
+EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& pMainWord, const std::vector<Word>& pSubWord, const int& iCurrentLevel)
 {
 	EndGameNode* pEndGameNode = new EndGameNode();
 	if(pEndGameNode->initWin(iScore, pMainWord, pSubWord))
@@ -66,7 +66,7 @@ bool EndGameNode::initLose(const int& iScore, const Word& pMainWord)
 	return true;
 }
 
-bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, std::vector<const Word> pSubWord)
+bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::vector<Word>& pSubWord)
 {
 	if (!this->init())
 	{
@@ -262,19 +262,20 @@ void EndGameNode::updateStar()
 	}
 }
 
-Node* EndGameNode::generateLayoutSubWord(std::vector<const Word> subWord)
+Node* EndGameNode::generateLayoutSubWord(const std::vector<Word>& subWords)
 {
 	Node* pNode = Node::create();
 	int iWidth = 0;
-	while(!subWord.empty())
+	//while(!subWord.empty())
+	for(auto subword : subWords)
 	{
-		Label* pSubWord = Label::createWithTTF(subWord.back().m_sWord, "fonts/ARLRDBD.ttf", 24);
+		Label* pSubWord = Label::createWithTTF(subword.m_sWord, "fonts/ARLRDBD.ttf", 24);
 		pSubWord->setPosition(Point(iWidth, 0));
 		pSubWord->setColor(ccc3(0, 0, 0));
 		pNode->addChild(pSubWord);
 
 		iWidth += pSubWord->getContentSize().width + 60;
-		subWord.pop_back();
+		//subWord.pop_back();
 	}
 
 	pNode->setContentSize(CCSizeMake(iWidth-60, 20));

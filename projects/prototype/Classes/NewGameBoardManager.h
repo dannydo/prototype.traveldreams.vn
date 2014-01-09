@@ -3,6 +3,7 @@
 
 #include "GameBoardManager.h"
 #include "GameWordManager.h"
+#include "GameConfigManager.h"
 
 enum ComboEffectType
 {
@@ -65,14 +66,14 @@ public:
 	inline GameWordManager* GetGameWordManager() { return m_pGameWordManager;}
 	inline const int& GetCurrentScore() { return m_iCurrentScore;}
 	inline const int& GetCurrentMove() { return m_iCurrentMove;}
-	inline const LevelConfig& GetLevelConfig() { return m_LevelConfig;}
+	inline const LevelConfig& GetLevelConfig() { return *m_pLevelConfig;}
 	inline const int& GetCurrentLevel() { return m_iCurrentLevel;}
 
 
 	bool IsRowLocked(const int& iRow);
 	bool IsColumnLocked(const int& iColumn);
 
-	void GenerateGameBoard(int iRowNumber, int iColumnNumber, int iLevel);
+	void GenerateGameBoard(int iLevel);
 
 	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle>& doubleComboList, 
@@ -128,9 +129,9 @@ protected:
 
 	void TriggerWaitingCombo5List(std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList);
 protected:
-	GameWordManager* m_pGameWordManager;
+	GameWordManager* m_pGameWordManager;	
 
-	LevelConfig m_LevelConfig;
+	//LevelTarget m_LevelConfig;
 	int m_iCurrentLevel;
 	int m_iCurrentScore;// current score
 	int m_iCurrentMove;

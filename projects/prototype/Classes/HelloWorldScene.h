@@ -103,7 +103,9 @@ protected:
 		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells, bool bIsNewMove);
 	
-	Sprite* AddLetterToGem(const ComboEffectCell& cell);
+	Sprite* GenerateAndAddLetterToComboGem(const ComboEffectCell& cell);
+	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter );
+
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();
 
@@ -140,6 +142,7 @@ protected:
 private:
 	float m_fBoardLeftPosition, m_fBoardBottomPosition;
 	float m_fBoardLeftClipPosition, m_fBoardBottomClipPosition;
+	float m_fMaskWidth, m_fMaskHeight;
 	cocos2d::CCSpriteBatchNode* m_pBoardBatchNode;
 	cocos2d::Sprite* m_pMoveHintNode;
 	cocos2d::CCSpriteBatchNode* m_pComboEffectBatchNode;

@@ -16,6 +16,7 @@
 #define _COMBO_TYPE_COUNT_	3
 #define _MAX_LINKED_BLOCK_COUNT_	(_BOARD_MAX_ROW_NUMBER_*_BOARD_MAX_COLUMN_NUMBER_/4)
 
+#define _MAX_GAME_LEVEL_	6
 
 struct GameConfig
 {
@@ -39,7 +40,7 @@ public:
 	int m_iSubWordScoreRatio;
 };
 
-struct LevelConfig
+struct LevelTarget
 {
 public:
 	//int m_iNumberOfWidth, m_iNumberOfHeight;
@@ -79,12 +80,12 @@ enum GemComboType_e
 	_GCT_COMBO5_WAITING_TRIGGER_ = 4
 };
 
-enum ObstacleType_e
+enum ObstacleType_e : int
 {
 	_OT_NONE_ = 0,
-	_OT_LOCK_ROW_,
-	_OT_LOCK_COLUMN_,
 	_OT_LOCK_ROW_AND_COLUMN_,
+	_OT_LOCK_ROW_,
+	_OT_LOCK_COLUMN_,	
 	_OT_SHIELDED_ALIEN_,
 	_OT_FROGEN_ALIEN_
 };

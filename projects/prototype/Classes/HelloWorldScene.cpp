@@ -180,9 +180,7 @@ bool HelloWorld::init()
 }
 
 void HelloWorld::initLevel(int iLevel)
-{
-	int iNumberOfRow = 8;
-	int iNumberOfColumn = 8;
+{	
 	/*switch( iLevel)
 	{
 		case 1:
@@ -202,7 +200,60 @@ void HelloWorld::initLevel(int iLevel)
 			iNumberOfColumn = 9;
 			break;
 	};*/
-	m_GameBoardManager.GenerateGameBoard(iNumberOfRow, iNumberOfColumn, iLevel);
+	m_GameBoardManager.GenerateGameBoard(iLevel);
+	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
+	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
+
+	// init board position and mask based on its size
+	switch( iNumberOfRow)
+	{
+		case 8:
+		default:
+			m_fBoardBottomPosition = 102.f + 37.f;	
+			m_fBoardBottomClipPosition = 102.f;	
+			m_fMaskHeight = 518.f;
+			break;
+		case 7:
+			m_fBoardBottomPosition = 135.f + 40.f;
+			m_fBoardBottomClipPosition = 135.f;	
+			m_fMaskHeight = 413.f;
+			break;
+		case 6:
+			m_fBoardBottomPosition = 165.f + 40.f;
+			m_fBoardBottomClipPosition = 165.f;	
+			m_fMaskHeight = 303.f;
+			break;
+		case 5:
+			m_fBoardBottomPosition = 195.f + 40.f;
+			m_fBoardBottomClipPosition = 195.f;	
+			m_fMaskHeight = 199.f;
+			break;
+	};
+
+	switch( iNumberOfColumn)
+	{
+		case 8:
+		default:
+			m_fBoardLeftPosition = 6.f + 38.f;			
+			m_fBoardLeftClipPosition = 6.f;
+			m_fMaskWidth = 618.f;
+			break;
+		case 7:		
+			m_fBoardLeftPosition = 46.f + 38.f;			
+			m_fBoardLeftClipPosition = 46.f;
+			m_fMaskWidth = 506.f;
+			break;
+		case 6:		
+			m_fBoardLeftPosition = 86.f + 38.f;			
+			m_fBoardLeftClipPosition = 86.f;
+			m_fMaskWidth = 386.f;
+			break;
+		case 5:		
+			m_fBoardLeftPosition = 126.f + 38.f;			
+			m_fBoardLeftClipPosition = 126.f;
+			m_fMaskWidth = 272.f;
+			break;
+	};
 
 	m_eTouchMoveState = _TMS_NONE_;	
 
@@ -295,6 +346,19 @@ void HelloWorld::initLevel(int iLevel)
 			}
 		}
 
+	// add letter to gems if existing
+	if (levelConfig.m_bIsMainWordExistedOnBoard)
+	{
+		const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+				
+		for(int i=0; i< mainWord.m_iWordLength; i++)
+		{
+			AddLetterToGem( levelConfig.m_MainWordLetterPosition[i], m_GameBoardManager.GetCellValue( levelConfig.m_MainWordLetterPosition[i].m_iRow,
+				levelConfig.m_MainWordLetterPosition[i].m_iColumn), mainWord.m_sWord[i]);
+		}
+	}
+
+
 	// create temp sprite, this's used to animate the drag line
 	m_pTempSpriteForAction = Sprite::createWithSpriteFrameName( "brick.png");
 	m_pTempSpriteForAction->retain();
@@ -331,7 +395,7 @@ void HelloWorld::visit()
 
 	EGLView::getInstance()->setScissorInPoints(    // scissorRect is the rectangle you want to show.
 		m_fBoardLeftClipPosition, m_fBoardBottomClipPosition,
-		m_fBoardLeftClipPosition + 618, m_fBoardBottomClipPosition + 515);
+		m_fBoardLeftClipPosition + m_fMaskWidth, m_fBoardBottomClipPosition + m_fMaskHeight);
         //scissorRect.origin.x, scissorRect.origin.y,
         //scissorRect.size.width, scissorRect.size.height);
 
@@ -1056,7 +1120,7 @@ void HelloWorld::ExecuteBonusWinGameEffect()
 
 void HelloWorld::ShowWinGamePopup()
 {
-	std::vector<const Word> subWordList;
+	std::vector<Word> subWordList;
 	for(int i=0; i < m_GameBoardManager.GetGameWordManager()->GetSubWordCount(); i++)
 	{
 		subWordList.push_back(m_GameBoardManager.GetGameWordManager()->GetSubWord(i));
@@ -1065,7 +1129,7 @@ void HelloWorld::ShowWinGamePopup()
 	EndGameNode* pEndGameNode = EndGameNode::createLayoutWin( m_GameBoardManager.GetCurrentScore(),
 		m_GameBoardManager.GetGameWordManager()->GetMainWord(), subWordList, m_GameBoardManager.GetCurrentLevel());
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStars());
-	m_pHUDLayer->addChild( pEndGameNode, 10);
+	m_pHUDLayer->addChild( pEndGameNode, 100);
 }
 
 /*void HelloWorld::UpdatePostionOfSprite(const int& iRow,const int& iColumn, bool bIsMirror)
@@ -1144,15 +1208,17 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 						bMeetSide = true;	
 
 					iTranslatedMirrorCell += iSign;					
-					if (iColumn + iTranslatedMirrorCell + iSign < 0)
+					if (iColumn + iTranslatedMirrorCell + m_iMovingCellListLength < 0)
 						iTranslatedMirrorCell += m_iMovingCellListLength;
 
-					if (m_MovingCellList[(iColumn + iTranslatedMirrorCell) % m_iMovingCellListLength].m_pSprite != NULL)
+					if (m_MovingCellList[(iColumn + iTranslatedMirrorCell + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite != NULL)
 						break;
 					else if (bMeetSide)
-					{
-						iTranslatedMirrorCell += iSign;
-						bMeetSide = false;
+					{												
+						//if (iSign < 0)
+							//iTranslatedMirrorCell += iSign;
+						if (m_MovingCellList[(iColumn + iTranslatedMirrorCell + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite == NULL)
+							bMeetSide = false;
 					}
 				}
 			}
@@ -1374,15 +1440,19 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 						bMeetSide = true;	
 
 					iTranslatedMirrorCell += iSign;
-					if (iRow + iTranslatedMirrorCell + iSign < 0)
+					if (iRow + iTranslatedMirrorCell + m_iMovingCellListLength < 0)
 						iTranslatedMirrorCell += m_iMovingCellListLength;
 
-					if (m_MovingCellList[(iRow + iTranslatedMirrorCell) % m_iMovingCellListLength].m_pSprite != NULL)						
+					if (m_MovingCellList[(iRow + iTranslatedMirrorCell + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite != NULL)						
 						break;
 					else if (bMeetSide)
 					{
-						iTranslatedMirrorCell += iSign;						
-						bMeetSide = false;
+						//if (iSign < 0)
+							//iTranslatedMirrorCell += iSign;						
+						//if (iSign > 0)
+							//bMeetSide = false;
+						if (m_MovingCellList[(iRow + iTranslatedMirrorCell + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite == NULL)
+							bMeetSide = false;
 					}
 				}
 			}
@@ -1887,7 +1957,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 						NULL));			
 				
 				//
-				Sprite* pLetterSprite = AddLetterToGem( cell);
+				Sprite* pLetterSprite = GenerateAndAddLetterToComboGem( cell);
 				if (pLetterSprite != NULL)
 				{
 					pLetterSprite->setOpacity(0);
@@ -1940,7 +2010,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 	//CCLOG("Create new gems");
 
-	std::vector<unsigned char> outputLettersForGems;
+	//std::vector<unsigned char> outputLettersForGems;
 	Cell cell;
 	//unsigned char iLetter;
 	//m_GameBoardManager.GetGameWordManager()->GenerateNewLetters( newCells.size(), outputLettersForGems, bIsNewMove);	
@@ -2215,48 +2285,12 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 	m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = NULL;
 }
 
-Sprite* HelloWorld::AddLetterToGem(const ComboEffectCell& cell)
+Sprite* HelloWorld::GenerateAndAddLetterToComboGem(const ComboEffectCell& cell)
 {
 	unsigned char iLetter;
 	if (m_GameBoardManager.GetGameWordManager()->GenerateNewLetter( iLetter, cell.m_eGemComboType))	
-	{			
-		CCLOG("%d, %c:", iLetter, (unsigned char)iLetter);
-		Sprite* pCharacterSprite = Sprite::createWithSpriteFrameName(
-			m_pWordCollectBoardRenderNode->GetImageInGemFileFromLetter(iLetter).c_str());
-				
-		//pCharacterSprite->setScale(0.75f);
-		//pCharacterSprite->setAnchorPoint(ccp(0,0));
-		//pCharacterSprite->setPosition(ccp( 25.f, 25.f));
-		pCharacterSprite->setPosition(ccp( 42.f, 42.f));
-
-		switch(cell.m_iGemID)
-		{
-			case 0: //Orange
-				pCharacterSprite->setColor(ccc3(252, 234, 160));
-				break;
-			case 1: //red
-				pCharacterSprite->setColor(ccc3(242, 209, 163));
-				break;
-			case 2: //pink
-				pCharacterSprite->setColor(ccc3(242, 217, 179));
-				break;
-			case 3: //white
-				pCharacterSprite->setColor(ccc3(148, 135, 102));
-				break;
-			case 4: //blue
-				pCharacterSprite->setColor(ccc3(17, 215, 250));
-				break;
-			case 5: //green
-				pCharacterSprite->setColor(ccc3(184, 212, 6));
-				break;
-		}
-
-
-		m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pCharacterSprite);
-
-		m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iLetter = iLetter;
-
-		return pCharacterSprite;
+	{	
+		return AddLetterToGem(cell, cell.m_iGemID, iLetter);		
 	}
 	else
 	{
@@ -2264,6 +2298,43 @@ Sprite* HelloWorld::AddLetterToGem(const ComboEffectCell& cell)
 
 		return NULL;
 	}
+}
+
+Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter)
+{
+	Sprite* pCharacterSprite = Sprite::createWithSpriteFrameName(
+			m_pWordCollectBoardRenderNode->GetImageInGemFileFromLetter(iLetter).c_str());
+					
+	pCharacterSprite->setPosition(ccp( 42.f, 42.f));
+
+	switch(iGemID)
+	{
+		case 0: //Orange
+			pCharacterSprite->setColor(ccc3(252, 234, 160));
+			break;
+		case 1: //red
+			pCharacterSprite->setColor(ccc3(242, 209, 163));
+			break;
+		case 2: //pink
+			pCharacterSprite->setColor(ccc3(242, 217, 179));
+			break;
+		case 3: //white
+			pCharacterSprite->setColor(ccc3(148, 135, 102));
+			break;
+		case 4: //blue
+			pCharacterSprite->setColor(ccc3(17, 215, 250));
+			break;
+		case 5: //green
+			pCharacterSprite->setColor(ccc3(184, 212, 6));
+			break;
+	}
+
+
+	m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pCharacterSprite);
+
+	m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iLetter = iLetter;
+
+	return pCharacterSprite;
 }
 
 /*void HelloWorld::PlayBonusEndEffect( std::vector<ComboEffectCell>& convertedToComboCells,
@@ -2974,7 +3045,7 @@ void HelloWorld::EndUnlockLetterAnimation()
 
 			EndGameNode* pEndGameNode = EndGameNode::createLayoutLose( m_GameBoardManager.GetCurrentScore(), 
 				m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
-			m_pHUDLayer->addChild( pEndGameNode, 10);
+			m_pHUDLayer->addChild( pEndGameNode, 100);
 
 			SoundManager::PlaySoundEffect(_SET_LOSE);
 		}

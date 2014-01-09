@@ -1,26 +1,60 @@
 #include "GameBoardManager.h"
 #include "cocos2d.h"
 
-GameBoardManager::GameBoardManager()
+GameBoardManager::GameBoardManager(): m_GameConfig(GameConfigManager::getInstance()->GetGameConfig())
 {
+
 	m_ComboCountList[0] = m_ComboCountList[1] = m_ComboCountList[2] = 0;
 }
 
-void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int iLevel)
-{
+void GameBoardManager::GenerateGameBoard(int iLevel)
+{	
+	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(iLevel);
+
 	// Load game config
-	LoadGameConfig();
+	//LoadGameConfig();
 
 	// Load basic combo list
 	LoadBasicComboPatternList();
 
 	//
 
-	m_iRowNumber = iRowNumber;
-	m_iColumnNumber = iColumnNumber;
+	m_iRowNumber = m_pLevelConfig->m_iRowNumber;
+	m_iColumnNumber = m_pLevelConfig->m_iColumnNumber;
 
 	srand(time(NULL));
 
+	// board config now is loaded from file
+	int iRow, iColumn;
+	for(iRow = 0; iRow < m_iRowNumber; iRow++)
+		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+		{
+			if (m_pLevelConfig->m_BoardMatrix[iRow][iColumn] == 0)
+			{
+				m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
+				m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
+
+				continue;
+			}
+			
+			m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = false;
+
+			m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % m_pLevelConfig->m_iNumberOfColor;			
+			
+			while ( (iRow>1 && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow-1][iColumn].m_iGemID && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow-2][iColumn].m_iGemID) ||
+					(iColumn >1 && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow][iColumn-1].m_iGemID && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow][iColumn-2].m_iGemID))
+			{
+				m_BoardValueMatrix[iRow][iColumn].m_iGemID = (m_BoardValueMatrix[iRow][iColumn].m_iGemID + 1) % m_pLevelConfig->m_iNumberOfColor;
+			}
+		}
+
+	// generate obstacles
+	for(auto pObstacle : m_pLevelConfig->m_ObstacleConfigList)
+	{
+		for(int i=0; i< pObstacle->m_iCount; i++)			
+			m_BoardValueMatrix[pObstacle->m_ObstaclePositionList[i].m_iRow][pObstacle->m_ObstaclePositionList[i].m_iColumn].m_eObstacleType = (ObstacleType_e)pObstacle->m_iObstacleID;
+	}
+	/*
 	// test obstacle
 	if (iLevel == 2)
 	{
@@ -28,15 +62,15 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 	}
 
 	int iRow, iColumn;
-	for(iRow = 0; iRow < iRowNumber; iRow++)
-		for(iColumn = 0; iColumn < iColumnNumber; iColumn++)
+	for(iRow = 0; iRow < m_iRowNumber; iRow++)
+		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
 		{
 			if (iLevel == 2)
 			{
 			}
 			else if (iLevel == 3)
 			{
-				if ( iColumn >=3 && iColumn<=4 && (iRow <=1 || iRow>=iRowNumber-2) )
+				if ( iColumn >=3 && iColumn<=4 && (iRow <=1 || iRow>=m_iRowNumber-2) )
 				{
 					m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
 					m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
@@ -45,7 +79,7 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 			}
 			else if (iLevel == 4)
 			{
-				if (( iRow<=1 &&  (iColumn<=1 || iColumn>= iColumnNumber-2)) || (iRow>=iRowNumber-2 &&  (iColumn <=1 || iColumn>= iColumnNumber-2)))
+				if (( iRow<=1 &&  (iColumn<=1 || iColumn >= m_iColumnNumber-2)) || (iRow >= m_iRowNumber-2 &&  (iColumn <=1 || iColumn>= m_iColumnNumber-2)))
 				{
 					m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
 					m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
@@ -76,7 +110,7 @@ void GameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int 
 			{
 				m_BoardValueMatrix[iRow][iColumn].m_iGemID = (m_BoardValueMatrix[iRow][iColumn].m_iGemID + 1) % _MAX_GEM_ID_;
 			}
-		}
+		}*/
 }
 /*
 bool GameBoardManager::DoAMove(int iSelectedRow, int iSelectedColumn,int iDeltaRow, int iDeltaColumn, std::vector<Cell>& destroyCells,
@@ -645,7 +679,7 @@ bool GameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn,
 			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
 				if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
 				{
-					m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % _MAX_GEM_ID_;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % m_pLevelConfig->m_iNumberOfColor;
 					newCells.push_back(Cell(iRow, iColumn));
 				}
 	}	
@@ -653,7 +687,7 @@ bool GameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn,
 	return (m_iLinkedBlockCount > 0);	
 }
 
-void GameBoardManager::LoadGameConfig()
+/*void GameBoardManager::LoadGameConfig()
 {
 	unsigned long iDataSize;
 	unsigned char* orginalData = cocos2d::CCFileUtils::sharedFileUtils()->getFileData("GameConfig.txt", "r", &iDataSize);
@@ -697,7 +731,11 @@ void GameBoardManager::LoadGameConfig()
 	std::getline( inputStream, sComment);
 	std::getline( inputStream, sComment);
 	inputStream >> m_GameConfig.m_iSubWordScoreRatio;	
+
+	delete[] data;
+	delete[] orginalData;
 }
+*/
 
 void GameBoardManager::LoadBasicComboPatternList()
 {
@@ -732,6 +770,9 @@ void GameBoardManager::LoadBasicComboPatternList()
 
 		m_iBasicComboPatternCount += iCount;
 	}
+
+	delete[] data;
+	delete[] orginalData;
 }
 
 void GameBoardManager::CountBasicCombo()

@@ -3,6 +3,7 @@
 #include "LevelMapScene.h"
 #include "GameWordManager.h"
 #include "WorldMapScene.h"
+#include "GameConfigManager.h"
 
 USING_NS_CC;
 
@@ -13,6 +14,7 @@ AppDelegate::AppDelegate() {
 AppDelegate::~AppDelegate() 
 {
 	GameWordManager::getInstance()->releaseInstance();
+	GameConfigManager::releaseInstance();
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
@@ -33,6 +35,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	// load word list
 	GameWordManager::getInstance()->LoadWords();
 	GameWordManager::getInstance()->LoadWordGenerateConfig();
+
+	// load level config
+	GameConfigManager::getInstance()->LoadGameConfig();
+	GameConfigManager::getInstance()->LoadLevelsConfig();
 
     // create a scene. it's an autorelease object
 	auto scene =  WorldMapScene::create(); //MainMenuScene::create(); //HelloWorld::createScene();		

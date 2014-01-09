@@ -3,20 +3,20 @@
 
 NewGameBoardManager::NewGameBoardManager() : GameBoardManager()
 {
-	m_iCurrentScore = 0;	
-	m_iCurrentMove = 50;
+	m_iCurrentScore = 0;		
 }
 
-void NewGameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, int iLevel)
+void NewGameBoardManager::GenerateGameBoard(int iLevel)
 {
 	m_iCurrentLevel = iLevel;
-	GameBoardManager::GenerateGameBoard(iRowNumber, iColumnNumber, iLevel);
+	GameBoardManager::GenerateGameBoard(iLevel);
 	
-	m_pGameWordManager = GameWordManager::getInstance();
+	m_pGameWordManager = GameWordManager::getInstance();	
+	m_iCurrentMove = m_pLevelConfig->m_iNumberOfMove;
 	//m_pGameWordManager->GenerateWordForNewLevel(); //already called by main menu
 
-	// compute score/star for this level
-	m_LevelConfig.m_ScoreOfStars[0] = GetBonusScoreForUnlockMainWord(true);
+	// compute score/star for this level ==> score of stars now loaded from config file
+	/*m_LevelConfig.m_ScoreOfStars[0] = GetBonusScoreForUnlockMainWord(true);
 	int iTotalSubWordScore = 0;
 
 	// NOTE: temporary hardcode
@@ -29,7 +29,7 @@ void NewGameBoardManager::GenerateGameBoard(int iRowNumber, int iColumnNumber, i
 		iTotalSubWordScore = m_LevelConfig.m_ScoreOfStars[0]/1.5f;
 
 	m_LevelConfig.m_ScoreOfStars[1] = m_LevelConfig.m_ScoreOfStars[0] + iTotalSubWordScore /2;
-	m_LevelConfig.m_ScoreOfStars[2] = m_LevelConfig.m_ScoreOfStars[0] + iTotalSubWordScore;
+	m_LevelConfig.m_ScoreOfStars[2] = m_LevelConfig.m_ScoreOfStars[0] + iTotalSubWordScore;*/
 }
 
 bool NewGameBoardManager::IsRowLocked(const int& iRow)
@@ -1164,7 +1164,7 @@ void NewGameBoardManager::CalculateMoveCells(std::vector<Cell>& originalMovedCel
 		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
 			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
 			{
-				m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % _MAX_GEM_ID_;
+				m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % m_pLevelConfig->m_iNumberOfColor;
 				newCells.push_back(Cell(iRow, iColumn));
 			}
 
@@ -1248,11 +1248,11 @@ int NewGameBoardManager::IncreaseScoreForDestroyCells(const int& iGemCount, cons
 
 int NewGameBoardManager::GetEarnedStars()
 {
-	if (m_iCurrentScore >= m_LevelConfig.m_ScoreOfStars[2])
+	if (m_iCurrentScore >= m_pLevelConfig->m_ScoreOfStars[2])
 		return 3;
-	else if (m_iCurrentScore >= m_LevelConfig.m_ScoreOfStars[1])
+	else if (m_iCurrentScore >= m_pLevelConfig->m_ScoreOfStars[1])
 		return 2;
-	else  if (m_iCurrentScore >= m_LevelConfig.m_ScoreOfStars[0])
+	else  if (m_iCurrentScore >= m_pLevelConfig->m_ScoreOfStars[0])
 		return 1;
 	else
 		return 0;
