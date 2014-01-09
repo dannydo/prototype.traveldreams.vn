@@ -81,12 +81,6 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f));
 	this->addChild(pBackgroundWin);
 
-	std::string sPath = "FlashCard/";
-	sPath.append(pMainWord.m_sFlashCardImage);
-	Sprite* pFlashCard = Sprite::create(sPath.c_str());
-	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 31));
-	this->addChild(pFlashCard, 10);
-
 	m_pStarNode = this->generateLayoutStar();
 	m_pStarNode->setPosition(Point(228, 755));
 	this->addChild(m_pStarNode);
@@ -99,6 +93,12 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 	Sprite* pBackgroundTargetCard = Sprite::create("Target-End-Game/Win_Card.png");
 	pBackgroundTargetCard->setPosition(Point(320, 535));
 	this->addChild(pBackgroundTargetCard);
+
+	std::string sPath = "FlashCard/";
+	sPath.append(pMainWord.m_sFlashCardImage);
+	Sprite* pFlashCard = Sprite::create(sPath.c_str());
+	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 31));
+	this->addChild(pFlashCard, 10);
 
 	Label* pLabelMainWord = Label::createWithTTF(pMainWord.m_sWord, "fonts/ARLRDBD.ttf", 32);
 	pLabelMainWord->setColor(ccc3(0, 0, 0));
@@ -289,8 +289,9 @@ void EndGameNode::menuNextLevelCallBack()
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
 	pGameWordManager->GenerateWordForNewLevel(m_iCurrentLevel+1);
 
-	CCScene *pGameScene = HelloWorld::createScene(m_iCurrentLevel+1);
-	CCDirector::getInstance()->replaceScene(pGameScene);
+	LevelMapScene* pLevelMap = LevelMapScene::create();
+	pLevelMap->getLayer()->showPopupTargetGame(m_iCurrentLevel+1);
+	CCDirector::getInstance()->replaceScene(pLevelMap);
 }
 
 void EndGameNode::menuRetryLevelCallBack()

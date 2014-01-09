@@ -16,6 +16,7 @@ public:
 	void menuLevelSelected(Object* pSender);
 	void menuBackToWorldMap();
 	void menuOpenFlashCardCallBack();
+	void showPopupTargetGame(const int& iLevel);
 };
 
 class LevelMapScene : public cocos2d::CCScene

@@ -12,7 +12,7 @@ bool LevelMapScene::init()
 {
 	if(CCScene::init())
 	{
-		this->_layer =LevelMapLayer::create();
+		this->_layer = LevelMapLayer::create();
 		this->_layer->retain();
 		this->addChild(_layer);
 		return true;
@@ -140,4 +140,13 @@ void LevelMapLayer::menuOpenFlashCardCallBack()
 	FlashCardScene* pFlashCard = FlashCardScene::create();
 	pFlashCard->getLayer()->setNameClassParent("WorldMapScene");
 	Director::getInstance()->replaceScene(pFlashCard);
+}
+
+void LevelMapLayer::showPopupTargetGame(const int& iLevel)
+{
+	GameWordManager* pGameWordManager = GameWordManager::getInstance();
+	pGameWordManager->GenerateWordForNewLevel(iLevel);
+
+	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel);
+	this->addChild(pGameTargetNode, 10);
 }
