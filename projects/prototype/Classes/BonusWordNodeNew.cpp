@@ -171,7 +171,7 @@ float BonusWordNodeNew::calculatorDelayTime()
 			if (isFinish)
 			{
 				m_CompletedUnlockBonusWprds[iIndexWord] = 1;
-				fDelay += 3.4f + word.m_fSoundLength;
+				fDelay += 2.4f + word.m_fSoundLength;
 			}
 		}
 	}
@@ -329,7 +329,7 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 			}
 
 			auto actionEffect = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::playEffectFinishCollectWord));
-			auto delayEffect = DelayTime::create(3.4f +  word.m_fSoundLength);
+			auto delayEffect = DelayTime::create(2.4f +  word.m_fSoundLength);
 			this->runAction(Sequence::create(delay->clone(), actionEffect, delayEffect->clone(), actionLoopUpdate, NULL));
 		}
 		else
@@ -398,7 +398,7 @@ void BonusWordNodeNew::playEffectFinishCollectWord()
 	auto actionRemove = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::removeLabelFinishColectWord));
 	auto actionFadeOut = FadeOut::create(1.0f);
 	auto actionMove = MoveTo::create(1.0f, Point(320-this->getPositionX(), -300));
-	m_pLabelEffectFinish->runAction(Sequence::create(actionSacle, DelayTime::create(1.0f)->clone(), actionFadeOut, actionRemove, NULL));
+	m_pLabelEffectFinish->runAction(Sequence::create(actionSacle, DelayTime::create(word.m_fSoundLength)->clone(), actionFadeOut, actionRemove, NULL));
 	m_pLabelEffectFinish->runAction(actionMove);
 
 	Sprite* pMark = (Sprite*)m_pMarks->getObjectAtIndex(m_iCountWord);
