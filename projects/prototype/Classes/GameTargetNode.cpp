@@ -36,7 +36,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	this->setContentSize(pBackground->getContentSize());
 
 	m_pBackgroundBoard = Sprite::create("Target-End-Game/Target_Board.png");
-	m_pBackgroundBoard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f));
+	m_pBackgroundBoard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 50));
 	this->addChild(m_pBackgroundBoard);
 
 	//Sprite* pTargetCard = Sprite::create("Target-End-Game/Target_Card.png");
@@ -53,13 +53,9 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 31));
 	this->addChild(pFlashCard, 10);
 
-	char sLevel[5];
-	Label* pLabelLevel = Label::createWithTTF(itoa(m_iCurrentLevel, sLevel, 10), "fonts/ARLRDBD.ttf", 52);
-	pLabelLevel->setColor(ccc3(219, 160, 74));
-	pLabelLevel->setAnchorPoint(Point(0.0f, 0.0f));
-	pLabelLevel->setPosition(Point(350, 745));
-	pLabelLevel->setRotationX(15);
-	this->addChild(pLabelLevel);
+	Node* pLevelNode = this->generateLayoutLevel(m_iCurrentLevel);
+	pLevelNode->setPosition(Point(365, 840));
+	this->addChild(pLevelNode);
 
 	Label* pLabelMainWord = Label::createWithTTF("???", "fonts/ARLRDBD.ttf", 32);
 	pLabelMainWord->setColor(ccc3(0, 0, 0));
@@ -125,4 +121,44 @@ void GameTargetNode::onTouchBackground(cocos2d::Touch* pTouch,  cocos2d::Event* 
 
 	this->getParent()->removeChild(this);
 	pEvent->stopPropagation();
+}
+
+Node* GameTargetNode::generateLayoutLevel(int iLevel)
+{
+	std::vector<int> arrNumber = this->generateArrayNumber(iLevel);
+	int width = 0;
+	int height;
+	Node* pNode = Node::create();
+	int iTotal = arrNumber.size();
+	
+	while(!arrNumber.empty())
+	{
+		char sFileName[50];
+		sprintf(sFileName, "Target-End-Game/NumScore/NumScore_%d.png", arrNumber.back());
+		Sprite* sprite = Sprite::create(sFileName);
+
+		height = sprite->getContentSize().height;
+		sprite->setPosition(Point(width, height/2.0f));
+		width = width + sprite->getContentSize().width - 15;
+		pNode->addChild(sprite);
+		arrNumber.pop_back();
+	}
+	pNode->setContentSize(CCSizeMake(width - 18, height));
+	pNode->setAnchorPoint(Point(0.0f, 0.5f));
+	pNode->setScale(1.3f);
+
+	return pNode;
+}
+
+std::vector<int> GameTargetNode::generateArrayNumber(int iNumber)
+{
+	int iTemp = iNumber;
+	std::vector<int> arrNumber;
+	while(iTemp >= 1)
+	{
+		arrNumber.push_back(iTemp%10);
+		iTemp = iTemp/10.0f;
+	}
+
+	return arrNumber;
 }

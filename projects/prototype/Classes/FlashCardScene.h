@@ -20,11 +20,15 @@ private:
 
 	void createNodeSlideShow();
 	void menuBackCallBack();
+	void showSlideShowFlashCard();
+	void menuCloseSlideShowFlashCardCallBack();
 
 	cocos2d::Node* m_pFlashCardDisplay;
 	cocos2d::Node* m_pSlideShow;
+	cocos2d::Sprite* m_pFlashCardCollection;
 
 	bool m_bRunningEffect;
+	bool m_bShowSlideShow;
 
 	float m_fXMoved;
 	float m_fBeginX;
@@ -33,16 +37,6 @@ private:
 	int m_iIndexFlashCard;
 
 	const char* m_sNameClassParent;
-	
-
-	/*
-	cocos2d::Sprite* m_pBackground;
-	cocos2d::Sprite* m_pFlashCard;
-	cocos2d::LabelTTF* m_pTitleWord;
-	cocos2d::LabelTTF* m_pMeaningWord;
-
-	Word m_word;
-	*/
 };
 
 class FlashCardScene : public cocos2d::CCScene
