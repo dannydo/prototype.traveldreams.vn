@@ -45,12 +45,17 @@ bool FlashCardLayer::init()
 	m_iTotalFlashCard = 4;
 	m_iIndexFlashCard = 1;
 	m_bRunningEffect = false;
+	m_bShowSlideShow = false;
+
+	m_pFlashCardCollection = Sprite::create("FlashCard/flashcards-collection.jpg");
+	m_pFlashCardCollection->setAnchorPoint(Point(0.5f, 1.0f));
+	m_pFlashCardCollection->setPosition(Point(winSize.width/2.0f, winSize.height));
+	this->addChild(m_pFlashCardCollection);
 
 	m_pFlashCardDisplay = Node::create();
 	this->addChild(m_pFlashCardDisplay);
 
 	m_pSlideShow = Node::create();
-	this->createNodeSlideShow();
 	this->addChild(m_pSlideShow);
 
 	Sprite* pBarBottom = Sprite::create("FlashCard/bar-bottom.jpg");
@@ -64,43 +69,25 @@ bool FlashCardLayer::init()
 		CC_CALLBACK_0(FlashCardLayer::menuBackCallBack, this));
 	pBackItem->setPosition(ccp(56, 49));
 
-	CCMenu* pMenu = CCMenu::create(pBackItem, NULL);
+	CCMenuItemImage* pFlashCard = CCMenuItemImage::create(
+	"World-Map/mask-button-flash-card.png",
+	"World-Map/mask-button-flash-card.png",
+	CC_CALLBACK_0(FlashCardLayer::menuCloseSlideShowFlashCardCallBack, this));
+	pFlashCard->setPosition(ccp(365, 52));
+
+	CCMenuItemImage* pCollectionSchool = CCMenuItemImage::create(
+	"FlashCard/mask.png",
+	"FlashCard/mask.png",
+	CC_CALLBACK_0(FlashCardLayer::showSlideShowFlashCard, this));
+	pCollectionSchool->setPosition(ccp(188, 775));
+
+	CCMenu* pMenu = CCMenu::create(pBackItem, pFlashCard, pCollectionSchool, NULL);
 	pMenu->setPosition(CCPointZero);
 	this->addChild(pMenu);
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
-
-	/*
-	m_pBackground = Sprite::create("FlashCard/background.png");
-	m_pBackground->setOpacity(0);
-	this->addChild(m_pBackground);
-
-	std::string sPath = "FlashCard/";
-	sPath.append(m_word.m_sFlashCardImage);
-	m_pFlashCard = Sprite::create(sPath.c_str());
-	m_pFlashCard->setPosition(Point(96.0f, 3.0f));
-	m_pFlashCard->setOpacity(0);
-	this->addChild(m_pFlashCard);
-
-	Node* pWord = Node::create();
-	m_pTitleWord = LabelTTF::create(m_word.m_sWord, "Arial", 25);
-	m_pTitleWord->setColor(ccc3(13, 118, 200));
-	m_pTitleWord->setPositionY(10);
-	m_pTitleWord->setOpacity(0);
-	pWord->addChild(m_pTitleWord);
-
-	m_pMeaningWord = LabelTTF::create(m_word.m_sMeaning.c_str(), "Arial", 18);
-	m_pMeaningWord->setColor(ccc3(102, 102, 102));
-	m_pMeaningWord->setPositionY(-30);
-	m_pMeaningWord->setOpacity(0);
-	pWord->addChild(m_pMeaningWord);
-
-	pWord->setContentSize(CCSizeMake(106.0f, 180.0f));
-	pWord->setPosition(-108.0f, 3.0f);
-	this->addChild(pWord);
-	*/
-
+   
 	return true;
 }
 
@@ -125,15 +112,19 @@ void FlashCardLayer::menuBackCallBack()
 
 bool FlashCardLayer::onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)
 {
-	m_fXMoved = 0;
-	Point touchPosition = pTouch->getLocation();
-	m_fBeginX = touchPosition.x;
+	if (m_bShowSlideShow == true)
+	{
+		m_fXMoved = 0;
+		Point touchPosition = pTouch->getLocation();
+		m_fBeginX = touchPosition.x;
+	}
+
 	return true;
 }
 
 void FlashCardLayer::onTouchMoved(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)
 {
-	if (m_bRunningEffect == false)
+	if (m_bRunningEffect == false && m_bShowSlideShow == true)
 	{
 		Point touchPosition = pTouch->getLocation();
 		m_fXMoved += touchPosition.x - m_fBeginX;
@@ -154,7 +145,7 @@ void FlashCardLayer::onTouchMoved(cocos2d::Touch* pTouch, cocos2d::Event* pEvent
 
 void FlashCardLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)
 {
-	if (m_bRunningEffect == false)
+	if (m_bRunningEffect == false && m_bShowSlideShow == true)
 	{
 		if ((m_fXMoved > 0 && m_iIndexFlashCard == 1) || (m_fXMoved < 0 && m_iIndexFlashCard == m_iTotalFlashCard))
 		{
@@ -251,4 +242,23 @@ void FlashCardLayer::createNodeSlideShow()
 	m_pSlideShow->setVisible(false);
 	m_pFlashCardDisplay->setVisible(true);
 	m_bRunningEffect = false;
+}
+
+void FlashCardLayer::showSlideShowFlashCard()
+{
+	if (m_bShowSlideShow == false)
+	{
+		m_pFlashCardCollection->setVisible(false);
+		m_bShowSlideShow = true;
+		m_iIndexFlashCard = 1;
+		this->createNodeSlideShow();
+	}
+}
+
+void FlashCardLayer::menuCloseSlideShowFlashCardCallBack()
+{
+	m_pFlashCardCollection->setVisible(true);
+	m_pSlideShow->setVisible(false);
+	m_pFlashCardDisplay->setVisible(false);
+	m_bShowSlideShow = false;
 }

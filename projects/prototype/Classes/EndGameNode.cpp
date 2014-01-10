@@ -7,10 +7,10 @@ USING_NS_CC;
 
 EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& pMainWord, const int& iCurrentLevel)
 {
-	EndGameNode* pEndGameNode = new EndGameNode();
+	EndGameNode* pEndGameNode = new EndGameNode();	  
+	pEndGameNode->m_iCurrentLevel = iCurrentLevel;
 	if(pEndGameNode->initLose(iScore, pMainWord))
 	{
-		pEndGameNode->m_iCurrentLevel = iCurrentLevel;
 		pEndGameNode->autorelease();
 		return pEndGameNode;
 	}
@@ -21,10 +21,10 @@ EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& pMainW
 
 EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& pMainWord, const std::vector<Word>& pSubWord, const int& iCurrentLevel)
 {
-	EndGameNode* pEndGameNode = new EndGameNode();
+	EndGameNode* pEndGameNode = new EndGameNode();	  
+	pEndGameNode->m_iCurrentLevel = iCurrentLevel;
 	if(pEndGameNode->initWin(iScore, pMainWord, pSubWord))
 	{			
-		pEndGameNode->m_iCurrentLevel = iCurrentLevel;
 		pEndGameNode->autorelease();
 		return pEndGameNode;
 	}
@@ -41,8 +41,12 @@ bool EndGameNode::initLose(const int& iScore, const Word& pMainWord)
 	}
 
 	Sprite* pBackgroundFail = Sprite::create("Target-End-Game/Fail_Board.png");
-	pBackgroundFail->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f));
+	pBackgroundFail->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 50));
 	this->addChild(pBackgroundFail);
+
+	Node* pLevelNode = this->generateLayoutLevel(m_iCurrentLevel);
+	pLevelNode->setPosition(Point(365, 840));
+	this->addChild(pLevelNode);
 
 	Sprite* pBackgroundTargetCard = Sprite::create("Target-End-Game/Fail_Card.png");
 	pBackgroundTargetCard->setPosition(Point(320, 535));
@@ -78,11 +82,15 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 	this->addChild(pBackgroundShine);
 
 	Sprite* pBackgroundWin = Sprite::create("Target-End-Game/Win_Board.png");
-	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f));
+	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 50));
 	this->addChild(pBackgroundWin);
 
+	Node* pLevelNode = this->generateLayoutLevel(m_iCurrentLevel);
+	pLevelNode->setPosition(Point(365, 840));
+	this->addChild(pLevelNode);
+
 	m_pStarNode = this->generateLayoutStar();
-	m_pStarNode->setPosition(Point(228, 755));
+	m_pStarNode->setPosition(Point(228, 715));
 	this->addChild(m_pStarNode);
 
 	Node* pScoreNode = this->generateLayoutScore(iScore);
@@ -280,6 +288,33 @@ Node* EndGameNode::generateLayoutSubWord(const std::vector<Word>& subWords)
 
 	pNode->setContentSize(CCSizeMake(iWidth-60, 20));
 	pNode->setAnchorPoint(Point(0.5f, 0.5f));
+
+	return pNode;
+}
+
+Node* EndGameNode::generateLayoutLevel(int iLevel)
+{
+	std::vector<int> arrNumber = this->generateArrayNumber(iLevel);
+	int width = 0;
+	int height;
+	Node* pNode = Node::create();
+	int iTotal = arrNumber.size();
+	
+	while(!arrNumber.empty())
+	{
+		char sFileName[50];
+		sprintf(sFileName, "Target-End-Game/NumScore/NumScore_%d.png", arrNumber.back());
+		Sprite* sprite = Sprite::create(sFileName);
+
+		height = sprite->getContentSize().height;
+		sprite->setPosition(Point(width, height/2.0f));
+		width = width + sprite->getContentSize().width - 15;
+		pNode->addChild(sprite);
+		arrNumber.pop_back();
+	}
+	pNode->setContentSize(CCSizeMake(width - 18, height));
+	pNode->setAnchorPoint(Point(0.0f, 0.5f));
+	pNode->setScale(1.3f);
 
 	return pNode;
 }

@@ -25,7 +25,9 @@ private:
 	std::vector<int> generateArrayNumber(int iNumber);
 	cocos2d::Node* generateLayoutScore(int iScore);
 	cocos2d::Node* generateLayoutStar();
+
 	cocos2d::Node* generateLayoutSubWord(const std::vector<Word>& subWord);
+	cocos2d::Node* generateLayoutLevel(int iLevel);
 
 	void loopUpdateStar();
 	void sequenceUpdateStar();

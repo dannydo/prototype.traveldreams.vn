@@ -15,6 +15,8 @@ private:
 	void menuCloseCallBack();
 	void menuOpenDictCallBack();
 	void onTouchBackground(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
+	std::vector<int> generateArrayNumber(int iNumber);
+	cocos2d::Node* generateLayoutLevel(int iLevel);
 
 	int m_iCurrentLevel;
 

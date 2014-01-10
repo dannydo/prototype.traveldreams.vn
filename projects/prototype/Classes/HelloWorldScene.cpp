@@ -289,6 +289,8 @@ void HelloWorld::initLevel(int iLevel)
     animCache->addAnimationsWithFile("ComboEffect/combo4Animations.plist");
 	animCache->addAnimationsWithFile("ComboEffect/combo5Animations.plist");
 
+	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/AnimationDetach/Animation detach.ExportJson");
+
 	// get symbol size
 	CCSprite* pSprite;
 	pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(0).c_str());
@@ -2333,6 +2335,18 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 	m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pCharacterSprite);
 
 	m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iLetter = iLetter;
+
+	// add effect create character
+	/*auto pEffect = Armature::create("Animation detach");
+	pEffect->setBlendFunc(BlendFunc::ALPHA_NON_PREMULTIPLIED);	
+	pEffect->getAnimation()->playByIndex(0);
+	pEffect->setPosition(m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->getPosition());
+
+	m_pHUDLayer->addChild(pEffect, 2);
+	pEffect->runAction(
+		Sequence::createWithTwoActions(
+			DelayTime::create(pEffect->getAnimation()->getRawDuration() + 0.2f),
+			RemoveSelf::create()));*/
 
 	return pCharacterSprite;
 }
