@@ -431,20 +431,20 @@ void WordCollectBoardRenderNode::PlaySpellingSound()
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
 		//m_pMainWord->m_sSoundFile.c_str());
 
-	this->runAction(
+	/*this->runAction(
 		Sequence::create( 
 			DelayTime::create(3.5f),
 			CallFunc::create(this, callfunc_selector(WordCollectBoardRenderNode::PlayVietnameseSpelling)),
-			NULL));
+			NULL));*/
 
 }
 
 
-void WordCollectBoardRenderNode::PlayVietnameseSpelling()
+/*void WordCollectBoardRenderNode::PlayVietnameseSpelling()
 {
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(
 		m_pMainWord->m_sSoundVietnameseFile.c_str());
-}
+}*/
 
 void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position)
 {

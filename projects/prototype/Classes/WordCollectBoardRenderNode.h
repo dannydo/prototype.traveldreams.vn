@@ -46,7 +46,7 @@ private:
 
 	virtual bool init();		
 
-	void PlayVietnameseSpelling();	
+	//void PlayVietnameseSpelling();	
 private:	
 	//std::vector<CCLabelTTF*> m_LabelList;	
 	/*int m_iWordCount;	

@@ -21,6 +21,7 @@ Scene* HelloWorld::createScene(int iLevel)
 
     // 'layer' is an autorelease object
     auto boardLayer = HelloWorld::create();	
+	boardLayer->m_pHUDLayer = Layer::create();
 
     // add layer as a child to scene
     scene->addChild(boardLayer);
@@ -41,8 +42,7 @@ Scene* HelloWorld::createScene(int iLevel)
 	boardLayer->initLevel(iLevel);
 
 
-	// menu layer with close item
-	boardLayer->m_pHUDLayer = Layer::create();
+	// menu layer with close item	
 	auto closeItem = MenuItemImage::create(
                                            "Setting.png", //"CloseNormal.png",
                                            "Setting.png",//"CloseSelected.png",
@@ -356,7 +356,7 @@ void HelloWorld::initLevel(int iLevel)
 		for(int i=0; i< mainWord.m_iWordLength; i++)
 		{
 			AddLetterToGem( levelConfig.m_MainWordLetterPosition[i], m_GameBoardManager.GetCellValue( levelConfig.m_MainWordLetterPosition[i].m_iRow,
-				levelConfig.m_MainWordLetterPosition[i].m_iColumn), mainWord.m_sWord[i]);
+				levelConfig.m_MainWordLetterPosition[i].m_iColumn), mainWord.m_sWord[i], 0.f);
 		}
 	}
 
@@ -1959,7 +1959,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 						NULL));			
 				
 				//
-				Sprite* pLetterSprite = GenerateAndAddLetterToComboGem( cell);
+				Sprite* pLetterSprite = GenerateAndAddLetterToComboGem( cell, fDelayTime);
 				if (pLetterSprite != NULL)
 				{
 					pLetterSprite->setOpacity(0);
@@ -2287,12 +2287,12 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 	m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = NULL;
 }
 
-Sprite* HelloWorld::GenerateAndAddLetterToComboGem(const ComboEffectCell& cell)
+Sprite* HelloWorld::GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime)
 {
 	unsigned char iLetter;
 	if (m_GameBoardManager.GetGameWordManager()->GenerateNewLetter( iLetter, cell.m_eGemComboType))	
 	{	
-		return AddLetterToGem(cell, cell.m_iGemID, iLetter);		
+		return AddLetterToGem(cell, cell.m_iGemID, iLetter, fDelayTime);		
 	}
 	else
 	{
@@ -2302,7 +2302,7 @@ Sprite* HelloWorld::GenerateAndAddLetterToComboGem(const ComboEffectCell& cell)
 	}
 }
 
-Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter)
+Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const float& fDelayTime)
 {
 	Sprite* pCharacterSprite = Sprite::createWithSpriteFrameName(
 			m_pWordCollectBoardRenderNode->GetImageInGemFileFromLetter(iLetter).c_str());
@@ -2336,17 +2336,27 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 
 	m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iLetter = iLetter;
 
+	// add effect to letter	
+	pCharacterSprite->setScale(2.f);
+	pCharacterSprite->runAction(
+		Sequence::createWithTwoActions(
+			DelayTime::create( fDelayTime),
+			ScaleTo::create( 0.5f, 1.f, 1.f)));
+
 	// add effect create character
-	/*auto pEffect = Armature::create("Animation detach");
+	auto pEffect = Armature::create("Animation detach");
 	pEffect->setBlendFunc(BlendFunc::ALPHA_NON_PREMULTIPLIED);	
-	pEffect->getAnimation()->playByIndex(0);
+	pEffect->getAnimation()->playByIndex(0, -1, -1, 0);
 	pEffect->setPosition(m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->getPosition());
 
-	m_pHUDLayer->addChild(pEffect, 2);
-	pEffect->runAction(
+	m_pHUDLayer->addChild(pEffect);
+	//m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pEffect);
+	
+	this->getActionManager()->addAction(
 		Sequence::createWithTwoActions(
-			DelayTime::create(pEffect->getAnimation()->getRawDuration() + 0.2f),
-			RemoveSelf::create()));*/
+			DelayTime::create(pEffect->getAnimation()->getRawDuration()/60.f),
+			RemoveSelf::create()), pEffect, false);
+			//RemoveSelf::create()));
 
 	return pCharacterSprite;
 }

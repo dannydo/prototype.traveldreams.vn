@@ -103,8 +103,8 @@ protected:
 		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells, bool bIsNewMove);
 	
-	Sprite* GenerateAndAddLetterToComboGem(const ComboEffectCell& cell);
-	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter );
+	Sprite* GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime);
+	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const float& fDelayTime);
 
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();

@@ -5,7 +5,7 @@
 #include <string>
 
 #define _GDS_WORD_MAX_LENGTH_		12
-#define _GDS_WORD_MAX_COUNT_		20
+#define _GDS_WORD_MAX_COUNT_		30
 #define _GDS_SUB_WORD_MAX_COUNT_	2
 
 #define _MAX_GEM_ID_	6
@@ -195,7 +195,8 @@ public:
 
 	std::string m_sMeaning;
 	std::string m_sSoundFile;
-	std::string m_sSoundVietnameseFile;
+	float m_fSoundLength;
+	//std::string m_sSoundVietnameseFile;
 	std::string m_sFlashCardImage;
 
 	bool m_ActivatedCharacterFlags[_GDS_WORD_MAX_LENGTH_];

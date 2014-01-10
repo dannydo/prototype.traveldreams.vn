@@ -94,12 +94,13 @@ void GameWordManager::LoadWords()
 		std::getline(inputStream, m_WordList[iWordIndex].m_sMeaning);
 		//strcpy( m_WordList[iWordIndex].m_sMeaning, sTemp.c_str());
 
-		inputStream >> m_WordList[iWordIndex].m_sSoundFile;
-		inputStream >> m_WordList[iWordIndex].m_sSoundVietnameseFile;		
+		inputStream >> m_WordList[iWordIndex].m_sSoundFile;		
+		//inputStream >> m_WordList[iWordIndex].m_sSoundVietnameseFile;		
 		//std::getline(inputStream, m_WordList[iWordIndex].m_sSoundFile);
 		//std::getline(inputStream, m_WordList[iWordIndex].m_sSoundVietnameseFile);
 
 		inputStream >> m_WordList[iWordIndex].m_sFlashCardImage;
+		inputStream >> m_WordList[iWordIndex].m_fSoundLength;
 	}
 
 	delete[] data;
