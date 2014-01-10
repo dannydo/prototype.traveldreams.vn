@@ -329,7 +329,7 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 			}
 
 			auto actionEffect = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::playEffectFinishCollectWord));
-			auto delayEffect = DelayTime::create(3.3f);
+			auto delayEffect = DelayTime::create(3.4f);
 			this->runAction(Sequence::create(delay->clone(), actionEffect, delayEffect->clone(), actionLoopUpdate, NULL));
 		}
 		else
