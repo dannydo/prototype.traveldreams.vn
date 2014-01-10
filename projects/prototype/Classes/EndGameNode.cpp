@@ -90,11 +90,11 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 	this->addChild(pLevelNode);
 
 	m_pStarNode = this->generateLayoutStar();
-	m_pStarNode->setPosition(Point(228, 715));
+	m_pStarNode->setPosition(Point(228, 735));
 	this->addChild(m_pStarNode);
 
 	Node* pScoreNode = this->generateLayoutScore(iScore);
-	pScoreNode->setPosition(Point(320, 698));
+	pScoreNode->setPosition(Point(320, 680));
 
 	this->addChild(pScoreNode);
 
