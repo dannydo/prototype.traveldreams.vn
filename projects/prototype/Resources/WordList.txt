@@ -1,126 +1,126 @@
 25
 PEN
 Cây viết
-pen.wav
+pen
 pen.jpg
 2
 RULER
 Thước kẻ
-ruler.wav
+ruler
 ruler.jpg
 3
 GLOBE
 Quả địa cầu
-globe.wav
+globe
 globe.jpg
 3
 CRAYON
 Sáp màu
-crayon.wav
+crayon
 crayon.jpg
 3
 ERASER
 Cục tẩy
-eraser.wav
+eraser
 eraser.jpg
 3
 SCISSORS
 Cây kéo
-scissors.wav
+scissors
 scissors.jpg
 3
 BOOKCASE
 Tủ sách
-bookcase.wav
+bookcase
 bookcase.jpg
 3
 CLASSMATE
 Bạn học
-classmate.wav
+classmate
 classmate.jpg
 3
 TEACHER
 Giáo viên
-teacher.wav
+teacher
 teacher.jpg
 2
 TIMETABLE
 Thời khóa biểu
-timetable.wav
+timetable
 timetable.jpg
 4
 CHALK
 Viên phấn
-chalk.wav
+chalk
 default.jpg
 3
 LESSON
 Bài học
-lesson.wav
+lesson
 default.jpg
 3
 GLUE	
 Keo dán
-glue.wav
+glue
 default.jpg
 3
 RUBBER	
 Đồ lau bảng
-rubber.wav
+rubber
 default.jpg
 3
 STUDY
 Học
-study.wav
+study
 default.jpg
 2
 COURSE
 Khóa học
-course.wav
+course
 default.jpg
 3
 NOTEBOOK 	
 Quyển vở
-notebook.wav
+notebook
 default.jpg
 3
 LIBRARY	
 Thư viện
-library.wav
+library
 default.jpg
 3
 LABORATORY	
 Phòng thí nghiệm
-laboratory.wav
+laboratory
 default.jpg
 3
 TUTOR	
 Gia sư
-tutor.wav
+tutor
 default.jpg
 3
 MATHS	
 Môn toán
-maths.wav
+maths
 default.jpg
 3
 LECTURE	
 Bài giảng
-lecture.wav
+lecture
 default.jpg
 3
 CANTEEN	
 Căn tin
-canteen.wav
+canteen
 default.jpg
 3
 HISTORY	
 Môn sử
-history.wav
+history
 default.jpg
 3
 BLACKBOARD	
 Cái bảng
-blackboard.wav
+blackboard
 default.jpg
 3

@@ -171,7 +171,7 @@ float BonusWordNodeNew::calculatorDelayTime()
 			if (isFinish)
 			{
 				m_CompletedUnlockBonusWprds[iIndexWord] = 1;
-				fDelay += 3.3f;
+				fDelay += 3.4f + word.m_fSoundLength;
 			}
 		}
 	}
@@ -329,7 +329,7 @@ void BonusWordNodeNew::updateLetterCollectForWord()
 			}
 
 			auto actionEffect = CallFunc::create(this, callfunc_selector(BonusWordNodeNew::playEffectFinishCollectWord));
-			auto delayEffect = DelayTime::create(3.4f);
+			auto delayEffect = DelayTime::create(3.4f +  word.m_fSoundLength);
 			this->runAction(Sequence::create(delay->clone(), actionEffect, delayEffect->clone(), actionLoopUpdate, NULL));
 		}
 		else
