@@ -75,13 +75,15 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 		CC_CALLBACK_0(GameTargetNode::menuCloseCallBack, this));
 	pCloseItem->setPosition(Point(561, 790));
 
+	/*
 	MenuItemImage* pDictItem = MenuItemImage::create(
 		"Target-End-Game/Dict_Button.png",
 		"Target-End-Game/Dict_Button_Click.png",
 		CC_CALLBACK_0(GameTargetNode::menuOpenDictCallBack, this));
 	pDictItem->setPosition(Point(150, 300));
+	*/
 
-	Menu* pMenu = Menu::create(pPlayLevel, pCloseItem, pDictItem, NULL);
+	Menu* pMenu = Menu::create(pPlayLevel, pCloseItem, NULL);
 	pMenu->setPosition(Point::ZERO);
 	this->addChild(pMenu, 10);
 
