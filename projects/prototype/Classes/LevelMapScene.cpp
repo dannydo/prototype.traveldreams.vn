@@ -87,7 +87,7 @@ bool LevelMapLayer::init()
 			"World-Map/mask-level.png",
 			"World-Map/mask-level.png",
 			CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
-		pLevel6Item->setTag(3);
+		pLevel6Item->setTag(8);
 		pLevel6Item->setPosition(ccp(526, 813));
 
 		CCMenuItemImage* pBackItem = CCMenuItemImage::create(
@@ -102,7 +102,7 @@ bool LevelMapLayer::init()
 		CC_CALLBACK_0(LevelMapLayer::menuOpenFlashCardCallBack, this));
 		pFlashCard->setPosition(ccp(365, 52));
 			
-		CCMenu* pMenu = CCMenu::create( pLevel1Item, pLevel2Item, pLevel3Item, pLevel4Item, pLevel5Item, pBackItem, pFlashCard, NULL);
+		CCMenu* pMenu = CCMenu::create( pLevel1Item, pLevel2Item, pLevel3Item, pLevel4Item, pLevel5Item, pLevel6Item, pBackItem, pFlashCard, NULL);
 		pMenu->setPosition(CCPointZero);
 			
 		this->addChild(pMenu, 1);

@@ -321,6 +321,9 @@ Node* EndGameNode::generateLayoutLevel(int iLevel)
 
 void EndGameNode::menuNextLevelCallBack()
 {
+	if ( m_iCurrentLevel >= 8)
+		m_iCurrentLevel = 0;
+
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
 	pGameWordManager->GenerateWordForNewLevel(m_iCurrentLevel+1);
 

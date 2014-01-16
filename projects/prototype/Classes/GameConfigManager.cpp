@@ -2,6 +2,10 @@
 #include "cocos2d.h"
 #include "GameBoardManager.h"
 #include "GameWordManager.h"
+#include "cocos-ext.h"
+
+USING_NS_CC;
+USING_NS_CC_EXT;
 
 GameConfigManager* GameConfigManager::m_pInstance = NULL;
 
@@ -11,20 +15,33 @@ GameConfigManager::GameConfigManager()
 
 GameConfigManager::~GameConfigManager()
 {
-	for(int i=1; i<=5; i++)
+	for(int i=1; i<=8; i++)
 		for(auto pObstacle: m_LevelConfigList[i].m_ObstacleConfigList)
 			delete pObstacle;
+
+	for(auto pObstacleDescription : m_ObstacleDescriptionArray)
+		delete pObstacleDescription;
 }
 	
 void GameConfigManager::LoadLevelsConfig()
 {
-	for(int i=1; i<=5; i++)
+	for(int i=1; i<=8; i++)
 		LoadConfigOfLevel(i);
 }
 
 const LevelConfig& GameConfigManager::GetLevelConfig(int iLevel)
 {
 	return m_LevelConfigList[iLevel];	
+}
+
+const ObstacleLevelDescription& GameConfigManager::GetObstacleLevelDescription(const int& iObstacleTypeID, const int& iLevel)
+{
+	ObstacleDescription* pObstacleDescription = m_ObstacleDescriptionArray[iObstacleTypeID];
+	if (iLevel> 0 && pObstacleDescription->m_LevelList.size() > iLevel)
+		return pObstacleDescription->m_LevelList[iLevel-1];
+	else
+		return pObstacleDescription->m_LevelList[0];
+	//for(int i=0; i < pObstacleDescription->m_LevelList.size(); i++)
 }
 
 void GameConfigManager::LoadConfigOfLevel(int iLevel)
@@ -117,7 +134,9 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 	for(int i=0; i< iObstacleCount; i++)
 	{
 		Level_ObstacleConfig* pObstacleConfig = new Level_ObstacleConfig();
-		inputStream >> pObstacleConfig->m_iObstacleID;
+		inputStream >> sTemp;
+		pObstacleConfig->m_iObstacleID = m_ObstaleNameToIDMap[sTemp];
+		inputStream >> pObstacleConfig->m_iObstacleLevel;
 		inputStream >> pObstacleConfig->m_iCount;
 		for(int j=0; j < pObstacleConfig->m_iCount; j++)
 		{
@@ -181,5 +200,107 @@ void GameConfigManager::LoadGameConfig()
 	inputStream >> m_GameConfig.m_iSubWordScoreRatio;	
 
 	delete[] data;
-	delete[] orginalData;
+	delete[] orginalData;	
+}
+
+void GameConfigManager::LoadObstacleConfig()
+{	
+	const char* sFileName = "ObstacleConfig.data";
+	const char *des = NULL;
+	std::string jsonpath;
+    cs::JsonDictionary *pJsonDict = NULL;
+    jsonpath = FileUtils::getInstance()->fullPathForFilename(sFileName);
+
+	unsigned long size = 0;
+    des = (char*)(FileUtils::getInstance()->getFileData(jsonpath.c_str(),"r" , &size));
+	if(NULL == des || strcmp(des, "") == 0)
+	{
+		printf("read json file[%s] error!\n", sFileName);
+		return;
+	}
+
+	std::string strDes(des);
+    pJsonDict = new cs::JsonDictionary();
+    pJsonDict->initWithDescription(strDes.c_str());
+
+
+	// start to get data from dictionary
+	int iObstacleCount = pJsonDict->getArrayItemCount("obstacleList");
+	for(int i=0; i < iObstacleCount; i++)
+	{
+		const char* sObstacleName = pJsonDict->getStringValueFromArray("obstacleList", i);
+		assert(sObstacleName != NULL);
+		m_ObstaleNameToIDMap[sObstacleName] = i;
+		
+		m_ObstacleDescriptionArray.push_back(NULL);
+	}
+
+	// read obstacle detail
+	string sObstacleName;
+	cs::JsonDictionary* pObstacleDetailDict;
+	cs::JsonDictionary* pObstacleLevellDict;
+
+	for(int i=0; i < iObstacleCount; i++)
+	{
+		ObstacleDescription* pObstacleDescription = new ObstacleDescription();
+		pObstacleDetailDict = pJsonDict->getSubItemFromArray("obstacles", i);
+		
+		sObstacleName = pObstacleDetailDict->getItemStringValue("name");
+		pObstacleDescription->m_iObstacleID = m_ObstaleNameToIDMap[sObstacleName];
+		pObstacleDescription->m_bIsWrapGem = pObstacleDetailDict->getItemBoolvalue("wrapGame", true);
+
+		// obstacles that has ability to infect other cells
+		pObstacleDescription->m_bIsInfectable = pObstacleDetailDict->getItemBoolvalue("infectable", false);
+		////** pObstacleDescription->infactableObjects = pJsonDict->getArrayItemCount("infactableObjects", true);
+
+		pObstacleDescription->m_bCanBeMoveThrough = pObstacleDetailDict->getItemBoolvalue("canBeMoveThrough", false);
+		pObstacleDescription->m_bDropable = pObstacleDetailDict->getItemBoolvalue("dropable", true);
+		pObstacleDescription->m_bLockRow = pObstacleDetailDict->getItemBoolvalue("lockRow", false);
+		pObstacleDescription->m_bLockColumn = pObstacleDetailDict->getItemBoolvalue("lockColumn", false);
+
+		int iLevelCount = pObstacleDetailDict->getArrayItemCount("levelList");
+		for(int iLevel=0; iLevel < iLevelCount; iLevel++)
+		{
+			pObstacleLevellDict = pObstacleDetailDict->getSubItemFromArray( "levelList", iLevel);
+
+			ObstacleLevelDescription levelObstacle;
+			levelObstacle.m_iLevelID = pObstacleLevellDict->getItemIntValue("level", 0);
+			levelObstacle.m_sSpriteFileName = pObstacleLevellDict->getItemStringValue("spriteFileName");
+
+			pObstacleDescription->m_LevelList.push_back(levelObstacle);
+
+			CC_SAFE_DELETE(pObstacleLevellDict);
+		}
+
+		pObstacleDescription->m_bDecreaseLevelAfterDestroyed = pObstacleDetailDict->getItemBoolvalue("decreaseLevelAfterDestroyed", true);
+		pObstacleDescription->m_bDecreaseLevelAfterMoved = pObstacleDetailDict->getItemBoolvalue("decreaseLevelAfterMoved", true);
+		////** pObstacleDescription->m_TransformToObjectAtLevel0 = pObstacleDetailDict->getItemBoolvalue("transformToObjectAtLevel0", true);
+		
+		//pObstacleDescription->m_bMatchToDestroy = pObstacleDetailDict->getItemBoolvalue("matchToDestroy", true);
+		pObstacleDescription->m_bMatchAroundToDestroyed = pObstacleDetailDict->getItemBoolvalue("matchAroundToDestroy", true);
+		
+		// how to appear
+		pObstacleDescription->m_bAppearByDrop = pObstacleDetailDict->getItemBoolvalue("appearByDrop", true);
+		pObstacleDescription->m_iDropRate = pObstacleDetailDict->getItemIntValue("dropRate", 0);
+		pObstacleDescription->m_bAppearByTransform = pObstacleDetailDict->getItemBoolvalue("appearByTransform", true);
+		pObstacleDescription->m_iTransformRate = pObstacleDetailDict->getItemIntValue("transfromRate", 0);
+
+		m_ObstacleDescriptionArray[ pObstacleDescription->m_iObstacleID] = pObstacleDescription;
+
+		CC_SAFE_DELETE(pObstacleDetailDict);
+	}
+
+	// read priority list
+	//for(int i=0; i< pJsonDict->getArrayItemCount(
+	/*
+	"priorityList":
+        [            
+            "SHIELD",
+            "LOCK"            
+        ],*/
+
+	// read compatible list
+	
+	CC_SAFE_DELETE(pJsonDict);
+    CC_SAFE_DELETE_ARRAY(des);
 }

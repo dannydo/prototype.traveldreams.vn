@@ -16,7 +16,7 @@
 #define _COMBO_TYPE_COUNT_	3
 #define _MAX_LINKED_BLOCK_COUNT_	(_BOARD_MAX_ROW_NUMBER_*_BOARD_MAX_COLUMN_NUMBER_/4)
 
-#define _MAX_GAME_LEVEL_	6
+#define _MAX_GAME_LEVEL_	9
 
 struct GameConfig
 {
@@ -124,21 +124,24 @@ public:
 	int m_iGemID;
 	bool m_bIsBlankCell;
 	GemComboType_e m_eGemComboType;
-	ObstacleType_e m_eObstacleType;
+	//ObstacleType_e m_eObstacleType;
+	int m_iObstacleBlockID;
 
 	CellValue()
 	{
 		m_iGemID = -1;
 		m_bIsBlankCell = true;
 		m_eGemComboType = _GCT_NONE_;
-		m_eObstacleType = _OT_NONE_;
+		m_iObstacleBlockID = -1;
+		//m_eObstacleType = _OT_NONE_;
 	}
 
 	void Reset()
 	{
 		m_iGemID = -1;
 		m_eGemComboType = _GCT_NONE_;
-		m_eObstacleType = _OT_NONE_;
+		m_iObstacleBlockID = -1;
+		//	m_eObstacleType = _OT_NONE_;
 	}
 };
 

@@ -156,6 +156,9 @@ private:
 	CellView m_BoardViewMatrix[_BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
 	CellView m_BoardViewMirrorMatrix[_BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
 
+	//Sprite* m_BoardObstaclesMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_][_MAX_OBSTACLE_TYPE_COUNT_];
+	Sprite* m_BoardObstaclesList[ _BOARD_MAX_ROW_NUMBER_* _BOARD_MAX_COLUMN_NUMBER_][_MAX_OBSTACLE_TYPE_COUNT_];
+
 	CellView m_MovingCellList[_BOARD_MAX_LENGTH_];
 	CellView m_MovingCellMirrorList[_BOARD_MAX_LENGTH_];
 	int m_iMovingCellListLength;//this should be number of row or column

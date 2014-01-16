@@ -24,6 +24,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/FlashCardScene.cpp \
 				   ../../Classes/LevelMapScene.cpp \
 				   ../../Classes/WorldMapScene.cpp \
+				   ../../Classes/GameConfigManager.cpp \
+				   ../../Classes/ObstacleProcessManager.cpp \
                    ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

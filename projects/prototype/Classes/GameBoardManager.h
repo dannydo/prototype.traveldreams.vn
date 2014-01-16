@@ -12,11 +12,12 @@ public:
 	GameBoardManager();
 	void GenerateGameBoard(int iLevel);
 
+	inline const LevelConfig* GetLevelConfig() { return m_pLevelConfig;}
 	inline int GetRowNumber() { return m_iRowNumber;}
 	inline int GetColumnNumber() { return m_iColumnNumber;}
 	inline int GetCellValue(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_iGemID;}
 	inline GemComboType_e GetCellGemComboType(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_eGemComboType;}
-	inline ObstacleType_e GetCellObstacleType(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_eObstacleType;}
+	//inline ObstacleType_e GetCellObstacleType(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_eObstacleType;}
 
 	inline bool IsBlankCell(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell;}
 
@@ -37,7 +38,7 @@ protected:
 	const LevelConfig* m_pLevelConfig;	
 
 	int m_iRowNumber, m_iColumnNumber;
-	CellValue m_BoardValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];	
+	CellValue m_BoardValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];		
 
 	// use this matrix to check board after move
 	CellValue m_TemporaryValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];

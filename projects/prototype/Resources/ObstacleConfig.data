@@ -1,0 +1,74 @@
+{
+    "obstacleList":
+        [
+			"SHIELD",
+            "LOCK"
+            
+        ],    
+    "compatibleMatrix":
+        [
+            1,1,
+            1,1
+        ],    
+    "obstacles":
+    [
+        {
+            "name": "LOCK",
+            "wrapGem": true,
+            "infectable": false,
+            "infactableObjects": [],
+            "canBeMoveThrough": false,
+            "dropable": true,
+            "lockRow":true,
+            "lockColumn":true,
+            "levelList":
+                [
+                    { 
+                        "level": 0,
+                        "spriteFileName":"Lock.png"
+                    }
+                ],
+            "decreaseLevelAfterDestroyed": true,
+            "decreaseLevelAfterMoved": false,
+            "transformToObjectAtLevel0": "",            
+            "matchAroundToDestroy" : false,
+            "appearByDrop": false,
+            "dropRate": 0,
+            "appearByTransform": false,
+            "transfromRate": 0
+        },
+        {
+            "name": "SHIELD",
+            "wrapGem": true,
+            "infectable": false,
+            "infactableObjects": [],
+            "canBeMoveThrough": false,
+            "dropable": true,
+            "lockRow": false,
+            "lockColumn": false,
+            "levelList":
+                [
+                    { 
+                        "level":1,
+                        "spriteFileName":"Shield_1.png"
+                    },
+					{ 
+                        "level":2,
+                        "spriteFileName":"Shield_2.png"
+                    },
+					{ 
+                        "level":3,
+                        "spriteFileName":"Shield_3.png"
+                    }
+                ],
+            "decreaseLevelAfterDestroyed": true,
+            "decreaseLevelAfterMoved": false,
+            "transformToObjectAtLevel0": "",            
+            "matchAroundToDestroy" : false,
+            "appearByDrop": false,
+            "dropRate": 0,
+            "appearByTransform": false,
+            "transfromRate": 0
+        }
+    ]     
+}

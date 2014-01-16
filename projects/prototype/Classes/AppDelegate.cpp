@@ -38,7 +38,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	// load level config
 	GameConfigManager::getInstance()->LoadGameConfig();
+	GameConfigManager::getInstance()->LoadObstacleConfig();
 	GameConfigManager::getInstance()->LoadLevelsConfig();
+
 
     // create a scene. it's an autorelease object
 	auto scene =  WorldMapScene::create(); //MainMenuScene::create(); //HelloWorld::createScene();		

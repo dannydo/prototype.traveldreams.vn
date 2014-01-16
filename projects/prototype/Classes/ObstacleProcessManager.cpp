@@ -1,0 +1,151 @@
+#include "ObstacleProcessManager.h"
+#include "NewGameBoardManager.h"
+
+ObstacleProcessManager::ObstacleProcessManager(NewGameBoardManager* pGameBoardManager)
+{
+	m_pGameBoardManager = pGameBoardManager;
+}
+
+void ObstacleProcessManager::InitLevel()
+{
+	const LevelConfig& levelConfig = m_pGameBoardManager->GetLevelConfig();
+	int iBlockID;
+	for(auto pObstacleLevelConfig : levelConfig.m_ObstacleConfigList)
+	{
+		for(int i=0; i< pObstacleLevelConfig->m_iCount; i++)
+		{
+			iBlockID = m_pGameBoardManager->GetObstacleBlockID( pObstacleLevelConfig->m_ObstaclePositionList[i].m_iRow, pObstacleLevelConfig->m_ObstaclePositionList[i].m_iColumn);
+			if (iBlockID < 0)
+			{
+				iBlockID = AllocFreeBlock();				
+				m_pGameBoardManager->SetObstacleBlockID( pObstacleLevelConfig->m_ObstaclePositionList[i].m_iRow, pObstacleLevelConfig->m_ObstaclePositionList[i].m_iColumn, iBlockID);
+			}
+			
+			m_ObstacleBoardList[iBlockID].m_ObstacleList[pObstacleLevelConfig->m_iObstacleID].m_bIsActive = true;
+			m_ObstacleBoardList[iBlockID].m_ObstacleList[pObstacleLevelConfig->m_iObstacleID].m_iObstacleLevel = 
+				pObstacleLevelConfig->m_iObstacleLevel;
+		}
+	}
+
+	/*
+	for(int i=0; i< pLevelConfig->m_ObstacleConfigList.size)
+
+	int iRow, iColumn, iObstacleTypeID;
+	for(iRow=0; iRow < _BOARD_MAX_ROW_NUMBER_; iRow++)
+		for(iColumn=0; iColumn < _BOARD_MAX_COLUMN_NUMBER_; iColumn++)
+			for(iObstacleTypeID=0; iObstacleTypeID < _MAX_OBSTACLE_TYPE_COUNT_; iObstacleTypeID++)
+			{
+
+			}*/
+}
+
+int ObstacleProcessManager::AllocFreeBlock()
+{
+	for(int i=0; i< _BOARD_MAX_ROW_NUMBER_*_BOARD_MAX_COLUMN_NUMBER_; i++)
+		if (m_ObstacleBoardList[i].m_bIsFreeBlock)
+		{
+			m_ObstacleBoardList[i].m_bIsFreeBlock = false;
+			return i;
+		}
+	return -1;
+}
+
+bool ObstacleProcessManager::DestroyCell(const int& iBlockID)
+{
+	//if (iBlockID < 0)
+		//return true;
+
+	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
+	
+
+	for(int iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
+	{
+		const ObstacleDescription* pObstacleDescription = GameConfigManager::getInstance()->GetObstacleDescription(iObstacleTypeID);
+		if (pObstacleDescription ==  NULL)
+			continue;
+
+		if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive)
+		{
+			if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel == 0)
+			{
+				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive = false;												
+			}
+			else
+			{
+				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel--;
+				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty = true;				
+
+				if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel == 0 && pObstacleDescription->m_LevelList[0].m_iLevelID != 0) // level 1 is lowest 
+				{
+					m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive = false;				
+				}
+
+				return false;
+			}
+		}
+	}
+	
+	m_BlockWaitingClearList.push_back(iBlockID);
+
+	return true;		
+}
+
+void ObstacleProcessManager::Update()
+{
+	for(auto iBlockID :  m_BlockWaitingClearList)
+	{
+		m_ObstacleBoardList[iBlockID].m_bIsFreeBlock = true;
+		m_pGameBoardManager->ClearObstacleBlockID(iBlockID);
+	}
+
+	m_BlockWaitingClearList.clear();
+
+}
+
+bool ObstacleProcessManager::IsRowLocked(const int& iBlockID)
+{
+	int iColumn=0;
+	int iNumberOfColumn = m_pGameBoardManager->GetColumnNumber();
+	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
+
+	for(int iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
+	{
+		const ObstacleDescription* pObstacleDescription = GameConfigManager::getInstance()->GetObstacleDescription(iObstacleTypeID);
+		if (pObstacleDescription ==  NULL || !pObstacleDescription->m_bLockRow)
+			continue;
+		if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive)
+			return true;		
+	}
+	return false;
+}
+	
+bool ObstacleProcessManager::IsColumnLocked(const int& iBlockID)
+{
+	int iRow=0;
+	int iNumberOfRow = m_pGameBoardManager->GetRowNumber();
+	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
+
+	for(int iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
+	{
+		const ObstacleDescription* pObstacleDescription = GameConfigManager::getInstance()->GetObstacleDescription(iObstacleTypeID);
+		if (pObstacleDescription ==  NULL || !pObstacleDescription->m_bLockColumn)
+			continue;
+
+		if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive)
+			return true;				
+	}
+	return false;
+}
+/*
+void ObstacleProcessManager::MoveObstacles(const int& iRow1, const int& iColumn1, const int& iRow2, const int& iColumn2)
+{
+	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
+	for(int iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
+	{
+		m_ObstacleBoardMatrix[iRow2][iColumn2][iObstacleTypeID] = m_ObstacleBoardMatrix[iRow1][iColumn1][iObstacleTypeID];
+
+		m_ObstacleBoardMatrix[iRow1][iColumn1][iObstacleTypeID].m_bIsActive = false;
+		m_ObstacleBoardMatrix[iRow1][iColumn1][iObstacleTypeID].m_bIsDirty = false;
+		m_ObstacleBoardMatrix[iRow1][iColumn1][iObstacleTypeID].m_iObstacleLevel = 0;
+	}
+}*/

@@ -5,23 +5,21 @@
 ;number of color
 6
 ;score of stars
-3000	4000	5000
+5000	6000	7000
 ;map matrix
 0	1	1	1	1	1	1	0
 1	1	1	1	1	1	1	1
 1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
+1	1	1	0	0	1	1	1
+1	1	1	0	0	1	1	1
 1	1	1	1	1	1	1	1
 1	1	1	1	1	1	1	1
 0	1	1	1	1	1	1	0
 ;main word
-ERASER
-1
-1 2 4 5 7 6 3 4 8 5 7 1
+SCISSORS
+0
 ;bonus word
 1
-NOTEBOOK
+LABORATORY
 ;obstacle list: count, list
 0
-

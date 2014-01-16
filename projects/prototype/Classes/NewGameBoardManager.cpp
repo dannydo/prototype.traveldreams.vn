@@ -4,6 +4,12 @@
 NewGameBoardManager::NewGameBoardManager() : GameBoardManager()
 {
 	m_iCurrentScore = 0;		
+	m_pObstacleProcessManager = new ObstacleProcessManager(this);
+}
+
+NewGameBoardManager::~NewGameBoardManager()
+{
+	delete m_pObstacleProcessManager;
 }
 
 void NewGameBoardManager::GenerateGameBoard(int iLevel)
@@ -13,6 +19,8 @@ void NewGameBoardManager::GenerateGameBoard(int iLevel)
 	
 	m_pGameWordManager = GameWordManager::getInstance();	
 	m_iCurrentMove = m_pLevelConfig->m_iNumberOfMove;
+
+	m_pObstacleProcessManager->InitLevel();
 	//m_pGameWordManager->GenerateWordForNewLevel(); //already called by main menu
 
 	// compute score/star for this level ==> score of stars now loaded from config file
@@ -32,11 +40,23 @@ void NewGameBoardManager::GenerateGameBoard(int iLevel)
 	m_LevelConfig.m_ScoreOfStars[2] = m_LevelConfig.m_ScoreOfStars[0] + iTotalSubWordScore;*/
 }
 
+void NewGameBoardManager::ClearObstacleBlockID(const int& iObstacleBlockID)
+{
+	int iRow, iColumn;
+	for(iRow=0; iRow < m_iRowNumber; iRow++)
+		for(iColumn=0; iColumn < m_iColumnNumber; iColumn++)
+			if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID == iObstacleBlockID)
+			{
+				m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID = -1;
+				return;	
+			}
+}
+
 bool NewGameBoardManager::IsRowLocked(const int& iRow)
 {
 	for(int iColumn=0; iColumn < m_iColumnNumber; iColumn++)
-		if (! m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell)
-			if (m_BoardValueMatrix[iRow][iColumn].m_eObstacleType == _OT_LOCK_ROW_ || m_BoardValueMatrix[iRow][iColumn].m_eObstacleType == _OT_LOCK_ROW_AND_COLUMN_)
+		if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID >= 0)
+			if (m_pObstacleProcessManager->IsRowLocked( m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))			
 				return true;
 	return false;
 }
@@ -44,8 +64,8 @@ bool NewGameBoardManager::IsRowLocked(const int& iRow)
 bool NewGameBoardManager::IsColumnLocked(const int& iColumn)
 {
 	for(int iRow=0; iRow < m_iRowNumber; iRow++)
-		if (! m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell)
-			if (m_BoardValueMatrix[iRow][iColumn].m_eObstacleType == _OT_LOCK_ROW_ || m_BoardValueMatrix[iRow][iColumn].m_eObstacleType == _OT_LOCK_ROW_AND_COLUMN_)
+		if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID >= 0)
+			if (m_pObstacleProcessManager->IsColumnLocked( m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))			
 				return true;
 	return false;
 }
@@ -411,32 +431,35 @@ void NewGameBoardManager::ExecuteComboChain(std::vector<ComboEffectBundle*>& com
 			{			
 				if (iRow >= 0 && iRow < m_iRowNumber && iColumn >=0 && iColumn < m_iColumnNumber &&
 					m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_WAITING_TRIGGER_)
-				{				
-					// this may trigger another combo ?
-					if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >=0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
-					{
-						ComboEffectBundle* pNextTriggeredCombo = new ComboEffectBundle();
-						pNextTriggeredCombo->m_ComboEffectDescription.m_eComboEffectType =  GetComboEffectTypeFromComboType(m_BoardValueMatrix[iRow][iColumn].m_eGemComboType); // _CET_EXPLOSION_;
-						pNextTriggeredCombo->m_ComboEffectDescription.m_Position = Cell(iRow, iColumn);
-						pNextTriggeredCombo->m_ComboEffectDescription.m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
-						pNextTriggeredCombo->m_iNormalChainPhase =  pComboInChain->m_iNormalChainPhase + 1;
+				{
+					if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID < 0 || m_pObstacleProcessManager->DestroyCell(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))
+					{				
+						// this may trigger another combo ?
+						if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >=0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
+						{
+							ComboEffectBundle* pNextTriggeredCombo = new ComboEffectBundle();
+							pNextTriggeredCombo->m_ComboEffectDescription.m_eComboEffectType =  GetComboEffectTypeFromComboType(m_BoardValueMatrix[iRow][iColumn].m_eGemComboType); // _CET_EXPLOSION_;
+							pNextTriggeredCombo->m_ComboEffectDescription.m_Position = Cell(iRow, iColumn);
+							pNextTriggeredCombo->m_ComboEffectDescription.m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
+							pNextTriggeredCombo->m_iNormalChainPhase =  pComboInChain->m_iNormalChainPhase + 1;
 
-						//pComboInChain->m_TriggeredComboEfectBundleList.push_back(pNextTriggeredCombo);
+							//pComboInChain->m_TriggeredComboEfectBundleList.push_back(pNextTriggeredCombo);
 								
-						// add it to chain to trigger later
-						comboChainList.push_back(pNextTriggeredCombo);
-					}		
+							// add it to chain to trigger later
+							comboChainList.push_back(pNextTriggeredCombo);
+						}		
 
-					// combo 5 cell wil be activated/destroyed later
-					if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_)
-					{
-						m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
-						pComboInChain->m_DestroyedCells.push_back(Cell(iRow, iColumn));
+						// combo 5 cell wil be activated/destroyed later
+						if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_)
+						{
+							m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+							pComboInChain->m_DestroyedCells.push_back(Cell(iRow, iColumn));
+						}
+						else
+						{
+							m_BoardValueMatrix[iRow][iColumn].m_eGemComboType =	_GCT_COMBO5_WAITING_TRIGGER_;						
+						}					
 					}
-					else
-					{
-						m_BoardValueMatrix[iRow][iColumn].m_eGemComboType =	_GCT_COMBO5_WAITING_TRIGGER_;						
-					}					
 				}
 			}	
 		}
@@ -503,33 +526,34 @@ void NewGameBoardManager::TriggerWaitingCombo5List(std::vector<ComboEffectBundle
 		{			
 			if ( !m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID == iGemID
 				&& m_BoardValueMatrix[iRow][iColumn].m_eGemComboType !=_GCT_COMBO5_WAITING_TRIGGER_)
-			{				
-				// this may trigger another combo ?
-				if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >=0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
-				{
-					ComboEffectBundle* pNextTriggeredCombo = new ComboEffectBundle();
-					pNextTriggeredCombo->m_ComboEffectDescription.m_eComboEffectType =  GetComboEffectTypeFromComboType(m_BoardValueMatrix[iRow][iColumn].m_eGemComboType); // _CET_EXPLOSION_;
-					pNextTriggeredCombo->m_ComboEffectDescription.m_Position = Cell(iRow, iColumn);
-					pNextTriggeredCombo->m_ComboEffectDescription.m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
-					pNextTriggeredCombo->m_iActivatedByCombo5Phase =  pTriggeredCombo->m_iActivatedByCombo5Phase+1;
+				if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID < 0 || m_pObstacleProcessManager->DestroyCell(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))
+				{				
+					// this may trigger another combo ?
+					if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >=0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
+					{
+						ComboEffectBundle* pNextTriggeredCombo = new ComboEffectBundle();
+						pNextTriggeredCombo->m_ComboEffectDescription.m_eComboEffectType =  GetComboEffectTypeFromComboType(m_BoardValueMatrix[iRow][iColumn].m_eGemComboType); // _CET_EXPLOSION_;
+						pNextTriggeredCombo->m_ComboEffectDescription.m_Position = Cell(iRow, iColumn);
+						pNextTriggeredCombo->m_ComboEffectDescription.m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
+						pNextTriggeredCombo->m_iActivatedByCombo5Phase =  pTriggeredCombo->m_iActivatedByCombo5Phase+1;
 
-					//pTriggeredCombo->m_TriggeredComboEfectBundleList.push_back(pNextTriggeredCombo);
+						//pTriggeredCombo->m_TriggeredComboEfectBundleList.push_back(pNextTriggeredCombo);
 								
-					// add it to chain to trigger later
-					comboChainList.push_back(pNextTriggeredCombo);
-				}		
+						// add it to chain to trigger later
+						comboChainList.push_back(pNextTriggeredCombo);
+					}		
 
-				// combo 5 cell wil be activated/destroyed later
-				if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_)
-				{
-					m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
-					pTriggeredCombo->m_DestroyedCells.push_back(Cell(iRow, iColumn));
+					// combo 5 cell wil be activated/destroyed later
+					if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_)
+					{
+						m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+						pTriggeredCombo->m_DestroyedCells.push_back(Cell(iRow, iColumn));
+					}
+					else
+					{
+						m_BoardValueMatrix[iRow][iColumn].m_eGemComboType =	_GCT_COMBO5_WAITING_TRIGGER_;
+					}
 				}
-				else
-				{
-					m_BoardValueMatrix[iRow][iColumn].m_eGemComboType =	_GCT_COMBO5_WAITING_TRIGGER_;
-				}
-			}
 		}
 
 		// reset combo cell
@@ -594,7 +618,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	}
 
 	int iRandomIndex;
-	int iMaxConvertedCell = MIN(m_iCurrentMove, 5);
+	int iMaxConvertedCell = MIN(m_iCurrentMove, 1);
 	m_iCurrentMove -= iMaxConvertedCell;
 
 	for(int i=0; i< iMaxConvertedCell; i++)
@@ -1010,38 +1034,42 @@ void NewGameBoardManager::RemoveCellsByBasicMatching( std::vector<Cell>& basicMa
 	for(auto& cell : basicMatchingDestroyedCells)
 	{
 		if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID >= 0)
-		{		
-			// NOTE: destroyed cell include double combo cells!!! ????
-			// 1 cell affected by 2 effects (basic matching and double combo) ==> how to display those effect???		
-			if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType != _GCT_NONE_)
-			{				
-				ComboEffectBundle* pTriggeredComboEffectBundle = new ComboEffectBundle();
-				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = GetComboEffectTypeFromComboType(m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType);
-					//_CET_EXPLOSION_; //only implement explosion now
-				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_Position = cell;
-				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_iGemID = m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID;
-				pTriggeredComboEffectBundle->m_iNormalChainPhase = comboChainList.size(); //0;														
+			if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID < 0 || m_pObstacleProcessManager->DestroyCell(m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID))
+			{		
+				// NOTE: destroyed cell include double combo cells!!! ????
+				// 1 cell affected by 2 effects (basic matching and double combo) ==> how to display those effect???		
+				if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType != _GCT_NONE_)
+				{				
+					ComboEffectBundle* pTriggeredComboEffectBundle = new ComboEffectBundle();
+					pTriggeredComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = GetComboEffectTypeFromComboType(m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType);
+						//_CET_EXPLOSION_; //only implement explosion now
+					pTriggeredComboEffectBundle->m_ComboEffectDescription.m_Position = cell;
+					pTriggeredComboEffectBundle->m_ComboEffectDescription.m_iGemID = m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID;
+					pTriggeredComboEffectBundle->m_iNormalChainPhase = comboChainList.size(); //0;														
 
-				comboChainList.push_back(pTriggeredComboEffectBundle);
-			}			
+					comboChainList.push_back(pTriggeredComboEffectBundle);
+				}			
 
-			// combo 5 will be activated/destroyed later
-			if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType == _GCT_COMBO5_)
-			{
-				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType = _GCT_COMBO5_WAITING_TRIGGER_;
-				cell.m_iRow = cell.m_iColumn = -1;
+				// combo 5 will be activated/destroyed later
+				if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType == _GCT_COMBO5_)
+				{
+					m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType = _GCT_COMBO5_WAITING_TRIGGER_;
+					cell.m_iRow = cell.m_iColumn = -1;
+				}
+				else
+					m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].Reset(); //m_iGemID = -1; m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType = _GCT_NONE_;				
+
+				/*if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType != _GCT_COMBO5_)
+				{								
+				}
+				else{
+					m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID = -1;
+					cell.m_iRow = cell.m_iColumn = -1;
+				}*/
 			}
 			else
-				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].Reset(); //m_iGemID = -1; m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType = _GCT_NONE_;				
-
-			/*if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType != _GCT_COMBO5_)
-			{								
-			}
-			else{
-				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID = -1;
 				cell.m_iRow = cell.m_iColumn = -1;
-			}*/
-		}
+
 	}	
 }
 
@@ -1097,6 +1125,7 @@ void NewGameBoardManager::CreateComboCells(const int& iSelectedRow, const int& i
 						if (( basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + j].m_iRow == iSelectedRow
 							|| basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + j].m_iColumn == iSelectedColumn) && 
 							basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + j].m_iRow >= 0)
+							//&&  m_BoardValueMatrix[comboCell.m_iRow][comboCell.m_iColumn].m_iGemID < 0)
 						{
 							bFoundCellOnActiveDragLine = true;
 							comboCell = basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + j];							
@@ -1155,6 +1184,8 @@ void NewGameBoardManager::CalculateMoveCells(std::vector<Cell>& originalMovedCel
 					m_BoardValueMatrix[iCheckRowIndex][iColumn] = m_BoardValueMatrix[iRow][iColumn];
 					m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
 					targetMovedCells.push_back(Cell(iCheckRowIndex, iColumn));
+
+					//m_pObstacleProcessManager->MoveObstacles( iRow, iColumn, iCheckRowIndex, iColumn);
 				}
 			}
 		}

@@ -6,9 +6,7 @@
 USING_NS_CC;
 
 Scene* HelloWorld::createScene(int iLevel)
-{
-	if ( iLevel > 5)
-		iLevel = 1;
+{	
     // 'scene' is an autorelease object
     auto scene = Scene::create();
     
@@ -282,7 +280,7 @@ void HelloWorld::initLevel(int iLevel)
 	// init batch node for combo effect (used later)
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ComboEffect/combo.plist");
 	m_pComboEffectBatchNode = CCSpriteBatchNode::create("ComboEffect/combo.pvr.ccz");
-	this->addChild(m_pComboEffectBatchNode);
+	this->m_pHUDLayer->addChild(m_pComboEffectBatchNode, 20);
 
 	// cache anim
 	auto animCache = AnimationCache::getInstance();    
@@ -296,7 +294,12 @@ void HelloWorld::initLevel(int iLevel)
 	pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(0).c_str());
 	m_SymbolSize = Point(78.f, 78.f); //pSprite->getContentSize() * 0.5;
 
-	int iRow, iColumn, iFlag;
+	int iRow, iColumn, iFlag, iObstacleTypeID;
+	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
+	ObstacleProcessManager* pObstacleProcessManager = m_GameBoardManager.GetObstacleProcessManager();
+
+	memset( m_BoardObstaclesList, 0, sizeof(m_BoardObstaclesList));
+
 	for(iRow=0; iRow < iNumberOfRow; iRow++)
 		for( iColumn = 0; iColumn < iNumberOfColumn; iColumn++)
 		{
@@ -338,15 +341,38 @@ void HelloWorld::initLevel(int iLevel)
 					m_pBoardBatchNode->addChild(pSprite);
 
 					// extra, add obstacle to map
-					if (m_GameBoardManager.GetCellObstacleType( iRow, iColumn) != _OT_NONE_)
+					/*if (m_GameBoardManager.GetCellObstacleType( iRow, iColumn) != _OT_NONE_)
 					{
 						Sprite* pMaskSprite = Sprite::createWithSpriteFrameName( "Lock.png");
 						pMaskSprite->setAnchorPoint(Point(0,0));
 						pSprite->addChild(pMaskSprite);
-					}					
+					}*/			
+					if (iFlag == 0)
+					{
+						int iBlockID;
+						iBlockID = m_GameBoardManager.GetObstacleBlockID(iRow, iColumn);
+						if (iBlockID < 0)
+							continue;
+
+						for(iObstacleTypeID = iObstacleTypeCount-1; iObstacleTypeID >=0; iObstacleTypeID--) // from low to highest priority
+						{							
+							ObstacleData& obstacleData = pObstacleProcessManager->GetObstacleData(iBlockID, iObstacleTypeID);
+							if (obstacleData.m_bIsActive)
+							{
+								Sprite* pMaskSprite = 
+									Sprite::createWithSpriteFrameName( GameConfigManager::getInstance()->GetObstacleLevelDescription(iObstacleTypeID, obstacleData.m_iObstacleLevel).m_sSpriteFileName.c_str()); //"Lock.png");														
+								pMaskSprite->setAnchorPoint(Point(0,0));
+								pSprite->addChild(pMaskSprite);
+
+								if (obstacleData.m_iObstacleLevel > 0)
+									m_BoardObstaclesList[iBlockID][iObstacleTypeID] = pMaskSprite;
+							}
+						}
+					}
 				}
 			}
 		}
+	
 
 	// add letter to gems if existing
 	if (levelConfig.m_bIsMainWordExistedOnBoard)
@@ -1064,7 +1090,7 @@ void HelloWorld::CheckBoardStateAfterMove()
 			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells))
 	{
 		PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_DoubleComboList, 
-			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells, false);
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells, false);		
 	}
 	else
 	{		
@@ -1098,6 +1124,9 @@ void HelloWorld::CheckBoardStateAfterMove()
 			PlayUnlockLettersOfMainWordAnimation(0.f);			
 		}
 	}
+
+	// update obstacle list after move
+	m_GameBoardManager.GetObstacleProcessManager()->Update();
 }
 
 void HelloWorld::ExecuteBonusWinGameEffect()
@@ -1640,16 +1669,20 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		// play effect convert normal cells to combo cells
 		if (convertedToComboCells.size() > 0)
 		{
+			float fDelayPerConvertedCell = 0.1f;
+			auto pCombo5AnimBolt = AnimationCache::getInstance()->getAnimation("effectCombo5_Bolt");		
+			Point rootEffect( 530.f, 820.f);
+			int iIndex = 0;
+
 			for(auto cell: convertedToComboCells)
 			{
-				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime,fDestroyTime);
+				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime + (iIndex+1) * fDelayPerConvertedCell,fDestroyTime);
 
 				// create combo cell
 				Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(cell.m_iGemID, cell.m_eGemComboType).c_str());
 				//pSprite->setAnchorPoint(ccp(0,0));
-
-				pSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn  * m_SymbolSize.width, 
-						m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height));
+				Point pos(m_fBoardLeftPosition + cell.m_iColumn  * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height);
+				pSprite->setPosition(pos);
 
 				//pSprite->setScale(0.65f);
 				m_pBoardBatchNode->addChild(pSprite);
@@ -1659,19 +1692,42 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				pSprite->setOpacity(0);
 				pSprite->runAction( 
 					Sequence::create( 
-						DelayTime::create(fDelayTime),
+						DelayTime::create(fDelayTime  + (iIndex+1) * fDelayPerConvertedCell),
 						EaseIn::create( FadeIn::create(fDestroyTime), 2.f),
 						NULL));
 
 				pSprite->setScale(2.f);//1.5f);
 				pSprite->runAction( 
 					Sequence::create( 
-						DelayTime::create(fDelayTime),
+						DelayTime::create(fDelayTime  + (iIndex+1) * fDelayPerConvertedCell),
 						EaseIn::create(ScaleTo::create(fDestroyTime, 1.f, 1.f), 2.f),
-						NULL));						
+						NULL));					
+
+
+				// bolt effect
+				Point vector( pos.x - rootEffect.x, pos.y - rootEffect.y);
+				auto fAngle = atan2f( vector.y, vector.x);
+				float fDistance = sqrtf( vector.x*vector.x + vector.y*vector.y);
+
+				auto pComboEffectSprite = Sprite::createWithSpriteFrameName("Bolt 2_00000_1.png");
+				pComboEffectSprite->setAnchorPoint  (Point( 0, 0.5f));
+				pComboEffectSprite->setPosition(rootEffect);
+				pComboEffectSprite->setRotation(-fAngle * 180.f / M_PI);
+				pComboEffectSprite->setScaleX( fDistance / pComboEffectSprite->getContentSize().width);
+				pComboEffectSprite->setScaleY(1.5f);
+
+				m_pComboEffectBatchNode->addChild(pComboEffectSprite);
+				pComboEffectSprite->runAction( 
+					Sequence::create( 
+						DelayTime::create(fDelayTime + iIndex * fDelayPerConvertedCell),
+						Animate::create( pCombo5AnimBolt),
+						RemoveSelf::create(),
+						NULL));
+				
+				iIndex++;
 			}
 
-			fDelayTime += fDestroyTime;			
+			fDelayTime += fDestroyTime + (iIndex+3) * fDelayPerConvertedCell;			
 		}
 	}
 
@@ -1999,6 +2055,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		m_BoardViewMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn] = m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];		
 		
 		m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn] = m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];		
+		
 		//m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setVisible(false);
 		//UpdatePostionOfSprite(targetMovedCells[i].m_iRow, targetMovedCells[i].m_iColumn, true);		
 
@@ -2194,6 +2251,46 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	m_pStatusLayer->setCurrentMove( m_GameBoardManager.GetCurrentMove());
 	m_pStatusLayer->setCurrentScore( m_GameBoardManager.GetCurrentScore());
 	//m_pStatusLayer->update(0);
+
+
+	// ************** check obstacle
+	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
+	int iRow, iColumn, iBlockID;
+	ObstacleProcessManager*	pObstacleProcessManager = m_GameBoardManager.GetObstacleProcessManager();
+	for(iRow =0; iRow < iNumberOfRow; iRow++)
+		for(iColumn =0; iColumn < iNumberOfColumn; iColumn++)
+		{
+			iBlockID = m_GameBoardManager.GetObstacleBlockID(iRow, iColumn);
+			if (iBlockID < 0)
+				continue;
+
+			for(int iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
+			{
+				if (m_BoardObstaclesList[iBlockID][iObstacleTypeID] != NULL)
+				{
+					
+					ObstacleData& obstacleData = pObstacleProcessManager->GetObstacleData(iBlockID, iObstacleTypeID);
+
+					if (obstacleData.m_bIsDirty)
+					{
+						m_BoardObstaclesList[iBlockID][iObstacleTypeID]->removeFromParentAndCleanup(true);
+						m_BoardObstaclesList[iBlockID][iObstacleTypeID] = NULL;
+
+						if (obstacleData.m_bIsActive)
+						{
+							Sprite* pMaskSprite = 
+								Sprite::createWithSpriteFrameName( GameConfigManager::getInstance()->GetObstacleLevelDescription(iObstacleTypeID, obstacleData.m_iObstacleLevel).m_sSpriteFileName.c_str()); //"Lock.png");														
+							pMaskSprite->setAnchorPoint(Point(0,0));
+							m_BoardViewMatrix[iRow][iColumn].m_pSprite->addChild(pMaskSprite);
+
+							if (obstacleData.m_iObstacleLevel > 0)
+								m_BoardObstaclesList[iBlockID][iObstacleTypeID] = pMaskSprite;
+						}
+						obstacleData.m_bIsDirty = false;
+					}		
+				}
+			}
+		}
 }
 
 void HelloWorld::ActivateImageEffect(Node* pSender)
@@ -2284,7 +2381,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 
 	m_BoardViewMatrix[iRow][iColumn].m_pSprite = NULL;
 	m_BoardViewMatrix[iRow][iColumn].m_iLetter = 255; //-1;
-	m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = NULL;
+	m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = NULL;	
 }
 
 Sprite* HelloWorld::GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime)

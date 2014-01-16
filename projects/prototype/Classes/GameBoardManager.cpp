@@ -49,11 +49,11 @@ void GameBoardManager::GenerateGameBoard(int iLevel)
 		}
 
 	// generate obstacles
-	for(auto pObstacle : m_pLevelConfig->m_ObstacleConfigList)
+	/*for(auto pObstacle : m_pLevelConfig->m_ObstacleConfigList)
 	{
 		for(int i=0; i< pObstacle->m_iCount; i++)			
 			m_BoardValueMatrix[pObstacle->m_ObstaclePositionList[i].m_iRow][pObstacle->m_ObstaclePositionList[i].m_iColumn].m_eObstacleType = (ObstacleType_e)pObstacle->m_iObstacleID;
-	}
+	}*/
 	/*
 	// test obstacle
 	if (iLevel == 2)

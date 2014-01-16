@@ -4,6 +4,7 @@
 #include "GameBoardManager.h"
 #include "GameWordManager.h"
 #include "GameConfigManager.h"
+#include "ObstacleProcessManager.h"
 
 enum ComboEffectType
 {
@@ -62,13 +63,18 @@ class NewGameBoardManager : public GameBoardManager
 {
 public:
 	NewGameBoardManager();
+	~NewGameBoardManager();
 
 	inline GameWordManager* GetGameWordManager() { return m_pGameWordManager;}
+	inline ObstacleProcessManager* GetObstacleProcessManager() { return m_pObstacleProcessManager;}
 	inline const int& GetCurrentScore() { return m_iCurrentScore;}
 	inline const int& GetCurrentMove() { return m_iCurrentMove;}
 	inline const LevelConfig& GetLevelConfig() { return *m_pLevelConfig;}
 	inline const int& GetCurrentLevel() { return m_iCurrentLevel;}
 
+	inline void SetObstacleBlockID(const int& iRow, const int& iColumn, const int& iObstacleBlockID) { m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID = iObstacleBlockID;}	
+	inline int GetObstacleBlockID(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID;}
+	void ClearObstacleBlockID(const int& iObstacleBlockID);
 
 	bool IsRowLocked(const int& iRow);
 	bool IsColumnLocked(const int& iColumn);
@@ -130,6 +136,7 @@ protected:
 	void TriggerWaitingCombo5List(std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList);
 protected:
 	GameWordManager* m_pGameWordManager;	
+	ObstacleProcessManager* m_pObstacleProcessManager;
 
 	//LevelTarget m_LevelConfig;
 	int m_iCurrentLevel;

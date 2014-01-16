@@ -1,26 +1,22 @@
 ;size map
-8	8
+5 5
 ;number of move
-25
-;number of color
 6
+;number of color
+4
 ;score of stars
-15000	23000	30000
+500	 1000	1500
 ;map matrix
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-;main word
+1	1	1	1	1
+1	1	1	1	1
+1	1	1	1	1
+1	1	1	1	1
+1	1	1	1	1
+;main word row/collum
 PEN
 1
-4 3 4 4 4 5 4 6
+3 2 3 3 3 4
 ;bonus word
-1
-STUDY
+0
 ;obstacle list: count, list
 0
