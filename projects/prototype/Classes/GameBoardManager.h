@@ -17,6 +17,8 @@ public:
 	inline int GetColumnNumber() { return m_iColumnNumber;}
 	inline int GetCellValue(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_iGemID;}
 	inline GemComboType_e GetCellGemComboType(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_eGemComboType;}
+	inline bool IsComboCell(const int& iRow, const int& iColumn) { return (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType > _GCT_NONE_);}
+
 	//inline ObstacleType_e GetCellObstacleType(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_eObstacleType;}
 
 	inline bool IsBlankCell(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell;}

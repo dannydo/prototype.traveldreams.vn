@@ -51,7 +51,7 @@ public:
 	// generate new letters for new gems, also update rate
 	void GenerateNewLetters(const int& iGemCount, std::vector<unsigned char>& outputLettersForGems, bool bIsNewMove);	
 	
-	bool GenerateNewLetter(unsigned char& sOuputLetter, const GemComboType_e& eComboType);	
+	//bool GenerateNewLetter(unsigned char& sOuputLetter, const GemComboType_e& eComboType);	
 	void UpdateParamForNewMove();
 
 	bool UnlockLetter(const unsigned char& iLetter, int& iUnlockedLetterIndexOfMainWord, std::vector<int> (&unlockedLettersIndexOfSubWords)[_GDS_SUB_WORD_MAX_COUNT_],

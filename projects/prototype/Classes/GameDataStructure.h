@@ -9,6 +9,8 @@
 #define _GDS_SUB_WORD_MAX_COUNT_	2
 
 #define _MAX_GEM_ID_	6
+#define _SPECIAL_COMBO_GEM_ID	10
+
 #define _BOARD_MAX_ROW_NUMBER_	9
 #define _BOARD_MAX_COLUMN_NUMBER_	9
 #define _BOARD_MAX_LENGTH_	9 //max(row, column)
@@ -77,7 +79,18 @@ enum GemComboType_e
 	_GCT_COMBO4_ = 1,
 	_GCT_COMBO5_ = 2,
 	_GCT_COMBO6_ = 3,
-	_GCT_COMBO5_WAITING_TRIGGER_ = 4
+	_GCT_COMBO4_2_ = 4,
+	_GCT_COMBO5_2_ = 5,
+	_GCT_COMBO6_2_ = 6,
+	_GCT_COMBO5_WAITING_TRIGGER_ = 7
+};
+
+enum ComboActivateDirection_e
+{
+	_CAD_LEFT_,
+	_CAD_UP_,
+	_CAD_RIGHT_,
+	_CAD_DOWN_
 };
 
 enum ObstacleType_e : int

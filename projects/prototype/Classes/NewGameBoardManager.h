@@ -22,10 +22,10 @@ public:
 	int m_iGemID;
 };
 
-enum DoubleComboType
+/*enum DoubleComboType
 {
 	_DCT_DEFAULT
-};
+};*/
 
 struct ComboEffectBundle
 {
@@ -47,10 +47,11 @@ struct DoubleComboCreationInfo
 {
 public:
 	Cell m_Position;
-	DoubleComboType m_eDoubleComboType;
+	//DoubleComboType m_eDoubleComboType;
+	GemComboType_e m_eComboType;
 	Cell m_Cell1, m_Cell2;
 };
-
+/*
 struct DoubleComboEffectBundle
 {
 public:
@@ -58,7 +59,7 @@ public:
 	//std::vector<ComboEffectBundle> m_TriggeredComboEfectBundleList;
 	//ComboEffectBundle m_ComboEffectBundle; //note: double combo may include a list of comboEffect!!!! ==> this effect will be added to combo chain!!!
 };
-
+*/
 class NewGameBoardManager : public GameBoardManager
 {
 public:
@@ -82,7 +83,7 @@ public:
 	void GenerateGameBoard(int iLevel);
 
 	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle>& doubleComboList, 
+		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
@@ -90,6 +91,14 @@ public:
 
 	bool FastCheckBlocks( int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& basicMatchingDestroyedCells);
+
+	void PreCheckComboEffect(int iSelectedRow, int iSelectedColumn, ComboActivateDirection_e eDirection, std::vector<Cell>& basicMatchingDestroyedCells);
+	void ExecuteComboEffect(int iSelectedRow, int iSelectedColumn, ComboActivateDirection_e eDirection,
+		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
+		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
+		std::vector<ComboEffectCell>& newComboCells,
+		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<Cell>& newCells);
 
 	int DecreaseMove() { return (m_iCurrentMove--);}
 
@@ -111,13 +120,16 @@ public:
 	// Bonus end game
 	bool ExecuteEndGameBonus(
 		std::vector<ComboEffectCell>& convertedToComboCells,
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle>& doubleComboList, 
+		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& doubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells);		
 protected:
 	inline ComboEffectType GetComboEffectTypeFromComboType(GemComboType_e eGemComboType);
+
+	bool CanComboBeUpgraded(GemComboType_e eComboType);
+	GemComboType_e UpgradeCombo(GemComboType_e eComboType);
 
 	// Execute move util methods
 	void CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn);

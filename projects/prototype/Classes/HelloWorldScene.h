@@ -23,7 +23,12 @@ enum TouchMoveState
 	_TMS_NONE_,
 	_TMS_BEGIN_IDENTIFY_,
 	_TMS_MOVE_HORIZONTAL_,
-	_TMS_MOVE_VERTICAL_
+	_TMS_MOVE_VERTICAL_,
+	_TMS_BEGIN_ACTIVATE_COMBO_,
+	_TMS_ACTIVATE_COMBO_LEFT_,
+	_TMS_ACTIVATE_COMBO_UP_,
+	_TMS_ACTIVATE_COMBO_RIGHT_,
+	_TMS_ACTIVATE_COMBO_DOWN_
 };
 
 struct CellView
@@ -46,7 +51,8 @@ struct ComputeMoveResult
 public:
 	std::vector<ComboEffectCell> m_ConvertedComboCells;
 	std::vector<Cell> m_BasicMatchingDestroyedCells;
-	std::vector<DoubleComboEffectBundle> m_DoubleComboList;
+	//std::vector<DoubleComboEffectBundle> m_DoubleComboList;
+	std::vector<DoubleComboCreationInfo> m_NewDoubleComboList;
 	std::vector<ComboEffectBundle*> m_ComboChainList;
 	std::vector<ComboEffectBundle*> m_TriggeredCombo5ChainList;
 	std::vector<ComboEffectCell> m_NewComboCells;
@@ -60,7 +66,7 @@ public:
 		if (bResetConvertedCombo)
 			m_ConvertedComboCells.clear();
 		m_BasicMatchingDestroyedCells.clear();
-		m_DoubleComboList.clear();
+		m_NewDoubleComboList.clear();
 		m_ComboChainList.clear();
 		m_TriggeredCombo5ChainList.clear();
 		m_NewComboCells.clear();
@@ -98,22 +104,26 @@ protected:
 	void AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, int iRowMove, int iColumnMove);
 	
 	void PlayEffect2(const bool& bIsBonusEndGamePhase,  std::vector<ComboEffectCell>& convertedToComboCells, 
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
+		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo> doubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<Cell>& newCells, bool bIsNewMove);
 	
-	Sprite* GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime);
-	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const float& fDelayTime);
+	//Sprite* GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime);
+	//Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const float& fDelayTime);
+	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter);
 
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();
+	void UpdateObstacleListAfterMove();
 
 
 	void UpdatePostionOfSprite(const int& iRow, const int& iColumn, bool bIsMirror = false);
 
 	void HorizontalMoveUlti(float fDeltaX);
 	void VerticalMoveUlti(float fDeltaY);
+
+	void DrawComboHint();
 
 	void PlayCombo4Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
 	void PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
@@ -193,8 +203,6 @@ private:
 
 	// special region for end game effect
 	cocos2d::LayerColor* m_pEndGameEffectLayer;
-	
-
 };
 
 #endif // __HELLOWORLD_SCENE_H__

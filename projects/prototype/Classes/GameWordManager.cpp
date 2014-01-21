@@ -356,26 +356,28 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<unsig
 
 	// generate letters from main word
 	int iAppearRatio = m_iMainWordGenerateRate;	
-	while(bShouldGenerateLetter && characterOutput.size() < iMaxNewLetters)
+	if (!m_pLevelConfig->m_bIsMainWordExistedOnBoard)
 	{
-		bShouldGenerateLetter = SuccessWithPercentRatio(iAppearRatio);
-		if (bShouldGenerateLetter)
+		while(bShouldGenerateLetter && characterOutput.size() < iMaxNewLetters)
 		{
-			if (GenerateLetterFromMainWord(sLetter))
+			bShouldGenerateLetter = SuccessWithPercentRatio(iAppearRatio);
+			if (bShouldGenerateLetter)
 			{
-				characterOutput.push_back(sLetter);				
-				iAppearRatio *= m_WordGenerateConfig.m_iRatioBetweenLettersOfMainWord / 100;				
+				if (GenerateLetterFromMainWord(sLetter))
+				{
+					characterOutput.push_back(sLetter);				
+					iAppearRatio *= m_WordGenerateConfig.m_iRatioBetweenLettersOfMainWord / 100;				
+				}
+				else
+					bShouldGenerateLetter = false;
 			}
-			else
-				bShouldGenerateLetter = false;
+		}
+
+		if (characterOutput.size() > 0) //appear letter in main word ==> update ratio for next generation
+		{
+			m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate-m_WordGenerateConfig.m_iDecreasePercentAfterLetterAppearedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);
 		}
 	}
-
-	if (characterOutput.size() > 0) //appear letter in main word ==> update ratio for next generation
-	{
-		m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate-m_WordGenerateConfig.m_iDecreasePercentAfterLetterAppearedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);
-	}
-	
 
 	// generate letters from sub words
 	iAppearRatio = m_iSubWordGenerateRate;	
@@ -441,7 +443,7 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<unsig
 	}
 }
 
-bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemComboType_e& eComboType)
+/*bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemComboType_e& eComboType)
 {
 	bool bIsLetterFromMainWord = false, bIsLetterFromSubWord = false;
 	bool bIsCompleted = false; 
@@ -534,7 +536,7 @@ bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemCo
 		m_iCountOfLettersOnBoard ++;		
 
 	return bIsCompleted;
-}
+}*/
 
 void GameWordManager::UpdateParamForNewMove()
 {

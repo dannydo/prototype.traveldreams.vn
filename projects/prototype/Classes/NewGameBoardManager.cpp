@@ -70,8 +70,30 @@ bool NewGameBoardManager::IsColumnLocked(const int& iColumn)
 	return false;
 }
 
+bool NewGameBoardManager::CanComboBeUpgraded(GemComboType_e eComboType)
+{
+	if (eComboType >= _GCT_COMBO4_ && eComboType <= _GCT_COMBO6_)
+		return true;
+
+	return false;
+}
+
+GemComboType_e NewGameBoardManager::UpgradeCombo(GemComboType_e eComboType)
+{
+	switch( eComboType)
+	{
+		default:
+		case _GCT_COMBO4_:
+			return _GCT_COMBO4_2_;
+		case _GCT_COMBO5_:
+			return _GCT_COMBO5_2_;
+		case _GCT_COMBO6_:
+			return _GCT_COMBO6_2_;
+	}
+}
+
 bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle>& doubleComboList, 
+		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
@@ -104,24 +126,24 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 	// create temporary list to compute result for shifting move
 	CopyDataToTempBoardMatrixAndResetFlags( iSelectedRow, iSelectedColumn, iDeltaRow, iDeltaColumn);
 
-	// ************* create double combo ****************************************************	
-	std::vector<ComboEffectBundle*> chainEffectFromDoubleCombo;
+	// ************* find and create double combo ****************************************************	
+	//std::vector<DoubleComboCreationInfo> newDoubleComboList;
 	
-	/*for(iRow=0; iRow < m_iRowNumber; iRow++)
+	for(iRow=0; iRow < m_iRowNumber; iRow++)
 	{
 		for(iColumn=0; iColumn < m_iColumnNumber; iColumn++)
 		{
-			if ( m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
+			if ( CanComboBeUpgraded(m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType))
 			{
 				bool bFoundDoubleCombo = false;
 				Cell nextCell;			
-				if (iRow < m_iRowNumber-1 && m_TemporaryValueMatrix[iRow+1][iColumn].m_eGemComboType)
+				if (iRow < m_iRowNumber-1 && m_TemporaryValueMatrix[iRow+1][iColumn].m_eGemComboType == m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType)
 				{
 					bFoundDoubleCombo = true;
 					nextCell.m_iRow = iRow + 1;
 					nextCell.m_iColumn = iColumn;
 				}
-				else if (iColumn < m_iColumnNumber-1 && m_TemporaryValueMatrix[iRow][iColumn+1].m_eGemComboType)
+				else if (iColumn < m_iColumnNumber-1 && m_TemporaryValueMatrix[iRow][iColumn+1].m_eGemComboType == m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType)
 				{
 					bFoundDoubleCombo = true;
 					nextCell.m_iRow = iRow ;
@@ -130,37 +152,41 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 
 				if (bFoundDoubleCombo)
 				{
-					DoubleComboEffectBundle doubleCombo;
-					doubleCombo.m_CreationInfo.m_Cell1 = Cell(iRow, iColumn);
-					doubleCombo.m_CreationInfo.m_Cell2 = nextCell;
-					doubleCombo.m_CreationInfo.m_Position = doubleCombo.m_CreationInfo.m_Cell1;
-					doubleCombo.m_CreationInfo.m_eDoubleComboType = _DCT_DEFAULT;
+					DoubleComboCreationInfo doubleCombo;
+					doubleCombo.m_Cell1 = Cell(iRow, iColumn);
+					doubleCombo.m_Cell2 = nextCell;
+					doubleCombo.m_Position = doubleCombo.m_Cell1;
+					doubleCombo.m_eComboType = UpgradeCombo(m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType);
 
-					doubleComboList.push_back(doubleCombo);
+					newDoubleComboList.push_back(doubleCombo);
 
 					// disable 2 combo cell
 					m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+					m_TemporaryValueMatrix[iRow][iColumn].m_iGemID = -1;
 					m_TemporaryValueMatrix[nextCell.m_iRow][nextCell.m_iColumn].m_eGemComboType = _GCT_NONE_;
-					
-					// effect of double combo will be execute in combo chain!!!
-					ComboEffectBundle* pComboEffectBundle = new ComboEffectBundle();
-					pComboEffectBundle->m_iPhase = 1;
-					pComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = _CET_DOUBLE_EXPLOSION_;
-					pComboEffectBundle->m_ComboEffectDescription.m_Position = doubleCombo.m_CreationInfo.m_Position;
-									
-					chainEffectFromDoubleCombo.push_back(pComboEffectBundle);
+					m_TemporaryValueMatrix[nextCell.m_iRow][nextCell.m_iColumn].m_iGemID = -1;
+
+					// recheck order of 2 cells
+					if (nextCell.m_iRow == iSelectedRow || nextCell.m_iColumn == iSelectedColumn)
+					{						
+						doubleCombo.m_Position = doubleCombo.m_Cell2;
+					}
+
+					// create double combo cell
+					//m_TemporaryValueMatrix[doubleCombo.m_Cell1.m_iRow][doubleCombo.m_Cell1.m_iColumn].m_eGemComboType = doubleCombo.m_eComboType;
+
 				}
 			}
 		}
 	}
-	*/
+	
 
 	// ************* create block for basic matching ******************************************
 	bool bIsNewBlockCreated;
 	CreateBlockForBasicMatching( bIsNewBlockCreated, basicMatchingDestroyedCells);
 
 	// **********************************
-	if (m_iLinkedBlockCount > 0 || doubleComboList.size() > 0)
+	if (m_iLinkedBlockCount > 0 || newDoubleComboList.size() > 0)
 	{
 		// for test
 		CountBasicCombo();
@@ -179,10 +205,17 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 		RemoveCellsByBasicMatching( basicMatchingDestroyedCells, comboChainList);
 	
 		// add effect of double combo to chain
-		comboChainList.insert(comboChainList.end(), chainEffectFromDoubleCombo.begin(), chainEffectFromDoubleCombo.end());		
+		//comboChainList.insert(comboChainList.end(), chainEffectFromDoubleCombo.begin(), chainEffectFromDoubleCombo.end());		
 
 		// trigger combo chain from effect of triggered combos
 		ExecuteComboChain(comboChainList);
+
+		// create double combo cells
+		for(auto doubleComboCreation : newDoubleComboList)
+		{
+			m_BoardValueMatrix[doubleComboCreation.m_Position.m_iRow][doubleComboCreation.m_Position.m_iColumn].m_eGemComboType = doubleComboCreation.m_eComboType;
+			m_BoardValueMatrix[doubleComboCreation.m_Position.m_iRow][doubleComboCreation.m_Position.m_iColumn].m_iGemID = _SPECIAL_COMBO_GEM_ID;
+		}
 
 		// create combo cells	
 		CreateComboCells( iSelectedRow, iSelectedColumn, basicMatchingDestroyedCells, newComboCells);
@@ -249,7 +282,7 @@ bool NewGameBoardManager::FastCheckBlocks( int iSelectedRow, int iSelectedColumn
 
 	while (iRow != iLimitRow || iColumn != iLimitColumn)
 	{	
-		if (!m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell) //not blank cell
+		if (!m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell && m_TemporaryValueMatrix[iRow][iColumn].m_iGemID != _SPECIAL_COMBO_GEM_ID) //not blank cell
 		{
 			currentCheckCell.m_iRow = iRow;
 			currentCheckCell.m_iColumn = iColumn;				
@@ -573,7 +606,7 @@ void NewGameBoardManager::TriggerWaitingCombo5List(std::vector<ComboEffectBundle
 
 bool NewGameBoardManager::ExecuteEndGameBonus(
 		std::vector<ComboEffectCell>& convertedToComboCells,
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle>& doubleComboList, 
+		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& doubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
@@ -618,7 +651,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	}
 
 	int iRandomIndex;
-	int iMaxConvertedCell = MIN(m_iCurrentMove, 1);
+	int iMaxConvertedCell = MIN(m_iCurrentMove, 5);
 	m_iCurrentMove -= iMaxConvertedCell;
 
 	for(int i=0; i< iMaxConvertedCell; i++)
@@ -637,59 +670,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	}
 
 	// ************* create double combo ****************************************************	
-	std::vector<ComboEffectBundle*> chainEffectFromDoubleCombo;
-	
-	for(iRow=0; iRow < m_iRowNumber; iRow++)
-	{
-		for(iColumn=0; iColumn < m_iColumnNumber; iColumn++)
-		{
-			if ( m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
-			{
-				bHasExistingCombo = true;
-				break;
-				/*bool bFoundDoubleCombo = false;
-				Cell nextCell;			
-				if (iRow < m_iRowNumber-1 && m_TemporaryValueMatrix[iRow+1][iColumn].m_eGemComboType)
-				{
-					bFoundDoubleCombo = true;
-					nextCell.m_iRow = iRow + 1;
-					nextCell.m_iColumn = iColumn;
-				}
-				else if (iColumn < m_iColumnNumber-1 && m_TemporaryValueMatrix[iRow][iColumn+1].m_eGemComboType)
-				{
-					bFoundDoubleCombo = true;
-					nextCell.m_iRow = iRow ;
-					nextCell.m_iColumn = iColumn + 1;
-				}
-
-				if (bFoundDoubleCombo)
-				{
-					DoubleComboEffectBundle doubleCombo;
-					doubleCombo.m_CreationInfo.m_Cell1 = Cell(iRow, iColumn);
-					doubleCombo.m_CreationInfo.m_Cell2 = nextCell;
-					doubleCombo.m_CreationInfo.m_Position = doubleCombo.m_CreationInfo.m_Cell1;
-					doubleCombo.m_CreationInfo.m_eDoubleComboType = _DCT_DEFAULT;
-
-					doubleComboList.push_back(doubleCombo);
-
-					// disable 2 combo cell
-					m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
-					m_TemporaryValueMatrix[nextCell.m_iRow][nextCell.m_iColumn].m_eGemComboType = _GCT_NONE_;
-					
-					// effect of double combo will be execute in combo chain!!!
-					ComboEffectBundle* pComboEffectBundle = new ComboEffectBundle();
-					pComboEffectBundle->m_iPhase = 1;
-					pComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = _CET_DOUBLE_EXPLOSION_;
-					pComboEffectBundle->m_ComboEffectDescription.m_Position = doubleCombo.m_CreationInfo.m_Position;
-									
-					chainEffectFromDoubleCombo.push_back(pComboEffectBundle);
-				}*/
-			}
-		}
-		if (bHasExistingCombo)
-			break;
-	}
-	
+	//*************************************
 	
 	// ************* create block for basic matching ******************************************
 	bool bIsNewBlockCreated;
@@ -710,8 +691,9 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 				for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
 					m_BoardValueMatrix[iRow][iColumn] = m_TemporaryValueMatrix[iRow][iColumn];
 		}
+		
 		// add effect of double combo to first of chain
-		comboChainList.insert(comboChainList.begin(), chainEffectFromDoubleCombo.begin(), chainEffectFromDoubleCombo.end());
+		//comboChainList.insert(comboChainList.begin(), chainEffectFromDoubleCombo.begin(), chainEffectFromDoubleCombo.end());
 
 		// remove cells by basic matching and create first combo chain
 		RemoveCellsByBasicMatching( basicMatchingDestroyedCells, comboChainList);
@@ -865,7 +847,7 @@ void NewGameBoardManager::CreateBlockForBasicMatching(bool& bIsNewBlockCreated, 
 	{
 		for(iColumn=0; iColumn < m_iColumnNumber; iColumn++)
 		{
-			if (!m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell) //not blank cell
+			if (!m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell && m_TemporaryValueMatrix[iRow][iColumn].m_iGemID != _SPECIAL_COMBO_GEM_ID) //not blank cell
 			{
 				currentCheckCell.m_iRow = iRow;
 				currentCheckCell.m_iColumn = iColumn;
@@ -1132,6 +1114,20 @@ void NewGameBoardManager::CreateComboCells(const int& iSelectedRow, const int& i
 							break;
 						}
 				}
+				// NOTE: special case: all cells belong to combo are shielded ==>combo cell won't be created
+				bool bAllCellAreShielded = true;
+
+				for(int j=0; j< linkedBlock.m_iCellCount; j++)						
+						if (basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + j].m_iRow >= 0
+							&&  basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + j].m_iColumn >= 0)							
+						{
+							bAllCellAreShielded = false;
+							break;
+						}
+
+				if (bAllCellAreShielded) 
+					continue;
+
 				if (!bFoundCellOnActiveDragLine)
 				{
 					int iRandomIndex = -1;
@@ -1142,7 +1138,7 @@ void NewGameBoardManager::CreateComboCells(const int& iSelectedRow, const int& i
 					}
 				}
 				
-				m_BoardValueMatrix[comboCell.m_iRow][comboCell.m_iColumn].m_iGemID = linkedBlock.m_iGemID;
+				m_BoardValueMatrix[comboCell.m_iRow][comboCell.m_iColumn].m_iGemID = _SPECIAL_COMBO_GEM_ID; //linkedBlock.m_iGemID;
 				m_BoardValueMatrix[comboCell.m_iRow][comboCell.m_iColumn].m_eGemComboType = linkedBlock.m_eGemComboType;
 
 				newComboCells.push_back(ComboEffectCell(comboCell, linkedBlock.m_eGemComboType, linkedBlock.m_iGemID) );					
@@ -1300,5 +1296,160 @@ ComboEffectType NewGameBoardManager::GetComboEffectTypeFromComboType(GemComboTyp
 			return _CET_DESTROY_COLOR_;
 		case _GCT_COMBO6_:
 			return _CET_DOUBLE_EXPLOSION_;
+	}
+}
+
+void NewGameBoardManager::PreCheckComboEffect(int iSelectedRow, int iSelectedColumn, ComboActivateDirection_e eDirection, std::vector<Cell>& basicMatchingDestroyedCells)
+{
+	if (m_BoardValueMatrix[iSelectedRow][iSelectedColumn].m_eGemComboType == _GCT_COMBO4_)
+	{
+		basicMatchingDestroyedCells.push_back(Cell( iSelectedRow, iSelectedColumn));
+
+		switch (eDirection)
+		{
+			case _CAD_LEFT_:
+			{
+				for(int iColumn = iSelectedColumn-1; iColumn >= 0; iColumn--)
+					if (!m_BoardValueMatrix[iSelectedRow][iColumn].m_bIsBlankCell)
+					{
+						basicMatchingDestroyedCells.push_back(Cell( iSelectedRow, iColumn));
+					}
+				break;
+			}
+			case _CAD_UP_:
+			{
+				for(int iRow = iSelectedRow+1; iRow < m_iRowNumber; iRow++)
+					if (!m_BoardValueMatrix[iRow][iSelectedColumn].m_bIsBlankCell)
+					{
+						basicMatchingDestroyedCells.push_back(Cell( iRow, iSelectedColumn));
+					}
+				break;
+			}
+			case _CAD_RIGHT_:
+			{
+				for(int iColumn = iSelectedColumn+1; iColumn < m_iColumnNumber; iColumn++)
+					if (!m_BoardValueMatrix[iSelectedRow][iColumn].m_bIsBlankCell)
+					{
+						basicMatchingDestroyedCells.push_back(Cell( iSelectedRow, iColumn));
+					}
+				break;
+			}
+			default:
+			case _CAD_DOWN_:
+			{
+				for(int iRow = iSelectedRow-1; iRow >= 0; iRow--)
+					if (!m_BoardValueMatrix[iRow][iSelectedColumn].m_bIsBlankCell)
+					{
+						basicMatchingDestroyedCells.push_back(Cell( iRow, iSelectedColumn));
+					}
+				break;
+			}
+		}		
+	}
+	else //if (m_BoardValueMatrix[iSelectedRow][iSelectedColumn].m_eGemComboType == _GCT_COMBO4_2_)
+	{
+		basicMatchingDestroyedCells.push_back(Cell( iSelectedRow, iSelectedColumn));
+
+		switch (eDirection)
+		{
+			case _CAD_LEFT_:
+			{
+				for(int iColumn = iSelectedColumn-1; iColumn >= 0; iColumn--)
+				{
+					if (!m_BoardValueMatrix[iSelectedRow][iColumn].m_bIsBlankCell)
+					{
+						basicMatchingDestroyedCells.push_back(Cell( iSelectedRow, iColumn));
+					}
+
+					if (  iSelectedRow - (iSelectedColumn-iColumn) >= 0 && !m_BoardValueMatrix[iSelectedRow - (iSelectedColumn-iColumn) ][iColumn].m_bIsBlankCell)
+						basicMatchingDestroyedCells.push_back(Cell( iSelectedRow - (iSelectedColumn-iColumn), iColumn));
+
+					if (  iSelectedRow + (iSelectedColumn-iColumn) < m_iRowNumber && !m_BoardValueMatrix[iSelectedRow + (iSelectedColumn-iColumn) ][iColumn].m_bIsBlankCell)
+						basicMatchingDestroyedCells.push_back(Cell( iSelectedRow + (iSelectedColumn-iColumn), iColumn));
+				}
+				break;
+			}
+			case _CAD_UP_:
+			{
+				for(int iRow = iSelectedRow+1; iRow < m_iRowNumber; iRow++)
+				{
+					if (!m_BoardValueMatrix[iRow][iSelectedColumn].m_bIsBlankCell)
+					{
+						basicMatchingDestroyedCells.push_back(Cell( iRow, iSelectedColumn));
+					}
+
+					if (  iSelectedColumn - (iRow - iSelectedRow) >= 0 && !m_BoardValueMatrix[iRow][iSelectedColumn - (iRow - iSelectedRow)].m_bIsBlankCell)
+						basicMatchingDestroyedCells.push_back(Cell( iRow, iSelectedColumn - (iRow - iSelectedRow)));
+
+					if (  iSelectedColumn + (iRow - iSelectedRow) < m_iColumnNumber && !m_BoardValueMatrix[iRow][iSelectedColumn + (iRow - iSelectedRow)].m_bIsBlankCell)
+						basicMatchingDestroyedCells.push_back(Cell( iRow, iSelectedColumn + (iRow - iSelectedRow)));
+				}
+				break;
+			}
+			case _CAD_RIGHT_:
+			{
+				for(int iColumn = iSelectedColumn+1; iColumn < m_iColumnNumber; iColumn++)
+				{
+					if (!m_BoardValueMatrix[iSelectedRow][iColumn].m_bIsBlankCell)
+					{
+						basicMatchingDestroyedCells.push_back(Cell( iSelectedRow, iColumn));
+					}
+
+					if (  iSelectedRow - (iColumn - iSelectedColumn) >= 0 && !m_BoardValueMatrix[iSelectedRow - (iColumn - iSelectedColumn) ][iColumn].m_bIsBlankCell)
+						basicMatchingDestroyedCells.push_back(Cell( iSelectedRow - (iColumn - iSelectedColumn), iColumn));
+
+					if (  iSelectedRow + (iColumn - iSelectedColumn) < m_iRowNumber && !m_BoardValueMatrix[iSelectedRow + (iColumn - iSelectedColumn) ][iColumn].m_bIsBlankCell)
+						basicMatchingDestroyedCells.push_back(Cell( iSelectedRow + (iColumn - iSelectedColumn), iColumn));
+				}
+				break;
+			}
+			default:
+			case _CAD_DOWN_:
+			{
+				for(int iRow = iSelectedRow-1; iRow >= 0; iRow--)
+				{
+					if (!m_BoardValueMatrix[iRow][iSelectedColumn].m_bIsBlankCell)
+					{
+						basicMatchingDestroyedCells.push_back(Cell( iRow, iSelectedColumn));
+					}
+
+					if (  iSelectedColumn - (iSelectedRow-iRow) >= 0 && !m_BoardValueMatrix[iRow][iSelectedColumn - (iSelectedRow-iRow)].m_bIsBlankCell)
+						basicMatchingDestroyedCells.push_back(Cell( iRow, iSelectedColumn - (iSelectedRow-iRow)));
+
+					if (  iSelectedColumn + (iSelectedRow-iRow) < m_iColumnNumber && !m_BoardValueMatrix[iRow][iSelectedColumn + (iSelectedRow-iRow)].m_bIsBlankCell)
+						basicMatchingDestroyedCells.push_back(Cell( iRow, iSelectedColumn + (iSelectedRow-iRow)));
+				}
+				break;
+			}
+		}		
+	}
+}
+
+
+void NewGameBoardManager::ExecuteComboEffect(int iSelectedRow, int iSelectedColumn, ComboActivateDirection_e eDirection,
+		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
+		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
+		std::vector<ComboEffectCell>& newComboCells,
+		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<Cell>& newCells)
+{
+	// get effective cells
+	PreCheckComboEffect(iSelectedRow, iSelectedColumn, eDirection, basicMatchingDestroyedCells);
+
+	m_BoardValueMatrix[iSelectedRow][iSelectedColumn].m_eGemComboType = _GCT_NONE_;
+
+	if (basicMatchingDestroyedCells.size() > 0)
+	{
+		// remove cells by basic matching and create first combo chain		
+		RemoveCellsByBasicMatching( basicMatchingDestroyedCells, comboChainList);
+
+		// trigger combo chain from effect of triggered combos
+		ExecuteComboChain(comboChainList);
+
+		// create combo cells	
+		CreateComboCells( iSelectedRow, iSelectedColumn, basicMatchingDestroyedCells, newComboCells);
+
+		// calculate move cells and create new cells
+		CalculateMoveCells( originalMovedCells, targetMovedCells, newCells);
 	}
 }
