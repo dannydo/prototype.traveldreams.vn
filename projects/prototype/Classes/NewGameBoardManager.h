@@ -144,6 +144,14 @@ protected:
 	int m_iCurrentMove;
 
 	std::vector<ComboEffectDescription> m_WaitingTriggerCombo5List;
+
+private:
+	bool haveCellMath3(const Cell& cell);
+	int haveMath3WHenMoveRow(const int& iRow);
+	int haveMath3WHenMoveColumn(const int& iColumn);
+
+public:
+	Hint findHintForGame(); 
 };
 
 
