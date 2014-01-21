@@ -1310,44 +1310,46 @@ ComboEffectType NewGameBoardManager::GetComboEffectTypeFromComboType(GemComboTyp
 
 
 
-bool NewGameBoardManager::haveCellMath3(const Cell& cell)
+bool NewGameBoardManager::haveCellMatch3(const Cell& cell)
 {
 	if (m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_bIsBlankCell == false)
 	{	
+		int iGemID = m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID;
+
 		//Check horizontal
-		if ((cell.m_iRow - 1 >= 0 && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow - 1][cell.m_iColumn].m_iGemID)
-			&& (cell.m_iRow - 2 >= 0 && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow - 2][cell.m_iColumn].m_iGemID))
+		if ((cell.m_iRow - 1 >= 0 && iGemID == m_TemporaryValueMatrix[cell.m_iRow - 1][cell.m_iColumn].m_iGemID)
+			&& (cell.m_iRow - 2 >= 0 && iGemID == m_TemporaryValueMatrix[cell.m_iRow - 2][cell.m_iColumn].m_iGemID))
 		{
 			return true;
 		}
 		
-		if ((cell.m_iRow - 1 >= 0 && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow - 1][cell.m_iColumn].m_iGemID)
-			&& (cell.m_iRow + 1 < m_iRowNumber && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow + 1][cell.m_iColumn].m_iGemID))
+		if ((cell.m_iRow - 1 >= 0 && iGemID == m_TemporaryValueMatrix[cell.m_iRow - 1][cell.m_iColumn].m_iGemID)
+			&& (cell.m_iRow + 1 < iGemID == m_TemporaryValueMatrix[cell.m_iRow + 1][cell.m_iColumn].m_iGemID))
 		{
 			return true;
 		}
 		
-		if ((cell.m_iRow + 1 < m_iRowNumber && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow + 1][cell.m_iColumn].m_iGemID)
-			&& (cell.m_iRow + 2 < m_iRowNumber && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow + 2][cell.m_iColumn].m_iGemID))
+		if ((cell.m_iRow + 1 < iGemID == m_TemporaryValueMatrix[cell.m_iRow + 1][cell.m_iColumn].m_iGemID)
+			&& (cell.m_iRow + 2 < iGemID == m_TemporaryValueMatrix[cell.m_iRow + 2][cell.m_iColumn].m_iGemID))
 		{
 			return true;
 		}
 
 		//Check vertical
-		if ((cell.m_iColumn - 1 >= 0 && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn - 1].m_iGemID)
-			&& (cell.m_iColumn - 2 >= 0 && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn - 2].m_iGemID))
+		if ((cell.m_iColumn - 1 >= 0 && iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn - 1].m_iGemID)
+			&& (cell.m_iColumn - 2 >= 0 && iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn - 2].m_iGemID))
 		{
 			return true;
 		}
 		
-		if ((cell.m_iColumn - 1 >= 0 && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn - 1].m_iGemID)
-			&& (cell.m_iColumn + 1 < m_iRowNumber && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn + 1].m_iGemID))
+		if ((cell.m_iColumn - 1 >= 0 && iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn - 1].m_iGemID)
+			&& (cell.m_iColumn + 1 < iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn + 1].m_iGemID))
 		{
 			return true;
 		}
 		
-		if ((cell.m_iColumn + 1 < m_iRowNumber && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn + 1].m_iGemID)
-			&& (cell.m_iColumn + 2 < m_iRowNumber && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn + 2].m_iGemID))
+		if ((cell.m_iColumn + 1 < iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn + 1].m_iGemID)
+			&& (cell.m_iColumn + 2 < iGemID == m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn + 2].m_iGemID))
 		{
 			return true;
 		}
@@ -1356,7 +1358,7 @@ bool NewGameBoardManager::haveCellMath3(const Cell& cell)
 	return false;
 }
 
-int NewGameBoardManager::haveMath3WHenMoveRow(const int& iRow)
+int NewGameBoardManager::haveMatch3WHenMoveRow(const int& iRow)
 {
 	if (IsRowLocked(iRow) == true)
 	{
@@ -1366,18 +1368,20 @@ int NewGameBoardManager::haveMath3WHenMoveRow(const int& iRow)
 	Cell currentCheckCell;
 	currentCheckCell.m_iRow = iRow;
 	int iDeltaMoveRow = 0;
+	int iIndexColumn, iTranslationCell, iSign;
+
 	while (iDeltaMoveRow < m_iColumnNumber - 1)
 	{
 		iDeltaMoveRow++;
 
 		// create temporary list to compute result for shifting move
-		for (int iIndexColumn=0; iIndexColumn<m_iColumnNumber; iIndexColumn++)
+		for (iIndexColumn=0; iIndexColumn<m_iColumnNumber; iIndexColumn++)
 		{
 			if (!m_BoardValueMatrix[iRow][iIndexColumn].m_bIsBlankCell)
 			{	
 				//int iBlankCellCount = 0; //blank cell on the move
-				int iTranslationCell = 0;
-				int iSign = 1;
+				iTranslationCell = 0;
+				iSign = 1;
 
 				for(int iStep=1; iStep<= abs(iDeltaMoveRow); iStep++)
 				{
@@ -1400,10 +1404,10 @@ int NewGameBoardManager::haveMath3WHenMoveRow(const int& iRow)
 			}
 		}
 
-		for (int iIndex=0; iIndex<m_iColumnNumber; iIndex++)
+		for (iIndexColumn=0; iIndexColumn<m_iColumnNumber; iIndexColumn++)
 		{	
-			currentCheckCell.m_iColumn = iIndex;
-			if(haveCellMath3(currentCheckCell) == true)
+			currentCheckCell.m_iColumn = iIndexColumn;
+			if(haveCellMatch3(currentCheckCell) == true)
 			{
 				return iDeltaMoveRow;
 			}
@@ -1413,7 +1417,7 @@ int NewGameBoardManager::haveMath3WHenMoveRow(const int& iRow)
 	return 0;
 }
 
-int NewGameBoardManager::haveMath3WHenMoveColumn(const int& iColumn)
+int NewGameBoardManager::haveMatch3WHenMoveColumn(const int& iColumn)
 {
 	if (IsColumnLocked(iColumn) == true)
 	{
@@ -1423,18 +1427,20 @@ int NewGameBoardManager::haveMath3WHenMoveColumn(const int& iColumn)
 	Cell currentCheckCell;
 	currentCheckCell.m_iColumn = iColumn;
 	int iDeltaMoveColumn = 0;
+	int iIndexRow, iTranslationCell, iSign;
+
 	while (iDeltaMoveColumn < m_iRowNumber - 1)
 	{
 		iDeltaMoveColumn++;
 
 		// create temporary list to compute result for shifting move
-		for (int iIndexRow=0; iIndexRow<m_iRowNumber; iIndexRow++)
+		for (iIndexRow=0; iIndexRow<m_iRowNumber; iIndexRow++)
 		{
 			if (!m_BoardValueMatrix[iIndexRow][iColumn].m_bIsBlankCell)
 			{	
 				//int iBlankCellCount = 0; //blank cell on the move
-				int iTranslationCell = 0;
-				int iSign = 1;
+				iTranslationCell = 0;
+				iSign = 1;
 
 				for(int iStep=1; iStep<= abs(iDeltaMoveColumn); iStep++)
 				{
@@ -1455,10 +1461,10 @@ int NewGameBoardManager::haveMath3WHenMoveColumn(const int& iColumn)
 			}
 		}
 
-		for (int iIndex=0; iIndex<m_iRowNumber; iIndex++)
+		for (iIndexRow=0; iIndexRow<m_iRowNumber; iIndexRow++)
 		{	
-			currentCheckCell.m_iRow = iIndex;
-			if(haveCellMath3(currentCheckCell) == true)
+			currentCheckCell.m_iRow = iIndexRow;
+			if(haveCellMatch3(currentCheckCell) == true)
 			{
 				return iDeltaMoveColumn;
 			}
@@ -1474,16 +1480,18 @@ Hint NewGameBoardManager::findHintForGame()
 	hint.m_deltaMove = 0;
 	hint.m_iRow = -1;
 	hint.m_iColumn = -1;
+
+	int iIndexRow, iIndexColumn;
 	
 	// create temporary list to compute result for shifting move
 	memcpy( m_TemporaryValueMatrix, m_BoardValueMatrix, sizeof(m_BoardValueMatrix));
 
-	for(int iIndexRow=0; iIndexRow < m_iRowNumber; iIndexRow++)
+	for(iIndexRow=0; iIndexRow < m_iRowNumber; iIndexRow++)
 	{
-		int deltaMove = haveMath3WHenMoveRow(iIndexRow);
+		int deltaMove = haveMatch3WHenMoveRow(iIndexRow);
 
 		//Reset row moved
-		for (int iIndexColumn = 0; iIndexColumn < m_iColumnNumber; iIndexColumn++)
+		for (iIndexColumn = 0; iIndexColumn < m_iColumnNumber; iIndexColumn++)
 		{
 			m_TemporaryValueMatrix[iIndexRow][iIndexColumn] = m_BoardValueMatrix[iIndexRow][iIndexColumn];
 		}
@@ -1497,12 +1505,12 @@ Hint NewGameBoardManager::findHintForGame()
 		}
 	}
 
-	for(int iIndexColumn=0; iIndexColumn < m_iColumnNumber; iIndexColumn++)
+	for(iIndexColumn=0; iIndexColumn < m_iColumnNumber; iIndexColumn++)
 	{
-		int deltaMove = haveMath3WHenMoveColumn(iIndexColumn);
+		int deltaMove = haveMatch3WHenMoveColumn(iIndexColumn);
 
 		//Reset column moved
-		for (int iIndexRow = 0; iIndexRow < m_iRowNumber; iIndexRow++)
+		for (iIndexRow = 0; iIndexRow < m_iRowNumber; iIndexRow++)
 		{
 			m_TemporaryValueMatrix[iIndexRow][iIndexColumn] = m_BoardValueMatrix[iIndexRow][iIndexColumn];
 		}
