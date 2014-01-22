@@ -101,6 +101,8 @@ public:
 	void visit() override;
 protected:
 	std::string GetImageFileFromGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
+	int GetUnmoveCellsFromCurrentMovingRowOrColumn();
+
 	void AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, int iRowMove, int iColumnMove);
 	
 	void PlayEffect2(const bool& bIsBonusEndGamePhase,  std::vector<ComboEffectCell>& convertedToComboCells, 

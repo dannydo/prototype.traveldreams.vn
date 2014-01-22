@@ -156,6 +156,15 @@ protected:
 	int m_iCurrentMove;
 
 	std::vector<ComboEffectDescription> m_WaitingTriggerCombo5List;
+
+private:
+	// utility methods to find hint on temporary matrix
+	bool haveCellMatch3(const Cell& cell);
+	int haveMatch3WHenMoveRow(const int& iRow);
+	int haveMatch3WHenMoveColumn(const int& iColumn);
+
+public:
+	Hint findHintForGame(); 
 };
 
 

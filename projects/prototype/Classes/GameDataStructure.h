@@ -221,5 +221,13 @@ public:
 	int m_iRemainNotAppearedCharacterCount;
 };
 
+struct Hint
+{
+public:
+	int m_iRow;
+	int m_iColumn;
+	int m_deltaMove;
+};
+
 
 #endif _GAME_DATA_STRUCTURE_H_
