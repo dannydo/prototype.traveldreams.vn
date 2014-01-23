@@ -3,9 +3,7 @@
 
 #include "cocos2d.h"
 
-#include "SimpleAudioEngine.h"
-
-class MainMenuLayer : public cocos2d::CCLayerColor
+class MainMenuLayer : public cocos2d::Layer
 {
 public:
 	MainMenuLayer() {};
@@ -13,13 +11,12 @@ public:
 	bool init();
 	CREATE_FUNC(MainMenuLayer);
 
-	void menuItemSelected(Object* pSender);
-	void menuOpenIntroduction();
-
-	
+private:
+	void playGame();
+	void loginFacebook();
 };
 
-class MainMenuScene : public cocos2d::CCScene
+class MainMenuScene : public cocos2d::Scene
 {
 public:
 	MainMenuScene():_layer(NULL) {};
