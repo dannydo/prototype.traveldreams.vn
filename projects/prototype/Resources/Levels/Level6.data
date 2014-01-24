@@ -1,7 +1,7 @@
 ;size map
 7	7
 ;number of move
-50
+30
 ;number of color
 5
 ;score of stars
@@ -21,4 +21,13 @@ BOOKCASE
 1
 STUDY
 ;obstacle list: count, list
-0
+3
+COUNTDOWN	5
+3
+3 4 8 5 7 1
+SHIELD 1
+3
+7 6 3 4 8 5
+LOCK	0
+1
+1	2

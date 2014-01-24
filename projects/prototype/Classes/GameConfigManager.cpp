@@ -37,7 +37,7 @@ const LevelConfig& GameConfigManager::GetLevelConfig(int iLevel)
 const ObstacleLevelDescription& GameConfigManager::GetObstacleLevelDescription(const int& iObstacleTypeID, const int& iLevel)
 {
 	ObstacleDescription* pObstacleDescription = m_ObstacleDescriptionArray[iObstacleTypeID];
-	if (iLevel> 0 && pObstacleDescription->m_LevelList.size() > iLevel)
+	if (iLevel> 0 && pObstacleDescription->m_LevelList.size() >= iLevel)
 		return pObstacleDescription->m_LevelList[iLevel-1];
 	else
 		return pObstacleDescription->m_LevelList[0];
@@ -274,9 +274,15 @@ void GameConfigManager::LoadObstacleConfig()
 
 		pObstacleDescription->m_bDecreaseLevelAfterDestroyed = pObstacleDetailDict->getItemBoolvalue("decreaseLevelAfterDestroyed", true);
 		pObstacleDescription->m_bDecreaseLevelAfterMoved = pObstacleDetailDict->getItemBoolvalue("decreaseLevelAfterMoved", true);
-		////** pObstacleDescription->m_TransformToObjectAtLevel0 = pObstacleDetailDict->getItemBoolvalue("transformToObjectAtLevel0", true);
 		
-		//pObstacleDescription->m_bMatchToDestroy = pObstacleDetailDict->getItemBoolvalue("matchToDestroy", true);
+		string sTargetTransformName = pObstacleDetailDict->getItemStringValue("transformToObjectAtLevel0");
+		if (sTargetTransformName.size() > 0)
+			pObstacleDescription->m_TransformToObjectAtLevel0 = m_ObstaleNameToIDMap[sTargetTransformName];
+		else
+			pObstacleDescription->m_TransformToObjectAtLevel0 = -1;
+		pObstacleDescription->m_iLevelOfTransformedObject = pObstacleDetailDict->getItemIntValue("levelOfTransformedObject", 0);
+		
+		pObstacleDescription->m_bIsDestroyable = pObstacleDetailDict->getItemBoolvalue("destroyable", true);
 		pObstacleDescription->m_bMatchAroundToDestroyed = pObstacleDetailDict->getItemBoolvalue("matchAroundToDestroy", true);
 		
 		// how to appear

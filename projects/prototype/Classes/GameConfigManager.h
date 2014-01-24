@@ -81,8 +81,9 @@ public:
 	bool m_bDecreaseLevelAfterMoved;
 	
 	int m_TransformToObjectAtLevel0;
+	int m_iLevelOfTransformedObject;
 	
-	//bool m_bMatchToDestroy;
+	bool m_bIsDestroyable;
 	bool m_bMatchAroundToDestroyed;
 		
 	bool m_bAppearByDrop;

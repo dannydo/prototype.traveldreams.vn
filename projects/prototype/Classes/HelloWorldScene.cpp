@@ -362,7 +362,7 @@ void HelloWorld::initLevel(int iLevel)
 								Sprite* pMaskSprite = 
 									Sprite::createWithSpriteFrameName( GameConfigManager::getInstance()->GetObstacleLevelDescription(iObstacleTypeID, obstacleData.m_iObstacleLevel).m_sSpriteFileName.c_str()); //"Lock.png");														
 								pMaskSprite->setAnchorPoint(Point(0,0));
-								pSprite->addChild(pMaskSprite);
+								pSprite->addChild(pMaskSprite, 10);
 
 								if (obstacleData.m_iObstacleLevel > 0)
 									m_BoardObstaclesList[iBlockID][iObstacleTypeID] = pMaskSprite;
@@ -681,6 +681,7 @@ void HelloWorld::onTouchEnded(Touch* pTouch, Event* pEvent)
 				break;		
 		}
 
+		m_ComputeMoveResult.Reset(false);
 		m_GameBoardManager.ExecuteComboEffect( m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn, eComboDireciton,
 			m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
 			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells);
@@ -768,6 +769,7 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 		(m_eTouchMoveState == _TMS_MOVE_VERTICAL_ &&  m_GameBoardManager.IsColumnLocked(m_SelectedCell.m_iColumn)))
 	{
 		onTouchEnded( pTouch, NULL);
+		return;
 	}
 
 
@@ -851,15 +853,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 	m_ComputeMoveResult.Reset(false);
 
 	if (m_eTouchMoveState == _TMS_MOVE_HORIZONTAL_)
-	{		
-		int iBlankCellOfFullLine = GetUnmoveCellsFromCurrentMovingRowOrColumn();	
-		if (fabs(fDeltaX) > (m_iMovingCellListLength - iBlankCellOfFullLine)* m_SymbolSize.width)
-			fDeltaX = fDeltaX/fabs(fDeltaX) * (m_iMovingCellListLength - iBlankCellOfFullLine)* m_SymbolSize.width;	
-	
-		// convert negative delta to active value for easier computation
-		if (fDeltaX < 0)
-			fDeltaX += (m_iMovingCellListLength - iBlankCellOfFullLine)* m_SymbolSize.width;	
-
+	{				
 		fMoveUnit = fDeltaX/m_SymbolSize.width;				
 		fMoveUnit = round(fMoveUnit);
 		iMoveUnit = (int)fMoveUnit;
@@ -894,22 +888,21 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 				tempCellList[iColumn] = m_BoardViewMatrix[m_SelectedCell.m_iRow][iColumn];
 				tempCellMirrorList[iColumn] = m_BoardViewMirrorMatrix[m_SelectedCell.m_iRow][iColumn];
 			}
-			
-			//int iBlankCellCount = 0; //blank cell on the move
+						
 			int iTranslationCell = 0;
-			//int iSign = 1;
-			//if (iMoveUnit != 0)
-				//iSign = iMoveUnit/ abs(iMoveUnit);
+			int iSign = 1;
+			if (iMoveUnit != 0)
+				iSign = iMoveUnit/ abs(iMoveUnit);
 			
 			for(int iColumn=0; iColumn < iNumberOfColumn; iColumn++)
 				if (!m_GameBoardManager.IsBlankCell(m_SelectedCell.m_iRow, iColumn))				
 				{
 					iTranslationCell = 0;
-					for(int iStep=1; iStep <= iMoveUnit; iStep++) //abs(iMoveUnit); iStep++)
+					for(int iStep=1; iStep <= abs(iMoveUnit); iStep++)
 					{
-						iTranslationCell += 1; //iSign;
-						//if (iTranslationCell < 0)
-							//iTranslationCell += iNumberOfColumn;
+						iTranslationCell += iSign;
+						if (iTranslationCell < 0)
+							iTranslationCell += iNumberOfColumn;
 
 						if (m_GameBoardManager.IsBlankCell( m_SelectedCell.m_iRow, (iColumn + iTranslationCell) % iNumberOfColumn))
 						{
@@ -917,20 +910,8 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 						}
 					}
 
-					m_BoardViewMatrix[m_SelectedCell.m_iRow][(iColumn + iTranslationCell) % (iNumberOfColumn)] = tempCellList[iColumn];
-					m_BoardViewMirrorMatrix[m_SelectedCell.m_iRow][(iColumn + iTranslationCell) % (iNumberOfColumn)] = tempCellMirrorList[iColumn];
-					/*
-					//iBlankCellCount = 0;
-
-					for(int iDelta=1; iDelta<= abs(iMoveUnit); iDelta++)
-						if (m_GameBoardManager.IsBlankCell(m_SelectedCell.m_iRow, (iColumn + iDelta * iSign + iNumberOfColumn) % iNumberOfColumn))
-							iBlankCellCount++;
-					//while (m_GameBoardManager.IsBlankCell(m_SelectedCell.m_iRow, (iColumn + iMoveUnit + iNumberOfColumn + iCheck) % (iNumberOfColumn)))
-						//iCheck += iStep;
-
-					m_BoardViewMatrix[m_SelectedCell.m_iRow][(iColumn + iMoveUnit + iNumberOfColumn + iBlankCellCount*iSign) % (iNumberOfColumn)] = tempCellList[iColumn];
-					m_BoardViewMirrorMatrix[m_SelectedCell.m_iRow][(iColumn + iMoveUnit + iNumberOfColumn + iBlankCellCount * iSign) % (iNumberOfColumn)] = tempCellMirrorList[iColumn];
-					*/
+					m_BoardViewMatrix[m_SelectedCell.m_iRow][(iColumn + iNumberOfColumn + iTranslationCell) % (iNumberOfColumn)] = tempCellList[iColumn];
+					m_BoardViewMirrorMatrix[m_SelectedCell.m_iRow][(iColumn + iNumberOfColumn + iTranslationCell) % (iNumberOfColumn)] = tempCellMirrorList[iColumn];					
 				}
 		}
 		else
@@ -950,15 +931,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 		}
 	}
 	else if (m_eTouchMoveState == _TMS_MOVE_VERTICAL_)
-	{
-		int iBlankCellOfFullLine = GetUnmoveCellsFromCurrentMovingRowOrColumn();	
-		if (fabs(fDeltaY) > (m_iMovingCellListLength - iBlankCellOfFullLine)* m_SymbolSize.height)
-			fDeltaY = fDeltaY/fabs(fDeltaY) * (m_iMovingCellListLength - iBlankCellOfFullLine)* m_SymbolSize.height;	
-	
-		// convert negative delta to active value for easier computation
-		if (fDeltaY < 0)
-			fDeltaY += (m_iMovingCellListLength - iBlankCellOfFullLine)* m_SymbolSize.height;
-
+	{		
 		fMoveUnit = fDeltaY/m_SymbolSize.height;
 		
 		fMoveUnit = round(fMoveUnit);
@@ -995,22 +968,21 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 				tempCellList[iRow] = m_BoardViewMatrix[iRow][m_SelectedCell.m_iColumn];
 				tempCellMirrorList[iRow] = m_BoardViewMirrorMatrix[iRow][m_SelectedCell.m_iColumn];
 			}
-			
-			//int iBlankCellCount = 0; //blank cell on the move
+						
 			int iTranslationCell = 0;
-			//int iSign = 1;
-			//if (iMoveUnit != 0)
-				//iSign = iMoveUnit/ abs(iMoveUnit);
+			int iSign = 1;
+			if (iMoveUnit != 0)
+				iSign = iMoveUnit/ abs(iMoveUnit);
 
 			for(int iRow=0; iRow < iNumberOfRow; iRow++)
 				if (!m_GameBoardManager.IsBlankCell(iRow, m_SelectedCell.m_iColumn))				
 				{
 					iTranslationCell = 0;
-					for(int iStep=1; iStep <= iMoveUnit; iStep++) //abs(iMoveUnit); iStep++)
+					for(int iStep=1; iStep <= abs(iMoveUnit); iStep++)
 					{
-						iTranslationCell += 1; //iSign;
-						//if (iTranslationCell < 0)
-							//iTranslationCell += iNumberOfRow;
+						iTranslationCell += iSign;
+						if (iTranslationCell < 0)
+							iTranslationCell += iNumberOfRow;
 
 						if (m_GameBoardManager.IsBlankCell( (iRow + iTranslationCell) % (iNumberOfRow), m_SelectedCell.m_iColumn))
 						{
@@ -1018,19 +990,8 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 						}
 					}
 
-					m_BoardViewMatrix[(iRow + iTranslationCell) % (iNumberOfRow)][m_SelectedCell.m_iColumn] = tempCellList[iRow];
-					m_BoardViewMirrorMatrix[(iRow + iTranslationCell) % (iNumberOfRow)][m_SelectedCell.m_iColumn] = tempCellMirrorList[iRow];
-					/*
-					iBlankCellCount = 0;
-					for(int iDelta=1; iDelta<= abs(iMoveUnit); iDelta++)
-						if (m_GameBoardManager.IsBlankCell( (iRow + iNumberOfRow + iDelta * iSign) % (iNumberOfRow), m_SelectedCell.m_iColumn))
-							iBlankCellCount++;
-
-					//while (m_GameBoardManager.IsBlankCell( (iRow + iMoveUnit + iNumberOfRow + iCheck) % (iNumberOfRow), m_SelectedCell.m_iColumn))
-						//iCheck += iStep;
-
-					m_BoardViewMatrix[(iRow + iMoveUnit + iNumberOfRow + iBlankCellCount*iSign) % (iNumberOfRow)][m_SelectedCell.m_iColumn] = tempCellList[iRow];
-					m_BoardViewMirrorMatrix[(iRow + iMoveUnit + iNumberOfRow + iBlankCellCount*iSign) % (iNumberOfRow)][m_SelectedCell.m_iColumn] = tempCellMirrorList[iRow];*/
+					m_BoardViewMatrix[(iRow + iNumberOfRow + iTranslationCell) % (iNumberOfRow)][m_SelectedCell.m_iColumn] = tempCellList[iRow];
+					m_BoardViewMirrorMatrix[(iRow + iNumberOfRow + iTranslationCell) % (iNumberOfRow)][m_SelectedCell.m_iColumn] = tempCellMirrorList[iRow];					
 				}
 		}
 		else
@@ -1211,6 +1172,10 @@ void HelloWorld::OnEndDragEffect()
 
 void HelloWorld::CheckBoardStateAfterMove()
 {
+	// clean old list of chain
+	m_GameBoardManager.GetObstacleProcessManager()->CleanWaitingClearList();
+
+
 	bool bMoveIsValid = false;
 	m_ComputeMoveResult.Reset(false);
 
@@ -1250,11 +1215,13 @@ void HelloWorld::CheckBoardStateAfterMove()
 		else //game is not end yet*/
 		{
 			PlayUnlockLettersOfMainWordAnimation(0.f);			
-		}
-	}
+		}		
 
-	// update obstacle manager after move
-	m_GameBoardManager.GetObstacleProcessManager()->Update();
+		// update obstacle manager after move
+		m_GameBoardManager.GetObstacleProcessManager()->UpdateAfterMove();
+
+		UpdateObstacleListAfterMove();
+	}	
 }
 
 void HelloWorld::ExecuteBonusWinGameEffect()
@@ -1354,12 +1321,12 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 							
 			bool bMeetSide = false;
 
-			if (fDeltaX>0 && fDeltaX > fMoveUnit * m_SymbolSize.width) // || (fDeltaX<0 && fDeltaX < fMoveUnit * m_SymbolSize.width))
+			if (fDeltaX>0 && fDeltaX > fMoveUnit * m_SymbolSize.width) 
 			{
 				while ((m_MovingCellList[(iColumn + iTranslatedMirrorCell + 1 + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite == NULL)
-						||  (iColumn + iTranslatedMirrorCell +  1 == m_iMovingCellListLength)) // || (iColumn + iTranslatedMirrorCell + iSign == -1))
+						||  (iColumn + iTranslatedMirrorCell +  1 == m_iMovingCellListLength)) 
 				{
-					if (iColumn + iTranslatedMirrorCell +  1 == m_iMovingCellListLength) //|| (iColumn + iTranslatedMirrorCell + iSign == -1))
+					if (iColumn + iTranslatedMirrorCell +  1 == m_iMovingCellListLength) 
 						bMeetSide = true;	
 
 					iTranslatedMirrorCell += 1;										
@@ -1367,9 +1334,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 					if (m_MovingCellList[(iColumn + iTranslatedMirrorCell) % m_iMovingCellListLength].m_pSprite != NULL)
 						break;
 					else if (bMeetSide)
-					{												
-						//if (iSign < 0)
-							//iTranslatedMirrorCell += iSign;
+					{																		
 						if (m_MovingCellList[(iColumn + iTranslatedMirrorCell) % m_iMovingCellListLength].m_pSprite == NULL)
 							bMeetSide = false;
 					}
@@ -1479,10 +1444,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 	
 	m_iSaveLastCellMoveDelta = iMoveUnit;
 
-	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
-	//int iSign = 1;
-	//if (iMoveUnit != 0)
-		//iSign = -iMoveUnit/ abs(iMoveUnit);
+	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();	
 	int iTranslationCell = 0;
 	
 	m_ComputeMoveResult.Reset(false);
@@ -1501,7 +1463,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 		for(auto cell : m_ComputeMoveResult.m_BasicMatchingDestroyedCells)
 		{
 			Sprite* pHintSprite = Sprite::createWithSpriteFrameName("Orange_Border.png");
-			//pHintSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height));
+			
 			Size size = m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->getContentSize();
 			if (cell.m_iRow != m_SelectedCell.m_iRow)
 				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pHintSprite);
@@ -1510,9 +1472,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 				iTranslationCell = 0;
 				for(int iStep=1; iStep <= abs(iMoveUnit); iStep++)
 				{
-					iTranslationCell += 1;//iSign;
-					//if (iTranslationCell < 0)
-						//iTranslationCell += iNumberOfColumn;
+					iTranslationCell += 1;
 
 					if (m_GameBoardManager.IsBlankCell( m_SelectedCell.m_iRow, (cell.m_iColumn + iTranslationCell) % iNumberOfColumn))
 					{
@@ -1525,10 +1485,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 
 			pHintSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
 			
-			m_HintSprites.push_back(pHintSprite);
-
-			//m_pBoardBatchNode->addChild(pHintSprite);
-			//m_pMoveHintNode->addChild(pHintSprite);
+			m_HintSprites.push_back(pHintSprite);			
 		}
 
 	}
@@ -1547,19 +1504,7 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 
 
 	float fMoveUnit = fDeltaY/m_SymbolSize.height;	
-	fMoveUnit = floorf(fMoveUnit);
-	/*int iSign; //1 or -1
-
-	if (fMoveUnit > 0)
-	{
-		fMoveUnit = floorf(fMoveUnit);
-		iSign = 1;
-	}
-	else
-	{
-		fMoveUnit = ceilf(fMoveUnit);
-		iSign = -1;
-	}*/
+	fMoveUnit = floorf(fMoveUnit);	
 		
 	int iMoveUnit = (int)fMoveUnit; //abs((int)fMoveUnit);		
 	//int iBlankCellInOriginMoving, iBlankCellInMirrorMoving;//blank cells on the moving path of origin and mirror
@@ -1577,18 +1522,14 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 			iTranslatedMirrorCell = 0;
 			for(int iStep = 1; iStep <= iMoveUnit; iStep++)
 			{
-				iTranslatedOriginCell += 1;
-				//if (iTranslatedOriginCell < 0)
-					//iTranslatedOriginCell += m_iMovingCellListLength;
+				iTranslatedOriginCell += 1;				
 
 				if (m_MovingCellList[(iRow + iTranslatedOriginCell) % m_iMovingCellListLength].m_pSprite == NULL)
 				{
 					iStep--;
 				}
 			}
-
-			//if (iSign < 0 && iTranslatedOriginCell > 0)
-				//iTranslatedOriginCell -= m_iMovingCellListLength;
+			
 			iTranslatedMirrorCell = iTranslatedOriginCell;	
 
 			bool bMeetSide = false;
@@ -1596,14 +1537,12 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 			if ((fDeltaY>0 && fDeltaY > fMoveUnit * m_SymbolSize.height) || (fDeltaY<0 && fDeltaY < fMoveUnit * m_SymbolSize.height))
 			{
 				while ((m_MovingCellList[(iRow + iTranslatedMirrorCell + 1 + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite == NULL)
-						||  (iRow + iTranslatedMirrorCell +  1 == m_iMovingCellListLength))// || (iRow + iTranslatedMirrorCell + iSign == -1))
+						||  (iRow + iTranslatedMirrorCell +  1 == m_iMovingCellListLength))
 				{
-					if (iRow + iTranslatedMirrorCell +  1 == m_iMovingCellListLength)// || (iRow + iTranslatedMirrorCell + iSign == -1))
+					if (iRow + iTranslatedMirrorCell +  1 == m_iMovingCellListLength)
 						bMeetSide = true;	
 
-					iTranslatedMirrorCell += 1; //iSign;
-					//if (iRow + iTranslatedMirrorCell + m_iMovingCellListLength < 0)
-						//iTranslatedMirrorCell += m_iMovingCellListLength;
+					iTranslatedMirrorCell += 1;
 
 					if (m_MovingCellList[(iRow + iTranslatedMirrorCell ) % m_iMovingCellListLength].m_pSprite != NULL)						
 						break;
@@ -1632,58 +1571,7 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 			{
 				m_MovingCellMirrorList[iRow].m_pSprite->setVisible(false);
 				m_MovingCellMirrorList[iRow].m_pSprite->setPosition(m_MovingCellList[iRow].m_pSprite->getPosition());
-			}
-
-			/*iBlankCellInOriginMoving = 0;
-			iBlankCellInMirrorMoving = 0;
-			
-			bool bMeetSide = false;
-
-			for(int iDelta = 1; iDelta <= iMoveUnit; iDelta++)
-				//if (m_GameBoardManager.IsBlankCell( (iRow + iDelta * iSign + m_iMovingCellListLength) % m_iMovingCellListLength, m_SelectedCell.m_iColumn))
-				if (m_MovingCellList[(iRow + iDelta * iSign + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite == NULL)
-				{
-					iBlankCellInOriginMoving++;
-					iBlankCellInMirrorMoving++;
-				}
-				
-			
-			if ((fDeltaY>0 && fDeltaY > fMoveUnit * m_SymbolSize.height) || (fDeltaY<0 && fDeltaY < fMoveUnit * m_SymbolSize.height))
-			{			
-				int iDelta = 0;
-			
-				while //(m_GameBoardManager.IsBlankCell((iRow + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength, m_SelectedCell.m_iColumn)
-					( m_MovingCellList[(iRow + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite == NULL
-					||  (iRow + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign == m_iMovingCellListLength) || (iRow + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign == -1))
-				{					
-					if ((iRow + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign == m_iMovingCellListLength) || (iRow + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign == -1))
-						bMeetSide = true;
-
-					iDelta++;
-
-					// this is real condition to continue
-					//if (!m_GameBoardManager.IsBlankCell( (iRow + (iMoveUnit + iBlankCellInMirrorMoving + iDelta) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength, m_SelectedCell.m_iColumn))
-					if (m_MovingCellList[(iRow + (iMoveUnit + iBlankCellInMirrorMoving + iDelta) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite != NULL)
-						break;
-				}
-
-				iBlankCellInMirrorMoving += iDelta;
-			}
-
-			m_MovingCellList[iRow].m_pSprite->setPositionY(
-				m_fBoardBottomPosition + ((iRow + (iMoveUnit +iBlankCellInOriginMoving) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength ) * m_SymbolSize.height + fDeltaY - fMoveUnit  * m_SymbolSize.height);
-			
-			if (iBlankCellInMirrorMoving != iBlankCellInOriginMoving)
-			{
-				m_MovingCellMirrorList[iRow].m_pSprite->setVisible(true);
-				m_MovingCellMirrorList[iRow].m_pSprite->setPositionY(
-					m_fBoardBottomPosition + ((iRow + (iMoveUnit + iBlankCellInMirrorMoving) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength ) * m_SymbolSize.height + fDeltaY - ( fMoveUnit + bMeetSide*iSign) * m_SymbolSize.height);
-			}
-			else
-			{
-				m_MovingCellMirrorList[iRow].m_pSprite->setVisible(false);
-				m_MovingCellMirrorList[iRow].m_pSprite->setPosition(m_MovingCellList[iRow].m_pSprite->getPosition());
-			}*/
+			}	
 		}
 	}
 
@@ -1749,9 +1637,7 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 				iTranslationCell = 0;
 				for(int iStep=1; iStep <= abs(iMoveUnit); iStep++)
 				{
-					iTranslationCell += 1;
-					//if (iTranslationCell < 0)
-						//iTranslationCell += iNumberOfRow;
+					iTranslationCell += 1;					
 
 					if (m_GameBoardManager.IsBlankCell( (cell.m_iRow + iTranslationCell) % iNumberOfRow,  m_SelectedCell.m_iColumn))
 					{
@@ -1765,9 +1651,6 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 			pHintSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
 			
 			m_HintSprites.push_back(pHintSprite);
-
-			//m_pBoardBatchNode->addChild(pHintSprite);
-			//m_pMoveHintNode->addChild(pHintSprite);
 		}
 
 	}
@@ -2420,28 +2303,26 @@ void HelloWorld::UpdateObstacleListAfterMove()
 
 			for(int iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
 			{
-				if (m_BoardObstaclesList[iBlockID][iObstacleTypeID] != NULL)
+				ObstacleData& obstacleData = pObstacleProcessManager->GetObstacleData(iBlockID, iObstacleTypeID);
+				if (obstacleData.m_bIsDirty)
 				{
-					
-					ObstacleData& obstacleData = pObstacleProcessManager->GetObstacleData(iBlockID, iObstacleTypeID);
-
-					if (obstacleData.m_bIsDirty)
-					{
+					if (m_BoardObstaclesList[iBlockID][iObstacleTypeID] != NULL)
+					{										
 						m_BoardObstaclesList[iBlockID][iObstacleTypeID]->removeFromParentAndCleanup(true);
 						m_BoardObstaclesList[iBlockID][iObstacleTypeID] = NULL;
+					}											
 
-						if (obstacleData.m_bIsActive)
-						{
-							Sprite* pMaskSprite = 
-								Sprite::createWithSpriteFrameName( GameConfigManager::getInstance()->GetObstacleLevelDescription(iObstacleTypeID, obstacleData.m_iObstacleLevel).m_sSpriteFileName.c_str()); //"Lock.png");														
-							pMaskSprite->setAnchorPoint(Point(0,0));
-							m_BoardViewMatrix[iRow][iColumn].m_pSprite->addChild(pMaskSprite);
+					if (obstacleData.m_bIsActive)
+					{
+						Sprite* pMaskSprite = 
+							Sprite::createWithSpriteFrameName( GameConfigManager::getInstance()->GetObstacleLevelDescription(iObstacleTypeID, obstacleData.m_iObstacleLevel).m_sSpriteFileName.c_str()); //"Lock.png");														
+						pMaskSprite->setAnchorPoint(Point(0,0));
+						m_BoardViewMatrix[iRow][iColumn].m_pSprite->addChild(pMaskSprite, 10);
 
-							if (obstacleData.m_iObstacleLevel > 0)
-								m_BoardObstaclesList[iBlockID][iObstacleTypeID] = pMaskSprite;
-						}
-						obstacleData.m_bIsDirty = false;
-					}		
+						if (obstacleData.m_iObstacleLevel > 0)
+							m_BoardObstaclesList[iBlockID][iObstacleTypeID] = pMaskSprite;
+					}
+					obstacleData.m_bIsDirty = false;						
 				}
 			}
 		}

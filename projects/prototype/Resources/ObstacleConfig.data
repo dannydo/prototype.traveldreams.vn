@@ -2,13 +2,14 @@
     "obstacleList":
         [
 			"SHIELD",
-            "LOCK"
-            
+            "LOCK",
+			"COUNTDOWN"            
         ],    
     "compatibleMatrix":
         [
-            1,1,
-            1,1
+            1,1,0,
+            1,1,0,
+			0,0,0
         ],    
     "obstacles":
     [
@@ -30,7 +31,9 @@
                 ],
             "decreaseLevelAfterDestroyed": true,
             "decreaseLevelAfterMoved": false,
-            "transformToObjectAtLevel0": "",            
+            "transformToObjectAtLevel0": "",
+			"levelOfTransformedObject": 0,
+			"destroyable" : true,
             "matchAroundToDestroy" : false,
             "appearByDrop": false,
             "dropRate": 0,
@@ -64,6 +67,51 @@
             "decreaseLevelAfterDestroyed": true,
             "decreaseLevelAfterMoved": false,
             "transformToObjectAtLevel0": "",            
+			"levelOfTransformedObject": 0,
+			"destroyable" : true,
+            "matchAroundToDestroy" : false,
+            "appearByDrop": false,
+            "dropRate": 0,
+            "appearByTransform": false,
+            "transfromRate": 0
+        },
+		{
+            "name": "COUNTDOWN",
+            "wrapGem": true,
+            "infectable": false,
+            "infactableObjects": [],
+            "canBeMoveThrough": false,
+            "dropable": true,
+            "lockRow": false,
+            "lockColumn": false,
+            "levelList":
+                [
+                    { 
+                        "level":1,
+                        "spriteFileName":"CountDown1.png"
+                    },
+					{ 
+                        "level":2,
+                        "spriteFileName":"CountDown2.png"
+                    },
+					{ 
+                        "level":3,
+                        "spriteFileName":"CountDown3.png"
+                    },
+					{ 
+                        "level":4,
+                        "spriteFileName":"CountDown4.png"
+                    },					
+					{ 
+                        "level":5,
+                        "spriteFileName":"CountDown5.png"
+                    }
+                ],
+            "decreaseLevelAfterDestroyed": false,
+            "decreaseLevelAfterMoved": true,
+            "transformToObjectAtLevel0": "LOCK",
+			"levelOfTransformedObject": 0,			
+			"destroyable" : true,
             "matchAroundToDestroy" : false,
             "appearByDrop": false,
             "dropRate": 0,

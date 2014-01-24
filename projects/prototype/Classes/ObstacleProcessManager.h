@@ -49,7 +49,8 @@ public:
 	inline ObstacleData& GetObstacleData(const int& iBlockID, const int& iObstacleTypeID) { return m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID];}
 	//void MoveObstacles(const int& iRow1, const int& iColumn1, const int& iRow2, const int& iColumn2);
 
-	void Update();
+	void CleanWaitingClearList();
+	void UpdateAfterMove();
 private:
 	int AllocFreeBlock();
 private:

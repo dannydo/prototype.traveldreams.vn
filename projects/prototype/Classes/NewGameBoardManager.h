@@ -162,7 +162,6 @@ private:
 	bool haveCellMatch3(const Cell& cell);
 	int haveMatch3WHenMoveRow(const int& iRow);
 	int haveMatch3WHenMoveColumn(const int& iColumn);
-
 public:
 	Hint findHintForGame(); 
 };

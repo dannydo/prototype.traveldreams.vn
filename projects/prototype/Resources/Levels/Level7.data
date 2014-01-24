@@ -1,7 +1,7 @@
 ;size map
 8	8
 ;number of move
-50
+30
 ;number of color
 6
 ;score of stars
@@ -22,4 +22,13 @@ SCISSORS
 1
 LABORATORY
 ;obstacle list: count, list
-0
+3
+COUNTDOWN	3
+3
+3 4 8 5 7 1
+SHIELD 2
+3
+7 6 3 4 8 5
+LOCK	0
+2
+1 2		3 7	

@@ -63,10 +63,14 @@ bool ObstacleProcessManager::DestroyCell(const int& iBlockID)
 		const ObstacleDescription* pObstacleDescription = GameConfigManager::getInstance()->GetObstacleDescription(iObstacleTypeID);
 		if (pObstacleDescription ==  NULL)
 			continue;
+		if (!pObstacleDescription->m_bIsDestroyable)
+			return false;
 
 		if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive)
 		{
-			if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel == 0)
+			// some obstacle should be removed instanly 1 time (with its gem) regard its level if m_bDecreaseLevelAfterDestroyed = false
+			// otherwise, only obstacle at level 0 has this effect
+			if (pObstacleDescription->m_bDecreaseLevelAfterDestroyed==false || m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel == 0)
 			{
 				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive = false;												
 			}
@@ -90,8 +94,9 @@ bool ObstacleProcessManager::DestroyCell(const int& iBlockID)
 	return true;		
 }
 
-void ObstacleProcessManager::Update()
+void ObstacleProcessManager::CleanWaitingClearList()
 {
+	// update block waiting clear list
 	for(auto iBlockID :  m_BlockWaitingClearList)
 	{
 		m_ObstacleBoardList[iBlockID].m_bIsFreeBlock = true;
@@ -99,7 +104,38 @@ void ObstacleProcessManager::Update()
 	}
 
 	m_BlockWaitingClearList.clear();
+}
 
+void ObstacleProcessManager::UpdateAfterMove()
+{	
+	// update obstacle list that decrease level after moved
+	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
+	int iBlockID;
+	for(int iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
+	{
+		const ObstacleDescription* pObstacleDescription = GameConfigManager::getInstance()->GetObstacleDescription(iObstacleTypeID);
+		if (pObstacleDescription ==  NULL || !pObstacleDescription->m_bDecreaseLevelAfterMoved)
+			continue;
+		for(iBlockID=0; iBlockID< _BOARD_MAX_ROW_NUMBER_*_BOARD_MAX_COLUMN_NUMBER_; iBlockID++)
+			if (!m_ObstacleBoardList[iBlockID].m_bIsFreeBlock)
+				if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive)
+				{
+					m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel--;
+					m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty = true;					
+
+					if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel == 0)
+					{
+						m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive = false;
+
+						if (pObstacleDescription->m_TransformToObjectAtLevel0 >= 0)
+						{
+							m_ObstacleBoardList[iBlockID].m_ObstacleList[pObstacleDescription->m_TransformToObjectAtLevel0].m_bIsActive = true;
+							m_ObstacleBoardList[iBlockID].m_ObstacleList[pObstacleDescription->m_TransformToObjectAtLevel0].m_bIsDirty = true;
+							m_ObstacleBoardList[iBlockID].m_ObstacleList[pObstacleDescription->m_TransformToObjectAtLevel0].m_iObstacleLevel = pObstacleDescription->m_iLevelOfTransformedObject;
+						}													
+					}
+				}
+	}
 }
 
 bool ObstacleProcessManager::IsRowLocked(const int& iBlockID)
