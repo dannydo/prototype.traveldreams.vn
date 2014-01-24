@@ -470,7 +470,7 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 					return "Orange_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "Word_Orange.png";
+					return "alienOrange.png";
 
 			}
 
@@ -493,7 +493,7 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 					return "Red_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "Word_Red.png";
+					return "alienRed.png";
 			}			
 		}
 		case 2:
@@ -514,7 +514,7 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 					return "Pink_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "Word_Pink.png";
+					return "alienPink.png";
 			}						
 		}
 		case 3:
@@ -535,7 +535,7 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 					return "White_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "Word_White.png";
+					return "alienWhite.png";
 			}									
 		}
 		case 4:
@@ -556,7 +556,7 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 					return "Blue_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "Word_Blue.png";
+					return "alienBlue.png";
 			}												
 		}
 		case 5:
@@ -577,7 +577,7 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 					return "Green_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "Word_Green.png";
+					return "alienGreen.png";
 			}					
 		}
 	}

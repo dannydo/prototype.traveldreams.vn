@@ -140,6 +140,11 @@ public:
 	//ObstacleType_e m_eObstacleType;
 	int m_iObstacleBlockID;
 
+	// extra info for storing letter	
+	unsigned char m_iHiddenLetter;
+	//int m_iWordID;
+
+
 	CellValue()
 	{
 		m_iGemID = -1;
@@ -147,6 +152,8 @@ public:
 		m_eGemComboType = _GCT_NONE_;
 		m_iObstacleBlockID = -1;
 		//m_eObstacleType = _OT_NONE_;
+		
+		m_iHiddenLetter = 255;
 	}
 
 	void Reset()
@@ -155,6 +162,8 @@ public:
 		m_eGemComboType = _GCT_NONE_;
 		m_iObstacleBlockID = -1;
 		//	m_eObstacleType = _OT_NONE_;
+
+		m_iHiddenLetter = 255;
 	}
 };
 
@@ -195,6 +204,18 @@ public:
 	{		
 	}
 };
+
+struct NewCellInfo : public Cell
+{
+public:
+	int m_iLetter;
+
+	NewCellInfo()
+	{
+		m_iLetter = 255;
+	}
+};
+
 /*
 struct ActivatedComboInChain
 {
