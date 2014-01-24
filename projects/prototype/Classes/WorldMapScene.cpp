@@ -2,6 +2,7 @@
 #include "LevelMapScene.h"
 #include "IntroductionLayer.h"
 #include "FlashCardScene.h"
+#include "MainMenuScene.h"
 
 USING_NS_CC;
 
@@ -77,7 +78,13 @@ bool WorldMapLayer::init()
 		CC_CALLBACK_0(WorldMapLayer::menuOpenFlashCardCallBack, this));
 	pFlashCard->setPosition(ccp(365, 52));
 
-	Menu* menuChapter = Menu::create(pChapterItem1 , pChapterItem2, pChapterItem3, pIntroduction, pFlashCard, NULL);
+	CCMenuItemImage* pBackItem = CCMenuItemImage::create(
+		"World-Map/mask-button-back.png",
+		"World-Map/mask-button-back.png",
+		CC_CALLBACK_0(WorldMapLayer::menuBackToMainMenuCallBack, this));
+	pBackItem->setPosition(ccp(56, 49));
+
+	Menu* menuChapter = Menu::create(pChapterItem1 , pChapterItem2, pChapterItem3, pIntroduction, pFlashCard, pBackItem, NULL);
 	menuChapter->setPosition(CCPointZero);
 	this->addChild(menuChapter);
 
@@ -101,4 +108,10 @@ void WorldMapLayer::menuOpenFlashCardCallBack()
 	FlashCardScene* pFlashCard = FlashCardScene::create();
 	pFlashCard->getLayer()->setNameClassParent("WorldMapScene");
 	Director::getInstance()->replaceScene(pFlashCard);
+}
+
+void WorldMapLayer::menuBackToMainMenuCallBack()
+{
+	MainMenuScene* scene = MainMenuScene::create();
+	Director::getInstance()->replaceScene(scene);
 }

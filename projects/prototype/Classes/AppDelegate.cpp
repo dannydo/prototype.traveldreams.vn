@@ -1,9 +1,8 @@
 #include "AppDelegate.h"
-#include "HelloWorldScene.h"
-#include "LevelMapScene.h"
 #include "GameWordManager.h"
-#include "WorldMapScene.h"
 #include "GameConfigManager.h"
+#include "SimpleAudioEngine.h"
+#include "LoadingScene.h"
 
 USING_NS_CC;
 
@@ -43,7 +42,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 
     // create a scene. it's an autorelease object
-	auto scene =  WorldMapScene::create(); //MainMenuScene::create(); //HelloWorld::createScene();		
+	auto scene =  LoadingScene::create(); //MainMenuScene::create(); //HelloWorld::createScene();		
 
     // run
     director->runWithScene(scene);
