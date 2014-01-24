@@ -41,21 +41,21 @@ bool EndGameNode::initLose(const int& iScore, const Word& pMainWord)
 	}
 
 	Sprite* pBackgroundFail = Sprite::create("Target-End-Game/Fail_Board.png");
-	pBackgroundFail->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 50));
+	pBackgroundFail->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 115));
 	this->addChild(pBackgroundFail);
 
 	Node* pLevelNode = this->generateLayoutLevel(m_iCurrentLevel);
-	pLevelNode->setPosition(Point(365, 840));
+	pLevelNode->setPosition(Point(365, 905));
 	this->addChild(pLevelNode);
 
 	Sprite* pBackgroundTargetCard = Sprite::create("Target-End-Game/Fail_Card.png");
-	pBackgroundTargetCard->setPosition(Point(320, 535));
+	pBackgroundTargetCard->setPosition(Point(320, 600));
 	this->addChild(pBackgroundTargetCard);
 
 	Label* pLabelMainWord = Label::createWithTTF(pMainWord.m_sWord, "fonts/ARLRDBD.ttf", 32);
 	pLabelMainWord->setColor(ccc3(0, 0, 0));
 	pLabelMainWord->setAnchorPoint(Point(0.5f, 0.0f));
-	pLabelMainWord->setPosition(Point(315, 580));
+	pLabelMainWord->setPosition(Point(315, 645));
 	this->addChild(pLabelMainWord);
 
 	MenuItemImage* pRetryLevel = MenuItemImage::create(
@@ -64,7 +64,7 @@ bool EndGameNode::initLose(const int& iScore, const Word& pMainWord)
 		CC_CALLBACK_0(EndGameNode::menuRetryLevelCallBack, this));
 
 	Menu* pMenuLose = Menu::create(pRetryLevel, NULL);
-	pMenuLose->setPosition(Point(this->getContentSize().width/2.0f, 305));
+	pMenuLose->setPosition(Point(this->getContentSize().width/2.0f, 370));
 	this->addChild(pMenuLose);
 
 	return true;
@@ -82,50 +82,59 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 	this->addChild(pBackgroundShine);
 
 	Sprite* pBackgroundWin = Sprite::create("Target-End-Game/Win_Board.png");
-	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 50));
+	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 115));
 	this->addChild(pBackgroundWin);
 
 	Node* pLevelNode = this->generateLayoutLevel(m_iCurrentLevel);
-	pLevelNode->setPosition(Point(365, 840));
+	pLevelNode->setPosition(Point(365, 905));
 	this->addChild(pLevelNode);
 
 	m_pStarNode = this->generateLayoutStar();
-	m_pStarNode->setPosition(Point(228, 735));
+	m_pStarNode->setPosition(Point(228, 800));
 	this->addChild(m_pStarNode);
 
 	Node* pScoreNode = this->generateLayoutScore(iScore);
-	pScoreNode->setPosition(Point(320, 680));
+	pScoreNode->setPosition(Point(320, 745));
 
 	this->addChild(pScoreNode);
 
 	Sprite* pBackgroundTargetCard = Sprite::create("Target-End-Game/Win_Card.png");
-	pBackgroundTargetCard->setPosition(Point(320, 535));
+	pBackgroundTargetCard->setPosition(Point(320, 600));
 	this->addChild(pBackgroundTargetCard);
 
 	std::string sPath = "FlashCard/";
 	sPath.append(pMainWord.m_sFlashCardImage);
 	Sprite* pFlashCard = Sprite::create(sPath.c_str());
-	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 31));
+	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 96));
 	this->addChild(pFlashCard, 10);
 
 	Label* pLabelMainWord = Label::createWithTTF(pMainWord.m_sWord, "fonts/ARLRDBD.ttf", 32);
 	pLabelMainWord->setColor(ccc3(0, 0, 0));
 	pLabelMainWord->setAnchorPoint(Point(0.5f, 0.0f));
-	pLabelMainWord->setPosition(Point(315, 580));
+	pLabelMainWord->setPosition(Point(315, 645));
 	this->addChild(pLabelMainWord);
 
 	Node* pSubWordNode = this->generateLayoutSubWord(pSubWord);
-	pSubWordNode->setPosition(Point(320, 375));
+	pSubWordNode->setPosition(Point(320, 440));
 	this->addChild(pSubWordNode);
 
 	MenuItemImage* pNextLevel = MenuItemImage::create(
 		"Target-End-Game/Next_Button.png",
 		"Target-End-Game/Next_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuNextLevelCallBack, this));
+	pNextLevel->setPosition(Point(this->getContentSize().width/2.0f + 115.0f, 370));
 
-	Menu* pMenuWin = Menu::create(pNextLevel, NULL);
-	pMenuWin->setPosition(Point(this->getContentSize().width/2.0f, 305));
+	MenuItemImage* pRetryLevel = MenuItemImage::create(
+		"Target-End-Game/Retry_Button.png",
+		"Target-End-Game/Retry_Button_Click.png",
+		CC_CALLBACK_0(EndGameNode::menuRetryLevelCallBack, this));
+	pRetryLevel->setPosition(Point(this->getContentSize().width/2.0f - 115.0f, 370));
+
+	Menu* pMenuWin = Menu::create(pRetryLevel, pNextLevel, NULL);
+	pMenuWin->setPosition(Point::ZERO);
 	this->addChild(pMenuWin);
+	
+	m_pLeaderBoard->addButtonShowMe();
 	
 	return true;
 }
@@ -150,7 +159,7 @@ bool EndGameNode::init()
 		"Target-End-Game/Close_Button.png",
 		"Target-End-Game/Close_Button_Click.png",
 		CC_CALLBACK_0(EndGameNode::menuCloseCallBack, this));
-	pCloseItem->setPosition(Point(561, 790));
+	pCloseItem->setPosition(Point(561, 855));
 
 	/*
 	MenuItemImage* pDictItem = MenuItemImage::create(
@@ -163,6 +172,10 @@ bool EndGameNode::init()
 	Menu* pMenu = Menu::create(pCloseItem, NULL);
 	pMenu->setPosition(Point::ZERO);
 	this->addChild(pMenu, 10);
+
+	m_pLeaderBoard = LeaderBoardtNode::create();
+	m_pLeaderBoard->setPosition(Point(320, 136));
+	this->addChild(m_pLeaderBoard);
 
 	return true;
 }

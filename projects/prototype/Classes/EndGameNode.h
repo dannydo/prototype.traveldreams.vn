@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "GameDataStructure.h"
+#include "LeaderBoardNode.h"
 
 class EndGameNode : public cocos2d::Node
 {
@@ -38,6 +39,8 @@ private:
 	int m_iYellowStar;
 	int m_iCountYellowStar;
 	int m_iCurrentLevel;
+
+	LeaderBoardtNode* m_pLeaderBoard;
 };
 
 #endif;
