@@ -2,6 +2,7 @@
 #include "LevelMapScene.h"
 #include "HelloWorldScene.h"
 #include "DictionaryNode.h"
+#include "LeaderBoardNode.h"
 
 USING_NS_CC;
 
@@ -36,7 +37,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	this->setContentSize(pBackground->getContentSize());
 
 	m_pBackgroundBoard = Sprite::create("Target-End-Game/Target_Board.png");
-	m_pBackgroundBoard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 50));
+	m_pBackgroundBoard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 115));
 	this->addChild(m_pBackgroundBoard);
 
 	//Sprite* pTargetCard = Sprite::create("Target-End-Game/Target_Card.png");
@@ -44,36 +45,36 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	//this->addChild(pTargetCard);
 
 	Sprite* pBackgroundTargetCard = Sprite::create("Target-End-Game/Win_Card.png");
-	pBackgroundTargetCard->setPosition(Point(320, 535));
+	pBackgroundTargetCard->setPosition(Point(320, 600));
 	this->addChild(pBackgroundTargetCard);
 
 	std::string sPath = "FlashCard/";
 	sPath.append(pMainWord.m_sFlashCardImage);
 	Sprite* pFlashCard = Sprite::create(sPath.c_str());
-	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 31));
+	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 96));
 	this->addChild(pFlashCard, 10);
 
 	Node* pLevelNode = this->generateLayoutLevel(m_iCurrentLevel);
-	pLevelNode->setPosition(Point(365, 840));
+	pLevelNode->setPosition(Point(365, 905));
 	this->addChild(pLevelNode);
 
 	Label* pLabelMainWord = Label::createWithTTF("???", "fonts/ARLRDBD.ttf", 32);
 	pLabelMainWord->setColor(ccc3(0, 0, 0));
 	pLabelMainWord->setAnchorPoint(Point(0.5f, 0.0f));
-	pLabelMainWord->setPosition(Point(315, 580));
+	pLabelMainWord->setPosition(Point(315, 645));
 	this->addChild(pLabelMainWord);
 
 	MenuItemImage* pPlayLevel = MenuItemImage::create(
 		"Target-End-Game/Play_Button.png",
 		"Target-End-Game/Play_Button_Click.png",
 		CC_CALLBACK_0(GameTargetNode::menuPlayLevelCallBack, this));
-	pPlayLevel->setPosition(Point(this->getContentSize().width/2.0f, 305));
+	pPlayLevel->setPosition(Point(this->getContentSize().width/2.0f, 370));
 
 	MenuItemImage* pCloseItem = MenuItemImage::create(
 		"Target-End-Game/Close_Button.png",
 		"Target-End-Game/Close_Button_Click.png",
 		CC_CALLBACK_0(GameTargetNode::menuCloseCallBack, this));
-	pCloseItem->setPosition(Point(561, 790));
+	pCloseItem->setPosition(Point(561, 855));
 
 	/*
 	MenuItemImage* pDictItem = MenuItemImage::create(
@@ -86,6 +87,10 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	Menu* pMenu = Menu::create(pPlayLevel, pCloseItem, NULL);
 	pMenu->setPosition(Point::ZERO);
 	this->addChild(pMenu, 10);
+
+	LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::create();
+	pLeaderBoard->setPosition(Point(320, 136));
+	this->addChild(pLeaderBoard);
 
 	return true;
 }		
