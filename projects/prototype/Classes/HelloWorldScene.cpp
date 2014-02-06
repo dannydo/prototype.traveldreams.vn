@@ -862,7 +862,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 
 		if (!bIsBlocked && m_GameBoardManager.RecheckAfterMoveV2( m_SelectedCell.m_iRow,-1,  -1, iMoveUnit, 
 			m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList,
-				m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells))
+				m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells, true))
 		//if (false)
 		{
 			CCLOG("1");
@@ -942,7 +942,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 
 		if (!bIsBlocked && m_GameBoardManager.RecheckAfterMoveV2( -1, m_SelectedCell.m_iColumn, iMoveUnit, -1, 
 				m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList,
-				m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells))
+				m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells, true))
 		//if (false)
 		{
 			bMoveIsValid = true;					
@@ -1180,7 +1180,7 @@ void HelloWorld::CheckBoardStateAfterMove()
 	m_ComputeMoveResult.Reset(false);
 
 	if (m_GameBoardManager.RecheckAfterMoveV2( -1, -1, -1, -1, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells))
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells, false))
 	{
 		PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
 			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells, false);		
@@ -1660,7 +1660,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo> doubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList,  std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells, bool bIsNewMove)
+		std::vector<NewCellInfo>& newCells, bool bIsNewMove)
 {
 	// for test	
 	for(int i=0; i< _COMBO_TYPE_COUNT_;i++)

@@ -58,7 +58,7 @@ public:
 	std::vector<ComboEffectCell> m_NewComboCells;
 	std::vector<Cell> m_OriginalMovedCells;
 	std::vector<Cell> m_TargetMovedCells;
-	std::vector<Cell> m_NewCells;
+	std::vector<NewCellInfo> m_NewCells;
 
 
 	void Reset(bool bResetConvertedCombo = false)
@@ -109,7 +109,7 @@ protected:
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo> doubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells, bool bIsNewMove);
+		std::vector<NewCellInfo>& newCells, bool bIsNewMove);
 	
 	//Sprite* GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime);
 	//Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const float& fDelayTime);

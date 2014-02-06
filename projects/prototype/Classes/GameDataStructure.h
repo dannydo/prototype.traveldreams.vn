@@ -141,7 +141,7 @@ public:
 	int m_iObstacleBlockID;
 
 	// extra info for storing letter	
-	unsigned char m_iHiddenLetter;
+	int m_iGemLetterBlockID;
 	//int m_iWordID;
 
 
@@ -153,7 +153,7 @@ public:
 		m_iObstacleBlockID = -1;
 		//m_eObstacleType = _OT_NONE_;
 		
-		m_iHiddenLetter = 255;
+		m_iGemLetterBlockID = -1;
 	}
 
 	void Reset()
@@ -163,7 +163,7 @@ public:
 		m_iObstacleBlockID = -1;
 		//	m_eObstacleType = _OT_NONE_;
 
-		m_iHiddenLetter = 255;
+		m_iGemLetterBlockID = -1;
 	}
 };
 
@@ -208,11 +208,11 @@ public:
 struct NewCellInfo : public Cell
 {
 public:
-	int m_iLetter;
+	int m_iGemLetterBlockID;
 
-	NewCellInfo()
+	NewCellInfo(int iRow, int iColumn) : Cell(iRow, iColumn)
 	{
-		m_iLetter = 255;
+		m_iGemLetterBlockID = -1;
 	}
 };
 

@@ -5,6 +5,7 @@
 #include "GameWordManager.h"
 #include "GameConfigManager.h"
 #include "ObstacleProcessManager.h"
+#include "GemLetterManager.h"
 
 enum ComboEffectType
 {
@@ -87,7 +88,7 @@ public:
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells);		
+		std::vector<NewCellInfo>& newCells, bool bIsNewMove);		
 
 	bool FastCheckBlocks( int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& basicMatchingDestroyedCells);
@@ -98,7 +99,7 @@ public:
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells);
+		std::vector<NewCellInfo>& newCells);
 
 	int DecreaseMove() { return (m_iCurrentMove--);}
 
@@ -124,7 +125,7 @@ public:
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells);		
+		std::vector<NewCellInfo>& newCells);		
 protected:
 	inline ComboEffectType GetComboEffectTypeFromComboType(GemComboType_e eGemComboType);
 
@@ -139,7 +140,8 @@ protected:
 
 	void ExecuteComboChain(std::vector<ComboEffectBundle*>& comboChainList);
 
-	void CalculateMoveCells(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells);
+	void CalculateMoveCells(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells); //, std::vector<Cell>& newCells);
+	void GenerateNewGems(std::vector<NewCellInfo>& newCells, bool bIsNewMove);
 
 	int GetBonusScoreForUnlockMainWord(bool bIncludeIndividualLetters=false);
 	int GetBonusScoreForUnlockSubWord(const int& iSubWordID, bool bIncludeIndividualLetters=false);
@@ -149,6 +151,7 @@ protected:
 protected:
 	GameWordManager* m_pGameWordManager;	
 	ObstacleProcessManager* m_pObstacleProcessManager;
+	GemLetterManager m_GemLetterManager;
 
 	//LevelTarget m_LevelConfig;
 	int m_iCurrentLevel;

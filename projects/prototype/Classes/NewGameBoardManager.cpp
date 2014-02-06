@@ -97,7 +97,7 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells)
+		std::vector<NewCellInfo>& newCells, bool bIsNewMove)
 {
 	// reset
 	m_iLinkedBlockCount = 0;
@@ -111,7 +111,10 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 		CreateComboCells( iSelectedRow, iSelectedColumn, basicMatchingDestroyedCells, newComboCells);
 
 		// calculate move cells and create new cells
-		CalculateMoveCells( originalMovedCells, targetMovedCells, newCells);
+		CalculateMoveCells( originalMovedCells, targetMovedCells);
+
+		// generate new cells
+		GenerateNewGems(newCells, bIsNewMove);
 
 		return true;
 	}
@@ -221,7 +224,10 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 		CreateComboCells( iSelectedRow, iSelectedColumn, basicMatchingDestroyedCells, newComboCells);
 
 		// calculate move cells and create new cells
-		CalculateMoveCells( originalMovedCells, targetMovedCells, newCells);
+		CalculateMoveCells( originalMovedCells, targetMovedCells);
+
+		// generate new cells
+		GenerateNewGems(newCells, bIsNewMove);
 
 		return true;
 	}
@@ -610,7 +616,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells)
+		std::vector<NewCellInfo>& newCells)
 {
 	// reset
 	m_iLinkedBlockCount = 0;
@@ -624,7 +630,10 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		CreateComboCells( -1, -1, basicMatchingDestroyedCells, newComboCells);
 
 		// calculate move cells and create new cells
-		CalculateMoveCells( originalMovedCells, targetMovedCells, newCells);
+		CalculateMoveCells( originalMovedCells, targetMovedCells);
+
+		// generate new cells
+		GenerateNewGems(newCells, false);
 
 		return true;
 	}
@@ -738,7 +747,10 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		CreateComboCells(-1, -1, basicMatchingDestroyedCells, newComboCells);
 
 		// calculate move cells and create new cells
-		CalculateMoveCells( originalMovedCells, targetMovedCells, newCells);
+		CalculateMoveCells( originalMovedCells, targetMovedCells);
+
+		// generate new cells   
+		GenerateNewGems(newCells, false);
 
 		return true;
 	}
@@ -1152,7 +1164,7 @@ void NewGameBoardManager::CreateComboCells(const int& iSelectedRow, const int& i
 	}
 }
 
-void NewGameBoardManager::CalculateMoveCells(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells)
+void NewGameBoardManager::CalculateMoveCells(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells) //, std::vector<Cell>& newCells)
 {
 	int iRow, iColumn;
 
@@ -1189,7 +1201,18 @@ void NewGameBoardManager::CalculateMoveCells(std::vector<Cell>& originalMovedCel
 					//m_pObstacleProcessManager->MoveObstacles( iRow, iColumn, iCheckRowIndex, iColumn);
 				}
 			}
-		}
+		}	
+
+	// refine position of waiting trigger combo 5
+	for(auto& waitingTriggerCombo : m_WaitingTriggerCombo5List)
+		for(int iIndex=0; iIndex < originalMovedCells.size(); iIndex++)
+			if (waitingTriggerCombo.m_Position == originalMovedCells[iIndex])
+				waitingTriggerCombo.m_Position = targetMovedCells[iIndex];		
+}
+
+void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bool bIsNewMove)
+{
+	int iRow, iColumn;	
 
 	// generate new gems
 	for(iRow = 0; iRow < m_iRowNumber; iRow++)
@@ -1197,14 +1220,25 @@ void NewGameBoardManager::CalculateMoveCells(std::vector<Cell>& originalMovedCel
 			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
 			{
 				m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % m_pLevelConfig->m_iNumberOfColor;
-				newCells.push_back(Cell(iRow, iColumn));
+				newCells.push_back(NewCellInfo(iRow, iColumn));
 			}
 
-	// refine position of waiting trigger combo 5
-	for(auto& waitingTriggerCombo : m_WaitingTriggerCombo5List)
-		for(int iIndex=0; iIndex < originalMovedCells.size(); iIndex++)
-			if (waitingTriggerCombo.m_Position == originalMovedCells[iIndex])
-				waitingTriggerCombo.m_Position = targetMovedCells[iIndex];		
+	std::vector<unsigned char> outputLettersForGems;
+	m_pGameWordManager->GenerateNewLetters( newCells.size(), outputLettersForGems, bIsNewMove);	
+
+	unsigned char iLetter = 255;	
+	for(int iIndex = 0; iIndex < newCells.size(); iIndex++)	
+	{
+		iLetter = outputLettersForGems[iIndex];		
+		NewCellInfo& cell = newCells[iIndex];
+		if (iLetter < 255)
+		{			
+			cell.m_iGemLetterBlockID = m_GemLetterManager.AllocFreeBlock(iLetter, true);
+			m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = cell.m_iGemLetterBlockID;			
+		}
+		else
+			m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = -1;
+	}
 }
 
 // score and stars
@@ -1436,7 +1470,7 @@ void NewGameBoardManager::ExecuteComboEffect(int iSelectedRow, int iSelectedColu
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells)
+		std::vector<NewCellInfo>& newCells)
 {
 	// get effective cells
 	PreCheckComboEffect(iSelectedRow, iSelectedColumn, eDirection, basicMatchingDestroyedCells);
@@ -1455,7 +1489,10 @@ void NewGameBoardManager::ExecuteComboEffect(int iSelectedRow, int iSelectedColu
 		CreateComboCells( iSelectedRow, iSelectedColumn, basicMatchingDestroyedCells, newComboCells);
 
 		// calculate move cells and create new cells
-		CalculateMoveCells( originalMovedCells, targetMovedCells, newCells);
+		CalculateMoveCells( originalMovedCells, targetMovedCells);
+
+		// generate new cells
+		GenerateNewGems(newCells, false);
 	}
 }
 
