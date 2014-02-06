@@ -142,6 +142,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\GameBoardManager.cpp" />
     <ClCompile Include="..\Classes\GameTargetNode.cpp" />
     <ClCompile Include="..\Classes\GameWordManager.cpp" />
+    <ClCompile Include="..\Classes\GemLetterManager.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="..\Classes\IntroductionLayer.cpp" />
     <ClCompile Include="..\Classes\GameConfigManager.cpp" />
@@ -169,6 +170,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\GameDataStructure.h" />
     <ClInclude Include="..\Classes\GameTargetNode.h" />
     <ClInclude Include="..\Classes\GameWordManager.h" />
+    <ClInclude Include="..\Classes\GemLetterManager.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
     <ClInclude Include="..\Classes\IntroductionLayer.h" />
     <ClInclude Include="..\Classes\GameConfigManager.h" />

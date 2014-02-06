@@ -90,6 +90,9 @@
     <ClCompile Include="..\Classes\LeaderBoardNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\GemLetterManager.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -165,6 +168,9 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\LeaderBoardNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GemLetterManager.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
