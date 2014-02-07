@@ -58,6 +58,7 @@ public:
 	std::vector<ComboEffectCell> m_NewComboCells;
 	std::vector<Cell> m_OriginalMovedCells;
 	std::vector<Cell> m_TargetMovedCells;
+	std::vector<NewCellInfo> m_UnlockedLetterCells;
 	std::vector<NewCellInfo> m_NewCells;
 
 
@@ -72,6 +73,7 @@ public:
 		m_NewComboCells.clear();
 		m_OriginalMovedCells.clear();
 		m_TargetMovedCells.clear();
+		m_UnlockedLetterCells.clear();
 		m_NewCells.clear();
 	}
 };
@@ -109,6 +111,7 @@ protected:
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo> doubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells, bool bIsNewMove);
 	
 	//Sprite* GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime);

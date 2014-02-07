@@ -78,6 +78,8 @@ public:
 	inline int GetObstacleBlockID(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID;}
 	void ClearObstacleBlockID(const int& iObstacleBlockID);
 
+	inline GemLetterData GetGemLetterData(const int& iBlockID) { return m_GemLetterManager.GetGemLetterData(iBlockID);}
+
 	bool IsRowLocked(const int& iRow);
 	bool IsColumnLocked(const int& iColumn);
 
@@ -88,7 +90,9 @@ public:
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<NewCellInfo>& newCells, bool bIsNewMove);		
+		std::vector<NewCellInfo>& unlockedLetterCells,
+		std::vector<NewCellInfo>& newCells, 
+		bool bIsNewMove);		
 
 	bool FastCheckBlocks( int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& basicMatchingDestroyedCells);
@@ -99,6 +103,7 @@ public:
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells);
 
 	int DecreaseMove() { return (m_iCurrentMove--);}
@@ -125,12 +130,16 @@ public:
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells);		
 protected:
 	inline ComboEffectType GetComboEffectTypeFromComboType(GemComboType_e eGemComboType);
 
 	bool CanComboBeUpgraded(GemComboType_e eComboType);
 	GemComboType_e UpgradeCombo(GemComboType_e eComboType);
+
+	inline bool IsCellDestroyable(const int& iRow, const int& iColumn) { return (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_WAITING_TRIGGER_);}
+	inline bool DestroySingleCellUtil(const int& iRow, const int& iColumn);
 
 	// Execute move util methods
 	void CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn);
@@ -141,6 +150,7 @@ protected:
 	void ExecuteComboChain(std::vector<ComboEffectBundle*>& comboChainList);
 
 	void CalculateMoveCells(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells); //, std::vector<Cell>& newCells);
+	void CreateUnlockedGemLetterFromWaitingList(std::vector<NewCellInfo>& newCells);
 	void GenerateNewGems(std::vector<NewCellInfo>& newCells, bool bIsNewMove);
 
 	int GetBonusScoreForUnlockMainWord(bool bIncludeIndividualLetters=false);
@@ -159,7 +169,7 @@ protected:
 	int m_iCurrentMove;
 
 	std::vector<ComboEffectDescription> m_WaitingTriggerCombo5List;
-
+	std::vector<NewCellInfo> m_UnlockedGemLetterCellList;
 private:
 	// utility methods to find hint on temporary matrix
 	bool haveCellMatch3(const Cell& cell);

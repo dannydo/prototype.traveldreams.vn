@@ -26,7 +26,7 @@ private:
 public:
 	GemLetterManager();
 
-	inline GemLetterData GemLetterData(const int& iBlockID) { return m_GemLetterList[iBlockID];}
+	inline GemLetterData GetGemLetterData(const int& iBlockID) { return m_GemLetterList[iBlockID];}
 	int AllocFreeBlock(unsigned char& iLetter, bool bIsMainWord);
 };
 

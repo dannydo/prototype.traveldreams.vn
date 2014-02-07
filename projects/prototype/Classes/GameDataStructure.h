@@ -209,10 +209,28 @@ struct NewCellInfo : public Cell
 {
 public:
 	int m_iGemLetterBlockID;
+	bool m_bIsUnlocked;
+	int m_iGemID;	
 
-	NewCellInfo(int iRow, int iColumn) : Cell(iRow, iColumn)
+	NewCellInfo() : Cell()
 	{
 		m_iGemLetterBlockID = -1;
+		m_bIsUnlocked = false;
+		m_iGemID = -1;
+	}
+
+	NewCellInfo(const int& iRow, const int& iColumn, const int& iGemID) : Cell(iRow, iColumn)
+	{
+		m_iGemLetterBlockID = -1;
+		m_bIsUnlocked = false;
+		m_iGemID = iGemID;
+	}
+
+	NewCellInfo(const int& iRow, const int& iColumn, const int& iGemLetterBlockID, const bool& bIsUnlocked, const int& iGemID) : Cell(iRow, iColumn)
+	{
+		m_iGemLetterBlockID = iGemLetterBlockID;
+		m_bIsUnlocked = bIsUnlocked;
+		m_iGemID = iGemID;
 	}
 };
 

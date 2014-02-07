@@ -97,10 +97,12 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells, bool bIsNewMove)
 {
 	// reset
 	m_iLinkedBlockCount = 0;
+	m_UnlockedGemLetterCellList.clear();
 
 	// activate marked combo 5 from last check
 	if (iSelectedRow < 0 && iSelectedColumn < 0 && m_WaitingTriggerCombo5List.size()>0)
@@ -109,6 +111,9 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 
 		// create combo cells	
 		CreateComboCells( iSelectedRow, iSelectedColumn, basicMatchingDestroyedCells, newComboCells);
+
+		// create unlocked gems with letter
+		CreateUnlockedGemLetterFromWaitingList(unlockedLetterCells);
 
 		// calculate move cells and create new cells
 		CalculateMoveCells( originalMovedCells, targetMovedCells);
@@ -222,6 +227,9 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 
 		// create combo cells	
 		CreateComboCells( iSelectedRow, iSelectedColumn, basicMatchingDestroyedCells, newComboCells);
+
+		// create unlocked gems with letter
+		CreateUnlockedGemLetterFromWaitingList(unlockedLetterCells);
 
 		// calculate move cells and create new cells
 		CalculateMoveCells( originalMovedCells, targetMovedCells);
@@ -446,6 +454,24 @@ bool NewGameBoardManager::FastCheckBlocks( int iSelectedRow, int iSelectedColumn
 
 }
 
+bool NewGameBoardManager::DestroySingleCellUtil(const int& iRow, const int& iColumn)
+{
+	// combo 5 cell wil be activated/destroyed later
+	if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_)
+	{
+		if (m_BoardValueMatrix[iRow][iColumn].m_iGemLetterBlockID >= 0)
+			m_UnlockedGemLetterCellList.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemLetterBlockID, true, m_BoardValueMatrix[iRow][iColumn].m_iGemID));
+
+		m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+		return true;		
+	}
+	else
+	{
+		m_BoardValueMatrix[iRow][iColumn].m_eGemComboType =	_GCT_COMBO5_WAITING_TRIGGER_;						
+		return false;
+	}		
+}
+
 void NewGameBoardManager::ExecuteComboChain(std::vector<ComboEffectBundle*>& comboChainList)
 {
 	int iComboIndexInChain = 0;
@@ -468,10 +494,9 @@ void NewGameBoardManager::ExecuteComboChain(std::vector<ComboEffectBundle*>& com
 			for(int iRow = position.m_iRow-iRowDelta; iRow <= position.m_iRow+iRowDelta; iRow++)
 				for(int iColumn = position.m_iColumn-iColumnDelta; iColumn <= position.m_iColumn+iColumnDelta; iColumn++)
 			{			
-				if (iRow >= 0 && iRow < m_iRowNumber && iColumn >=0 && iColumn < m_iColumnNumber &&
-					m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_WAITING_TRIGGER_)
+				if (iRow >= 0 && iRow < m_iRowNumber && iColumn >=0 && iColumn < m_iColumnNumber && IsCellDestroyable(iRow, iColumn))				
 				{
-					if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID < 0 || m_pObstacleProcessManager->DestroyCell(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))
+					if (m_pObstacleProcessManager->DestroyCellWithObstacle(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))
 					{				
 						// this may trigger another combo ?
 						if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >=0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
@@ -489,15 +514,10 @@ void NewGameBoardManager::ExecuteComboChain(std::vector<ComboEffectBundle*>& com
 						}		
 
 						// combo 5 cell wil be activated/destroyed later
-						if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_)
-						{
-							m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+						if (DestroySingleCellUtil(iRow, iColumn))
+						{							
 							pComboInChain->m_DestroyedCells.push_back(Cell(iRow, iColumn));
-						}
-						else
-						{
-							m_BoardValueMatrix[iRow][iColumn].m_eGemComboType =	_GCT_COMBO5_WAITING_TRIGGER_;						
-						}					
+						}						
 					}
 				}
 			}	
@@ -564,8 +584,10 @@ void NewGameBoardManager::TriggerWaitingCombo5List(std::vector<ComboEffectBundle
 			for(int iColumn = 0; iColumn <= m_iColumnNumber; iColumn++)
 		{			
 			if ( !m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID == iGemID
-				&& m_BoardValueMatrix[iRow][iColumn].m_eGemComboType !=_GCT_COMBO5_WAITING_TRIGGER_)
-				if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID < 0 || m_pObstacleProcessManager->DestroyCell(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))
+				&& IsCellDestroyable(iRow, iColumn))
+				//&& m_BoardValueMatrix[iRow][iColumn].m_eGemComboType !=_GCT_COMBO5_WAITING_TRIGGER_)
+				//if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID < 0 || m_pObstacleProcessManager->DestroyCell(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))
+				if (m_pObstacleProcessManager->DestroyCellWithObstacle(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))
 				{				
 					// this may trigger another combo ?
 					if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >=0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
@@ -583,15 +605,10 @@ void NewGameBoardManager::TriggerWaitingCombo5List(std::vector<ComboEffectBundle
 					}		
 
 					// combo 5 cell wil be activated/destroyed later
-					if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_)
-					{
-						m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+					if (DestroySingleCellUtil(iRow, iColumn))
+					{						
 						pTriggeredCombo->m_DestroyedCells.push_back(Cell(iRow, iColumn));
-					}
-					else
-					{
-						m_BoardValueMatrix[iRow][iColumn].m_eGemComboType =	_GCT_COMBO5_WAITING_TRIGGER_;
-					}
+					}					
 				}
 		}
 
@@ -616,10 +633,12 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells)
 {
 	// reset
 	m_iLinkedBlockCount = 0;
+	m_UnlockedGemLetterCellList.clear();
 
 	// activate marked combo 5 from last check
 	if (m_WaitingTriggerCombo5List.size()>0)
@@ -628,6 +647,9 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 
 		// create combo cells	
 		CreateComboCells( -1, -1, basicMatchingDestroyedCells, newComboCells);
+
+		// create unlocked gems with letter
+		CreateUnlockedGemLetterFromWaitingList(unlockedLetterCells);
 
 		// calculate move cells and create new cells
 		CalculateMoveCells( originalMovedCells, targetMovedCells);
@@ -745,6 +767,9 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 
 		// create combo cells	
 		CreateComboCells(-1, -1, basicMatchingDestroyedCells, newComboCells);
+
+		// create unlocked gems with letter
+		CreateUnlockedGemLetterFromWaitingList(newCells);
 
 		// calculate move cells and create new cells
 		CalculateMoveCells( originalMovedCells, targetMovedCells);
@@ -1033,7 +1058,8 @@ void NewGameBoardManager::RemoveCellsByBasicMatching( std::vector<Cell>& basicMa
 	for(auto& cell : basicMatchingDestroyedCells)
 	{
 		if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID >= 0)
-			if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID < 0 || m_pObstacleProcessManager->DestroyCell(m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID))
+			//if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID < 0 || m_pObstacleProcessManager->DestroyCell(m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID))
+			if (m_pObstacleProcessManager->DestroyCellWithObstacle(m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID))
 			{		
 				// NOTE: destroyed cell include double combo cells!!! ????
 				// 1 cell affected by 2 effects (basic matching and double combo) ==> how to display those effect???		
@@ -1050,14 +1076,11 @@ void NewGameBoardManager::RemoveCellsByBasicMatching( std::vector<Cell>& basicMa
 				}			
 
 				// combo 5 will be activated/destroyed later
-				if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType == _GCT_COMBO5_)
+				if (!DestroySingleCellUtil(cell.m_iRow, cell.m_iColumn))
 				{
-					m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType = _GCT_COMBO5_WAITING_TRIGGER_;
 					cell.m_iRow = cell.m_iColumn = -1;
 				}
-				else
-					m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].Reset(); //m_iGemID = -1; m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType = _GCT_NONE_;				
-
+				
 				/*if (m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType != _GCT_COMBO5_)
 				{								
 				}
@@ -1164,9 +1187,21 @@ void NewGameBoardManager::CreateComboCells(const int& iSelectedRow, const int& i
 	}
 }
 
+void NewGameBoardManager::CreateUnlockedGemLetterFromWaitingList(std::vector<NewCellInfo>& newCells)
+{
+	// create unlocked letter cells from waiting list, this must before move cells
+	for(auto& cell : m_UnlockedGemLetterCellList)
+	{
+		m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemID = cell.m_iGemID;
+		
+		newCells.push_back(cell);
+	}
+
+}
+
 void NewGameBoardManager::CalculateMoveCells(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells) //, std::vector<Cell>& newCells)
 {
-	int iRow, iColumn;
+	int iRow, iColumn;	
 
 	// calculate move cells
 	for(iRow = 1; iRow < m_iRowNumber; iRow++)
@@ -1213,14 +1248,14 @@ void NewGameBoardManager::CalculateMoveCells(std::vector<Cell>& originalMovedCel
 void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bool bIsNewMove)
 {
 	int iRow, iColumn;	
-
+	
 	// generate new gems
 	for(iRow = 0; iRow < m_iRowNumber; iRow++)
 		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
 			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
 			{
 				m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % m_pLevelConfig->m_iNumberOfColor;
-				newCells.push_back(NewCellInfo(iRow, iColumn));
+				newCells.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemID));
 			}
 
 	std::vector<unsigned char> outputLettersForGems;
@@ -1470,8 +1505,11 @@ void NewGameBoardManager::ExecuteComboEffect(int iSelectedRow, int iSelectedColu
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
+		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells)
 {
+	m_UnlockedGemLetterCellList.clear();
+
 	// get effective cells
 	PreCheckComboEffect(iSelectedRow, iSelectedColumn, eDirection, basicMatchingDestroyedCells);
 
@@ -1487,6 +1525,9 @@ void NewGameBoardManager::ExecuteComboEffect(int iSelectedRow, int iSelectedColu
 
 		// create combo cells	
 		CreateComboCells( iSelectedRow, iSelectedColumn, basicMatchingDestroyedCells, newComboCells);
+
+		// create unlocked gems with letter
+		CreateUnlockedGemLetterFromWaitingList(unlockedLetterCells);
 
 		// calculate move cells and create new cells
 		CalculateMoveCells( originalMovedCells, targetMovedCells);

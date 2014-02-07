@@ -50,10 +50,10 @@ int ObstacleProcessManager::AllocFreeBlock()
 	return -1;
 }
 
-bool ObstacleProcessManager::DestroyCell(const int& iBlockID)
+bool ObstacleProcessManager::DestroyCellWithObstacle(const int& iBlockID)
 {
-	//if (iBlockID < 0)
-		//return true;
+	if (iBlockID < 0)
+		return true;
 
 	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
 	

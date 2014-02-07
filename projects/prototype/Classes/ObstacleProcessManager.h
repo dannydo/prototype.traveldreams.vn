@@ -41,7 +41,7 @@ public:
 	ObstacleProcessManager(NewGameBoardManager* pGameBoardManager);
 	void InitLevel();
 
-	bool DestroyCell(const int& iBlockID);
+	bool DestroyCellWithObstacle(const int& iBlockID);
 	bool IsRowLocked(const int& iBlockID);
 	bool IsColumnLocked(const int& iBlockID);
 
