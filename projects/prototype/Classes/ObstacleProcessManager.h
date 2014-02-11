@@ -42,6 +42,7 @@ public:
 	void InitLevel();
 
 	bool DestroyCellWithObstacle(const int& iBlockID);
+	void ForceDestroyObstacleBlock(const int& iBlockID); //clear block of obstacles, regard of its types (detach obstacle with cell is the job of GameBoardManager)
 	bool IsRowLocked(const int& iBlockID);
 	bool IsColumnLocked(const int& iBlockID);
 

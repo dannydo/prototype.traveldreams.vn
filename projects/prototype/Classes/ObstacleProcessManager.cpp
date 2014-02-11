@@ -94,6 +94,13 @@ bool ObstacleProcessManager::DestroyCellWithObstacle(const int& iBlockID)
 	return true;		
 }
 
+void ObstacleProcessManager::ForceDestroyObstacleBlock(const int& iBlockID)
+{
+	if (iBlockID < 0)
+		return;
+	m_ObstacleBoardList[iBlockID].m_bIsFreeBlock = true;	
+}
+
 void ObstacleProcessManager::CleanWaitingClearList()
 {
 	// update block waiting clear list

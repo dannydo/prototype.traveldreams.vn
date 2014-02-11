@@ -37,7 +37,7 @@ protected:
 	void CountBasicCombo(); 
 protected:
 	const GameConfig& m_GameConfig;	
-	const LevelConfig* m_pLevelConfig;	
+	LevelConfig* m_pLevelConfig;	
 
 	int m_iRowNumber, m_iColumnNumber;
 	CellValue m_BoardValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];		

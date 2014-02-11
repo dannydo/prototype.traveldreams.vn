@@ -21,6 +21,8 @@ BOOKCASE
 ;bonus word
 1
 STUDY
+;boss
+0
 ;obstacle list: count, list
 3
 COUNTDOWN	5

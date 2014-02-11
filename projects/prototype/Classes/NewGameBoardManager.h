@@ -52,6 +52,15 @@ public:
 	GemComboType_e m_eComboType;
 	Cell m_Cell1, m_Cell2;
 };
+
+struct LevelBossInfo
+{
+public:
+	bool m_bIsEnable;
+	int m_iRemainLettersCount;
+	int m_iCurrentHitPoint;
+};
+
 /*
 struct DoubleComboEffectBundle
 {
@@ -81,6 +90,8 @@ public:
 	inline int AllocFreeGemLetterBlock(unsigned char& iLetter, bool bIsMainWord) { return m_GemLetterManager.AllocFreeBlock(iLetter, bIsMainWord); }
 	inline GemLetterData& GetGemLetterData(const int& iBlockID) { return m_GemLetterManager.GetGemLetterData(iBlockID);}
 	inline GemLetterData FreeGemLetterBlock(const int& iBlockID) { return m_GemLetterManager.FreeGemLetterBlock(iBlockID);}
+
+	inline const LevelBossInfo GetLevelBossInfo() { return m_LevelBossInfo;}
 
 	bool IsRowLocked(const int& iRow);
 	bool IsColumnLocked(const int& iColumn);
@@ -141,7 +152,7 @@ protected:
 	GemComboType_e UpgradeCombo(GemComboType_e eComboType);
 
 	inline bool IsCellDestroyable(const int& iRow, const int& iColumn) { return (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_WAITING_TRIGGER_);}
-	inline bool DestroySingleCellUtil(const int& iRow, const int& iColumn);
+	inline bool DestroySingleCellUtil(const int& iRow, const int& iColumn);	
 
 	// Execute move util methods
 	void CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn);
@@ -169,6 +180,8 @@ protected:
 	int m_iCurrentLevel;
 	int m_iCurrentScore;// current score
 	int m_iCurrentMove;
+
+	LevelBossInfo m_LevelBossInfo;
 
 	std::vector<ComboEffectDescription> m_WaitingTriggerCombo5List;
 	std::vector<NewCellInfo> m_UnlockedGemLetterCellList;

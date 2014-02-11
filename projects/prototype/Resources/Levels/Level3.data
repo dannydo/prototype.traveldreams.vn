@@ -23,6 +23,8 @@ GLOBE
 ;bonus word
 1
 RULER
+;boss
+0
 ;obstacle list: count, list
 2
 SHIELD	2
@@ -31,4 +33,3 @@ SHIELD	2
 LOCK	0
 2
 1	2	6	6
-

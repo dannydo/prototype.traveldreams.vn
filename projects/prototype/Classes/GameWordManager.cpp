@@ -277,6 +277,12 @@ void GameWordManager::ResetDataForNewPlay()
 		}
 }
 
+void GameWordManager::EnableVersusBossMode()
+{
+	m_iMainWordGenerateRate = 0;
+	m_bAddDirectLetterOfMainWordToTrash = false;
+}
+
 bool GameWordManager::UnlockLetter(const unsigned char& iLetter, const bool& bIsInMainWord, int& iUnlockedLetterIndexOfMainWord, std::vector<int> (&unlockedLettersIndexOfSubWords)[_GDS_SUB_WORD_MAX_COUNT_],
 								   bool& bIsMainWordJustUnlocked, bool (&justUnlockedSubWords)[_GDS_SUB_WORD_MAX_COUNT_])
 {

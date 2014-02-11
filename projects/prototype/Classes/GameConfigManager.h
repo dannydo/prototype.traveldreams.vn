@@ -23,6 +23,14 @@ public:
 	}
 };
 
+struct LevelBossConfig
+{
+public:
+	Cell m_Position;
+	int m_iWidth, m_iHeight;
+	int m_HitPointPerLetter;
+};
+
 struct LevelConfig
 {
 public:
@@ -45,11 +53,16 @@ public:
 	int m_BonusWordIDList[_GDS_SUB_WORD_MAX_COUNT_];
 	// obstacles
 	std::vector<Level_ObstacleConfig*> m_ObstacleConfigList;
+	// boss config
+	bool m_bEnableBoss;
+	LevelBossConfig m_BossConfig;
 
 	~LevelConfig()
 	{		
+		m_bEnableBoss = false;
 	}
 };
+
 
 struct ObstacleLevelDescription
 {
@@ -124,7 +137,7 @@ public:
 	void LoadGameConfig();
 	void LoadObstacleConfig();
 
-	const LevelConfig& GetLevelConfig(int iLevel);
+	LevelConfig& GetLevelConfig(int iLevel);
 	inline const GameConfig& GetGameConfig() { return m_GameConfig;}	
 	inline int GetObstacleTypeCount() { return m_ObstacleDescriptionArray.size();}
 

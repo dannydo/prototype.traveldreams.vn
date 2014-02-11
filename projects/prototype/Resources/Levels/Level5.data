@@ -23,6 +23,8 @@ ERASER
 ;bonus word
 1
 NOTEBOOK
+;boss
+0
 ;obstacle list: count, list
 3
 COUNTDOWN	5

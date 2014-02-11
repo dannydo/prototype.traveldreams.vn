@@ -23,6 +23,8 @@ CLASSMATE
 ;bonus word
 1
 LECTURE
+;boss
+0
 ;obstacle list: count, list
 3
 COUNTDOWN	3

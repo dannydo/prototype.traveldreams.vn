@@ -411,6 +411,41 @@ void HelloWorld::initLevel(int iLevel)
 		}
 	}
 
+	// add boss if this is versus mode
+	if (levelConfig.m_bEnableBoss)
+	{
+		pSprite = Sprite::createWithSpriteFrameName("BigAlien.png");
+		pSprite->setPosition( ccp(m_fBoardLeftPosition + (levelConfig.m_BossConfig.m_Position.m_iColumn + levelConfig.m_BossConfig.m_iWidth/4.f)  * m_SymbolSize.width, 
+			m_fBoardBottomPosition + (levelConfig.m_BossConfig.m_Position.m_iRow + levelConfig.m_BossConfig.m_iHeight/4.f) * m_SymbolSize.height));
+		//pSprite->setScale(1.f);
+		m_pBoardBatchNode->addChild(pSprite, 11);
+
+		// add letter to boss
+		unsigned char iLetter;
+		if (m_GameBoardManager.GetGameWordManager()->GenerateLetterFromMainWord(iLetter))
+		{
+			Sprite* pLetterSprite = Sprite::createWithSpriteFrameName(
+				m_pWordCollectBoardRenderNode->GetImageFileFromLetter(iLetter).c_str());
+			pLetterSprite->setPosition(Point( pSprite->getContentSize().width/2.f - pLetterSprite->getContentSize().width * 1.6f /4.f, 90.f));
+			pLetterSprite->setScale(1.6f);
+			pSprite->setTag(iLetter);
+
+			pSprite->addChild(pLetterSprite);
+		}
+		else
+			pSprite->setTag(-1);
+
+		// add hitpoint sprites
+		const LevelBossInfo& levelBossInfo = m_GameBoardManager.GetLevelBossInfo();
+		Sprite* pHitPointSprite;
+		for(int i=0; i< levelBossInfo.m_iCurrentHitPoint;i++)
+		{
+			pHitPointSprite = Sprite::createWithSpriteFrameName("BossHitPoint.png");
+			pHitPointSprite->setPosition( Point((i - levelBossInfo.m_iCurrentHitPoint/2.f + 0.5f ) * pHitPointSprite->getContentSize().width + m_SymbolSize.width, pHitPointSprite->getContentSize().height + 15.f));
+			pSprite->addChild(pHitPointSprite);
+		}
+	}
+
 
 	// create temp sprite, this's used to animate the drag line
 	m_pTempSpriteForAction = Sprite::createWithSpriteFrameName( "brick.png");

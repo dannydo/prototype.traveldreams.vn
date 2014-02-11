@@ -49,6 +49,11 @@ public:
 	int GetWordIndexFromContent(const std::string& sWord);
 	inline const Word& GetWord(const int& iWordIndex) { return m_WordList[iWordIndex];}
 
+	void EnableVersusBossMode();
+	bool GenerateLetterFromMainWord(unsigned char& sLetter);
+	//unsigned char GetFirstInactivatedLetterOfMainWord();
+	//void ActivateFirstInactivatedLetterOfMainWord();
+
 	// generate new letters for new gems, also update rate
 	void GenerateNewLetters(const int& iGemCount, std::vector<GemLetterData>& outputLettersForGems, bool bIsNewMove);	
 	
@@ -60,8 +65,7 @@ public:
 		//bool& bIsMainWordFullUnlocked);	
 private:
 	void ResetDataForNewPlay();
-
-	bool GenerateLetterFromMainWord(unsigned char& sLetter);
+	
 	bool GenerateLetterFromSubWords(unsigned char& sLetter);
 	bool GenerateLetterFromTrashCollection(unsigned char& sLetter);
 

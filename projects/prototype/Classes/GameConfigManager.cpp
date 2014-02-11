@@ -29,7 +29,7 @@ void GameConfigManager::LoadLevelsConfig()
 		LoadConfigOfLevel(i);
 }
 
-const LevelConfig& GameConfigManager::GetLevelConfig(int iLevel)
+LevelConfig& GameConfigManager::GetLevelConfig(int iLevel)
 {
 	return m_LevelConfigList[iLevel];	
 }
@@ -139,9 +139,23 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 	}
 	//std::getline(inputStream, sTemp);
 
+	// boss config
+	std::getline(inputStream, sTemp);
+	inputStream >> iTemp;
+	levelConfig.m_bEnableBoss = (iTemp >0);
+	if (levelConfig.m_bEnableBoss)
+	{
+		inputStream >> levelConfig.m_BossConfig.m_Position.m_iRow;
+		inputStream >> levelConfig.m_BossConfig.m_Position.m_iColumn;
+		inputStream >> levelConfig.m_BossConfig.m_iHeight;
+		inputStream >> levelConfig.m_BossConfig.m_iWidth;		
+		inputStream >> levelConfig.m_BossConfig.m_HitPointPerLetter;
+	}
+	std::getline(inputStream, sTemp);
+
 	// obstacle list
 	int iObstacleCount;
-
+	
 	std::getline(inputStream, sTemp);
 	inputStream >> iObstacleCount;
 	for(int i=0; i< iObstacleCount; i++)
@@ -160,7 +174,8 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 		}
 
 		levelConfig.m_ObstacleConfigList.push_back( pObstacleConfig);
-	}
+	}	
+
 
 	delete[] data;
 	delete[] orginalData;

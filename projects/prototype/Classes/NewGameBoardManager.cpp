@@ -23,6 +23,38 @@ void NewGameBoardManager::GenerateGameBoard(int iLevel)
 	m_pObstacleProcessManager->InitLevel();
 	//m_pGameWordManager->GenerateWordForNewLevel(); //already called by main menu
 
+
+	// process boss
+	if (m_pLevelConfig->m_bEnableBoss)
+	{
+		if (m_pLevelConfig->m_bIsMainWordExistedOnBoard)
+			m_pLevelConfig->m_bIsMainWordExistedOnBoard = false;
+		
+		m_pGameWordManager->EnableVersusBossMode();
+
+		int iRow, iColumn, iRowInc, iColumnInc;
+		for(iRowInc = 0; iRowInc < m_pLevelConfig->m_BossConfig.m_iHeight; iRowInc++)
+			for(iColumnInc = 0; iColumnInc < m_pLevelConfig->m_BossConfig.m_iWidth; iColumnInc++)
+			{
+				iRow = m_pLevelConfig->m_BossConfig.m_Position.m_iRow + iRowInc;
+				iColumn = m_pLevelConfig->m_BossConfig.m_Position.m_iColumn + iColumnInc;
+				if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID >= 0)
+				{
+					m_pObstacleProcessManager->ForceDestroyObstacleBlock(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID);
+				}
+
+				m_BoardValueMatrix[iRow][iColumn].Reset();
+				m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
+			}			
+
+		m_LevelBossInfo.m_bIsEnable = true;
+		m_LevelBossInfo.m_iCurrentHitPoint = m_pLevelConfig->m_BossConfig.m_HitPointPerLetter;
+		m_LevelBossInfo.m_iRemainLettersCount = m_pGameWordManager->GetMainWord().m_iRemainInactivatedCharacterCount;
+	}
+	else
+		m_LevelBossInfo.m_bIsEnable = false;
+
+
 	// compute score/star for this level ==> score of stars now loaded from config file
 	/*m_LevelConfig.m_ScoreOfStars[0] = GetBonusScoreForUnlockMainWord(true);
 	int iTotalSubWordScore = 0;
