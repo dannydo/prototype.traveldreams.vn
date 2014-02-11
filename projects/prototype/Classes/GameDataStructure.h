@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#define _GDS_WORD_MAX_LENGTH_		12
+#define _GDS_WORD_MAX_LENGTH_		20
 #define _GDS_WORD_MAX_COUNT_		30
 #define _GDS_SUB_WORD_MAX_COUNT_	2
 
@@ -245,7 +245,7 @@ public:
 struct Word
 {
 public:	
-	char m_sWord[_GDS_WORD_MAX_LENGTH_];	
+	char m_sWord[_GDS_WORD_MAX_LENGTH_];		
 	int m_iWordLength;
 
 	std::string m_sMeaning;

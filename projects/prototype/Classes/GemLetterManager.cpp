@@ -17,3 +17,14 @@ int GemLetterManager::AllocFreeBlock(unsigned char& iLetter, bool bIsMainWord)
 		}
 	return -1;
 }
+
+GemLetterData GemLetterManager::FreeGemLetterBlock(const int& iBlockID)
+{
+	GemLetterData data = m_GemLetterList[iBlockID];
+
+	m_GemLetterList[iBlockID].m_bIsActive = false;
+	m_GemLetterList[iBlockID].m_bIsInMainWord = false;
+	m_GemLetterList[iBlockID].m_iLetter = 255;
+
+	return data;
+}

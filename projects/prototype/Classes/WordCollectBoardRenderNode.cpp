@@ -144,9 +144,13 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	{
 		m_LabelList[i] =  //CCLabelTTF::create("", "Arial", 34);
 			Sprite::createWithSpriteFrameName( GetImageFileFromLetter(m_pMainWord->m_sWord[i]).c_str());
-		m_LabelList[i]->setAnchorPoint(Point(0,0));
-		m_LabelList[i]->setColor( ccc3(180, 180, 180));
-		m_LabelList[i]->setOpacity(80);
+		m_LabelList[i]->setAnchorPoint(Point(0,0));		
+
+		if (!m_pMainWord->m_ActivatedCharacterFlags[i])
+		{
+			m_LabelList[i]->setColor( ccc3(180, 180, 180));
+			m_LabelList[i]->setOpacity(80);
+		}
 		//pLabel->enableShadow(Size(10.f,10.f),0.8f,0.2f);
 		//m_LabelList[i]->enableStroke(ccc3(0,0,0), 2.f);		
 
@@ -163,6 +167,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 		m_pBackground = Sprite::createWithSpriteFrameName("Main_Board_Medium.png");
 	else
 		m_pBackground = Sprite::createWithSpriteFrameName("Main_Board_Large.png");
+
 	m_pBackground->setAnchorPoint( Point(0,0));
 	m_pBackground->setPosition( Point( 0, 0));
 	m_pBatchNode->addChild(m_pBackground);
@@ -332,7 +337,10 @@ void WordCollectBoardRenderNode::PlayCharacterAnim(int iAnimIndex, bool bIsLoop)
 std::string WordCollectBoardRenderNode::GetImageFileFromLetter(unsigned char iLetter)
 {	
 	char sFileName[10];
-	sprintf(sFileName, "%c.png", iLetter);
+	if (iLetter != ' ')
+		sprintf(sFileName, "%c.png", iLetter);
+	else
+		sprintf(sFileName, "_.png", iLetter);
 	return std::string(sFileName);
 }
 

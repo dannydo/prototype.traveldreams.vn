@@ -16,6 +16,13 @@ public:
 		m_iLetter = 255;
 		m_bIsInMainWord = false;
 	}
+
+	GemLetterData(const int& iLetter, const bool& bIsInMainWord)
+	{
+		m_bIsActive = true;
+		m_iLetter = iLetter;
+		m_bIsInMainWord = bIsInMainWord;
+	}
 };
 
 class GemLetterManager
@@ -26,7 +33,8 @@ private:
 public:
 	GemLetterManager();
 
-	inline GemLetterData GetGemLetterData(const int& iBlockID) { return m_GemLetterList[iBlockID];}
+	inline GemLetterData& GetGemLetterData(const int& iBlockID) { return m_GemLetterList[iBlockID];}
+	GemLetterData FreeGemLetterBlock(const int& iBlockID);
 	int AllocFreeBlock(unsigned char& iLetter, bool bIsMainWord);
 };
 

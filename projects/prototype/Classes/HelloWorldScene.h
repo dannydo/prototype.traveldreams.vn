@@ -36,13 +36,15 @@ struct CellView
 public:
 	Sprite* m_pSprite;
 	//int m_iCharacterID;
-	unsigned char m_iLetter;
+	//unsigned char m_iLetter;
+	int m_iGemLetterBlockID;
 
 	CellView()
 	{
 		m_pSprite = NULL;
 		//m_iCharacterID = -1;
-		m_iLetter = 255;
+		//m_iLetter = 255;
+		m_iGemLetterBlockID = -1;
 	}
 };
 
@@ -116,7 +118,7 @@ protected:
 	
 	//Sprite* GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime);
 	//Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const float& fDelayTime);
-	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter);
+	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID);
 
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();

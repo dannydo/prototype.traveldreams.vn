@@ -661,7 +661,7 @@ void BonusWordNodeNew::playEffectColorLetter(Node* pSender)
 }
 
 void BonusWordNodeNew::setVisibleTrueLayoutBonusWord()
-{
+{	
 	Node* pNode = this->getChildByTag(m_iCountWord);
 	pNode->setVisible(true);
 	m_pBackgroundEffectLayer->setVisible(false);

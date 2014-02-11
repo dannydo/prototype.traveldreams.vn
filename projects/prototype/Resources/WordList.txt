@@ -1,5 +1,5 @@
 25
-PEN
+A PEN
 Cây viết
 pen
 pen.jpg
@@ -59,12 +59,12 @@ Bài học
 lesson
 default.jpg
 3
-GLUE	
+GLUE
 Keo dán
 glue
 default.jpg
 3
-RUBBER	
+RUBBER
 Đồ lau bảng
 rubber
 default.jpg
@@ -79,47 +79,47 @@ Khóa học
 course
 default.jpg
 3
-NOTEBOOK 	
+NOTEBOOK
 Quyển vở
 notebook
 default.jpg
 3
-LIBRARY	
+LIBRARY
 Thư viện
 library
 default.jpg
 3
-LABORATORY	
+LABORATORY
 Phòng thí nghiệm
 laboratory
 default.jpg
 3
-TUTOR	
+TUTOR
 Gia sư
 tutor
 default.jpg
 3
-MATHS	
+MATHS
 Môn toán
 maths
 default.jpg
 3
-LECTURE	
+LECTURE
 Bài giảng
 lecture
 default.jpg
 3
-CANTEEN	
+CANTEEN
 Căn tin
 canteen
 default.jpg
 3
-HISTORY	
+HISTORY
 Môn sử
 history
 default.jpg
 3
-BLACKBOARD	
+BLACKBOARD
 Cái bảng
 blackboard
 default.jpg

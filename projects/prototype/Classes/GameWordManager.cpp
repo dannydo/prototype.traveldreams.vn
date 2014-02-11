@@ -86,11 +86,17 @@ void GameWordManager::LoadWords()
 	std::string sTemp;
 	for(int iWordIndex = 0; iWordIndex < m_iWordCount; iWordIndex++)
 	{
-		inputStream >> m_WordList[iWordIndex].m_sWord;		
-		m_WordList[iWordIndex].m_iWordLength = strlen( m_WordList[iWordIndex].m_sWord);
+		std::getline(inputStream, sTemp);
+		std::getline(inputStream, sTemp);
+		strcpy( m_WordList[iWordIndex].m_sWord, sTemp.data());		
+		m_WordList[iWordIndex].m_iWordLength = sTemp.size()-1;
+		m_WordList[iWordIndex].m_sWord[m_WordList[iWordIndex].m_iWordLength] = 0;
+
+		//inputStream >> m_WordList[iWordIndex].m_sWord;		
+		//m_WordList[iWordIndex].m_iWordLength = strlen( m_WordList[iWordIndex].m_sWord);
 
 		// read \r to temp
-		std::getline(inputStream, sTemp);		
+		//std::getline(inputStream, sTemp);		
 		std::getline(inputStream, m_WordList[iWordIndex].m_sMeaning);
 		//strcpy( m_WordList[iWordIndex].m_sMeaning, sTemp.c_str());
 
@@ -197,6 +203,17 @@ void GameWordManager::ResetDataForNewPlay()
 	m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount = m_WordList[m_iMainWordIndex].m_iWordLength;
 	m_WordList[m_iMainWordIndex].m_iRemainNotAppearedCharacterCount = m_WordList[m_iMainWordIndex].m_iWordLength;
 
+	for(int i=0; i< m_WordList[m_iMainWordIndex].m_iWordLength; i++)
+	{
+		if (m_pLevelConfig->m_MainWordUnlockedFlagList[i] ||  m_WordList[m_iMainWordIndex].m_sWord[i] == ' ')
+		{
+			m_WordList[m_iMainWordIndex].m_ActivatedCharacterFlags[i] = true;
+			m_WordList[m_iMainWordIndex].m_AppearedCharacterFlags[i] = true;
+			m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount--;
+			m_WordList[m_iMainWordIndex].m_iRemainNotAppearedCharacterCount--;
+		}
+	}
+
 	for(int i=0; i< m_iSubWordCount; i++)
 	{
 		// note: currently, already-appear-flag only used on main word
@@ -205,6 +222,15 @@ void GameWordManager::ResetDataForNewPlay()
 		
 		m_WordList[m_SubWordList[i]].m_iRemainInactivatedCharacterCount = m_WordList[m_iMainWordIndex].m_iWordLength;
 		m_WordList[m_SubWordList[i]].m_iRemainNotAppearedCharacterCount = m_WordList[m_iMainWordIndex].m_iWordLength;
+		
+		for(int j=0; j < m_WordList[m_SubWordList[i]].m_iWordLength; j++)
+			if (m_WordList[m_SubWordList[i]].m_sWord[j] == ' ')
+			{
+				m_WordList[m_SubWordList[i]].m_ActivatedCharacterFlags[i] = true;
+				m_WordList[m_SubWordList[i]].m_AppearedCharacterFlags[i] = true;
+				m_WordList[m_SubWordList[i]].m_iRemainInactivatedCharacterCount--;
+				m_WordList[m_SubWordList[i]].m_iRemainNotAppearedCharacterCount--;
+			}
 	}
 
 	// reset counter
@@ -236,7 +262,7 @@ void GameWordManager::ResetDataForNewPlay()
 				}
 			}
 
-			if (!bAlreadyInList) //check in main word
+			/*if (!bAlreadyInList) //check in main word
 			{
 				for(int iIndex=0; iIndex < m_WordList[m_iMainWordIndex].m_iWordLength; iIndex++)
 					if (m_WordList[m_iMainWordIndex].m_sWord[iIndex] == m_WordList[m_SubWordList[i]].m_sWord[j])
@@ -245,13 +271,13 @@ void GameWordManager::ResetDataForNewPlay()
 						break;
 					}
 			}
-
+			*/
 			if (!bAlreadyInList)
 				m_SubWordLettersCollection.push_back( m_WordList[m_SubWordList[i]].m_sWord[j]);
 		}
 }
 
-bool GameWordManager::UnlockLetter(const unsigned char& iLetter, int& iUnlockedLetterIndexOfMainWord, std::vector<int> (&unlockedLettersIndexOfSubWords)[_GDS_SUB_WORD_MAX_COUNT_],
+bool GameWordManager::UnlockLetter(const unsigned char& iLetter, const bool& bIsInMainWord, int& iUnlockedLetterIndexOfMainWord, std::vector<int> (&unlockedLettersIndexOfSubWords)[_GDS_SUB_WORD_MAX_COUNT_],
 								   bool& bIsMainWordJustUnlocked, bool (&justUnlockedSubWords)[_GDS_SUB_WORD_MAX_COUNT_])
 {
 	bool bNewCharacterIsUnlocked = false;
@@ -260,7 +286,7 @@ bool GameWordManager::UnlockLetter(const unsigned char& iLetter, int& iUnlockedL
 
 	// check main word
 	iUnlockedLetterIndexOfMainWord = -1;
-	if (m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount > 0)
+	if ( bIsInMainWord && m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount > 0)
 	{
 		for(int i=0; i< m_WordList[m_iMainWordIndex].m_iWordLength; i++)
 		{
@@ -289,35 +315,38 @@ bool GameWordManager::UnlockLetter(const unsigned char& iLetter, int& iUnlockedL
 	if (iUnlockedLetterIndexOfMainWord >=0)
 		m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate- m_WordGenerateConfig.m_iDecreasePercentAfterLetterDestroyedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);
 
-	for(int i=0; i < m_iSubWordCount; i++)
+	if (!bIsInMainWord)
 	{
-		int iSubWordID = m_SubWordList[i];
-		for(int j=0; j < m_WordList[iSubWordID].m_iWordLength; j++)		
-		{			
-			if (m_WordList[iSubWordID].m_sWord[j] != 0 && m_WordList[iSubWordID].m_ActivatedCharacterFlags[j]== false)		
-			{
-				if (iLetter == m_WordList[iSubWordID].m_sWord[j])
-				{					
-					unlockedLettersIndexOfSubWords[i].push_back(j);
+		for(int i=0; i < m_iSubWordCount; i++)
+		{
+			int iSubWordID = m_SubWordList[i];
+			for(int j=0; j < m_WordList[iSubWordID].m_iWordLength; j++)		
+			{			
+				if (m_WordList[iSubWordID].m_sWord[j] != 0 && m_WordList[iSubWordID].m_ActivatedCharacterFlags[j]== false)		
+				{
+					if (iLetter == m_WordList[iSubWordID].m_sWord[j])
+					{					
+						unlockedLettersIndexOfSubWords[i].push_back(j);
 
-					m_WordList[iSubWordID].m_ActivatedCharacterFlags[j] = true;					
-					m_WordList[iSubWordID].m_iRemainInactivatedCharacterCount--;
+						m_WordList[iSubWordID].m_ActivatedCharacterFlags[j] = true;					
+						m_WordList[iSubWordID].m_iRemainInactivatedCharacterCount--;
 
-					if (!m_WordList[iSubWordID].m_AppearedCharacterFlags[i])
-					{
-						m_WordList[iSubWordID].m_AppearedCharacterFlags[i] = true; //note: a letter can appear in both main word and sub-word
-						m_WordList[iSubWordID].m_iRemainNotAppearedCharacterCount--;
-					}
+						if (!m_WordList[iSubWordID].m_AppearedCharacterFlags[i])
+						{
+							m_WordList[iSubWordID].m_AppearedCharacterFlags[i] = true; //note: a letter can appear in both main word and sub-word
+							m_WordList[iSubWordID].m_iRemainNotAppearedCharacterCount--;
+						}
 
-					// check if sub word is just unlocked
-					justUnlockedSubWords[i] = (m_WordList[iSubWordID].m_iRemainInactivatedCharacterCount == 0);
+						// check if sub word is just unlocked
+						justUnlockedSubWords[i] = (m_WordList[iSubWordID].m_iRemainInactivatedCharacterCount == 0);
 
-					bNewCharacterIsUnlocked = true;
-				}				
+						bNewCharacterIsUnlocked = true;
+					}				
+				}
 			}
 		}
 	}
-		
+
 	m_iCountOfLettersOnBoard--;
 	if (bNewCharacterIsUnlocked)
 		AddLetterToTrashCollection(iLetter);
@@ -334,12 +363,12 @@ bool SuccessWithPercentRatio(const int& iPercentRatio)
 		return false;
 }
 
-void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<unsigned char>& outputLettersForGems, bool bIsNewMove)
+void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<GemLetterData>& outputLettersForGems, bool bIsNewMove)
 {
 	// init outputLettersForGems as empty list
 	outputLettersForGems.clear();
 	for(int i=0; i< iGemCount; i++)
-		outputLettersForGems.push_back(-1);	
+		outputLettersForGems.push_back(GemLetterData());	
 
 	// check maximum possible new letters
 	int iMaxNewLetters = MAX( MIN( iGemCount, m_WordGenerateConfig.m_iMaximumLettersAtTheSame - m_iCountOfLettersOnBoard), 0);	
@@ -347,7 +376,7 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<unsig
 		//return;	
 
 	// generate new letters
-	std::vector<unsigned char> characterOutput;
+	std::vector<GemLetterData> characterOutput;
 
 	bool bShouldGenerateLetter = true;
 	unsigned char sLetter;
@@ -365,7 +394,7 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<unsig
 			{
 				if (GenerateLetterFromMainWord(sLetter))
 				{
-					characterOutput.push_back(sLetter);				
+					characterOutput.push_back(GemLetterData( sLetter, true));				
 					iAppearRatio *= m_WordGenerateConfig.m_iRatioBetweenLettersOfMainWord / 100;				
 				}
 				else
@@ -389,7 +418,7 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<unsig
 		{
 			if (GenerateLetterFromSubWords(sLetter))
 			{
-				characterOutput.push_back(sLetter);
+				characterOutput.push_back(GemLetterData(sLetter, false));
 				iAppearRatio *= m_WordGenerateConfig.m_iRatioBetweenLettersOfSubWord / 100;
 			}
 			else
@@ -398,6 +427,7 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<unsig
 	}
 
 	// generate letters from trash words
+	/*
 	iAppearRatio = m_iTrashWordGenerateRate;	
 	bShouldGenerateLetter = true;
 	while(bShouldGenerateLetter && characterOutput.size() < iMaxNewLetters)
@@ -413,7 +443,7 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<unsig
 			else
 				bShouldGenerateLetter = false;
 		}
-	}
+	}*/
 
 	// now, place the letter to gems
 	if (characterOutput.size() > 0)
@@ -424,10 +454,10 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<unsig
 			indexList[i] = i;
 		
 		int iRandomIndex;
-		for(auto sLetter: characterOutput)
+		for(auto gemData: characterOutput)
 		{
 			iRandomIndex = rand() % iIndexListLength;
-			outputLettersForGems[indexList[iRandomIndex]] = sLetter;
+			outputLettersForGems[indexList[iRandomIndex]] = gemData;
 
 			indexList[iRandomIndex] = indexList[iIndexListLength-1];
 			iIndexListLength--;

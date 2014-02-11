@@ -460,7 +460,11 @@ bool NewGameBoardManager::DestroySingleCellUtil(const int& iRow, const int& iCol
 	if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_)
 	{
 		if (m_BoardValueMatrix[iRow][iColumn].m_iGemLetterBlockID >= 0)
+		{			
 			m_UnlockedGemLetterCellList.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemLetterBlockID, true, m_BoardValueMatrix[iRow][iColumn].m_iGemID));
+			m_BoardValueMatrix[iRow][iColumn].Reset();
+			return false;
+		}
 
 		m_BoardValueMatrix[iRow][iColumn].Reset(); //m_iGemID = -1;	m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
 		return true;		
@@ -676,7 +680,8 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	{
 		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
 		{
-			if (!m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell)
+			if (!m_TemporaryValueMatrix[iRow][iColumn].m_bIsBlankCell && m_TemporaryValueMatrix[iRow][iColumn].m_iGemLetterBlockID < 0 && m_TemporaryValueMatrix[iRow][iColumn].m_iObstacleBlockID < 0
+				&& m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType == _GCT_NONE_)
 				notComboCells.push_back(Cell(iRow, iColumn));
 		}
 	}
@@ -701,7 +706,53 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	}
 
 	// ************* create double combo ****************************************************	
-	//*************************************
+	for(iRow=0; iRow < m_iRowNumber; iRow++)
+	{
+		for(iColumn=0; iColumn < m_iColumnNumber; iColumn++)
+		{
+			if (m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
+				bHasExistingCombo = true;
+
+			if ( CanComboBeUpgraded(m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType))
+			{
+				bool bFoundDoubleCombo = false;
+				Cell nextCell;			
+				if (iRow < m_iRowNumber-1 && m_TemporaryValueMatrix[iRow+1][iColumn].m_eGemComboType == m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType)
+				{
+					bFoundDoubleCombo = true;
+					nextCell.m_iRow = iRow + 1;
+					nextCell.m_iColumn = iColumn;
+				}
+				else if (iColumn < m_iColumnNumber-1 && m_TemporaryValueMatrix[iRow][iColumn+1].m_eGemComboType == m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType)
+				{
+					bFoundDoubleCombo = true;
+					nextCell.m_iRow = iRow ;
+					nextCell.m_iColumn = iColumn + 1;
+				}
+
+				if (bFoundDoubleCombo)
+				{
+					DoubleComboCreationInfo doubleCombo;
+					doubleCombo.m_Cell1 = Cell(iRow, iColumn);
+					doubleCombo.m_Cell2 = nextCell;
+					doubleCombo.m_Position = doubleCombo.m_Cell1;
+					doubleCombo.m_eComboType = UpgradeCombo(m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType);
+
+					doubleComboList.push_back(doubleCombo);
+
+					// disable 2 combo cell
+					m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_NONE_;
+					m_TemporaryValueMatrix[iRow][iColumn].m_iGemID = -1;
+					m_TemporaryValueMatrix[nextCell.m_iRow][nextCell.m_iColumn].m_eGemComboType = _GCT_NONE_;
+					m_TemporaryValueMatrix[nextCell.m_iRow][nextCell.m_iColumn].m_iGemID = -1;					
+
+					// create double combo cell
+					//m_TemporaryValueMatrix[doubleCombo.m_Cell1.m_iRow][doubleCombo.m_Cell1.m_iColumn].m_eGemComboType = doubleCombo.m_eComboType;
+
+				}
+			}
+		}
+	}
 	
 	// ************* create block for basic matching ******************************************
 	bool bIsNewBlockCreated;
@@ -733,7 +784,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		// add converted combo from bonus and existing combo to list
 		for(auto cell: convertedToComboCells)
 		{
-			if (m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType != _GCT_NONE_)
+			if (m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType == _GCT_COMBO4_) //!= _GCT_NONE_)
 			{
 				ComboEffectBundle* pTriggeredComboEffectBundle = new ComboEffectBundle();
 				pTriggeredComboEffectBundle->m_ComboEffectDescription.m_eComboEffectType = _CET_EXPLOSION_; //only implement explosion now
@@ -769,7 +820,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		CreateComboCells(-1, -1, basicMatchingDestroyedCells, newComboCells);
 
 		// create unlocked gems with letter
-		CreateUnlockedGemLetterFromWaitingList(newCells);
+		CreateUnlockedGemLetterFromWaitingList(unlockedLetterCells);
 
 		// calculate move cells and create new cells
 		CalculateMoveCells( originalMovedCells, targetMovedCells);
@@ -1258,17 +1309,17 @@ void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bo
 				newCells.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemID));
 			}
 
-	std::vector<unsigned char> outputLettersForGems;
+	std::vector<GemLetterData> outputLettersForGems;
 	m_pGameWordManager->GenerateNewLetters( newCells.size(), outputLettersForGems, bIsNewMove);	
 
 	unsigned char iLetter = 255;	
 	for(int iIndex = 0; iIndex < newCells.size(); iIndex++)	
 	{
-		iLetter = outputLettersForGems[iIndex];		
+		iLetter = outputLettersForGems[iIndex].m_iLetter;		
 		NewCellInfo& cell = newCells[iIndex];
 		if (iLetter < 255)
 		{			
-			cell.m_iGemLetterBlockID = m_GemLetterManager.AllocFreeBlock(iLetter, true);
+			cell.m_iGemLetterBlockID = m_GemLetterManager.AllocFreeBlock(iLetter, outputLettersForGems[iIndex].m_bIsInMainWord);
 			m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = cell.m_iGemLetterBlockID;			
 		}
 		else

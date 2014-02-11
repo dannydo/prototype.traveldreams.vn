@@ -37,6 +37,7 @@ public:
 	int m_BoardMatrix[_BOARD_MAX_ROW_NUMBER_][_BOARD_MAX_COLUMN_NUMBER_];
 	// main word
 	int m_iMainWordID;
+	bool m_MainWordUnlockedFlagList[_GDS_WORD_MAX_LENGTH_];
 	bool m_bIsMainWordExistedOnBoard;
 	Cell m_MainWordLetterPosition[_GDS_WORD_MAX_LENGTH_];
 	// bonus words

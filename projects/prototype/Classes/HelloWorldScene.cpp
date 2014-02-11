@@ -299,6 +299,7 @@ void HelloWorld::initLevel(int iLevel)
 	ObstacleProcessManager* pObstacleProcessManager = m_GameBoardManager.GetObstacleProcessManager();
 
 	memset( m_BoardObstaclesList, 0, sizeof(m_BoardObstaclesList));
+	bool bIsGemContainLetter = false;
 
 	for(iRow=0; iRow < iNumberOfRow; iRow++)
 		for( iColumn = 0; iColumn < iNumberOfColumn; iColumn++)
@@ -319,9 +320,26 @@ void HelloWorld::initLevel(int iLevel)
 			}
 			else
 			{
+				bIsGemContainLetter = false;
+				if (levelConfig.m_bIsMainWordExistedOnBoard)
+				{
+					const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+
+					for(int i=0; i< mainWord.m_iWordLength; i++)
+					{			
+						if (!mainWord.m_ActivatedCharacterFlags[i])
+							if(levelConfig.m_MainWordLetterPosition[i].m_iRow == iRow && levelConfig.m_MainWordLetterPosition[i].m_iColumn == iColumn)
+							{
+								bIsGemContainLetter = true;
+								break;
+							}
+					}
+				}
+
 				for( iFlag =0; iFlag < 2; iFlag++)
-				{				
-					pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(m_GameBoardManager.GetCellValue(iRow, iColumn)).c_str());
+				{									
+					pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(m_GameBoardManager.GetCellValue(iRow, iColumn), 
+						bIsGemContainLetter?_GCT_HAS_LETTER_:_GCT_NONE_ ).c_str());
 					//pSprite->setAnchorPoint(ccp(0,0));
 					pSprite->setPosition( ccp(m_fBoardLeftPosition + iColumn * m_SymbolSize.width, m_fBoardBottomPosition + iRow * m_SymbolSize.height));
 					pSprite->setScale(1.f);
@@ -378,11 +396,18 @@ void HelloWorld::initLevel(int iLevel)
 	if (levelConfig.m_bIsMainWordExistedOnBoard)
 	{
 		const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
-				
+		int iGemLetterBlockID;
+		unsigned char iLetter;
+
 		for(int i=0; i< mainWord.m_iWordLength; i++)
-		{
-			AddLetterToGem( levelConfig.m_MainWordLetterPosition[i], m_GameBoardManager.GetCellValue( levelConfig.m_MainWordLetterPosition[i].m_iRow,
-				levelConfig.m_MainWordLetterPosition[i].m_iColumn), mainWord.m_sWord[i]);
+		{			
+			if (!mainWord.m_ActivatedCharacterFlags[i])
+			{
+				iLetter = mainWord.m_sWord[i];
+				iGemLetterBlockID = m_GameBoardManager.AllocFreeGemLetterBlock( iLetter, true);
+				AddLetterToGem( levelConfig.m_MainWordLetterPosition[i], m_GameBoardManager.GetCellValue( levelConfig.m_MainWordLetterPosition[i].m_iRow,
+					levelConfig.m_MainWordLetterPosition[i].m_iColumn), mainWord.m_sWord[i], iGemLetterBlockID);
+			}
 		}
 	}
 
@@ -2062,12 +2087,12 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 	// create gem with unlock letters
 	GemLetterData data;
-
+	Sprite* pSprite;
 	for(auto& cell : unlockedLetterCells)
 	{
 		for(int i=0; i< 2; i++)
 		{					
-			Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID( cell.m_iGemID,  //m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), //_GCT_NONE_).c_str());
+			/*Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID( cell.m_iGemID,  //m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), //_GCT_NONE_).c_str());
 						_GCT_HAS_LETTER_).c_str());
 			
 			//pSprite->setAnchorPoint(ccp(0,0));
@@ -2083,31 +2108,30 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			}
 			else
 			{
-				/*pSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, 
-					m_fBoardBottomPosition + (cell.m_iRow + iNumberOfRow) * m_SymbolSize.height));
-				pSprite->runAction(
-					Sequence::create(
-						DelayTime::create(fTotalDestroyCellTime + 0.027f* (m_GameBoardManager.GetRowNumber() - cell.m_iRow)),
-						EaseOut::create( MoveTo::create(fMoveTime * 1.4f,
-							ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, 
-									m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height)), 1.f),
-							NULL));*/
-
 				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
-				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iLetter = 255; //reset letter of gem				
+				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = -1; //reset letter of gem				
 			}
-			//pSprite->setScale(0.65f);
+			//pSprite->setScale(0.65f);*/
+
+			if (i!= 0)
+			{								
+				pSprite = m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite;
+			}
+			else
+			{
+				pSprite = m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite;				
+			}
 
 			if (cell.m_bIsUnlocked)
 			{
 				if (cell.m_iGemLetterBlockID >= 0) //iLetter < 255)
 				{
 					data = m_GameBoardManager.GetGemLetterData(cell.m_iGemLetterBlockID);							
-					AddLetterToGem( cell, m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), data.m_iLetter);			
+					AddLetterToGem( cell, m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), data.m_iLetter, cell.m_iGemLetterBlockID);			
 				}
 			}
 					
-			m_pBoardBatchNode->addChild(pSprite);						
+			//m_pBoardBatchNode->addChild(pSprite);						
 		}		
 	}
 
@@ -2183,7 +2207,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 							NULL));
 
 				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
-				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iLetter = 255; //reset letter of gem				
+				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = -1; //reset letter of gem				
 			}
 			//pSprite->setScale(0.65f);
 
@@ -2349,7 +2373,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 	// NOTE: following code to hot fix error cause by cells destroy by double combo and other effect!!!
 	if (m_BoardViewMatrix[iRow][iColumn].m_pSprite == NULL)
 	{
-		m_BoardViewMatrix[iRow][iColumn].m_iLetter = 255;
+		m_BoardViewMatrix[iRow][iColumn].m_iGemLetterBlockID = -1;
 		return;
 	}
 
@@ -2366,9 +2390,12 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 			//FadeOut::create(0.01f),
 			NULL));
 
-	if (m_BoardViewMatrix[iRow][iColumn].m_iLetter < 255)
-	{		
-		m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect(fDelay, m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
+	if (m_BoardViewMatrix[iRow][iColumn].m_iGemLetterBlockID >= 0)  //m_iLetter < 255)
+	{	
+		GemLetterData gemLetterData = m_GameBoardManager.FreeGemLetterBlock(m_BoardViewMatrix[iRow][iColumn].m_iGemLetterBlockID);
+
+
+		m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect(fDelay, gemLetterData.m_iLetter,  //m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
 			ccp(m_fBoardLeftPosition + iColumn  * m_SymbolSize.width, 
 					m_fBoardBottomPosition + iRow * m_SymbolSize.height));
 		
@@ -2380,10 +2407,10 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 		bool bIsMainWordJustUnlocked;
 		bool justUnlockedSubWords[_GDS_SUB_WORD_MAX_COUNT_];
 
-		if (m_GameBoardManager.GetGameWordManager()->UnlockLetter( m_BoardViewMatrix[iRow][iColumn].m_iLetter, iUnlockedLetterIndexOfMainWord, unlockedLettersIndexOfSubWords,
+		if (m_GameBoardManager.GetGameWordManager()->UnlockLetter( gemLetterData.m_iLetter, gemLetterData.m_bIsInMainWord, iUnlockedLetterIndexOfMainWord, unlockedLettersIndexOfSubWords,
 																	bIsMainWordJustUnlocked, justUnlockedSubWords))
 		{
-			m_pBonusWordNode->addLetter(m_BoardViewMatrix[iRow][iColumn].m_iLetter);
+			m_pBonusWordNode->addLetter(gemLetterData.m_iLetter);
 
 			if (iUnlockedLetterIndexOfMainWord >=0)
 				m_pWordCollectBoardRenderNode->UnlockLetter(iUnlockedLetterIndexOfMainWord);
@@ -2426,7 +2453,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 	}
 
 	m_BoardViewMatrix[iRow][iColumn].m_pSprite = NULL;
-	m_BoardViewMatrix[iRow][iColumn].m_iLetter = 255; //-1;
+	m_BoardViewMatrix[iRow][iColumn].m_iGemLetterBlockID = -1;
 	m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = NULL;	
 }
 
@@ -2505,7 +2532,7 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 }
 */
 
-Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter)
+Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID)
 {
 	Sprite* pCharacterSprite = Sprite::createWithSpriteFrameName(
 			m_pWordCollectBoardRenderNode->GetImageInGemFileFromLetter(iLetter).c_str());
@@ -2536,7 +2563,7 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 
 
 	m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pCharacterSprite);
-	m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iLetter = iLetter;
+	m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = iGemLetterBlockID; //m_iLetter = iLetter;
 
 	return pCharacterSprite;
 }

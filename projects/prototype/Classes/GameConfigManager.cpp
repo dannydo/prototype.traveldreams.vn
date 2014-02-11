@@ -97,10 +97,20 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 
 	// main word
 	std::getline(inputStream, sTemp);
-	inputStream >> sTemp;
+	std::getline(inputStream, sTemp);
+	sTemp.erase( sTemp.size()-1, 1);  // remove \r at the end of line
 	levelConfig.m_iMainWordID = GameWordManager::getInstance()->GetWordIndexFromContent(sTemp);		
 	
-	int iTemp;
+	memset( levelConfig.m_MainWordUnlockedFlagList, 0, sizeof(levelConfig.m_MainWordUnlockedFlagList));
+	int iAlreadyUnlockedLetterCount, iTemp;
+	inputStream >> iAlreadyUnlockedLetterCount;
+	for(int i=0; i< iAlreadyUnlockedLetterCount; i++)
+	{
+		inputStream >> iTemp; 
+		levelConfig.m_MainWordUnlockedFlagList[iTemp-1] = true;
+	}
+
+	//int iTemp;
 	inputStream >> iTemp;
 	levelConfig.m_bIsMainWordExistedOnBoard = (iTemp > 0);
 	if (levelConfig.m_bIsMainWordExistedOnBoard)
@@ -119,12 +129,15 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 	// bonus word
 	std::getline(inputStream, sTemp);
 	inputStream >> levelConfig.m_iBonusWordsCount;
+	std::getline(inputStream, sTemp);
 	for(int i=0; i< levelConfig.m_iBonusWordsCount; i++)
 	{
-		inputStream >> sTemp;
+		//inputStream >> sTemp;
+		std::getline(inputStream, sTemp);
+		sTemp.erase( sTemp.size()-1, 1); // remove \r
 		levelConfig.m_BonusWordIDList[i] = GameWordManager::getInstance()->GetWordIndexFromContent(sTemp);
 	}
-	std::getline(inputStream, sTemp);
+	//std::getline(inputStream, sTemp);
 
 	// obstacle list
 	int iObstacleCount;
