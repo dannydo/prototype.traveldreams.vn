@@ -27,9 +27,12 @@ RULER
 0
 ;obstacle list: count, list
 2
-SHIELD	2
-2
-1	2	6	6
+COUNTDOWN	5
+0
+1	
+0	2
+1	50	8	50
 LOCK	0
 2
 1	2	6	6
+0

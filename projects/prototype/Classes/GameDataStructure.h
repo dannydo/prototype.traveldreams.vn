@@ -82,7 +82,7 @@ enum GemComboType_e
 	_GCT_COMBO4_2_ = 4,
 	_GCT_COMBO5_2_ = 5,
 	_GCT_COMBO6_2_ = 6,
-	_GCT_COMBO5_WAITING_TRIGGER_ = 7
+	_GCT_COMBO6_WAITING_TRIGGER_ = 7
 };
 
 enum ComboActivateDirection_e
@@ -107,18 +107,21 @@ struct Cell
 {
 	int m_iRow, m_iColumn;	
 	//int m_iCharacter;
+	//int m_iObstacleBlockID; //used for destroy cell only
 			
 	Cell()
 	{
 		m_iRow = 0;
 		m_iColumn = 0;		
+		//m_iObstacleBlockID = -1;
 	}
 
 	Cell (int iRow, int iColumn)
 	{
 		m_iRow = iRow;
-		m_iColumn = iColumn;		
-	}	
+		m_iColumn = iColumn;	
+		//m_iObstacleBlockID = -1;
+	}		
 
 	bool operator ==(const Cell &input)
 	{

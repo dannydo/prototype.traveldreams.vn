@@ -360,7 +360,6 @@ bool GameWordManager::UnlockLetter(const unsigned char& iLetter, const bool& bIs
 	return bNewCharacterIsUnlocked;
 }
 
-
 bool SuccessWithPercentRatio(const int& iPercentRatio)
 {
 	if (rand() % 100 <= iPercentRatio)
@@ -391,7 +390,7 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<GemLe
 
 	// generate letters from main word
 	int iAppearRatio = m_iMainWordGenerateRate;	
-	if (!m_pLevelConfig->m_bIsMainWordExistedOnBoard)
+	if (!m_pLevelConfig->m_bIsMainWordExistedOnBoard && !m_pLevelConfig->m_bEnableBoss)
 	{
 		while(bShouldGenerateLetter && characterOutput.size() < iMaxNewLetters)
 		{
@@ -591,10 +590,10 @@ bool GameWordManager::GenerateLetterFromMainWord(unsigned char& sLetter)
 			m_WordList[m_iMainWordIndex].m_AppearedCharacterFlags[i] = true;
 			m_WordList[m_iMainWordIndex].m_iRemainNotAppearedCharacterCount--;
 
-			sLetter = m_WordList[m_iMainWordIndex].m_sWord[i];
+			sLetter = m_WordList[m_iMainWordIndex].m_sWord[i];			
 			return true;
 		}
-	
+
 	return false;
 }
 

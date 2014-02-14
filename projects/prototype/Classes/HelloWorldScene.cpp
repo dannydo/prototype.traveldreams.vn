@@ -412,28 +412,35 @@ void HelloWorld::initLevel(int iLevel)
 	}
 
 	// add boss if this is versus mode
+	m_pBossSprite = NULL;
+
 	if (levelConfig.m_bEnableBoss)
 	{
-		pSprite = Sprite::createWithSpriteFrameName("BigAlien.png");
-		pSprite->setPosition( ccp(m_fBoardLeftPosition + (levelConfig.m_BossConfig.m_Position.m_iColumn + levelConfig.m_BossConfig.m_iWidth/4.f)  * m_SymbolSize.width, 
+		m_pBossSprite = Sprite::createWithSpriteFrameName("BigAlien.png");
+		m_pBossSprite->setPosition( ccp(m_fBoardLeftPosition + (levelConfig.m_BossConfig.m_Position.m_iColumn + levelConfig.m_BossConfig.m_iWidth/4.f)  * m_SymbolSize.width, 
 			m_fBoardBottomPosition + (levelConfig.m_BossConfig.m_Position.m_iRow + levelConfig.m_BossConfig.m_iHeight/4.f) * m_SymbolSize.height));
 		//pSprite->setScale(1.f);
-		m_pBoardBatchNode->addChild(pSprite, 11);
+		m_pBoardBatchNode->addChild(m_pBossSprite, 11);
 
 		// add letter to boss
+		AddNewLetterToBossSprite(0);
+
+		// add HP Sprite to boss
+		AddHitPointSpritesToBossSprite(0);
+		/*
 		unsigned char iLetter;
 		if (m_GameBoardManager.GetGameWordManager()->GenerateLetterFromMainWord(iLetter))
 		{
 			Sprite* pLetterSprite = Sprite::createWithSpriteFrameName(
 				m_pWordCollectBoardRenderNode->GetImageFileFromLetter(iLetter).c_str());
-			pLetterSprite->setPosition(Point( pSprite->getContentSize().width/2.f - pLetterSprite->getContentSize().width * 1.6f /4.f, 90.f));
+			pLetterSprite->setPosition(Point( m_pBossSprite->getContentSize().width/2.f - pLetterSprite->getContentSize().width * 1.6f /4.f, 90.f));
 			pLetterSprite->setScale(1.6f);
-			pSprite->setTag(iLetter);
+			m_pBossSprite->setTag(iLetter);
 
-			pSprite->addChild(pLetterSprite);
+			m_pBossSprite->addChild(pLetterSprite);
 		}
 		else
-			pSprite->setTag(-1);
+			m_pBossSprite->setTag(-1);
 
 		// add hitpoint sprites
 		const LevelBossInfo& levelBossInfo = m_GameBoardManager.GetLevelBossInfo();
@@ -442,8 +449,8 @@ void HelloWorld::initLevel(int iLevel)
 		{
 			pHitPointSprite = Sprite::createWithSpriteFrameName("BossHitPoint.png");
 			pHitPointSprite->setPosition( Point((i - levelBossInfo.m_iCurrentHitPoint/2.f + 0.5f ) * pHitPointSprite->getContentSize().width + m_SymbolSize.width, pHitPointSprite->getContentSize().height + 15.f));
-			pSprite->addChild(pHitPointSprite);
-		}
+			m_pBossSprite->addChild(pHitPointSprite);
+		}*/
 	}
 
 
@@ -494,7 +501,7 @@ void HelloWorld::visit()
 
 std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemComboType)
 {
-	switch (eGemComboType)
+	/*switch (eGemComboType)
 	{		
 		case _GCT_COMBO4_:
 			return "combo4.png";
@@ -508,7 +515,7 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 			return "combo6.png";
 		case _GCT_COMBO6_2_:
 			return "combo6_2.png";
-	}
+	}*/
 
 	switch(iGemID)
 	{
@@ -675,6 +682,8 @@ bool HelloWorld::onTouchBegan(Touch *pTouch, Event *pEvent)
 		m_StartTouchPosition = touchPosition;
 		m_iSaveLastCellMoveDelta = 0;
 
+		m_eTouchMoveState = _TMS_BEGIN_IDENTIFY_;
+		/*
 		if (m_GameBoardManager.IsComboCell(iRow, iColumn) && m_GameBoardManager.GetObstacleBlockID(iRow, iColumn) < 0)
 		{
 			m_eTouchMoveState = _TMS_BEGIN_ACTIVATE_COMBO_;			
@@ -682,7 +691,7 @@ bool HelloWorld::onTouchBegan(Touch *pTouch, Event *pEvent)
 		else
 		{
 			m_eTouchMoveState = _TMS_BEGIN_IDENTIFY_;
-		}
+		}*/
 
 	}
 
@@ -714,14 +723,14 @@ void HelloWorld::onTouchEnded(Touch* pTouch, Event* pEvent)
 		m_HintSprites.clear();
 	}
 
-	if (m_eTouchMoveState < _TMS_BEGIN_ACTIVATE_COMBO_) //this is normal move
+	//if (m_eTouchMoveState < _TMS_BEGIN_ACTIVATE_COMBO_) //this is normal move
 	{
 		Point currentPosition = pTouch->getLocation();
 		float fDeltaX = currentPosition.x - m_StartTouchPosition.x;
 		float fDeltaY = currentPosition.y - m_StartTouchPosition.y;
 		AdjustPosition( bIsBlocked, fDeltaX, fDeltaY, m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn);
 	}
-	else if (m_eTouchMoveState != _TMS_BEGIN_ACTIVATE_COMBO_)
+	/*else if (m_eTouchMoveState != _TMS_BEGIN_ACTIVATE_COMBO_)
 	{
 		ComboActivateDirection_e eComboDireciton;
 		switch (m_eTouchMoveState)
@@ -748,7 +757,7 @@ void HelloWorld::onTouchEnded(Touch* pTouch, Event* pEvent)
 
 		PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
 			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells,  m_ComputeMoveResult.m_NewCells, true);
-	}
+	}*/
 	m_eTouchMoveState = _TMS_NONE_;	
 }
 
@@ -834,7 +843,7 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 
 
 	// ************************************ active combo
-	if (m_eTouchMoveState >= _TMS_BEGIN_ACTIVATE_COMBO_ && m_eTouchMoveState <= _TMS_ACTIVATE_COMBO_DOWN_)
+	/*if (m_eTouchMoveState >= _TMS_BEGIN_ACTIVATE_COMBO_ && m_eTouchMoveState <= _TMS_ACTIVATE_COMBO_DOWN_)
 	{
 		int iCurrentRow = (currentPosition.y - m_fBoardBottomPosition + m_SymbolSize.height/2.f)/m_SymbolSize.height;
 		int iCurrentColumn = (currentPosition.x - m_fBoardLeftPosition + m_SymbolSize.width/2.f)/m_SymbolSize.width;
@@ -865,7 +874,7 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 			m_eTouchMoveState = eNewMoveState;
 			DrawComboHint();
 		}
-	}
+	}*/
 }
 
 void HelloWorld::update(float fDeltaTime)
@@ -921,7 +930,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 		m_ePlayingDragEffect = _TMS_MOVE_HORIZONTAL_;
 
 		if (!bIsBlocked && m_GameBoardManager.RecheckAfterMoveV2( m_SelectedCell.m_iRow,-1,  -1, iMoveUnit, 
-			m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList,
+			m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList,
 				m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, true))
 		//if (false)
 		{
@@ -1001,7 +1010,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 		m_ePlayingDragEffect = _TMS_MOVE_VERTICAL_;
 
 		if (!bIsBlocked && m_GameBoardManager.RecheckAfterMoveV2( -1, m_SelectedCell.m_iColumn, iMoveUnit, -1, 
-				m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList,
+				m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList,
 				m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, true))
 		//if (false)
 		{
@@ -1075,8 +1084,11 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 	// now play effect to destroy/move old cells, and generate new cells
 	if (bMoveIsValid)
 	{		
+		// update obstacle manager right begin of move
+		m_GameBoardManager.GetObstacleProcessManager()->UpdateAfterMove();
+
 		PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, true);
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, true);
 	}
 
 	/*
@@ -1240,10 +1252,10 @@ void HelloWorld::CheckBoardStateAfterMove()
 	m_ComputeMoveResult.Reset(false);
 
 	if (m_GameBoardManager.RecheckAfterMoveV2( -1, -1, -1, -1, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false))
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false))
 	{
 		PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false);		
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false);		
 	}
 	else
 	{		
@@ -1278,9 +1290,9 @@ void HelloWorld::CheckBoardStateAfterMove()
 		}		
 
 		// update obstacle manager after move
-		m_GameBoardManager.GetObstacleProcessManager()->UpdateAfterMove();
+		//m_GameBoardManager.GetObstacleProcessManager()->UpdateAfterMove();
 
-		UpdateObstacleListAfterMove();
+		//UpdateObstacleListAfterMove();
 	}	
 }
 
@@ -1290,10 +1302,10 @@ void HelloWorld::ExecuteBonusWinGameEffect()
 
 	//if (m_GameBoardManager.GetCurrentMove() > 0)
 	if (m_GameBoardManager.ExecuteEndGameBonus(m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-		m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells))
+		m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells))
 	{
 		PlayEffect2( true, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo5ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells,  m_ComputeMoveResult.m_NewCells, false);
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells,  m_ComputeMoveResult.m_NewCells, false);
 
 		m_pStatusLayer->setCurrentMove( m_GameBoardManager.GetCurrentMove());
 		//m_pStatusLayer->update(0);
@@ -1718,7 +1730,7 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 
 void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<ComboEffectCell>& convertedToComboCells, 
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo> doubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList,  std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
+		std::vector<ComboEffectBundle*>& comboChainList,  std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
 		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,		
 		std::vector<NewCellInfo>& unlockedLetterCells, std::vector<NewCellInfo>& newCells, bool bIsNewMove)
 {
@@ -1732,7 +1744,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	float fDestroyTime = 0.35f;
 	float fMoveTime = 0.3f; //25f;
 	float fDelayPerNormalComboChain = fDestroyTime;
-	float fDelayPerCombo5Chain = 0.45f;
+	float fDelayPerCombo6Chain = 0.45f;
 	
 	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
 	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
@@ -1907,16 +1919,16 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	//CCLOG("Combo chain");
 		
 	// play chain of triggered combo 5
-	if (triggeredCombo5ChainList.size() > 0)
+	if (triggeredCombo6ChainList.size() > 0)
 	{		
-		for(auto pComboEffect : triggeredCombo5ChainList)
+		for(auto pComboEffect : triggeredCombo6ChainList)
 		{
-			PlayCombo5Effect(pComboEffect, fDelayTime + pComboEffect->m_iActivatedByCombo5Phase * fDelayPerCombo5Chain, fDelayPerCombo5Chain);
+			PlayCombo6Effect(pComboEffect, fDelayTime + pComboEffect->m_iActivatedByCombo6Phase * fDelayPerCombo6Chain, fDelayPerCombo6Chain);
 
 			// destroy cells by combo
 			for(auto cell: pComboEffect->m_DestroyedCells)
 			{
-				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime + (pComboEffect->m_iActivatedByCombo5Phase + 1)* fDelayPerCombo5Chain - 0.02f, fDestroyTime);			
+				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime + (pComboEffect->m_iActivatedByCombo6Phase + 1)* fDelayPerCombo6Chain - 0.02f, fDestroyTime);			
 			}
 
 			// increase score by combo		
@@ -1926,20 +1938,22 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			delete pComboEffect;
 		}
 
-		fTotalDestroyCellTime = fDelayTime + fDelayPerCombo5Chain * triggeredCombo5ChainList.size();
+		fTotalDestroyCellTime = fDelayTime + fDelayPerCombo6Chain * triggeredCombo6ChainList.size();
 	}
 
 	// play combo chain	
 	float fCurrentDelayComboChain;
 	for(auto pComboEffect : comboChainList)
 	{
-		fCurrentDelayComboChain = fDelayTime + pComboEffect->m_iActivatedByCombo5Phase * fDelayPerCombo5Chain + pComboEffect->m_iNormalChainPhase* fDelayPerNormalComboChain;
+		fCurrentDelayComboChain = fDelayTime + pComboEffect->m_iActivatedByCombo6Phase * fDelayPerCombo6Chain + pComboEffect->m_iNormalChainPhase* fDelayPerNormalComboChain;
 		if (fCurrentDelayComboChain + fDestroyTime > fTotalDestroyCellTime)
 			fTotalDestroyCellTime = fCurrentDelayComboChain + fDestroyTime;
 
 		// play effect
-		if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_EXPLOSION_)
+		if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_DESTROY_ROW_ || pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_DESTROY_COLUMN_)
 			PlayCombo4Effect(pComboEffect, fCurrentDelayComboChain, fDestroyTime);
+		else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_EXPLOSION_)
+			PlayCombo5Effect(pComboEffect, fCurrentDelayComboChain, fDestroyTime);
 		else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_DESTROY_COLOR_)
 		{
 			if (pComboEffect->m_iNormalChainPhase < 0)
@@ -2065,6 +2079,81 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		delete pComboEffect;
 	}
 
+
+	// compute effect on boss
+	if (m_GameBoardManager.GetLevelBossInfo().m_bIsEnable)
+	{
+		if (m_GameBoardManager.IsBossStateChanged())
+		{
+			const LevelBossInfo& levelBossInfo = m_GameBoardManager.GetLevelBossInfo();
+			float fDelayEffectTime = fDelayTime + levelBossInfo.m_iBossStateChangePhase * fDelayPerNormalComboChain;
+
+			// remove 1 hp
+			Remove1HPFromBossSprite(fDelayEffectTime);
+
+			if (levelBossInfo.m_bJustReleaseALetter)
+			{
+				// play sound effect 
+				SoundManager::PlaySoundEffect(_SET_GET_CHARACTER_);
+
+				// remove current letter sprite
+				RemoveLetterFromBossSprite(fDelayEffectTime);
+
+				// play effect unlock letter
+				unsigned char iLetter;
+				if (m_pBossSprite->getTag() > 0)
+				{
+					iLetter = (unsigned char) m_pBossSprite->getTag();
+					int iUnlockedLetterOfMainWord;
+					std::vector<int> unlockedLettersIndexOfSubWords[_GDS_SUB_WORD_MAX_COUNT_];
+					bool bIsMainWordJustUnlocked;
+					bool justUnlockedSubWords[_GDS_SUB_WORD_MAX_COUNT_];
+
+					if (m_GameBoardManager.GetGameWordManager()->UnlockLetter( iLetter, true, iUnlockedLetterOfMainWord, unlockedLettersIndexOfSubWords, bIsMainWordJustUnlocked, justUnlockedSubWords))
+					{
+						const LevelBossConfig& bossLevelConfig = m_GameBoardManager.GetLevelConfig().m_BossConfig;
+
+						m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect(fDelayEffectTime, iLetter,  //m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
+							ccp(m_fBoardLeftPosition + (  bossLevelConfig.m_Position.m_iColumn + bossLevelConfig.m_iWidth/4.f)  * m_SymbolSize.width, 
+								m_fBoardBottomPosition + (  bossLevelConfig.m_Position.m_iRow + bossLevelConfig.m_iHeight/4.f) * m_SymbolSize.height));
+
+						m_pWordCollectBoardRenderNode->UnlockLetter(iUnlockedLetterOfMainWord);
+
+						if (bIsMainWordJustUnlocked)
+							m_GameBoardManager.IncreaseScoreForLetterInMainWord();
+					}
+				}
+
+				// generate new letter
+				AddNewLetterToBossSprite(fDelayEffectTime);
+
+				// add HP Sprite to boss
+				AddHitPointSpritesToBossSprite(fDelayEffectTime);
+			}
+			else
+			{				
+				
+			}
+
+			// play effect on fire on boss
+			auto flashLightEffect = 
+				Sequence::create(
+					DelayTime::create(fDelayEffectTime),
+					Repeat::create(
+						Sequence::create(
+							TintTo::create( 0.15f, 100, 200, 100),
+							TintTo::create( 0.15f, 255, 255, 155),
+							NULL), 2),
+					NULL);
+				
+			flashLightEffect->setTag(-100);
+			m_pBossSprite->runAction(flashLightEffect);
+
+
+			if (levelBossInfo.m_iRemainLettersCount == 0)
+				m_GameBoardManager.KillBoss();
+		}
+	}
 
 	// create new combo cells
 	for(auto cell: newComboCells)
@@ -2356,14 +2445,104 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	UpdateObstacleListAfterMove();
 }
 
+// utility functions on boss sprite
+void HelloWorld::AddNewLetterToBossSprite(const float& fDelayTime)
+{
+	unsigned char iLetter;
+	if (m_GameBoardManager.GetGameWordManager()->GenerateLetterFromMainWord(iLetter))
+	{
+		Sprite* pLetterSprite = Sprite::createWithSpriteFrameName(
+			m_pWordCollectBoardRenderNode->GetImageFileFromLetter(iLetter).c_str());
+		pLetterSprite->setPosition(Point( m_pBossSprite->getContentSize().width/2.f - pLetterSprite->getContentSize().width * 1.6f /4.f, 90.f));
+		pLetterSprite->setScale(1.6f);
+		m_pBossSprite->setTag(iLetter);
+
+		m_pBossSprite->addChild(pLetterSprite);
+		
+		if (fDelayTime > 0)
+		{
+			pLetterSprite->setOpacity(0);
+			pLetterSprite->runAction(
+				Sequence::create(
+					DelayTime::create(fDelayTime),
+					FadeTo::create( 0.1f, 255),
+					NULL));
+		}
+	}
+	else
+		m_pBossSprite->setTag(-1);
+}
+
+void HelloWorld::AddHitPointSpritesToBossSprite(const float& fDelayTime)
+{
+	const LevelBossInfo& levelBossInfo = m_GameBoardManager.GetLevelBossInfo();
+	Sprite* pHitPointSprite;
+	for(int i=0; i< levelBossInfo.m_iCurrentHitPoint;i++)
+	{
+		pHitPointSprite = Sprite::createWithSpriteFrameName("BossHitPoint.png");
+		pHitPointSprite->setPosition( Point((i - levelBossInfo.m_iCurrentHitPoint/2.f + 0.5f ) * pHitPointSprite->getContentSize().width + m_SymbolSize.width, pHitPointSprite->getContentSize().height + 15.f));
+		m_pBossSprite->addChild(pHitPointSprite);
+
+		if (fDelayTime > 0)
+		{
+			pHitPointSprite->setOpacity(0);
+			pHitPointSprite->runAction(
+				Sequence::create(
+					DelayTime::create(fDelayTime),
+					FadeTo::create( 0.1f, 255),
+					NULL));
+		}
+	}
+}
+
+void HelloWorld::RemoveLetterFromBossSprite(const float& fDelayTime)
+{
+	if (m_pBossSprite->getChildrenCount() > 1)
+	{
+		Sprite* pLetterSprite = (Sprite*)m_pBossSprite->getChildren()->getObjectAtIndex(0);
+		pLetterSprite->runAction(
+			Sequence::create( 
+			DelayTime::create(fDelayTime - 0.05f),
+				RemoveSelf::create(),
+				NULL));
+	}
+}
+
+void HelloWorld::Remove1HPFromBossSprite(const float& fDelayTime)
+{
+	// remove 1 hp
+	if (m_pBossSprite->getChildrenCount() > 1)
+	{
+		Sprite* pLastHPSprite = (Sprite*)m_pBossSprite->getChildren()->getLastObject();
+		pLastHPSprite->runAction(
+			Sequence::create( 
+			DelayTime::create(fDelayTime),
+				RemoveSelf::create(),
+				NULL));
+	}
+}
+
 void HelloWorld::UpdateObstacleListAfterMove()
 {
 	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
 	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
 	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
 
-	int iRow, iColumn, iBlockID;
+	int iRow, iColumn, iBlockID, iObstacleTypeID;
 	ObstacleProcessManager*	pObstacleProcessManager = m_GameBoardManager.GetObstacleProcessManager();
+
+
+	// remove waiting clear list
+	std::vector<int>& waitingClearBlockList = pObstacleProcessManager->GetBlockWaitingClearList();
+	for(auto iBlockID : waitingClearBlockList)
+	{
+		for(iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
+		{
+			m_BoardObstaclesList[iBlockID][iObstacleTypeID] = NULL;
+		}
+	}
+
+	// update dirty list
 	for(iRow =0; iRow < iNumberOfRow; iRow++)
 		for(iColumn =0; iColumn < iNumberOfColumn; iColumn++)
 		{
@@ -2371,7 +2550,7 @@ void HelloWorld::UpdateObstacleListAfterMove()
 			if (iBlockID < 0)
 				continue;
 
-			for(int iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
+			for(iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
 			{
 				ObstacleData& obstacleData = pObstacleProcessManager->GetObstacleData(iBlockID, iObstacleTypeID);
 				if (obstacleData.m_bIsDirty)
@@ -2404,7 +2583,7 @@ void HelloWorld::ActivateImageEffect(Node* pSender)
 }
 
 void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float& fEffectDuration)
-{
+{	
 	// NOTE: following code to hot fix error cause by cells destroy by double combo and other effect!!!
 	if (m_BoardViewMatrix[iRow][iColumn].m_pSprite == NULL)
 	{
@@ -3091,8 +3270,40 @@ void HelloWorld::ShowLevelCompleteEffect()
 	SoundManager::PlaySoundEffect(_SET_WIN_);
 }
 
-
 void HelloWorld::PlayCombo4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
+{
+	auto pComboEffectSprite = Sprite::createWithSpriteFrameName("SimpleEffect.png");
+	pComboEffectSprite->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
+				m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height));
+	pComboEffectSprite->setOpacity(0);
+	m_pComboEffectBatchNode->addChild(pComboEffectSprite);
+
+	if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_DESTROY_ROW_)
+	{
+		pComboEffectSprite->runAction(
+			Sequence::createWithTwoActions(
+				DelayTime::create(fDelayTime),
+				ScaleTo::create( fDisplayTime, 20.f, 1.f)));
+						
+	}
+	else
+		pComboEffectSprite->runAction(
+			Sequence::createWithTwoActions(
+				DelayTime::create(fDelayTime),
+				ScaleTo::create( fDisplayTime, 1.f, 20.f)));
+
+	pComboEffectSprite->runAction(
+			Sequence::create(				
+				DelayTime::create(fDelayTime),
+				FadeIn::create(0.02f),
+				FadeOut::create(fDisplayTime + 0.05f),
+				RemoveSelf::create(),
+				NULL));
+
+	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
+}
+
+void HelloWorld::PlayCombo5Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
 {
 	auto pComboEffectSprite = Sprite::createWithSpriteFrameName("Com4_Ex_00000.png");
 	auto pCombo4Anim = AnimationCache::getInstance()->getAnimation("effectCombo4");		
@@ -3111,7 +3322,7 @@ void HelloWorld::PlayCombo4Effect(ComboEffectBundle* pComboEffect, float fDelayT
 	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
 }
 	
-void HelloWorld::PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime)
+void HelloWorld::PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime)
 {	
 	auto pCombo5AnimFlare = AnimationCache::getInstance()->getAnimation("effectCombo5_Flare");
 	auto pCombo5AnimBolt = AnimationCache::getInstance()->getAnimation("effectCombo5_Bolt");		

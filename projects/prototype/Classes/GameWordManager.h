@@ -5,6 +5,8 @@
 #include "GameConfigManager.h"
 #include "GemLetterManager.h"
 
+bool SuccessWithPercentRatio(const int& iPercentRatio);
+
 class GameWordManager
 {
 public:	

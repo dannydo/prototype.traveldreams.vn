@@ -10,6 +10,8 @@
 enum ComboEffectType
 {
 	_CET_BASIC_MATCHING_,
+	_CET_DESTROY_ROW_,
+	_CET_DESTROY_COLUMN_,
 	_CET_EXPLOSION_,
 	_CET_DESTROY_COLOR_,
 	_CET_DOUBLE_EXPLOSION_
@@ -35,12 +37,12 @@ public:
 	//std::vector<ComboEffectBundle*> m_TriggeredComboEfectBundleList;
 	ComboEffectDescription m_ComboEffectDescription;
 	int m_iNormalChainPhase;
-	int m_iActivatedByCombo5Phase;
+	int m_iActivatedByCombo6Phase;
 
 	ComboEffectBundle()
 	{
 		m_iNormalChainPhase = 0;
-		m_iActivatedByCombo5Phase = 0;
+		m_iActivatedByCombo6Phase = 0;
 	}
 };
 
@@ -57,8 +59,22 @@ struct LevelBossInfo
 {
 public:
 	bool m_bIsEnable;
+
+	int m_iBossStateChangePhase;
+	bool m_bJustReleaseALetter; //true: release a letter, false: decrease 1 HP
 	int m_iRemainLettersCount;
 	int m_iCurrentHitPoint;
+
+	LevelBossInfo()
+	{
+		m_bIsEnable = false;
+
+		m_iBossStateChangePhase = 0;
+		m_bJustReleaseALetter = false;
+
+		m_iRemainLettersCount = 0;
+		m_iCurrentHitPoint = 0;
+	}
 };
 
 /*
@@ -92,6 +108,8 @@ public:
 	inline GemLetterData FreeGemLetterBlock(const int& iBlockID) { return m_GemLetterManager.FreeGemLetterBlock(iBlockID);}
 
 	inline const LevelBossInfo GetLevelBossInfo() { return m_LevelBossInfo;}
+	inline bool IsBossStateChanged() { return m_bIsBossStateChanged;}
+	inline void KillBoss() { m_LevelBossInfo.m_bIsEnable = false;}
 
 	bool IsRowLocked(const int& iRow);
 	bool IsColumnLocked(const int& iColumn);
@@ -104,7 +122,7 @@ public:
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<NewCellInfo>& unlockedLetterCells,
-		std::vector<NewCellInfo>& newCells, 
+		std::vector<NewCellInfo>& newCells,
 		bool bIsNewMove);		
 
 	bool FastCheckBlocks( int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
@@ -146,18 +164,18 @@ public:
 		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells);		
 protected:
-	inline ComboEffectType GetComboEffectTypeFromComboType(GemComboType_e eGemComboType);
+	inline ComboEffectType GetComboEffectTypeFromComboType(GemComboType_e eGemComboType, const int& iDeltaMoveRow, const int& iDeltaMoveColumn);
 
 	bool CanComboBeUpgraded(GemComboType_e eComboType);
 	GemComboType_e UpgradeCombo(GemComboType_e eComboType);
 
-	inline bool IsCellDestroyable(const int& iRow, const int& iColumn) { return (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO5_WAITING_TRIGGER_);}
-	inline bool DestroySingleCellUtil(const int& iRow, const int& iColumn);	
+	inline bool IsCellDestroyable(const int& iRow, const int& iColumn) { return (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO6_WAITING_TRIGGER_);}
+	inline bool DestroySingleCellUtil(const int& iRow, const int& iColumn, const int& iPhaseIndex);	
 
 	// Execute move util methods
 	void CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn);
 	void CreateBlockForBasicMatching(bool& bIsNewBlockCreated, std::vector<Cell>& basicMatchingDestroyedCells);
-	void RemoveCellsByBasicMatching( std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectBundle*>& comboChainList);
+	void RemoveCellsByBasicMatching( std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectBundle*>& comboChainList, const int& iMoveRow, const int& iMoveColumn);
 	void CreateComboCells(const int& iSelectedRow, const int& iSelectedColumn, const std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectCell>& newComboCells);
 
 	void ExecuteComboChain(std::vector<ComboEffectBundle*>& comboChainList);
@@ -165,6 +183,8 @@ protected:
 	void CalculateMoveCells(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells); //, std::vector<Cell>& newCells);
 	void CreateUnlockedGemLetterFromWaitingList(std::vector<NewCellInfo>& newCells);
 	void GenerateNewGems(std::vector<NewCellInfo>& newCells, bool bIsNewMove);
+
+	void CalculateMoveEffectOnBoss(bool& bIsBossStateChanged);
 
 	int GetBonusScoreForUnlockMainWord(bool bIncludeIndividualLetters=false);
 	int GetBonusScoreForUnlockSubWord(const int& iSubWordID, bool bIncludeIndividualLetters=false);
@@ -182,8 +202,9 @@ protected:
 	int m_iCurrentMove;
 
 	LevelBossInfo m_LevelBossInfo;
+	bool m_bIsBossStateChanged;
 
-	std::vector<ComboEffectDescription> m_WaitingTriggerCombo5List;
+	std::vector<ComboEffectDescription> m_WaitingTriggerCombo6List;
 	std::vector<NewCellInfo> m_UnlockedGemLetterCellList;
 private:
 	// utility methods to find hint on temporary matrix

@@ -34,6 +34,7 @@ public:
 };
 
 class NewGameBoardManager;
+struct Level_ObstacleConfig;
 
 class ObstacleProcessManager
 {
@@ -49,6 +50,9 @@ public:
 	//inline ObstacleData& GetObstacleDataOfCell(const int& iRow, const int& iColumn, const int& iObstacleTypeID) { return m_ObstacleBoardMatrix[iRow][iColumn][iObstacleTypeID];}
 	inline ObstacleData& GetObstacleData(const int& iBlockID, const int& iObstacleTypeID) { return m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID];}
 	//void MoveObstacles(const int& iRow1, const int& iColumn1, const int& iRow2, const int& iColumn2);
+	inline std::vector<int>& GetBlockWaitingClearList() { return m_BlockWaitingClearList;}
+
+	void GenerateObstacle(Level_ObstacleConfig* pLevelObstacleConfig, int& iBlockID);
 
 	void CleanWaitingClearList();
 	void UpdateAfterMove();

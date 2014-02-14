@@ -39,6 +39,17 @@ void ObstacleProcessManager::InitLevel()
 			}*/
 }
 
+
+void ObstacleProcessManager::GenerateObstacle(Level_ObstacleConfig* pLevelObstacleConfig, int& iBlockID)
+{
+	if (iBlockID < 0)
+		iBlockID =  AllocFreeBlock();
+
+	m_ObstacleBoardList[iBlockID].m_ObstacleList[pLevelObstacleConfig->m_iObstacleID].m_bIsActive = true;
+	m_ObstacleBoardList[iBlockID].m_ObstacleList[pLevelObstacleConfig->m_iObstacleID].m_iObstacleLevel = pLevelObstacleConfig->m_iObstacleLevel;
+	m_ObstacleBoardList[iBlockID].m_ObstacleList[pLevelObstacleConfig->m_iObstacleID].m_bIsDirty = true;
+}
+
 int ObstacleProcessManager::AllocFreeBlock()
 {
 	for(int i=0; i< _BOARD_MAX_ROW_NUMBER_*_BOARD_MAX_COLUMN_NUMBER_; i++)
@@ -125,7 +136,7 @@ void ObstacleProcessManager::UpdateAfterMove()
 			continue;
 		for(iBlockID=0; iBlockID< _BOARD_MAX_ROW_NUMBER_*_BOARD_MAX_COLUMN_NUMBER_; iBlockID++)
 			if (!m_ObstacleBoardList[iBlockID].m_bIsFreeBlock)
-				if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive)
+				if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive && !m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty)
 				{
 					m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel--;
 					m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty = true;					

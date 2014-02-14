@@ -35,8 +35,7 @@
 			"levelOfTransformedObject": 0,
 			"destroyable" : true,
             "matchAroundToDestroy" : false,
-            "appearByDrop": false,
-            "dropRate": 0,
+            "appearByDrop": false,            
             "appearByTransform": false,
             "transfromRate": 0
         },
@@ -70,8 +69,7 @@
 			"levelOfTransformedObject": 0,
 			"destroyable" : true,
             "matchAroundToDestroy" : false,
-            "appearByDrop": false,
-            "dropRate": 0,
+            "appearByDrop": false,            
             "appearByTransform": false,
             "transfromRate": 0
         },
@@ -113,8 +111,7 @@
 			"levelOfTransformedObject": 0,			
 			"destroyable" : true,
             "matchAroundToDestroy" : false,
-            "appearByDrop": false,
-            "dropRate": 0,
+            "appearByDrop": true,            
             "appearByTransform": false,
             "transfromRate": 0
         }

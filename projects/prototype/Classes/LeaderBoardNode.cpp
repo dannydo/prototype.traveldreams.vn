@@ -60,14 +60,16 @@ Node* LeaderBoardtNode::createItem(const int& iScore, const char* sName, const c
 	pNodeItem->addChild(pLabelName);
 
 	char sScore[10];
-	Label* pLabelScore = Label::createWithTTF(itoa(iScore, sScore, 10), "fonts/ARLRDBD.ttf", 24);
+	sprintf( sScore, "%d", iScore);
+	Label* pLabelScore = Label::createWithTTF(sScore, "fonts/ARLRDBD.ttf", 24);
 	pLabelScore->setColor(ccc3(0, 0, 0));
 	pLabelScore->setAnchorPoint(Point(0.0f, 0.0f));
 	pLabelScore->setPosition(Point(-50.0f, 30.0f));
 	pNodeItem->addChild(pLabelScore);
 
 	char sIndex[10];
-	Label* pLabelIndex = Label::createWithTTF(itoa(iINdex, sIndex, 10), "fonts/ARLRDBD.ttf", 50);
+	sprintf( sIndex, "%d", iINdex);
+	Label* pLabelIndex = Label::createWithTTF(sIndex, "fonts/ARLRDBD.ttf", 50);
 	pLabelIndex->setColor(ccc3(96, 137, 241));
 	pLabelIndex->setAnchorPoint(Point(0.0f, 0.0f));
 	pLabelIndex->setPosition(Point(-90.0f, 15.0f));

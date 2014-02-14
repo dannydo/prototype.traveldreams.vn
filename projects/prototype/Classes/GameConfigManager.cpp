@@ -146,7 +146,9 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 	if (levelConfig.m_bEnableBoss)
 	{
 		inputStream >> levelConfig.m_BossConfig.m_Position.m_iRow;
+		levelConfig.m_BossConfig.m_Position.m_iRow--;
 		inputStream >> levelConfig.m_BossConfig.m_Position.m_iColumn;
+		levelConfig.m_BossConfig.m_Position.m_iColumn--;
 		inputStream >> levelConfig.m_BossConfig.m_iHeight;
 		inputStream >> levelConfig.m_BossConfig.m_iWidth;		
 		inputStream >> levelConfig.m_BossConfig.m_HitPointPerLetter;
@@ -171,6 +173,28 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 			pObstacleConfig->m_ObstaclePositionList[j].m_iRow--;
 			inputStream >> pObstacleConfig->m_ObstaclePositionList[j].m_iColumn;
 			pObstacleConfig->m_ObstaclePositionList[j].m_iColumn--;
+		}
+
+		inputStream >> iTemp;
+		pObstacleConfig->m_bEnableGenerateByDrop = (iTemp >0);
+		if (pObstacleConfig->m_bEnableGenerateByDrop)
+		{
+			inputStream >> iTemp;
+			pObstacleConfig->m_bCanDropOnAllColumn = (iTemp > 0);
+			if (pObstacleConfig->m_bCanDropOnAllColumn)
+				inputStream >> pObstacleConfig->m_iDropOnAllColumnRate;
+			else
+			{
+				int iColumnCount, iColumnIndex;
+				inputStream >> iColumnCount;
+				for(int j=0; j< iColumnCount; j++)
+				{
+					inputStream >> iColumnIndex;
+					iColumnIndex--;
+					inputStream >> iTemp;
+					pObstacleConfig->m_DropOnColumnsRateList[iColumnIndex] = iTemp;
+				}
+			}
 		}
 
 		levelConfig.m_ObstacleConfigList.push_back( pObstacleConfig);
@@ -315,7 +339,7 @@ void GameConfigManager::LoadObstacleConfig()
 		
 		// how to appear
 		pObstacleDescription->m_bAppearByDrop = pObstacleDetailDict->getItemBoolvalue("appearByDrop", true);
-		pObstacleDescription->m_iDropRate = pObstacleDetailDict->getItemIntValue("dropRate", 0);
+		//pObstacleDescription->m_iDropRate = pObstacleDetailDict->getItemIntValue("dropRate", 0);
 		pObstacleDescription->m_bAppearByTransform = pObstacleDetailDict->getItemBoolvalue("appearByTransform", true);
 		pObstacleDescription->m_iTransformRate = pObstacleDetailDict->getItemIntValue("transfromRate", 0);
 

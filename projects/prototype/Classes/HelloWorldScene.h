@@ -56,13 +56,12 @@ public:
 	//std::vector<DoubleComboEffectBundle> m_DoubleComboList;
 	std::vector<DoubleComboCreationInfo> m_NewDoubleComboList;
 	std::vector<ComboEffectBundle*> m_ComboChainList;
-	std::vector<ComboEffectBundle*> m_TriggeredCombo5ChainList;
+	std::vector<ComboEffectBundle*> m_TriggeredCombo6ChainList;
 	std::vector<ComboEffectCell> m_NewComboCells;
 	std::vector<Cell> m_OriginalMovedCells;
 	std::vector<Cell> m_TargetMovedCells;
 	std::vector<NewCellInfo> m_UnlockedLetterCells;
-	std::vector<NewCellInfo> m_NewCells;
-
+	std::vector<NewCellInfo> m_NewCells;	
 
 	void Reset(bool bResetConvertedCombo = false)
 	{
@@ -71,12 +70,12 @@ public:
 		m_BasicMatchingDestroyedCells.clear();
 		m_NewDoubleComboList.clear();
 		m_ComboChainList.clear();
-		m_TriggeredCombo5ChainList.clear();
+		m_TriggeredCombo6ChainList.clear();
 		m_NewComboCells.clear();
 		m_OriginalMovedCells.clear();
 		m_TargetMovedCells.clear();
 		m_UnlockedLetterCells.clear();
-		m_NewCells.clear();
+		m_NewCells.clear();		
 	}
 };
 
@@ -111,7 +110,7 @@ protected:
 	
 	void PlayEffect2(const bool& bIsBonusEndGamePhase,  std::vector<ComboEffectCell>& convertedToComboCells, 
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo> doubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
+		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
 		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells, bool bIsNewMove);
@@ -134,6 +133,7 @@ protected:
 
 	void PlayCombo4Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
 	void PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
+	void PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);	
 	void ActivateImageEffect(Node* pSender);
 	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float& fEffectDuration);
 
@@ -156,13 +156,21 @@ protected:
 
 	void ShowLevelCompleteEffect();
 	void ShowWinGamePopup();
+
+	// utility functions on boss sprite	
+	void AddNewLetterToBossSprite(const float& fDelayTime);
+	void AddHitPointSpritesToBossSprite(const float& fDelayTime);
+	void RemoveLetterFromBossSprite(const float& fDelayTime);
+	void Remove1HPFromBossSprite(const float& fDelayTime);
 private:
 	float m_fBoardLeftPosition, m_fBoardBottomPosition;
 	float m_fBoardLeftClipPosition, m_fBoardBottomClipPosition;
 	float m_fMaskWidth, m_fMaskHeight;
+
 	cocos2d::CCSpriteBatchNode* m_pBoardBatchNode;
 	cocos2d::Sprite* m_pMoveHintNode;
 	cocos2d::CCSpriteBatchNode* m_pComboEffectBatchNode;
+	cocos2d::Sprite* m_pBossSprite;
 
 	//cocos2d::CCSprite* m_BoardSpriteMatrix[ _BOARD_MAX_ROW_NUMBER_*3][ _BOARD_MAX_COLUMN_NUMBER_*3];
 	/*cocos2d::CCSprite* m_BoardSpriteMatrixLeft[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];

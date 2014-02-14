@@ -12,14 +12,27 @@ struct Level_ObstacleConfig
 public:
 	int m_iObstacleID;
 	int m_iObstacleLevel;
+
+	// existing on board
 	int m_iCount;	
 	Cell m_ObstaclePositionList[_BOARD_MAX_ROW_NUMBER_*_BOARD_MAX_COLUMN_NUMBER_];
+
+	// drop
+	bool m_bEnableGenerateByDrop;
+	bool m_bCanDropOnAllColumn; //if true, use dropOnAllColumnRate, else then m_DropOnColumnCount and next 2 list
+	int m_iDropOnAllColumnRate; //percent	
+	int m_DropOnColumnsRateList[_BOARD_MAX_COLUMN_NUMBER_]; //percent
 
 	Level_ObstacleConfig()
 	{
 		m_iObstacleID = -1;
 		m_iObstacleLevel = 0;
 		m_iCount = 0;
+
+		m_bEnableGenerateByDrop = false;
+		m_bCanDropOnAllColumn = true;
+		m_iDropOnAllColumnRate = 0;		
+		memset(m_DropOnColumnsRateList, 0, sizeof(m_DropOnColumnsRateList));
 	}
 };
 
@@ -101,7 +114,7 @@ public:
 	bool m_bMatchAroundToDestroyed;
 		
 	bool m_bAppearByDrop;
-	int m_iDropRate;
+	//int m_iDropRate;
 	
 	bool m_bAppearByTransform;	
 	int m_iTransformRate;
