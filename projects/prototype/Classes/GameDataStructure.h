@@ -208,6 +208,43 @@ public:
 	}
 };
 
+struct DestroyedByComboCell : public Cell
+{
+public:
+	float m_fDestroyTime;
+	int m_iDestroyPhaseIndex;
+	int m_iGroupIndex;
+	bool m_bIsCompleteDestroyed; //this cell only used to trigger combo step so it's used even if not complete destroy
+	// NOTE: some combo may effect 1 cell 2 times!!!! ==> used dirty flag of obstacle to check it!!!
+	// 2 van de lon: - O combo 6 nam giua 2 cell trong. - Da lo keo dong chua combo 6 thi ko the huy??? ==> neu keo no tro ve vi tri ban dau thi co trigger hay ko?
+	// *** Chua co hint
+
+	DestroyedByComboCell() : Cell()
+	{
+		m_fDestroyTime = 0;
+		m_iDestroyPhaseIndex = 0;
+		m_iGroupIndex = 0;
+		m_bIsCompleteDestroyed = true;
+	}
+
+	DestroyedByComboCell (int iRow, int iColumn) : Cell(iRow, iColumn)
+	{	
+		m_fDestroyTime = 0;
+		m_iDestroyPhaseIndex = 0;
+		m_iGroupIndex = 0;
+		m_bIsCompleteDestroyed = true;
+	}	
+
+	DestroyedByComboCell(Cell cell): Cell(cell)
+	{
+		m_fDestroyTime = 0;
+		m_iDestroyPhaseIndex = 0;
+		m_iGroupIndex = 0;
+		m_bIsCompleteDestroyed = true;
+	}
+
+};
+
 struct NewCellInfo : public Cell
 {
 public:

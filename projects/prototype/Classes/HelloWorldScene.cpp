@@ -501,21 +501,21 @@ void HelloWorld::visit()
 
 std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemComboType)
 {
-	/*switch (eGemComboType)
+	switch (eGemComboType)
 	{		
-		case _GCT_COMBO4_:
-			return "combo4.png";
-		case _GCT_COMBO4_2_:
-			return "combo4_2.png";
-		case _GCT_COMBO5_:
-			return "combo5.png";
-		case _GCT_COMBO5_2_:
-			return "combo5_2.png";
+	//	case _GCT_COMBO4_:
+//			return "combo4.png";
+		//case _GCT_COMBO4_2_:
+		//	return "combo4_2.png";
+	//	case _GCT_COMBO5_:
+//			return "combo5.png";
+		//case _GCT_COMBO5_2_:
+			//return "combo5_2.png";
 		case _GCT_COMBO6_:
 			return "combo6.png";
-		case _GCT_COMBO6_2_:
-			return "combo6_2.png";
-	}*/
+		//case _GCT_COMBO6_2_:
+			//return "combo6_2.png";
+	}
 
 	switch(iGemID)
 	{
@@ -1744,7 +1744,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	float fDestroyTime = 0.35f;
 	float fMoveTime = 0.3f; //25f;
 	float fDelayPerNormalComboChain = fDestroyTime;
-	float fDelayPerCombo6Chain = 0.45f;
+	float fDelayPerCombo6Chain = 0.75f;
 	
 	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
 	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
@@ -1928,7 +1928,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			// destroy cells by combo
 			for(auto cell: pComboEffect->m_DestroyedCells)
 			{
-				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime + (pComboEffect->m_iActivatedByCombo6Phase + 1)* fDelayPerCombo6Chain - 0.02f, fDestroyTime);			
+				if (cell.m_bIsCompleteDestroyed)
+					BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime + (pComboEffect->m_iActivatedByCombo6Phase + 1)* fDelayPerCombo6Chain - 0.02f, fDestroyTime);			
 			}
 
 			// increase score by combo		
@@ -1954,7 +1955,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			PlayCombo4Effect(pComboEffect, fCurrentDelayComboChain, fDestroyTime);
 		else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_EXPLOSION_)
 			PlayCombo5Effect(pComboEffect, fCurrentDelayComboChain, fDestroyTime);
-		else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_DESTROY_COLOR_)
+		else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_DESTROY_COLOR_ROW_ || pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_DESTROY_COLOR_COLUMN_)
 		{
 			if (pComboEffect->m_iNormalChainPhase < 0)
 			{
@@ -2045,7 +2046,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		// destroy cells by combo
 		for(auto cell: pComboEffect->m_DestroyedCells)
 		{
-			BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fCurrentDelayComboChain, fDestroyTime);
+			if (cell.m_bIsCompleteDestroyed)
+				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fCurrentDelayComboChain, fDestroyTime);
 			/*m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->runAction(
 				Sequence::create( 
 					DelayTime::create(fDelayTime + pComboEffect->m_iPhase* fDestroyTime),
@@ -3339,7 +3341,99 @@ void HelloWorld::PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float f
 			RemoveSelf::create(),
 			NULL));
 
-	for(auto destroyedCell : pComboEffectBundle->m_DestroyedCells)
+	int i,j;
+	DestroyedByComboCell phase0Cell, phase1cell;
+	int iSize = pComboEffectBundle->m_DestroyedCells.size();
+	for(i=0; i< iSize; i++)
+	{
+		if (pComboEffectBundle->m_DestroyedCells[i].m_iDestroyPhaseIndex == 0)
+		{
+			phase0Cell = pComboEffectBundle->m_DestroyedCells[i];
+
+			//phase 0 effect
+			auto pComboEffectSprite = Sprite::createWithSpriteFrameName("Bolt 2_00000_1.png");
+			pComboEffectSprite->setAnchorPoint  (Point( 0, 0.5f));
+			pComboEffectSprite->setPosition(Point(m_fBoardLeftPosition + comboCell.m_iColumn  * m_SymbolSize.width, 
+					m_fBoardBottomPosition + comboCell.m_iRow * m_SymbolSize.height));
+
+			Point vector(phase0Cell.m_iColumn - comboCell.m_iColumn, phase0Cell.m_iRow - comboCell.m_iRow);
+			auto fAngle = atan2f( vector.y, vector.x);
+			float fDistance = sqrtf( vector.x*vector.x + vector.y*vector.y);
+		
+			pComboEffectSprite->setRotation(-fAngle * 180.f / M_PI);
+			pComboEffectSprite->setScaleX( fDistance * m_SymbolSize.width / pComboEffectSprite->getContentSize().width);
+			pComboEffectSprite->setScaleY(1.5f);
+
+			m_pComboEffectBatchNode->addChild(pComboEffectSprite);
+			pComboEffectSprite->runAction( 
+				Sequence::create( 
+					DelayTime::create(fDelayTime + 0.05f),
+					Animate::create( pCombo5AnimBolt),
+					RemoveSelf::create(),
+					NULL));
+
+
+			auto pFlareSprite = Sprite::createWithSpriteFrameName("Flare_00000_1.png");	
+			pFlareSprite->setPosition(Point(m_fBoardLeftPosition + phase0Cell.m_iColumn  * m_SymbolSize.width, 
+						m_fBoardBottomPosition + phase0Cell.m_iRow * m_SymbolSize.height));
+			//pFlareSprite->setOpacity(0);		
+			m_pComboEffectBatchNode->addChild(pFlareSprite);
+		
+			pFlareSprite->runAction( 
+				Sequence::create(
+					DelayTime::create(fDelayTime + 0.32f),
+					Animate::create( pCombo5AnimFlare),
+					RemoveSelf::create(),
+					NULL ));		
+
+
+
+			for(j=0; j< iSize; j++)
+			{
+				if (pComboEffectBundle->m_DestroyedCells[j].m_iGroupIndex == phase0Cell.m_iGroupIndex &&  i != j)
+				{
+					phase1cell = pComboEffectBundle->m_DestroyedCells[j];
+
+					auto pComboEffectSprite = Sprite::createWithSpriteFrameName("Bolt 2_00000_1.png");
+					pComboEffectSprite->setAnchorPoint  (Point( 0, 0.5f));
+					pComboEffectSprite->setPosition(Point(m_fBoardLeftPosition + phase0Cell.m_iColumn  * m_SymbolSize.width, 
+							m_fBoardBottomPosition + phase0Cell.m_iRow * m_SymbolSize.height));
+
+					Point vector(phase1cell.m_iColumn - phase0Cell.m_iColumn, phase1cell.m_iRow - phase0Cell.m_iRow);
+					auto fAngle = atan2f( vector.y, vector.x);
+					float fDistance = sqrtf( vector.x*vector.x + vector.y*vector.y);
+		
+					pComboEffectSprite->setRotation(-fAngle * 180.f / M_PI);
+					pComboEffectSprite->setScaleX( fDistance * m_SymbolSize.width / pComboEffectSprite->getContentSize().width);
+					pComboEffectSprite->setScaleY(1.5f);
+
+					m_pComboEffectBatchNode->addChild(pComboEffectSprite);
+					pComboEffectSprite->runAction( 
+						Sequence::create( 
+							DelayTime::create(fDelayTime + 0.35f),
+							Animate::create( pCombo5AnimBolt),
+							RemoveSelf::create(),
+							NULL));
+
+
+					auto pFlareSprite = Sprite::createWithSpriteFrameName("Flare_00000_1.png");	
+					pFlareSprite->setPosition(Point(m_fBoardLeftPosition + phase1cell.m_iColumn  * m_SymbolSize.width, 
+								m_fBoardBottomPosition + phase1cell.m_iRow * m_SymbolSize.height));
+					//pFlareSprite->setOpacity(0);		
+					m_pComboEffectBatchNode->addChild(pFlareSprite);
+		
+					pFlareSprite->runAction( 
+						Sequence::create(
+							DelayTime::create(fDelayTime + 0.72f),
+							Animate::create( pCombo5AnimFlare),
+							RemoveSelf::create(),
+							NULL ));		
+				}
+			}
+		}
+	}
+
+	/*for(auto destroyedCell : pComboEffectBundle->m_DestroyedCells)
 	{
 		auto pComboEffectSprite = Sprite::createWithSpriteFrameName("Bolt 2_00000_1.png");
 		pComboEffectSprite->setAnchorPoint  (Point( 0, 0.5f));
@@ -3363,25 +3457,19 @@ void HelloWorld::PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float f
 				NULL));
 
 
-
 		auto pFlareSprite = Sprite::createWithSpriteFrameName("Flare_00000_1.png");	
 		pFlareSprite->setPosition(Point(m_fBoardLeftPosition + destroyedCell.m_iColumn  * m_SymbolSize.width, 
 					m_fBoardBottomPosition + destroyedCell.m_iRow * m_SymbolSize.height));
 		//pFlareSprite->setOpacity(0);		
 		m_pComboEffectBatchNode->addChild(pFlareSprite);
-
-		/*pFlareSprite->runAction( 
-			Sequence::createWithTwoActions(
-				DelayTime::create(fDelayTime),
-				FadeTo::create(0.5f, 255)));
-				//ScaleTo::create(fDisplayTime, 1.f, 1.f)));*/
+		
 		pFlareSprite->runAction( 
 			Sequence::create(
 				DelayTime::create(fDelayTime + 0.42f),
 				Animate::create( pCombo5AnimFlare),
 				RemoveSelf::create(),
 				NULL ));		
-	}
+	} */
 
 	/*
 	auto pTriggerSprite = Sprite::createWithSpriteFrameName("flare.png");	

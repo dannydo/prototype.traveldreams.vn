@@ -13,7 +13,8 @@ enum ComboEffectType
 	_CET_DESTROY_ROW_,
 	_CET_DESTROY_COLUMN_,
 	_CET_EXPLOSION_,
-	_CET_DESTROY_COLOR_,
+	_CET_DESTROY_COLOR_ROW_, //activate with nearby cells on row
+	_CET_DESTROY_COLOR_COLUMN_, //activate with nearby cells on row
 	_CET_DOUBLE_EXPLOSION_
 };
 
@@ -33,7 +34,7 @@ public:
 struct ComboEffectBundle
 {
 public:
-	std::vector<Cell> m_DestroyedCells;
+	std::vector<DestroyedByComboCell> m_DestroyedCells;
 	//std::vector<ComboEffectBundle*> m_TriggeredComboEfectBundleList;
 	ComboEffectDescription m_ComboEffectDescription;
 	int m_iNormalChainPhase;
@@ -118,7 +119,7 @@ public:
 
 	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
+		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<NewCellInfo>& unlockedLetterCells,
@@ -190,7 +191,7 @@ protected:
 	int GetBonusScoreForUnlockSubWord(const int& iSubWordID, bool bIncludeIndividualLetters=false);
 
 
-	void TriggerWaitingCombo5List(std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList);
+	void TriggerWaitingCombo6List(std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList);
 protected:
 	GameWordManager* m_pGameWordManager;	
 	ObstacleProcessManager* m_pObstacleProcessManager;
