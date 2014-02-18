@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <projectDescription>
 	<name>prototype</name>
-	<comment></comment>
+	<comment />
 	<projects>
 	</projects>
 	<buildSpec>
@@ -30,7 +30,7 @@
 				</dictionary>
 				<dictionary>
 					<key>?name?</key>
-					<value></value>
+					<value />
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.append_environment</key>
@@ -74,7 +74,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.fullBuildTarget</key>
-					<value></value>
+					<value />
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.stopOnError</key>
@@ -127,5 +127,5 @@
 			<type>2</type>
 			<locationURI>COCOS2DX/scripting</locationURI>
 		</link>
-	</linkedResources>
+	<link><name>plugin-x</name><type>2</type><locationURI>PARENT-3-PROJECT_LOC/plugin/publish</locationURI></link></linkedResources>
 </projectDescription>

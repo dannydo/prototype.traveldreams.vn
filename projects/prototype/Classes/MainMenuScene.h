@@ -14,6 +14,14 @@ public:
 private:
 	void playGame();
 	void loginFacebook();
+	void LogoutFacebook();
+	void shareLinkFacebook();
+	void shareDialogFacebook();
+
+	cocos2d::CCMenuItemImage* m_pLoginfacebook;
+	cocos2d::MenuItemLabel* m_pItemLogout;
+	cocos2d::MenuItemLabel* m_pItemShareLink;
+	cocos2d::MenuItemLabel* m_pItemShareDialog;
 };
 
 class MainMenuScene : public cocos2d::Scene

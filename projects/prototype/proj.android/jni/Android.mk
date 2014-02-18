@@ -29,11 +29,14 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/GemLetterManager.cpp \
 				   ../../Classes/LeaderBoardNode.cpp \
 				   ../../Classes/LoadingScene.cpp \
+				   ../../Classes/FacebookManager.cpp \
                    ../../Classes/HelloWorldScene.cpp
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
+					$(LOCAL_PATH)/../../../../plugin/protocols/platform/android
 
-LOCAL_WHOLE_STATIC_LIBRARIES += cocos2dx_static
+LOCAL_WHOLE_STATIC_LIBRARIES += cocos2dx_static \
+PluginProtocolStatic
 LOCAL_WHOLE_STATIC_LIBRARIES += cocosdenshion_static
 LOCAL_WHOLE_STATIC_LIBRARIES += box2d_static
 LOCAL_WHOLE_STATIC_LIBRARIES += cocos_extension_static
@@ -46,4 +49,5 @@ $(call import-module,cocos2dx/platform/third_party/android/prebuilt/libcurl)
 $(call import-module,CocosDenshion/android)
 $(call import-module,extensions)
 $(call import-module,external/Box2D)
+$(call import-module,protocols/android)
 $(call import-module,cocos2dx/platform/android)

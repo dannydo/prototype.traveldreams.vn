@@ -1,4 +1,4 @@
-APPNAME="prototype"
+APPNAME="Prototype"
 
 # options
 
@@ -51,6 +51,7 @@ fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # ... use paths relative to current directory
+PLUGIN_ROOT="$DIR/../../../plugin"
 COCOS2DX_ROOT="$DIR/../../.."
 APP_ROOT="$DIR/.."
 APP_ANDROID_ROOT="$DIR"
@@ -59,6 +60,9 @@ echo "NDK_ROOT = $NDK_ROOT"
 echo "COCOS2DX_ROOT = $COCOS2DX_ROOT"
 echo "APP_ROOT = $APP_ROOT"
 echo "APP_ANDROID_ROOT = $APP_ANDROID_ROOT"
+
+# run the publish.sh in plugin/tools
+#${PLUGIN_ROOT}/tools/publish.sh
 
 # make sure assets is exist
 if [ -d "$APP_ANDROID_ROOT"/assets ]; then
@@ -79,13 +83,23 @@ if [ -f "$file" ]; then
 fi
 done
 
+# copy plugin resources
+if [ -d "${PLUGIN_ROOT}"/publish/plugins ]; then
+    for file in "${PLUGIN_ROOT}"/publish/plugins/*
+    do
+        if [ -d "${file}"/android/ForAssets/ ];then
+            cp -rf "$file"/android/ForAssets/* "$APP_ANDROID_ROOT"/assets
+        fi
+    done
+fi
+
 # run ndk-build
 if [[ "$buildexternalsfromsource" ]]; then
     echo "Building external dependencies from source"
     "$NDK_ROOT"/ndk-build -C "$APP_ANDROID_ROOT" $* \
-        "NDK_MODULE_PATH=${COCOS2DX_ROOT}:${COCOS2DX_ROOT}/cocos2dx/platform/third_party/android/source"
+        "NDK_MODULE_PATH=${PLUGIN_ROOT}/publish:${COCOS2DX_ROOT}:${COCOS2DX_ROOT}/cocos2dx/platform/third_party/android/source"
 else
     echo "Using prebuilt externals"
     "$NDK_ROOT"/ndk-build -C "$APP_ANDROID_ROOT" $* \
-        "NDK_MODULE_PATH=${COCOS2DX_ROOT}:${COCOS2DX_ROOT}/cocos2dx/platform/third_party/android/prebuilt"
+        "NDK_MODULE_PATH=${PLUGIN_ROOT}/publish:${COCOS2DX_ROOT}:${COCOS2DX_ROOT}/cocos2dx/platform/third_party/android/prebuilt"
 fi
