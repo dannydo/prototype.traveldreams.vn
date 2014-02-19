@@ -16,6 +16,9 @@
     <Filter Include="Classes\Source Files">
       <UniqueIdentifier>{ed5fd3b1-d13a-4300-b36f-5ecd05e7f898}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Facebook">
+      <UniqueIdentifier>{a5e00149-467a-42ee-82d7-4d4afc5d2631}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -92,6 +95,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\GemLetterManager.cpp">
       <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\FacebookManager.cpp">
+      <Filter>Facebook</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\GemLetterManager.h">
       <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\FacebookManager.h">
+      <Filter>Facebook</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
