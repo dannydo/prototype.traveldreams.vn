@@ -9,21 +9,42 @@
 
 enum ComboEffectType
 {
+	_CET_NONE_,
 	_CET_BASIC_MATCHING_,
 	_CET_DESTROY_ROW_,
 	_CET_DESTROY_COLUMN_,
 	_CET_EXPLOSION_,
+	_CET_EXPLOSION_SECOND_,
 	_CET_DESTROY_COLOR_ROW_, //activate with nearby cells on row
-	_CET_DESTROY_COLOR_COLUMN_, //activate with nearby cells on row
-	_CET_DOUBLE_EXPLOSION_
+	_CET_DESTROY_COLOR_COLUMN_, //activate with nearby cells on row	
+	_CET_4_4_EFFECT_,
+	_CET_4_4_4_EFFECT_,
+	_CET_4_5_EFFECT_,
+	_CET_5_5_EFFECT_,
+	_CET_5_5_SECOND_EFFECT_,
+	_CET_5_5_5_EFFECT_,
+	_CET_6_4_EFFECT_,
+	_CET_6_5_EFFECT_,
+	_CET_6_6_EFFECT_,
+	_CET_6_6_6_EFFECT_,
+	_CET_6_6_6_SECOND_EFFECT_
 };
 
 struct ComboEffectDescription
 {
 public:
 	Cell m_Position;
+	DestroyedByComboCell m_Phase0CellList[15]; //cells that participate at phase0 of combo, that could be nearby other combos in case of double/tripple combo
+	int m_Phase0CellCount;
 	ComboEffectType m_eComboEffectType;
 	int m_iGemID;
+
+	ComboEffectDescription()
+	{
+		m_Phase0CellCount = 0;
+		m_iGemID = -1;
+		m_eComboEffectType = _CET_EXPLOSION_;
+	}
 };
 
 /*enum DoubleComboType
@@ -37,13 +58,17 @@ public:
 	std::vector<DestroyedByComboCell> m_DestroyedCells;
 	//std::vector<ComboEffectBundle*> m_TriggeredComboEfectBundleList;
 	ComboEffectDescription m_ComboEffectDescription;
+
+	float m_fTriggerTime;
+
 	int m_iNormalChainPhase;
-	int m_iActivatedByCombo6Phase;
+	//int m_iActivatedByCombo6Phase;
 
 	ComboEffectBundle()
 	{
 		m_iNormalChainPhase = 0;
-		m_iActivatedByCombo6Phase = 0;
+		//m_iActivatedByCombo6Phase = 0;
+		m_fTriggerTime = 0;
 	}
 };
 
@@ -61,7 +86,7 @@ struct LevelBossInfo
 public:
 	bool m_bIsEnable;
 
-	int m_iBossStateChangePhase;
+	float m_fBossStateChangeAtTime;
 	bool m_bJustReleaseALetter; //true: release a letter, false: decrease 1 HP
 	int m_iRemainLettersCount;
 	int m_iCurrentHitPoint;
@@ -70,7 +95,7 @@ public:
 	{
 		m_bIsEnable = false;
 
-		m_iBossStateChangePhase = 0;
+		m_fBossStateChangeAtTime = 0;
 		m_bJustReleaseALetter = false;
 
 		m_iRemainLettersCount = 0;
@@ -165,13 +190,15 @@ public:
 		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells);		
 protected:
-	inline ComboEffectType GetComboEffectTypeFromComboType(GemComboType_e eGemComboType, const int& iDeltaMoveRow, const int& iDeltaMoveColumn);
+	inline ComboEffectType GetComboEffectTypeFromComboType(GemComboType_e eGemComboType, const int& iDeltaMoveRow, const int& iDeltaMoveColumn);	
 
-	bool CanComboBeUpgraded(GemComboType_e eComboType);
-	GemComboType_e UpgradeCombo(GemComboType_e eComboType);
+	inline bool IsCellDestroyable(const int& iRow, const int& iColumn) { return (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType < _GCT_COMBO6_WAITING_TRIGGER_ 
+																				|| m_BoardValueMatrix[iRow][iColumn].m_eGemComboType > _GCT_COMBO6_6_6_TRIGGER_SECOND_TIME_ ));}
+	inline bool DestroySingleCellUtil(const int& iRow, const int& iColumn, const float fDestroyAtTime);	
+	inline void DestroySingleCellByComboUtil(const int& iRow, const int& iColumn, ComboEffectBundle* pTriggerCombo, std::vector<ComboEffectBundle*>& nextComboChainList, const float& fDestroyAtTime,
+		const float& fActivateSubsequenceComboAtTime);
 
-	inline bool IsCellDestroyable(const int& iRow, const int& iColumn) { return (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_COMBO6_WAITING_TRIGGER_);}
-	inline bool DestroySingleCellUtil(const int& iRow, const int& iColumn, const int& iPhaseIndex);	
+	inline bool IsSimpleCombo(const GemComboType_e& eGemComboType) { return (eGemComboType >= _GCT_COMBO4_ && eGemComboType <= _GCT_COMBO6_);}
 
 	// Execute move util methods
 	void CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn);
@@ -190,8 +217,14 @@ protected:
 	int GetBonusScoreForUnlockMainWord(bool bIncludeIndividualLetters=false);
 	int GetBonusScoreForUnlockSubWord(const int& iSubWordID, bool bIncludeIndividualLetters=false);
 
+	//  trigger combos at its second phase
+	void TriggerWaitingCombo6(const ComboEffectDescription& comboDescription, ComboEffectBundle* &pTriggeredCombo, std::vector<ComboEffectBundle*>& comboChainList);
 
-	void TriggerWaitingCombo6List(std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList);
+	// methods for processing double and tripple combos
+	void FindSortAndFilterAdvanceCombos(std::vector<ComboEffectDescription>& advanceComboList);
+	ComboEffectType GetComboEffectTypeOfAdvanceCombo(ComboEffectCell (&linkCellList)[3], const int& iLinkCellCount);
+
+	void TriggerAdvanceComboList(const std::vector<ComboEffectDescription>& advanceComboList, std::vector<ComboEffectBundle*>& nextComboChainList, std::vector<ComboEffectBundle*>& outputComboChainList, const bool& bIsTriggerComboSecondTimeList);
 protected:
 	GameWordManager* m_pGameWordManager;	
 	ObstacleProcessManager* m_pObstacleProcessManager;
@@ -205,7 +238,8 @@ protected:
 	LevelBossInfo m_LevelBossInfo;
 	bool m_bIsBossStateChanged;
 
-	std::vector<ComboEffectDescription> m_WaitingTriggerCombo6List;
+	//std::vector<ComboEffectDescription> m_WaitingTriggerCombo6List;
+	std::vector<ComboEffectDescription> m_WaitingTriggerSecondTimeComboList; //combo 5, combo 5-5, combo 6-6-6, this include waiting combo 6 too!!!!
 	std::vector<NewCellInfo> m_UnlockedGemLetterCellList;
 private:
 	// utility methods to find hint on temporary matrix

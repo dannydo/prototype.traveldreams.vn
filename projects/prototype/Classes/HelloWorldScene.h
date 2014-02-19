@@ -118,6 +118,7 @@ protected:
 	//Sprite* GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime);
 	//Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const float& fDelayTime);
 	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID);
+	void AddNewComboCell(const ComboEffectCell& cell, const float& fDelayTime, const float& fEffectTime, bool bCreateMirror = true);
 
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();
@@ -133,9 +134,22 @@ protected:
 
 	void PlayCombo4Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
 	void PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
-	void PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);	
+	void PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime);	
+
+	void PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime);
+	void PlayCombo4_4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime);
+
+	void PlayCombo4_5Effect(ComboEffectBundle* pComboEffect, float fDelayTime);
+	void PlayCombo5_5_5Effect(ComboEffectBundle* pComboEffect, float fDelayTime);
+	
+
+	void PlayCombo5_5Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime);
+
+	void PlayCombo6_6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime);	
+
 	void ActivateImageEffect(Node* pSender);
-	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float& fEffectDuration);
+	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float fEffectDuration);
+	void PlayChangeColorEffectOnSprite(Sprite* pSprite,const float& fDelayTime);
 
 
 	// unlock letter flow

@@ -20,6 +20,19 @@
 
 #define _MAX_GAME_LEVEL_	9
 
+
+// timing effects, temporary place here
+#define _TME_BASIC_DESTROY_CELL_TIME_	0.35f
+#define _TME_MOVE_CELL_TIME_			0.3f
+#define _TME_DELAY_ACTIVE_COMBO_WHEN_BASIC_MATCHING_	0.1f
+#define _TME_BASIC_COMBO_EXECUTE_TIME_	0.35f ///basic: 4, 5, 4-4, 4-4-4
+#define _TME_COMBO_6_PHASE1_EXECUTE_TIME_		0.15f //
+#define _TME_COMBO_6_PHASE2_REMOVE_CELL_AT_TIME_	0.55f
+#define _TME_COMBO_6_PHASE2_EXECUTE_TIME_		0.75f //
+#define _TME_COMBO_6_5_EXECUTE_TIME_			0.75f
+#define _TME_COMBO_4_5_PHASE2_DELAY_TIME_	0.2f //this delay used for 5-5-5 too, execution of each phase = basic combo execute time	
+
+
 struct GameConfig
 {
 public:
@@ -79,10 +92,13 @@ enum GemComboType_e
 	_GCT_COMBO4_ = 1,
 	_GCT_COMBO5_ = 2,
 	_GCT_COMBO6_ = 3,
-	_GCT_COMBO4_2_ = 4,
-	_GCT_COMBO5_2_ = 5,
-	_GCT_COMBO6_2_ = 6,
-	_GCT_COMBO6_WAITING_TRIGGER_ = 7
+	//_GCT_COMBO4_2_ = 4,
+	//_GCT_COMBO5_2_ = 5,
+	//_GCT_COMBO6_2_ = 6,
+	_GCT_COMBO6_WAITING_TRIGGER_ = 7,
+	_GCT_COMBO5_TRIGGER_SECOND_TIME_,
+	_GCT_COMBO5_5_TRIGGER_SECOND_TIME_,
+	_GCT_COMBO6_6_6_TRIGGER_SECOND_TIME_
 };
 
 enum ComboActivateDirection_e
@@ -211,8 +227,8 @@ public:
 struct DestroyedByComboCell : public Cell
 {
 public:
-	float m_fDestroyTime;
-	int m_iDestroyPhaseIndex;
+	float m_fDestroyAtTime;
+	int m_iDestroyPhaseIndex; //remove this???
 	int m_iGroupIndex;
 	bool m_bIsCompleteDestroyed; //this cell only used to trigger combo step so it's used even if not complete destroy
 	// NOTE: some combo may effect 1 cell 2 times!!!! ==> used dirty flag of obstacle to check it!!!
@@ -221,15 +237,15 @@ public:
 
 	DestroyedByComboCell() : Cell()
 	{
-		m_fDestroyTime = 0;
+		m_fDestroyAtTime = 0;
 		m_iDestroyPhaseIndex = 0;
 		m_iGroupIndex = 0;
 		m_bIsCompleteDestroyed = true;
 	}
 
-	DestroyedByComboCell (int iRow, int iColumn) : Cell(iRow, iColumn)
+	DestroyedByComboCell (const int& iRow, const int& iColumn) : Cell(iRow, iColumn)
 	{	
-		m_fDestroyTime = 0;
+		m_fDestroyAtTime = 0;
 		m_iDestroyPhaseIndex = 0;
 		m_iGroupIndex = 0;
 		m_bIsCompleteDestroyed = true;
@@ -237,12 +253,20 @@ public:
 
 	DestroyedByComboCell(Cell cell): Cell(cell)
 	{
-		m_fDestroyTime = 0;
+		m_fDestroyAtTime = 0;
 		m_iDestroyPhaseIndex = 0;
 		m_iGroupIndex = 0;
 		m_bIsCompleteDestroyed = true;
 	}
 
+	DestroyedByComboCell (const int& iRow, const int& iColumn, const int& iDestroyPhaseIndex, const float& fDestroyAtTime) : Cell(iRow, iColumn)
+	{	
+		m_fDestroyAtTime = 0;
+		m_iDestroyPhaseIndex = iDestroyPhaseIndex;
+		m_iGroupIndex = 0;
+		m_bIsCompleteDestroyed = true;
+		m_fDestroyAtTime = fDestroyAtTime;
+	}	
 };
 
 struct NewCellInfo : public Cell

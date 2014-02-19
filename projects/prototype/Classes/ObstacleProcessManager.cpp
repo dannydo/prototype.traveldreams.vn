@@ -79,6 +79,9 @@ bool ObstacleProcessManager::DestroyCellWithObstacle(const int& iBlockID)
 
 		if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive)
 		{
+			if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty)
+				return false;
+
 			// some obstacle should be removed instanly 1 time (with its gem) regard its level if m_bDecreaseLevelAfterDestroyed = false
 			// otherwise, only obstacle at level 0 has this effect
 			if (pObstacleDescription->m_bDecreaseLevelAfterDestroyed==false || m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel == 0)
