@@ -49,8 +49,8 @@ void GameBoardManager::GenerateGameBoard(int iLevel)
 		}
 
 	// for test
-	//m_BoardValueMatrix[1][0].m_iGemID = m_BoardValueMatrix[1][1].m_iGemID=m_BoardValueMatrix[0][2].m_iGemID=m_BoardValueMatrix[1][3].m_iGemID=	m_BoardValueMatrix[1][4].m_iGemID = 0;
-		//m_BoardValueMatrix[4][2].m_iGemID=m_BoardValueMatrix[5][2].m_iGemID=0;
+	//m_BoardValueMatrix[1][0].m_iGemID = m_BoardValueMatrix[1][1].m_iGemID=m_BoardValueMatrix[0][2].m_iGemID=m_BoardValueMatrix[1][3].m_iGemID=	//m_BoardValueMatrix[1][4].m_iGemID = 0;
+//		m_BoardValueMatrix[4][2].m_iGemID=m_BoardValueMatrix[5][2].m_iGemID=0;
 	//m_BoardValueMatrix[1][2].m_iGemID=m_BoardValueMatrix[2][2].m_iGemID=1;
 
 	// generate obstacles

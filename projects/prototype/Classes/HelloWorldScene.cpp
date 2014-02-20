@@ -1463,6 +1463,9 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 
 
 	// draw hint
+	if (m_eTouchMoveState != _TMS_MOVE_HORIZONTAL_)
+		return;
+
 	fMoveUnit = fDeltaX/m_SymbolSize.width;
 				
 	fMoveUnit = round(fMoveUnit);
@@ -1626,6 +1629,9 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 
 
 	// draw hint
+	if (m_eTouchMoveState != _TMS_MOVE_VERTICAL_)
+		return;
+
 	fMoveUnit = fDeltaY/m_SymbolSize.height;
 				
 	fMoveUnit = round(fMoveUnit);
@@ -1839,80 +1845,6 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 	// increase score by basic matching
 	m_GameBoardManager.IncreaseScoreForDestroyCells( basicMatchingDestroyedCells.size(), _CET_BASIC_MATCHING_);
-	
-	
-	// destroy cells and create double combos
-	/*for(auto doubleCombo : doubleComboList)
-	{
-		// play sound
-		SoundManager::PlaySoundEffect(_SET_COMBINE_DOUBLE_COMBO_, fDelayTime);
-
-		// destroy cells
-		BasicDestroyCellUlti( doubleCombo.m_Cell1.m_iRow, doubleCombo.m_Cell1.m_iColumn, fDelayTime,fDestroyTime);
-		BasicDestroyCellUlti( doubleCombo.m_Cell2.m_iRow, doubleCombo.m_Cell2.m_iColumn, fDelayTime,fDestroyTime);
-
-		// create double combo cell
-		for(int iFlag =0; iFlag < 2; iFlag++)
-		{
-			Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID( 0, doubleCombo.m_eComboType).c_str());			
-
-			pSprite->setPosition( ccp(m_fBoardLeftPosition + doubleCombo.m_Position.m_iColumn  * m_SymbolSize.width, 
-					m_fBoardBottomPosition + doubleCombo.m_Position.m_iRow * m_SymbolSize.height));
-
-			//pSprite->setScale(0.65f);
-			m_pBoardBatchNode->addChild(pSprite);
-
-			if (iFlag == 0)
-			{
-				m_BoardViewMatrix[doubleCombo.m_Position.m_iRow][doubleCombo.m_Position.m_iColumn].m_pSprite = pSprite;
-
-				pSprite->setOpacity(0);
-				pSprite->runAction( 
-					Sequence::create( 
-						DelayTime::create(fDelayTime),
-						EaseIn::create( FadeIn::create(fDestroyTime - 0.05f), 2.f),
-						NULL));
-
-				pSprite->setScale(1.5f);
-				pSprite->runAction( 
-					Sequence::create( 
-						DelayTime::create(fDelayTime),
-						EaseIn::create(ScaleTo::create(fDestroyTime - 0.05f, 1.f, 1.f), 2.f),
-						NULL));					
-			}
-			else
-			{
-				m_BoardViewMirrorMatrix[doubleCombo.m_Position.m_iRow][doubleCombo.m_Position.m_iColumn].m_pSprite = pSprite;
-				pSprite->setVisible(false);
-			}
-		}
-	}*/
-
-	//CCLOG("Combo chain");
-		
-	// play chain of triggered combo 6
-	/*if (triggeredCombo6ChainList.size() > 0)
-	{		
-		for(auto pComboEffect : triggeredCombo6ChainList)
-		{
-			PlayCombo6Effect(pComboEffect, fDelayTime + pComboEffect->m_iActivatedByCombo6Phase * fDelayPerCombo6Chain, fDelayPerCombo6Chain);
-
-			// destroy cells by combo
-			for(auto cell: pComboEffect->m_DestroyedCells)
-			{
-				if (cell.m_bIsCompleteDestroyed)
-					BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime + (pComboEffect->m_iActivatedByCombo6Phase + 1)* fDelayPerCombo6Chain - 0.02f, fDestroyTime);			
-			}
-
-			// increase score by combo		
-			m_GameBoardManager.IncreaseScoreForDestroyCells( basicMatchingDestroyedCells.size(), pComboEffect->m_ComboEffectDescription.m_eComboEffectType);
-
-			// clean data
-			delete pComboEffect;
-		}
-
-		fTotalDestroyCellTime = fDelayTime + fDelayPerCombo6Chain * triggeredCombo6ChainList.size();
-	}*/
 
 	// play combo chain	
 	float fCurrentDelayComboChain;
@@ -1976,44 +1908,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 		// ******************************
 		if (pComboEffect->m_fTriggerTime + _TME_BASIC_COMBO_EXECUTE_TIME_ > fTotalDestroyCellTime)
-			fTotalDestroyCellTime = pComboEffect->m_fTriggerTime + _TME_BASIC_COMBO_EXECUTE_TIME_;
-		/*
-		Sprite* pComboEffectSprite;
-
-		if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_DOUBLE_EXPLOSION_)
-		{
-			// play sound
-			SoundManager::PlaySoundEffect(_SET_DOUBLE_COMPLE_EFFECT_, fDelayTime + pComboEffect->m_iPhase* fDestroyTime);
-
-			pComboEffectSprite = Sprite::createWithSpriteFrameName("Explosion2.png");		
-			pComboEffectSprite->setScale(2.17f);
-
-			//destroy temporary double combo cell too
-			BasicDestroyCellUlti( pComboEffect->m_ComboEffectDescription.m_Position.m_iRow, pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn,
-				fDelayTime + pComboEffect->m_iPhase* fDestroyTime, fDestroyTime);
-		}
-		else
-		{
-			// play sound
-			SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime + pComboEffect->m_iPhase* fDestroyTime);
-
-			pComboEffectSprite = Sprite::createWithSpriteFrameName("Explosion.png");
-			pComboEffectSprite->setScale(1.3f);
-		}
-
-		pComboEffectSprite->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
-					m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height));
-
-		m_pBoardBatchNode->addChild(pComboEffectSprite);
-
-		pComboEffectSprite->setOpacity(0);
-		pComboEffectSprite->runAction(Sequence::create( 
-				DelayTime::create(fDelayTime + pComboEffect->m_iPhase* fDestroyTime),
-				CallFuncN::create( this, callfuncN_selector( HelloWorld::ActivateImageEffect)),
-				EaseOut::create( FadeOut::create( fDestroyTime), 2.f),				
-				RemoveSelf::create( true),				
-				NULL));		
-		*/
+			fTotalDestroyCellTime = pComboEffect->m_fTriggerTime + _TME_BASIC_COMBO_EXECUTE_TIME_;		
 
 
 		// destroy cells by combo
@@ -2030,7 +1925,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			{			
 				newComboCell.m_iRow = cell.m_iRow;
 				newComboCell.m_iColumn = cell.m_iColumn;
-				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, cell.m_fDestroyAtTime, 0.03f);				
+				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, cell.m_fDestroyAtTime, _TME_BASIC_DESTROY_CELL_TIME_); //0.03f);				
 				
 				AddNewComboCell (newComboCell, cell.m_fDestroyAtTime, 0.03f, false);
 			}
@@ -2040,31 +1935,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				
 				if (cell.m_fDestroyAtTime + _TME_BASIC_DESTROY_CELL_TIME_ > fTotalDestroyCellTime)
 					fTotalDestroyCellTime = cell.m_fDestroyAtTime + _TME_BASIC_DESTROY_CELL_TIME_;
-			}
-			/*m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->runAction(
-				Sequence::create( 
-					DelayTime::create(fDelayTime + pComboEffect->m_iPhase* fDestroyTime),
-					FadeOut::create( fDestroyTime),
-					//ScaleTo::create( fDestroyTime, 0.05f, 0.05f),
-					RemoveSelf::create( true),
-					//FadeOut::create(0.01f),
-					NULL));
-
-			if (m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iCharacterID >= 0)
-			{
-				m_pWordCollectBoardRenderNode->UnlockCharacter(m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iCharacterID);
-			}
-
-			//m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->runAction(
-				//Sequence::create(
-					//DelayTime::create(fDelayTime + fDestroyTime),
-					//RemoveSelf::create( true),
-					////FadeOut::create(0.01f),
-					//NULL));
-
-			m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = NULL;
-			m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iCharacterID = -1;
-			m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = NULL;*/
+			}		
 		}
 
 		// increase score by combo		
@@ -2153,57 +2024,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	// create new combo cells, this is right after basic matching cells are destroyed
 	for(auto cell: newComboCells)
 	{
-		AddNewComboCell (cell, fDelayTime, _TME_BASIC_DESTROY_CELL_TIME_);
-			/*
-		for(int i=0; i< 2; i++)
-		{
-			Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(cell.m_iGemID, cell.m_eGemComboType).c_str());
-			//pSprite->setAnchorPoint(ccp(0,0));
-
-			pSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn  * m_SymbolSize.width, 
-					m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height));
-
-			//pSprite->setScale(0.65f);
-			m_pBoardBatchNode->addChild(pSprite);
-
-			if (i!= 0)
-			{			
-				pSprite->setVisible(false);
-				m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
-				
-			}
-			else
-			{
-				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;				
-
-				pSprite->setOpacity(0);
-				pSprite->runAction( 
-					Sequence::create( 
-						DelayTime::create(fDelayTime),
-						EaseIn::create( FadeIn::create(fDestroyTime), 2.f),
-						NULL));
-
-				pSprite->setScale(2.f);//1.5f);
-				pSprite->runAction( 
-					Sequence::create( 
-						DelayTime::create(fDelayTime),
-						EaseIn::create(ScaleTo::create(fDestroyTime, 1.f, 1.f), 2.f),
-						NULL));			
-				
-				//
-				/*Sprite* pLetterSprite = GenerateAndAddLetterToComboGem( cell, fDelayTime);
-				if (pLetterSprite != NULL)
-				{
-					pLetterSprite->setOpacity(0);
-					pLetterSprite->runAction( 
-						Sequence::create( 
-							DelayTime::create(fDelayTime),
-							EaseIn::create( FadeIn::create(fDestroyTime), 2.f),
-							NULL));
-					
-				}*/
-		//	}			
-		//}
+		AddNewComboCell (cell, fDelayTime, _TME_BASIC_DESTROY_CELL_TIME_);			
 	}
 
 	// create gem with unlock letters ==> chua implement dung timing
@@ -2212,28 +2033,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	for(auto& cell : unlockedLetterCells)
 	{
 		for(int i=0; i< 2; i++)
-		{					
-			/*Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID( cell.m_iGemID,  //m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), //_GCT_NONE_).c_str());
-						_GCT_HAS_LETTER_).c_str());
-			
-			//pSprite->setAnchorPoint(ccp(0,0));
-			//pSprite->setColor(ccc3( 255-(m_iMoveCount+1)*5,  255, 255));
-
-			pSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn  * m_SymbolSize.width, 
-					m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height));
-
-			if (i!= 0)
-			{				
-				pSprite->setVisible(false);
-				m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
-			}
-			else
-			{
-				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
-				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = -1; //reset letter of gem				
-			}
-			//pSprite->setScale(0.65f);*/
-
+		{								
 			if (i!= 0)
 			{								
 				pSprite = m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite;
@@ -2243,7 +2043,9 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				pSprite = m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite;				
 			}
 
-			if (cell.m_bIsUnlocked)
+			assert(pSprite!= NULL);
+
+			if (cell.m_bIsUnlocked) // && pSprite != NULL) // safe check
 			{
 				if (cell.m_iGemLetterBlockID >= 0) //iLetter < 255)
 				{
@@ -2255,8 +2057,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			//m_pBoardBatchNode->addChild(pSprite);						
 		}		
 	}
-
-	//CCLOG("Move gems");
+	
 	// move cells
 	for (int i=0; i < originalMovedCells.size(); i++)
 	{		
@@ -2273,13 +2074,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 		m_BoardViewMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn] = m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];		
 		
-		m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn] = m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];		
-		
-		//m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setVisible(false);
-		//UpdatePostionOfSprite(targetMovedCells[i].m_iRow, targetMovedCells[i].m_iColumn, true);		
-
-		//if (m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite == NULL)
-		//	CCLOG("3- Effect Mirror NULL");
+		m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn] = m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];					
 	}	
 
 
@@ -2714,7 +2509,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 	{
 		m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite->runAction(
 			Sequence::create(
-				DelayTime::create(fDelay),
+				DelayTime::create(fDelay + fEffectDuration ),
 				RemoveSelf::create( true),
 				//FadeOut::create(0.01f),
 				NULL));

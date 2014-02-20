@@ -194,7 +194,7 @@ protected:
 
 	inline bool IsCellDestroyable(const int& iRow, const int& iColumn) { return (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType < _GCT_COMBO6_WAITING_TRIGGER_ 
 																				|| m_BoardValueMatrix[iRow][iColumn].m_eGemComboType > _GCT_COMBO6_6_6_TRIGGER_SECOND_TIME_ ));}
-	inline bool DestroySingleCellUtil(const int& iRow, const int& iColumn, const float fDestroyAtTime);	
+	inline bool DestroySingleCellUtil(const int& iRow, const int& iColumn, const float& fDestroyAtTime);	
 	inline void DestroySingleCellByComboUtil(const int& iRow, const int& iColumn, ComboEffectBundle* pTriggerCombo, std::vector<ComboEffectBundle*>& nextComboChainList, const float& fDestroyAtTime,
 		const float& fActivateSubsequenceComboAtTime);
 
@@ -221,8 +221,8 @@ protected:
 	void TriggerWaitingCombo6(const ComboEffectDescription& comboDescription, ComboEffectBundle* &pTriggeredCombo, std::vector<ComboEffectBundle*>& comboChainList);
 
 	// methods for processing double and tripple combos
-	void FindSortAndFilterAdvanceCombos(std::vector<ComboEffectDescription>& advanceComboList);
-	ComboEffectType GetComboEffectTypeOfAdvanceCombo(ComboEffectCell (&linkCellList)[3], const int& iLinkCellCount);
+	void FindSortAndFilterAdvanceCombos(std::vector<ComboEffectDescription>& advanceComboList, const int& iSelectedRow, const int& iSelectedColumn);
+	ComboEffectType GetComboEffectTypeOfAdvanceCombo(ComboEffectCell (&linkCellList)[3], const int& iLinkCellCount, const int& iSelectedRow, const int& iSelectedColumn);
 
 	void TriggerAdvanceComboList(const std::vector<ComboEffectDescription>& advanceComboList, std::vector<ComboEffectBundle*>& nextComboChainList, std::vector<ComboEffectBundle*>& outputComboChainList, const bool& bIsTriggerComboSecondTimeList);
 protected:
@@ -234,6 +234,7 @@ protected:
 	int m_iCurrentLevel;
 	int m_iCurrentScore;// current score
 	int m_iCurrentMove;
+	int m_iPhaseMoveInComboChain;
 
 	LevelBossInfo m_LevelBossInfo;
 	bool m_bIsBossStateChanged;
