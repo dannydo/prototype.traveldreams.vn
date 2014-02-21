@@ -27,6 +27,13 @@ LECTURE
 0
 ;obstacle list: count, list
 0
+;bonus quest
+1
+0	3
+1
+10	0	0	20	0	0
+
+
 COUNTDOWN	3
 3
 3 4 8 5 7 1

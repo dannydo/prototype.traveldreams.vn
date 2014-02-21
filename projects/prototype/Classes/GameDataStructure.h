@@ -10,6 +10,7 @@
 
 #define _MAX_GEM_ID_	6
 #define _SPECIAL_COMBO_GEM_ID	10
+#define _BONUS_QUEST_GEM_ID_		11
 
 #define _BOARD_MAX_ROW_NUMBER_	9
 #define _BOARD_MAX_COLUMN_NUMBER_	9
@@ -38,21 +39,53 @@ struct GameConfig
 public:
 	int m_iScoreOfGem;
 
-	int m_iComboCombineRatio;
-	int m_iCombEffectRatio4;
-	int m_iCombEffectRatio5;
-	int m_iCombEffectRatio6;
-	int m_iCombEffectRatio4_4;
-	int m_iCombEffectRatio4_5;
-	int m_iCombEffectRatio4_6;
-	int m_iCombEffectRatio5_5;
-	int m_iCombEffectRatio5_6;
-	int m_iCombEffectRatio6_6;
+	//int m_iComboCombineRatio;
 
-	int m_iScoreOfMainWord;
-	int m_iMainWordScoreRatio;
-	int m_iScoreOfSubWord;
-	int m_iSubWordScoreRatio;
+	// ***********  combo effect - destroy cell ratio (percent)
+	//simple combo 4,5,6
+	int m_iCombEffectDestroyCellRatio4;
+	int m_iCombEffectDestroyCellRatio5;
+	int m_iCombEffectDestroyCellRatio6;
+	//double combo: 4-4, 4-5, 5-5, 6-4, 6-5, 6-6
+	int m_iCombEffectDestroyCellRatio4_4;
+	int m_iCombEffectDestroyCellRatio4_5;
+	int m_iCombEffectDestroyCellRatio5_5;
+	int m_iCombEffectDestroyCellRatio6_4;
+	int m_iCombEffectDestroyCellRatio6_5;
+	int m_iCombEffectDestroyCellRatio6_6;
+	//tripple combo: 4-4-4, 5-5-5, 6-6-6
+	int m_iCombEffectDestroyCellRatio4_4_4;
+	int m_iCombEffectDestroyCellRatio5_5_5;
+	int m_iCombEffectDestroyCellRatio6_6_6;
+
+	// *********** bonus score when create combo
+	//simple combo 4,5,6
+	int m_iBonusScoreCreateComboCreate4;
+	int m_iBonusScoreCreateComboCreate5;
+	int m_iBonusScoreCreateComboCreate6;
+
+	// *********** bonus score when activate combo
+	//simple combo 4,5,6
+	int m_iBonusScoreActivateCombo4;
+	int m_iBonusScoreActivateCombo5;
+	int m_iBonusScoreActivateCombo6;
+	//double combo: 4-4, 4-5, 5-5, 6-4, 6-5, 6-6
+	int m_iBonusScoreActivateCombo4_4;
+	int m_iBonusScoreActivateCombo4_5;
+	int m_iBonusScoreActivateCombo5_5;
+	int m_iBonusScoreActivateCombo6_4;
+	int m_iBonusScoreActivateCombo6_5;
+	int m_iBonusScoreActivateCombo6_6;
+	//tripple combo: 4-4-4, 5-5-5, 6-6-6
+	int m_iBonusScoreActivateCombo4_4_4;
+	int m_iBonusScoreActivateCombo5_5_5;
+	int m_iBonusScoreActivateCombo6_6_6;
+
+	int m_iScoreLetterOfMainWord;
+	int m_iScoreRatioCompleteMainWord;
+
+	int m_iScoreLetterOfBonusWord;
+	int m_iScoreRatioCompleteBonusWord;
 };
 
 struct LevelTarget
@@ -98,7 +131,9 @@ enum GemComboType_e
 	_GCT_COMBO6_WAITING_TRIGGER_ = 7,
 	_GCT_COMBO5_TRIGGER_SECOND_TIME_,
 	_GCT_COMBO5_5_TRIGGER_SECOND_TIME_,
-	_GCT_COMBO6_6_6_TRIGGER_SECOND_TIME_
+	_GCT_COMBO6_6_6_TRIGGER_SECOND_TIME_,
+	
+	_GCT_SINGLE_COMBO_COUNT_ = 3
 };
 
 enum ComboActivateDirection_e

@@ -62,6 +62,7 @@ public:
 	std::vector<Cell> m_TargetMovedCells;
 	std::vector<NewCellInfo> m_UnlockedLetterCells;
 	std::vector<NewCellInfo> m_NewCells;	
+	
 
 	void Reset(bool bResetConvertedCombo = false)
 	{
@@ -75,7 +76,7 @@ public:
 		m_OriginalMovedCells.clear();
 		m_TargetMovedCells.clear();
 		m_UnlockedLetterCells.clear();
-		m_NewCells.clear();		
+		m_NewCells.clear();				
 	}
 };
 

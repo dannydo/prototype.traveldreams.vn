@@ -99,6 +99,9 @@
     <ClCompile Include="..\Classes\FacebookManager.cpp">
       <Filter>Facebook</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\BonusQuestManager.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -181,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\FacebookManager.h">
       <Filter>Facebook</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\BonusQuestManager.h">
+      <Filter>Classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

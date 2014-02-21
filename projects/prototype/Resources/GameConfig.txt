@@ -1,22 +1,47 @@
 ;score of gem
 10
-;combo combine ratio
-1
-;combo effect ratio
-2
-3
-4
-2
-3
-4
-3
-4
-4
-;score main word
+;combo effect - destroy cell ratio (percent)
+;simple combo 4,5,6
+200
+300
+400
+;double combo: 4-4, 4-5, 5-5, 6-4, 6-5, 6-6
+200
+250
+300
+300
+350
+400
+;tripple combo: 4-4-4, 5-5-5, 6-6-6
+200
+300
+400
+;bonus score when create combo
+;simple combo 4,5,6
 40
-;ratio main word
-10
-;score sub word
-20
-;ratio sub word
-8
+100
+150
+;bonus score when activate combo
+;simple combo 4,5,6
+80
+150
+200
+;double combo: 4-4, 4-5, 5-5, 6-4, 6-5, 6-6
+160
+230
+300
+280
+350
+400
+;tripple combo: 4-4-4, 5-5-5, 6-6-6
+240
+450
+600
+;score letter of main word
+1000
+;ratio complete main word
+1000
+;score letter of bonus word
+500
+;ratio complete bonus word
+500

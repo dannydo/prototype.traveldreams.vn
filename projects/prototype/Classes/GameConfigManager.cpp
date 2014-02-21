@@ -199,6 +199,55 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 
 		levelConfig.m_ObstacleConfigList.push_back( pObstacleConfig);
 	}	
+	std::getline(inputStream, sTemp);
+	
+	// bonus quest
+	std::getline(inputStream, sTemp); //read comment line
+	inputStream >> levelConfig.m_BonusQuestConfig.m_iBonusQuestCount;
+	if (levelConfig.m_BonusQuestConfig.m_iBonusQuestCount > 0)
+	{
+		inputStream >> iTemp;
+		levelConfig.m_BonusQuestConfig.m_bIsBonusGemAppearOnStartGame = (iTemp == 1);
+		if (levelConfig.m_BonusQuestConfig.m_bIsBonusGemAppearOnStartGame)
+		{
+			Cell pos;
+			for(int i=0; i< levelConfig.m_BonusQuestConfig.m_iBonusQuestCount; i++)
+			{
+				inputStream >> pos.m_iRow;
+				inputStream >> pos.m_iColumn;
+				levelConfig.m_BonusQuestConfig.m_PositionOfBonusGemAtStartGame[i] = Cell(pos.m_iRow-1, pos.m_iColumn-1);
+			}
+		}
+		else
+		{
+			for(int i=0; i< levelConfig.m_BonusQuestConfig.m_iBonusQuestCount; i++)
+				inputStream >> levelConfig.m_BonusQuestConfig.m_BonusGemAppearAtMoves[i];
+		}
+		memset( levelConfig.m_BonusQuestConfig.m_IsBonusEnabledQuestFlags, 0, sizeof(levelConfig.m_BonusQuestConfig.m_IsBonusEnabledQuestFlags));
+		// read detail quest description
+		for(int i=0; i< levelConfig.m_BonusQuestConfig.m_iBonusQuestCount; i++)
+		{
+			inputStream >> iTemp;
+			iTemp--;
+			switch (iTemp)
+			{
+				case _BQT_COLLECT_GEM_:	//collect gem quest
+				{
+					levelConfig.m_BonusQuestConfig.m_IsBonusEnabledQuestFlags[iTemp] = true;				
+					for(int j=0; j < _MAX_GEM_ID_; j++)
+						inputStream >> levelConfig.m_BonusQuestConfig.m_CollectGemQuest.m_CountPerGemType[j];
+					break;
+				}
+				case _BQT_COLLECT_COMBO_:	//collect combo quest
+				{
+					levelConfig.m_BonusQuestConfig.m_IsBonusEnabledQuestFlags[iTemp] = true;
+					for(int j=0; j < _GCT_SINGLE_COMBO_COUNT_; j++)
+						inputStream >> levelConfig.m_BonusQuestConfig.m_CollectComboQuest.m_CountPerComboGem[j];
+					break;
+				}
+			}
+		}
+	}
 
 
 	delete[] data;
@@ -223,33 +272,84 @@ void GameConfigManager::LoadGameConfig()
 	std::getline( inputStream, sComment);
 
 	// read combo config
+	//std::getline( inputStream, sComment);	
+	//inputStream >> m_GameConfig.m_iComboCombineRatio;
+
+	// destroy cell ratio
 	std::getline( inputStream, sComment);
-	inputStream >> m_GameConfig.m_iComboCombineRatio;
+	std::getline( inputStream, sComment);
+	//simple combo 4,5,6
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio4;
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio5;
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio6;
+	std::getline( inputStream, sComment);
+	
+	//double combo: 4-4, 4-5, 5-5, 6-4, 6-5, 6-6
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio4_4;
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio4_5;
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio5_5;
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio6_4;
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio6_5;
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio6_6;
+	std::getline( inputStream, sComment);
+
+	//tripple combo: 4-4-4, 5-5-5, 6-6-6
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio4_4_4;
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio5_5_5;
+	inputStream >> m_GameConfig.m_iCombEffectDestroyCellRatio6_6_6;
+	std::getline( inputStream, sComment);
+
+
+	// *********** bonus score when create combo
+	//simple combo 4,5,6
 	std::getline( inputStream, sComment);
 	std::getline( inputStream, sComment);
-	inputStream >> m_GameConfig.m_iCombEffectRatio4;
-	inputStream >> m_GameConfig.m_iCombEffectRatio5;
-	inputStream >> m_GameConfig.m_iCombEffectRatio6;
-	inputStream >> m_GameConfig.m_iCombEffectRatio4_4;
-	inputStream >> m_GameConfig.m_iCombEffectRatio4_5;
-	inputStream >> m_GameConfig.m_iCombEffectRatio4_6;
-	inputStream >> m_GameConfig.m_iCombEffectRatio5_5;
-	inputStream >> m_GameConfig.m_iCombEffectRatio5_6;
-	inputStream >> m_GameConfig.m_iCombEffectRatio6_6;
+	inputStream >> m_GameConfig.m_iBonusScoreCreateComboCreate4;
+	inputStream >> m_GameConfig.m_iBonusScoreCreateComboCreate5;
+	inputStream >> m_GameConfig.m_iBonusScoreCreateComboCreate6;
+	std::getline( inputStream, sComment);
+
+	
+	// *********** bonus score when activate combo
+	//simple combo 4,5,6
+	std::getline( inputStream, sComment);
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo4;
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo5;
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo6;
+	std::getline( inputStream, sComment);
+
+	//double combo: 4-4, 4-5, 5-5, 6-4, 6-5, 6-6
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo4_4;
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo4_5;
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo5_5;
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo6_4;
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo6_5;
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo6_6;
+	std::getline( inputStream, sComment);
+
+	//tripple combo: 4-4-4, 5-5-5, 6-6-6
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo4_4_4;
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo5_5_5;
+	inputStream >> m_GameConfig.m_iBonusScoreActivateCombo6_6_6;
 	std::getline( inputStream, sComment);
 
 	// read word config
 	std::getline( inputStream, sComment);
-	inputStream >> m_GameConfig.m_iScoreOfMainWord;
+	inputStream >> m_GameConfig.m_iScoreLetterOfMainWord;
 	std::getline( inputStream, sComment);
 	std::getline( inputStream, sComment);
-	inputStream >> m_GameConfig.m_iMainWordScoreRatio;
+	inputStream >> m_GameConfig.m_iScoreRatioCompleteMainWord;
 	std::getline( inputStream, sComment);
 	std::getline( inputStream, sComment);
-	inputStream >> m_GameConfig.m_iScoreOfSubWord;
+	inputStream >> m_GameConfig.m_iScoreLetterOfBonusWord;
 	std::getline( inputStream, sComment);
 	std::getline( inputStream, sComment);
-	inputStream >> m_GameConfig.m_iSubWordScoreRatio;	
+	inputStream >> m_GameConfig.m_iScoreRatioCompleteBonusWord;	
 
 	delete[] data;
 	delete[] orginalData;	

@@ -519,6 +519,8 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 
 	switch(iGemID)
 	{
+		case  _BONUS_QUEST_GEM_ID_:
+			return "BonusQuestGem.png";			
 		case 0:
 		{
 			switch (eGemComboType)
@@ -1809,10 +1811,14 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	//CCLOG("Destroy cells");
 
 	// destroy cells by basic matching 
+	int iTotalDestroyCell = 0;
 	for(auto cell: basicMatchingDestroyedCells)
 	{			
 		if (cell.m_iRow >= 0 && cell.m_iColumn >= 0)
+		{
+			iTotalDestroyCell++;
 			BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime,_TME_BASIC_DESTROY_CELL_TIME_);
+		}
 		else
 		{
 			cell.m_iRow = 0;
@@ -1844,7 +1850,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	}
 
 	// increase score by basic matching
-	m_GameBoardManager.IncreaseScoreForDestroyCells( basicMatchingDestroyedCells.size(), _CET_BASIC_MATCHING_);
+	m_GameBoardManager.IncreaseScoreForDestroyCells( iTotalDestroyCell, _CET_BASIC_MATCHING_);
 
 	// play combo chain	
 	float fCurrentDelayComboChain;
@@ -1919,6 +1925,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			newComboCell.m_iGemID = pComboEffect->m_ComboEffectDescription.m_iGemID;
 		}
 
+		iTotalDestroyCell = 0;
 		for(auto cell: pComboEffect->m_DestroyedCells)
 		{
 			if (cell.m_iDestroyPhaseIndex >=0 && (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_6_4_EFFECT_ || pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_6_5_EFFECT_ ))
@@ -1931,6 +1938,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			}
 			else if (cell.m_bIsCompleteDestroyed)
 			{
+				iTotalDestroyCell++;
 				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, cell.m_fDestroyAtTime, _TME_BASIC_DESTROY_CELL_TIME_);
 				
 				if (cell.m_fDestroyAtTime + _TME_BASIC_DESTROY_CELL_TIME_ > fTotalDestroyCellTime)
@@ -1945,6 +1953,15 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		delete pComboEffect;
 	}
 
+	// check destroy bonus gem list
+	std::vector<DestroyedByComboCell>& destroyBonusQuestGemList = m_GameBoardManager.GetDestroyBonusQuestGemList();
+	//iTotalDestroyCell= 0;
+
+	for(auto cell: destroyBonusQuestGemList)
+	{			
+		//iTotalDestroyCell++;
+		BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, cell.m_fDestroyAtTime,_TME_BASIC_DESTROY_CELL_TIME_);
+	}
 
 	// compute effect on boss
 	if (m_GameBoardManager.GetLevelBossInfo().m_bIsEnable)
@@ -2025,6 +2042,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	for(auto cell: newComboCells)
 	{
 		AddNewComboCell (cell, fDelayTime, _TME_BASIC_DESTROY_CELL_TIME_);			
+
+		m_GameBoardManager.IncreaseScoreForCreateCombo(cell.m_eGemComboType);
 	}
 
 	// create gem with unlock letters ==> chua implement dung timing

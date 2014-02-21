@@ -44,6 +44,49 @@ public:
 	int m_HitPointPerLetter;
 };
 
+enum BonusQuestType : int
+{
+	_BQT_COLLECT_GEM_ = 0,
+	_BQT_COLLECT_COMBO_ = 1,
+	_BQT_COLLECT_BONUS_WORD_ = 2,
+	_BQT_TYPE_COUNT_ = 3
+};
+
+struct BonusQuestCollectGemDescription
+{
+public:
+	int m_CountPerGemType[_MAX_GEM_ID_];
+	//reward here?
+};
+
+struct BonusQuestCollectComboDescription
+{
+public:
+	int m_CountPerComboGem[_GCT_SINGLE_COMBO_COUNT_];//only count combo4, combo5, combo6
+};
+
+struct BonusQuestConfig
+{
+public:	
+	int m_iBonusQuestCount;
+	bool m_bIsBonusGemAppearOnStartGame;// true: appear on startGame, false: drop at later move
+	Cell m_PositionOfBonusGemAtStartGame[3];
+	int m_BonusGemAppearAtMoves[3];
+
+	bool m_IsBonusEnabledQuestFlags[_BQT_TYPE_COUNT_];
+	//bool m_bIsEnableCollectGemQuest;
+	BonusQuestCollectGemDescription m_CollectGemQuest;
+	//bool m_bIsEnableCollectComboQuest;
+	BonusQuestCollectComboDescription m_CollectComboQuest;
+
+	BonusQuestConfig()
+	{
+		m_iBonusQuestCount = 0;
+		m_bIsBonusGemAppearOnStartGame = true;
+		memset( m_IsBonusEnabledQuestFlags, 0, sizeof( m_IsBonusEnabledQuestFlags));
+	}
+};
+
 struct LevelConfig
 {
 public:
@@ -69,6 +112,8 @@ public:
 	// boss config
 	bool m_bEnableBoss;
 	LevelBossConfig m_BossConfig;
+	// bonus quest config
+	BonusQuestConfig m_BonusQuestConfig;
 
 	~LevelConfig()
 	{		

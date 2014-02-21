@@ -5,6 +5,7 @@ NewGameBoardManager::NewGameBoardManager() : GameBoardManager()
 {
 	m_iCurrentScore = 0;		
 	m_pObstacleProcessManager = new ObstacleProcessManager(this);
+	m_iPhaseMoveInComboChain = 0;
 }
 
 NewGameBoardManager::~NewGameBoardManager()
@@ -54,6 +55,21 @@ void NewGameBoardManager::GenerateGameBoard(int iLevel)
 	else
 		m_LevelBossInfo.m_bIsEnable = false;
 
+
+	// generate bonus quest
+	m_BonusQuestManager.m_pGameBoardManager = this;
+	m_BonusQuestManager.InitLevel();
+	if (m_pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount > 0 && m_pLevelConfig->m_BonusQuestConfig.m_bIsBonusGemAppearOnStartGame)
+	{
+		for(int i=0; i< m_pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount; i++)
+		{
+			CellValue& cellValue = m_BoardValueMatrix[m_pLevelConfig->m_BonusQuestConfig.m_PositionOfBonusGemAtStartGame[i].m_iRow][m_pLevelConfig->m_BonusQuestConfig.m_PositionOfBonusGemAtStartGame[i].m_iColumn];
+			if (!cellValue.m_bIsBlankCell && cellValue.m_eGemComboType == _GCT_NONE_ && cellValue.m_iGemLetterBlockID < 0 && cellValue.m_iObstacleBlockID < 0)
+			{
+				cellValue.m_iGemID = _BONUS_QUEST_GEM_ID_;
+			}
+		}
+	}
 
 	// compute score/star for this level ==> score of stars now loaded from config file
 	/*m_LevelConfig.m_ScoreOfStars[0] = GetBonusScoreForUnlockMainWord(true);
@@ -112,7 +128,7 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 		std::vector<NewCellInfo>& newCells, bool bIsNewMove)
 {
 	if (bIsNewMove)
-		m_iPhaseMoveInComboChain = 0;
+		m_iPhaseMoveInComboChain = 1;
 	else
 		m_iPhaseMoveInComboChain++;
 
@@ -121,6 +137,7 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 	m_UnlockedGemLetterCellList.clear();
 	m_bIsBossStateChanged = false;
 	m_LevelBossInfo.m_bJustReleaseALetter = false;
+	
 
 	int iRow, iColumn, iGemID;
 
@@ -147,7 +164,7 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 			CreateComboCells( iSelectedRow, iSelectedColumn, basicMatchingDestroyedCells, newComboCells);			
 
 			// create unlocked gems with letter
-			CreateUnlockedGemLetterFromWaitingList(unlockedLetterCells);
+			CreateUnlockedGemLetterFromWaitingList(unlockedLetterCells);			
 
 			// calculate move cells and create new cells
 			CalculateMoveCells( originalMovedCells, targetMovedCells);
@@ -561,6 +578,14 @@ bool NewGameBoardManager::FastCheckBlocks( int iSelectedRow, int iSelectedColumn
 
 bool NewGameBoardManager::DestroySingleCellUtil(const int& iRow, const int& iColumn, const float& fDestroyAtTime)
 {	
+	if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
+	{
+		// count combo gems
+		m_BonusQuestManager.IncreaseComboCellCountForBonusQuest(m_BoardValueMatrix[iRow][iColumn].m_eGemComboType);
+	}
+
+	
+
 	// combo 5 cell wil be activated/destroyed later
 	if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType == _GCT_COMBO6_)
 	{
@@ -580,6 +605,36 @@ bool NewGameBoardManager::DestroySingleCellUtil(const int& iRow, const int& iCol
 			m_BoardValueMatrix[iRow][iColumn].Reset();
 			return false;
 		}
+
+		// note: destroy combo 5,6 wont activate boss or bonus quest game !!! ==> BUGS?
+		if (m_pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount > 0)
+		{
+			if ( iRow > 0 && m_BoardValueMatrix[iRow-1][iColumn].m_iGemID == _BONUS_QUEST_GEM_ID_)
+			{
+				m_BonusQuestManager.ActivateBonusQuest();
+				m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow-1, iColumn,-1,fDestroyAtTime));
+				m_BoardValueMatrix[iRow-1][iColumn].Reset();
+			}
+			if ( iRow < m_iRowNumber-1 && m_BoardValueMatrix[iRow+1][iColumn].m_iGemID == _BONUS_QUEST_GEM_ID_)
+			{
+				m_BonusQuestManager.ActivateBonusQuest();
+				m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow+1, iColumn, -1, fDestroyAtTime));
+				m_BoardValueMatrix[iRow+1][iColumn].Reset();
+			}
+			if ( iColumn > 0 && m_BoardValueMatrix[iRow][iColumn-1].m_iGemID == _BONUS_QUEST_GEM_ID_)
+			{
+				m_BonusQuestManager.ActivateBonusQuest();
+				m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow, iColumn-1, -1, fDestroyAtTime));
+				m_BoardValueMatrix[iRow][iColumn-1].Reset();
+			}
+			if ( iColumn < m_iColumnNumber-1 && m_BoardValueMatrix[iRow][iColumn+1].m_iGemID == _BONUS_QUEST_GEM_ID_)
+			{
+				m_BonusQuestManager.ActivateBonusQuest();
+				m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow, iColumn+1, -1, fDestroyAtTime));
+				m_BoardValueMatrix[iRow][iColumn+1].Reset();
+			}
+		}
+
 
 		if (m_LevelBossInfo.m_bIsEnable && !m_bIsBossStateChanged)
 		{
@@ -875,7 +930,9 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells)
-{
+{	
+	m_iPhaseMoveInComboChain = 1;
+
 	// reset
 	m_iLinkedBlockCount = 0;
 	m_UnlockedGemLetterCellList.clear();
@@ -1594,11 +1651,29 @@ void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bo
 				newCells.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemID));
 			}
 
+	// check and generate bonus quest gem
+	int iNewBonusQuestGemCount = 0;
+	if (bIsNewMove)
+	{
+		if (m_pLevelConfig->m_BonusQuestConfig.m_BonusGemAppearAtMoves)
+		{
+			int iMoveElapse = m_pLevelConfig->m_iNumberOfMove - m_iCurrentMove+1;
+			
+			for(int i=0; i < m_pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount; i++)
+				if (iMoveElapse == m_pLevelConfig->m_BonusQuestConfig.m_BonusGemAppearAtMoves[i])
+				{
+					iNewBonusQuestGemCount++;
+					m_BoardValueMatrix[newCells[newCells.size()-iNewBonusQuestGemCount].m_iRow][newCells[newCells.size()-iNewBonusQuestGemCount].m_iColumn].m_iGemID = _BONUS_QUEST_GEM_ID_;
+					newCells[newCells.size()-iNewBonusQuestGemCount].m_iGemID = _BONUS_QUEST_GEM_ID_;
+				}
+		}
+	}
+
 	std::vector<GemLetterData> outputLettersForGems;
-	m_pGameWordManager->GenerateNewLetters( newCells.size(), outputLettersForGems, bIsNewMove);	
+	m_pGameWordManager->GenerateNewLetters( newCells.size()-iNewBonusQuestGemCount, outputLettersForGems, bIsNewMove);	
 
 	unsigned char iLetter = 255;	
-	for(int iIndex = 0; iIndex < newCells.size(); iIndex++)	
+	for(int iIndex = 0; iIndex < newCells.size()-iNewBonusQuestGemCount; iIndex++)	
 	{
 		iLetter = outputLettersForGems[iIndex].m_iLetter;		
 		NewCellInfo& cell = newCells[iIndex];
@@ -1636,7 +1711,7 @@ void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bo
 }
 
 // score and stars
-int NewGameBoardManager::GetScoreForUnlockLetterInMainWord()
+/*int NewGameBoardManager::GetScoreForUnlockLetterInMainWord()
 {
 	return m_GameConfig.m_iScoreOfMainWord;
 }
@@ -1645,16 +1720,16 @@ int NewGameBoardManager::GetScoreForUnlockLetterInSubWord()
 {
 	return m_GameConfig.m_iScoreOfSubWord;
 }
-
+*/
 int NewGameBoardManager::IncreaseScoreForLetterInMainWord()
 {
-	m_iCurrentScore += m_GameConfig.m_iScoreOfMainWord;
-	return m_GameConfig.m_iScoreOfMainWord;
+	m_iCurrentScore += m_GameConfig.m_iScoreLetterOfMainWord;
+	return m_GameConfig.m_iScoreLetterOfMainWord;
 }
 
 int NewGameBoardManager::IncreaseScoreForLetterInSubWords(const int& iLetterCount)
 {
-	int iTotalScoreIncrement = m_GameConfig.m_iScoreOfSubWord * iLetterCount;
+	int iTotalScoreIncrement = m_GameConfig.m_iScoreLetterOfBonusWord * iLetterCount;
 	m_iCurrentScore += iTotalScoreIncrement;
 	return iTotalScoreIncrement;
 }
@@ -1669,7 +1744,11 @@ int NewGameBoardManager::IncreaseScoreForUnlockMainWord()
 
 int NewGameBoardManager::GetBonusScoreForUnlockMainWord(bool bIncludeIndividualLetters)
 {
-	int iBonusScore = m_pGameWordManager->GetMainWord().m_iWordLength * m_GameConfig.m_iScoreOfMainWord * ( m_GameConfig.m_iMainWordScoreRatio + (int)bIncludeIndividualLetters);	
+	int iRealLetterCount = m_pGameWordManager->GetMainWord().m_iWordLength;
+	for(int i=0; i<  m_pGameWordManager->GetMainWord().m_iWordLength; i++)
+		if (m_pGameWordManager->GetMainWord().m_sSoundFile[i] == ' ')
+			iRealLetterCount--;
+	int iBonusScore = iRealLetterCount *  m_GameConfig.m_iScoreRatioCompleteMainWord;	
 
 	return iBonusScore;
 }
@@ -1684,47 +1763,101 @@ int NewGameBoardManager::IncreaseScoreForUnlockSubWord(const int& iSubWordID)
 
 int NewGameBoardManager::GetBonusScoreForUnlockSubWord(const int& iSubWordID, bool bIncludeIndividualLetters)
 {
-	int iBonusScore = m_pGameWordManager->GetSubWord(iSubWordID).m_iWordLength * m_GameConfig.m_iScoreOfSubWord * (m_GameConfig.m_iSubWordScoreRatio + (int)bIncludeIndividualLetters);
+	int iBonusScore = m_pGameWordManager->GetSubWord(iSubWordID).m_iWordLength * m_GameConfig.m_iScoreRatioCompleteBonusWord;
 	return iBonusScore;
 }
 
+
+int NewGameBoardManager::IncreaseScoreForCreateCombo(const GemComboType_e& eComboType)
+{
+	int iCreateBonusScore = 0;
+	switch (eComboType)
+	{
+		// single
+		case GemComboType_e::_GCT_COMBO4_:
+		{			
+			iCreateBonusScore = m_GameConfig.m_iBonusScoreActivateCombo4;
+			break;
+		}
+		case GemComboType_e::_GCT_COMBO5_:
+		{			
+			iCreateBonusScore = m_GameConfig.m_iBonusScoreActivateCombo5;
+			break;
+		}
+		case GemComboType_e::_GCT_COMBO6_:
+		{			
+			iCreateBonusScore = m_GameConfig.m_iBonusScoreActivateCombo5;
+			break;
+		}		
+	}
+	int iIncrementScore = iCreateBonusScore * m_iPhaseMoveInComboChain;
+	m_iCurrentScore += iIncrementScore;
+
+	return iIncrementScore;
+}
+
+
 int NewGameBoardManager::IncreaseScoreForDestroyCells(const int& iGemCount, const ComboEffectType& eComboEffectType)
 {
-	int iRatio = m_GameConfig.m_iScoreOfGem;
+	int iRatio = 1;
+	int iActivationBonusScore = 0;
 	switch (eComboEffectType)
 	{
+		// single
 		case ComboEffectType::_CET_DESTROY_ROW_ :
 		case ComboEffectType::_CET_DESTROY_COLUMN_:
-			iRatio *= m_GameConfig.m_iCombEffectRatio4;
+		{
+			iRatio *= m_GameConfig.m_iCombEffectDestroyCellRatio4;
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo4;
 			break;
+		}
 		case ComboEffectType::_CET_EXPLOSION_:
-			iRatio *= m_GameConfig.m_iCombEffectRatio5;
+			iRatio *= m_GameConfig.m_iCombEffectDestroyCellRatio5;
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo5;
 			break;
 		case ComboEffectType::_CET_DESTROY_COLOR_ROW_:
 		case ComboEffectType::_CET_DESTROY_COLOR_COLUMN_:
-			iRatio *= m_GameConfig.m_iCombEffectRatio6;
+			iRatio *= m_GameConfig.m_iCombEffectDestroyCellRatio6;
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo6;
 			break;
+
+		// double
 		case ComboEffectType:: _CET_4_4_EFFECT_:
-		case ComboEffectType::_CET_4_4_4_EFFECT_:
-			iRatio *= m_GameConfig.m_iCombEffectRatio4_4;
+			iRatio *= m_GameConfig.m_iCombEffectDestroyCellRatio4_4;
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo4_4;
 			break;
 		case ComboEffectType::_CET_4_5_EFFECT_:
-			iRatio *= m_GameConfig.m_iCombEffectRatio4_5;
-			break;
-		case ComboEffectType::_CET_5_5_EFFECT_:
-		case ComboEffectType::_CET_5_5_5_EFFECT_:
-			iRatio *= m_GameConfig.m_iCombEffectRatio5_5;
+			iRatio *= m_GameConfig.m_iCombEffectDestroyCellRatio4_5;
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo4_5;
 			break;
 		case ComboEffectType::_CET_6_4_EFFECT_:
-		case ComboEffectType::_CET_6_5_EFFECT_:
-		case ComboEffectType::_CET_6_6_EFFECT_:
-		case ComboEffectType::_CET_6_6_6_EFFECT_:
-			iRatio *= m_GameConfig.m_iCombEffectRatio6_6;
+			iRatio *= m_GameConfig.m_iCombEffectDestroyCellRatio6_4;
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo6_4;
 			break;
-			//iRatio *= m_GameConfig.m_iCombEffectRatio4_4;
-			//break;
+		case ComboEffectType::_CET_6_5_EFFECT_:
+			iRatio *= m_GameConfig.m_iCombEffectDestroyCellRatio6_5;
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo6_5;
+			break;
+
+		// triple
+		case ComboEffectType:: _CET_4_4_4_EFFECT_:
+			iRatio *= m_GameConfig.m_iCombEffectDestroyCellRatio4_4_4;
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo4_4_4;
+			break;
+		case ComboEffectType::_CET_5_5_5_EFFECT_:
+			iRatio *= m_GameConfig.m_iCombEffectDestroyCellRatio5_5_5;
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo5_5_5;
+			break;
+		case ComboEffectType::_CET_6_6_6_EFFECT_:
+			iRatio *= m_GameConfig.m_iCombEffectDestroyCellRatio6_6_6;
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo6_6_6;
+			break;
 	}
-	int iIncrementScore = iRatio * iGemCount;
+	int iIncrementScore;
+	if (iRatio > 1)
+		iIncrementScore = (m_GameConfig.m_iScoreOfGem * iRatio * iGemCount/100 + iActivationBonusScore) * m_iPhaseMoveInComboChain;
+	else
+		iIncrementScore = (m_GameConfig.m_iScoreOfGem * iGemCount + iActivationBonusScore) * m_iPhaseMoveInComboChain;
 	m_iCurrentScore += iIncrementScore;
 
 	return iIncrementScore;
@@ -2244,8 +2377,8 @@ void NewGameBoardManager::FindSortAndFilterAdvanceCombos(std::vector<ComboEffect
 	// step 2: sort combo based on their priorites
 	int iListSize = tempAdvanceComboList.size();
 	
-	for(i=0; i< iListSize-2; i++)
-		for(j=i+1; j< iListSize-1; j++)
+	for(i=0; i< iListSize-1; i++)
+		for(j=i+1; j< iListSize; j++)
 			if (tempAdvanceComboList[i].m_eComboEffectType < tempAdvanceComboList[j].m_eComboEffectType)
 			{
 				tempComboDescription = tempAdvanceComboList[i];

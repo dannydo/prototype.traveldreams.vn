@@ -6,6 +6,7 @@
 #include "GameConfigManager.h"
 #include "ObstacleProcessManager.h"
 #include "GemLetterManager.h"
+#include "BonusQuestManager.h"
 
 enum ComboEffectType
 {
@@ -142,6 +143,8 @@ public:
 
 	void GenerateGameBoard(int iLevel);
 
+	inline std::vector<DestroyedByComboCell>& GetDestroyBonusQuestGemList() { return m_DestroyBonusQuestGemList;}
+
 	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
@@ -166,8 +169,8 @@ public:
 	int DecreaseMove() { return (m_iCurrentMove--);}
 
 	// score and stars
-	int GetScoreForUnlockLetterInMainWord();
-	int GetScoreForUnlockLetterInSubWord();
+	//int GetScoreForUnlockLetterInMainWord();
+	//int GetScoreForUnlockLetterInSubWord();
 
 	int IncreaseScoreForLetterInMainWord();
 	int IncreaseScoreForLetterInSubWords(const int& iLetterCount);
@@ -176,6 +179,7 @@ public:
 	
 	int IncreaseScoreForDestroyCells(const int& iGemCount, const ComboEffectType& eComboEffectType);
 	//int IncreaseScoreComboEffect(const int& iGemCount, const GemComboType_e& eComboType)
+	int IncreaseScoreForCreateCombo(const GemComboType_e& eComboType);
 
 	int GetEarnedStars();
 
@@ -225,10 +229,12 @@ protected:
 	ComboEffectType GetComboEffectTypeOfAdvanceCombo(ComboEffectCell (&linkCellList)[3], const int& iLinkCellCount, const int& iSelectedRow, const int& iSelectedColumn);
 
 	void TriggerAdvanceComboList(const std::vector<ComboEffectDescription>& advanceComboList, std::vector<ComboEffectBundle*>& nextComboChainList, std::vector<ComboEffectBundle*>& outputComboChainList, const bool& bIsTriggerComboSecondTimeList);
+	
 protected:
 	GameWordManager* m_pGameWordManager;	
 	ObstacleProcessManager* m_pObstacleProcessManager;
 	GemLetterManager m_GemLetterManager;
+	BonusQuestManager m_BonusQuestManager;
 
 	//LevelTarget m_LevelConfig;
 	int m_iCurrentLevel;
@@ -242,6 +248,7 @@ protected:
 	//std::vector<ComboEffectDescription> m_WaitingTriggerCombo6List;
 	std::vector<ComboEffectDescription> m_WaitingTriggerSecondTimeComboList; //combo 5, combo 5-5, combo 6-6-6, this include waiting combo 6 too!!!!
 	std::vector<NewCellInfo> m_UnlockedGemLetterCellList;
+	std::vector<DestroyedByComboCell> m_DestroyBonusQuestGemList;
 private:
 	// utility methods to find hint on temporary matrix
 	bool haveCellMatch3(const Cell& cell);
