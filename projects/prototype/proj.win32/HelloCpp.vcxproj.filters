@@ -186,7 +186,7 @@
       <Filter>Facebook</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\BonusQuestManager.h">
-      <Filter>Classes</Filter>
+      <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

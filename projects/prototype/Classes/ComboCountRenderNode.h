@@ -18,13 +18,16 @@ public:
 	void draw() override;
 	void update(float dt) override;	
 
-	void UpdateList(int iTypeID, int iComboCount);	
-private:
-	void GenerateLabels();
-	
+	void UpdateGemList(int iGemID, int iCount);	
+	void UpdateComboList(int iTypeID, int iComboCount);	
+	void GenerateLabels(int iType);
+	void CompleteQuest(int iType);
 private:	
 	int m_ComboCountList[_COMBO_TYPE_COUNT_];	
-	LabelTTF* m_LabelList[_COMBO_TYPE_COUNT_];	
+	int m_DestroyGemCountList[_MAX_GEM_ID_];
+	LabelTTF* m_QuestLabelList[2];
+	LabelTTF* m_LabelGemCountList[_MAX_GEM_ID_];	
+	LabelTTF* m_LabelComboCountList[_COMBO_TYPE_COUNT_];	
 };
 
 

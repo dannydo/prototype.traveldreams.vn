@@ -14,6 +14,28 @@ public:
 	void ActivateBonusQuest();
 	void IncreaseComboCellCountForBonusQuest(const GemComboType_e& eGemComboType);
 	void IncreaseBasicCellCountForBonusQuest(const int& iGemID);
+
+	inline bool IsQuestJustActivated(const BonusQuestType& eQuestType) { 
+		if (m_IsBonusQuestDirtyFlags[eQuestType] && !m_IsBonusQuestActivatedFlags[eQuestType])
+		{
+			m_IsBonusQuestActivatedFlags[eQuestType] = true;
+			m_IsBonusQuestDirtyFlags[eQuestType] = false;
+			return true;
+		}
+	}
+
+	inline bool IsQuestActivated(const BonusQuestType& eQuestType) { return m_IsBonusQuestActivatedFlags[eQuestType];}
+
+	inline bool IsQuestJustCompleted(const BonusQuestType& eQuestType) { 
+		if (m_IsBonusQuestDirtyFlags[eQuestType] && m_IsBonusQuestCompletedFlags[eQuestType])
+		{			
+			m_IsBonusQuestDirtyFlags[eQuestType] = false;
+			return true;
+		}
+	}
+
+	inline const BonusQuestCollectGemDescription& GetCollectGemParam() { return m_CollectGemParam;}
+	inline const BonusQuestCollectComboDescription& GetCollectComboParam() { return m_CollectComboParam;}
 private:
 	friend class NewGameBoardManager;
 	NewGameBoardManager* m_pGameBoardManager;

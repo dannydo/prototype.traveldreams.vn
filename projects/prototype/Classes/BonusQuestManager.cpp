@@ -24,13 +24,13 @@ void BonusQuestManager::InitLevel()
 				case _BQT_COLLECT_GEM_:
 				{
 					m_CollectGemObjective = m_pLevelConfig->m_BonusQuestConfig.m_CollectGemQuest;
-					memset(m_CollectGemObjective.m_CountPerGemType, 0, sizeof( m_CollectGemObjective.m_CountPerGemType));
+					memset(m_CollectGemParam.m_CountPerGemType, 0, sizeof( m_CollectGemObjective.m_CountPerGemType));
 					break;
 				}
 				case _BQT_COLLECT_COMBO_:
 				{
 					m_CollectComboObjective = m_pLevelConfig->m_BonusQuestConfig.m_CollectComboQuest;
-					memset(m_CollectComboObjective.m_CountPerComboGem, 0, sizeof( m_CollectComboObjective.m_CountPerComboGem));
+					memset(m_CollectComboParam.m_CountPerComboGem, 0, sizeof( m_CollectComboObjective.m_CountPerComboGem));
 					break;
 				}
 			}
@@ -41,10 +41,11 @@ void BonusQuestManager::InitLevel()
 void BonusQuestManager::ActivateBonusQuest()
 {
 	for(int i=0; i < _BQT_TYPE_COUNT_; i++)
-		if (m_IsBonusEnabledQuestFlags[i] && !m_IsBonusQuestActivatedFlags[i])
+		if (m_IsBonusEnabledQuestFlags[i] && !m_IsBonusQuestActivatedFlags[i] && !m_IsBonusQuestDirtyFlags[i])
 		{
 			m_IsBonusQuestDirtyFlags[i] = true;
 			//m_IsBonusQuestActivatedFlags[i].
+			break;
 		}
 }
 
@@ -57,7 +58,7 @@ void BonusQuestManager::IncreaseComboCellCountForBonusQuest(const GemComboType_e
 		bool bIsQuestCompleted = true;
 		for(int i=0; i< _GCT_SINGLE_COMBO_COUNT_; i++)
 		{
-			if (m_CollectComboObjective.m_CountPerComboGem[i] != m_CollectComboParam.m_CountPerComboGem[i])
+			if (m_CollectComboObjective.m_CountPerComboGem[i] > m_CollectComboParam.m_CountPerComboGem[i])
 			{
 				bIsQuestCompleted = false;
 				break;
@@ -81,7 +82,7 @@ void BonusQuestManager::IncreaseBasicCellCountForBonusQuest(const int& iGemID)
 		bool bIsQuestCompleted = true;
 		for(int i=0; i< _MAX_GEM_ID_; i++)
 		{
-			if (m_CollectGemObjective.m_CountPerGemType[i] != m_CollectGemParam.m_CountPerGemType[i])
+			if (m_CollectGemObjective.m_CountPerGemType[i] > m_CollectGemParam.m_CountPerGemType[i])
 			{
 				bIsQuestCompleted = false;
 				break;

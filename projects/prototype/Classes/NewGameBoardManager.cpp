@@ -578,7 +578,7 @@ bool NewGameBoardManager::FastCheckBlocks( int iSelectedRow, int iSelectedColumn
 
 bool NewGameBoardManager::DestroySingleCellUtil(const int& iRow, const int& iColumn, const float& fDestroyAtTime)
 {	
-	if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
+	if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >= _GCT_COMBO4_ && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType <= _GCT_COMBO6_)
 	{
 		// count combo gems
 		m_BonusQuestManager.IncreaseComboCellCountForBonusQuest(m_BoardValueMatrix[iRow][iColumn].m_eGemComboType);
@@ -634,6 +634,9 @@ bool NewGameBoardManager::DestroySingleCellUtil(const int& iRow, const int& iCol
 				m_BoardValueMatrix[iRow][iColumn+1].Reset();
 			}
 		}
+
+		// count normal gems
+		m_BonusQuestManager.IncreaseBasicCellCountForBonusQuest(m_BoardValueMatrix[iRow][iColumn].m_iGemID);
 
 
 		if (m_LevelBossInfo.m_bIsEnable && !m_bIsBossStateChanged)

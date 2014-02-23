@@ -1719,8 +1719,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		std::vector<NewCellInfo>& unlockedLetterCells, std::vector<NewCellInfo>& newCells, bool bIsNewMove)
 {
 	// for test	
-	for(int i=0; i< _COMBO_TYPE_COUNT_;i++)
-		m_pComboCountRenderNode->UpdateList(i, m_GameBoardManager.GetComboCount(i));
+	//for(int i=0; i< _COMBO_TYPE_COUNT_;i++)
+	//	m_pComboCountRenderNode->UpdateList(i, m_GameBoardManager.GetComboCount(i));
 
 	m_bIsEffectPlaying = true;	
 
@@ -1956,12 +1956,41 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	// check destroy bonus gem list
 	std::vector<DestroyedByComboCell>& destroyBonusQuestGemList = m_GameBoardManager.GetDestroyBonusQuestGemList();
 	//iTotalDestroyCell= 0;
+	if (destroyBonusQuestGemList.size() > 0)
+	{
+		for(auto cell: destroyBonusQuestGemList)
+		{			
+			//iTotalDestroyCell++;
+			BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, cell.m_fDestroyAtTime,_TME_BASIC_DESTROY_CELL_TIME_);
+		}
 
-	for(auto cell: destroyBonusQuestGemList)
-	{			
-		//iTotalDestroyCell++;
-		BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, cell.m_fDestroyAtTime,_TME_BASIC_DESTROY_CELL_TIME_);
+		// check for new bonus quests those're just activated
+		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustActivated(_BQT_COLLECT_GEM_))
+			m_pComboCountRenderNode->GenerateLabels(_BQT_COLLECT_GEM_);
+		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustActivated(_BQT_COLLECT_COMBO_))
+			m_pComboCountRenderNode->GenerateLabels(_BQT_COLLECT_COMBO_);
+		
+		destroyBonusQuestGemList.clear();
 	}
+
+	// update state of bonus quest here (for test only)
+	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_GEM_))
+	{
+		auto& collectGemParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectGemParam();
+		for(int i=0; i < _MAX_GEM_ID_; i++)
+			m_pComboCountRenderNode->UpdateGemList(i, collectGemParam.m_CountPerGemType[i]);
+	}
+	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_COMBO_))
+	{
+		auto& collectComboParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectComboParam();
+		for(int i=0; i < _GCT_SINGLE_COMBO_COUNT_; i++)
+			m_pComboCountRenderNode->UpdateComboList(i, collectComboParam.m_CountPerComboGem[i]);
+	}
+	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_GEM_))
+		m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_GEM_);
+	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_COMBO_))
+		m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_COMBO_);
+
 
 	// compute effect on boss
 	if (m_GameBoardManager.GetLevelBossInfo().m_bIsEnable)

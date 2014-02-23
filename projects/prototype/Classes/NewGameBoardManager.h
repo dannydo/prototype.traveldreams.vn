@@ -121,6 +121,8 @@ public:
 
 	inline GameWordManager* GetGameWordManager() { return m_pGameWordManager;}
 	inline ObstacleProcessManager* GetObstacleProcessManager() { return m_pObstacleProcessManager;}
+	inline BonusQuestManager* GetBonusQuestManager() { return &m_BonusQuestManager;}
+
 	inline const int& GetCurrentScore() { return m_iCurrentScore;}
 	inline const int& GetCurrentMove() { return m_iCurrentMove;}
 	inline const LevelConfig& GetLevelConfig() { return *m_pLevelConfig;}

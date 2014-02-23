@@ -10,7 +10,7 @@ ComboCountRenderNode* ComboCountRenderNode::create()
 	if( renderNode)
 	{		
 		renderNode->autorelease();
-		renderNode->GenerateLabels();
+		//renderNode->GenerateLabels();
 		return renderNode;
 	}
 
@@ -26,23 +26,63 @@ void ComboCountRenderNode::update(float dt)
 {
 }
 
-void ComboCountRenderNode::UpdateList(int iTypeID, int iComboCount)
+void ComboCountRenderNode::UpdateGemList(int iGemID, int iCount)
+{
+	char sText[10];
+	sprintf( sText, "%d", iCount);
+
+	m_LabelGemCountList[iGemID]->setString(sText);	
+}
+
+void ComboCountRenderNode::UpdateComboList(int iTypeID, int iComboCount)
 {
 	char sText[10];
 	sprintf( sText, "%d", iComboCount);
 
-	m_LabelList[iTypeID]->setString(sText);	
+	m_LabelComboCountList[iTypeID]->setString(sText);	
 }
 
-void ComboCountRenderNode::GenerateLabels()
+void ComboCountRenderNode::CompleteQuest(int iType)
+{
+	m_QuestLabelList[iType]->setString("Complete!");	
+}
+
+void ComboCountRenderNode::GenerateLabels(int iType)
 {
 	char sText[10];
-	for(int i=0; i<_COMBO_TYPE_COUNT_; i++)
+
+	if (iType == 0)
 	{
-		m_LabelList[i] = CCLabelTTF::create("", "Arial", 28);
-		m_LabelList[i]->setPositionX( i * 120.f);
-		m_LabelList[i]->setString("0");
+		// gem count
+		m_QuestLabelList[iType]= CCLabelTTF::create("Destroy gem:", "Arial", 22);
+		m_QuestLabelList[iType]->setPosition(Point( 10, 40));
+		this->addChild(m_QuestLabelList[iType]);
+
+	
+		for(int i=0; i<_MAX_GEM_ID_; i++)
+		{
+			m_LabelGemCountList[i] = CCLabelTTF::create("", "Arial", 22);
+			m_LabelGemCountList[i]->setPositionX( i * 70.f + 100);
+			m_LabelGemCountList[i]->setPositionY(40);
+			m_LabelGemCountList[i]->setString("0");
 		
-		this->addChild(m_LabelList[i]);		
+			this->addChild(m_LabelGemCountList[i]);		
+		}
+	} else if (iType == 1)
+	{
+		// combo count
+		m_QuestLabelList[iType]= CCLabelTTF::create("Destroy combo:", "Arial", 22);
+		m_QuestLabelList[iType]->setPosition(Point( 10, 10));
+		this->addChild(m_QuestLabelList[iType]);
+	
+		for(int i=0; i<_COMBO_TYPE_COUNT_; i++)
+		{
+			m_LabelComboCountList[i] = CCLabelTTF::create("", "Arial", 22);
+			m_LabelComboCountList[i]->setPositionX( i * 70.f + 100);
+			m_LabelComboCountList[i]->setPositionY( 10);
+			m_LabelComboCountList[i]->setString("0");
+		
+			this->addChild(m_LabelComboCountList[i]);		
+		}
 	}
 }
