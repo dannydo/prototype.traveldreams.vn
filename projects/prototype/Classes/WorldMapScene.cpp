@@ -3,6 +3,7 @@
 #include "IntroductionLayer.h"
 #include "FlashCardScene.h"
 #include "MainMenuScene.h"
+#include "LifeSystemNode.h"
 
 USING_NS_CC;
 
@@ -87,6 +88,10 @@ bool WorldMapLayer::init()
 	Menu* menuChapter = Menu::create(pChapterItem1 , pChapterItem2, pChapterItem3, pIntroduction, pFlashCard, pBackItem, NULL);
 	menuChapter->setPosition(CCPointZero);
 	this->addChild(menuChapter);
+
+	LifeSystemNode* pLifeNode = LifeSystemNode::create();
+	pLifeNode->setPosition(Point(50.0f, 910.0f));
+	this->addChild(pLifeNode);
 
 	return true;
 }

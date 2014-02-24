@@ -1,11 +1,13 @@
 #include "MainMenuScene.h"
 #include "SoundManager.h"
 #include "WorldMapScene.h"
+#include "LifeSystemNode.h"
 
 USING_NS_CC;
+USING_NS_CC_EXT;
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-#include "FacebookManager.h"
+#include "Social\FacebookManager.h"
 using namespace cocos2d::plugin;
 #endif
 
@@ -93,8 +95,62 @@ bool MainMenuLayer::init()
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	FacebookManager::getInstance()->loadPlugin();
 #endif
+	
+	LifeSystemNode* pLifeNode = LifeSystemNode::create();
+	pLifeNode->setPosition(Point(50.0f, 910.0f));
+	this->addChild(pLifeNode);
+
+	this->scheduleUpdate();
 
 	return true;
+}
+
+void MainMenuLayer::update(float dt)
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	if(FacebookManager::getInstance()->isLogined())
+	{
+		HttpRequest* request = UserService::getInstance()->registryUser(FacebookManager::getInstance()->getAccessToken());
+		request->setResponseCallback(this, httpresponse_selector(MainMenuLayer::onHttpRequestCompleted));
+		HttpClient::getInstance()->send(request);
+		request->release();
+		this->unscheduleUpdate();
+	}
+#endif
+}
+
+void MainMenuLayer::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)
+{
+	if (!response)
+    {
+        return;
+    }
+
+    // You can get original request type from: response->request->reqType
+    if (0 != strlen(response->getHttpRequest()->getTag())) 
+    {
+        CCLOG("%s completed", response->getHttpRequest()->getTag());
+    }
+
+    int statusCode = response->getResponseCode();
+
+    if (!response->isSucceed()) 
+    {
+        CCLOG("response failed");
+        CCLOG("error buffer: %s", response->getErrorBuffer());
+        return;
+    }
+
+    // dump data
+    std::vector<char> *buffer = response->getResponseData();
+	String str;
+    CCLog("Http Test, dump data: ");
+    for (unsigned int i = 0; i < buffer->size(); i++)
+    {
+		str.appendWithFormat("%c", (*buffer)[i]);
+    }
+    CCLOG("%s", str.getCString());
+	sender->release();
 }
 
 void MainMenuLayer::playGame()

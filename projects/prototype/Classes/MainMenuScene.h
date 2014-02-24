@@ -2,6 +2,7 @@
 #define _MAIN_MENU_H_
 
 #include "cocos2d.h"
+#include "APIService\UserService.h"
 
 class MainMenuLayer : public cocos2d::Layer
 {
@@ -11,12 +12,16 @@ public:
 	bool init();
 	CREATE_FUNC(MainMenuLayer);
 
+	void update(float dt) override;
+
 private:
 	void playGame();
 	void loginFacebook();
 	void LogoutFacebook();
 	void shareLinkFacebook();
 	void shareDialogFacebook();
+
+	void onHttpRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
 
 	cocos2d::CCMenuItemImage* m_pLoginfacebook;
 	cocos2d::MenuItemLabel* m_pItemLogout;

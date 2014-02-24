@@ -2,6 +2,7 @@
 #include "SoundManager.h"
 #include "EndGameNode.h"
 #include "LevelMapScene.h"
+#include "Database\UserTable.h"
 
 USING_NS_CC;
 
@@ -3733,7 +3734,9 @@ void HelloWorld::EndUnlockLetterAnimation()
 			m_bIsEndGamePhase = true; 
 
 			ShowMainWordUnlockEffect();
-			//ExecuteBonusWinGameEffect();						
+			//ExecuteBonusWinGameEffect();
+
+			UserTable::getInstance()->updateLife(0);
 		}
 		else  if (m_GameBoardManager.GetCurrentMove() == 0) // out of move ==> lose
 		{
@@ -3744,6 +3747,7 @@ void HelloWorld::EndUnlockLetterAnimation()
 			m_pHUDLayer->addChild( pEndGameNode, 100);
 
 			SoundManager::PlaySoundEffect(_SET_LOSE);
+			UserTable::getInstance()->updateLife(1);
 		}
 	}
 }

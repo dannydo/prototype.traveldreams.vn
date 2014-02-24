@@ -1,5 +1,7 @@
 #include "LoadingScene.h"
 #include "MainMenuScene.h"
+#include "Database\InitDatabase.h"
+#include "Database\UserTable.h"
 
 using namespace cocos2d;
 
@@ -54,7 +56,7 @@ bool LoadingLayer::init()
 
 	m_bFinishLoad = false;
 	this->scheduleUpdate();
-	this->loadingData();
+	this->loadData();
 
 	return true;
 }
@@ -68,12 +70,18 @@ void LoadingLayer::update(float dt)
 	}
 }
 
-void LoadingLayer::loadingData()
+void LoadingLayer::loadData()
 {
+	auto actionLoading = CallFunc::create(this, callfunc_selector(LoadingLayer::initDatase));
 	auto actionFinishLoading = CallFunc::create(this, callfunc_selector(LoadingLayer::finishLoading));
-	DelayTime* delay = DelayTime::create(2.0f);
 
-	this->runAction(Sequence::create(delay->clone(), actionFinishLoading, NULL));
+	this->runAction(Sequence::create(actionLoading, actionFinishLoading, NULL));
+}
+
+void LoadingLayer::initDatase()
+{
+	InitDatabase::getInstance();
+	UserTable::getInstance();
 }
 
 void LoadingLayer::finishLoading()

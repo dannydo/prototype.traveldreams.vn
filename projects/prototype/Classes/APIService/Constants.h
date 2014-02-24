@@ -1,0 +1,1 @@
+#define _CONSTANT_URL_	"http://192.168.30.200:8080/"
