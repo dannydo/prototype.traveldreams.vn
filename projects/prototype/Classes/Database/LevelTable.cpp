@@ -1,0 +1,78 @@
+#include "LevelTable.h"
+#include "InitDatabase.h"
+
+USING_NS_CC; 
+
+LevelTable* LevelTable::m_LevelTable = NULL;
+
+LevelTable::LevelTable()
+{
+
+}
+
+LevelTable::~LevelTable()
+{
+	
+}
+
+LevelTable* LevelTable::getInstance()
+{
+	if (m_LevelTable == NULL) {
+		m_LevelTable = new LevelTable();
+		m_LevelTable->init();
+	}
+
+	return m_LevelTable;
+}
+
+bool LevelTable::init()
+{
+	return true;
+}
+
+std::vector<LevelInfo> LevelTable::fetchLevelsForChapter(const int& iChapter)
+{
+	std::vector<LevelInfo> levels;
+	char **re;
+	int nRow, nColumn;
+		
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), "select * from Chapters", &re, &nRow, &nColumn,NULL);
+	CCLOG("row is %d,column is %d", nRow, nColumn);
+
+	for (int iRow=1; iRow<=nRow; iRow++)
+	{
+		LevelInfo levelInfo;
+		levelInfo.iLevel = int(strtod(re[iRow*nColumn+0], NULL));
+		levelInfo.iChapter = int(strtod(re[iRow*nColumn+1], NULL));
+		levelInfo.iStar = int(strtod(re[iRow*nColumn+2], NULL));
+		levelInfo.iScore = int(strtod(re[iRow*nColumn+3], NULL));
+		levelInfo.iBonusQuest = int(strtod(re[iRow*nColumn+4], NULL));
+		levelInfo.bIsUnlock = bool(strtod(re[iRow*nColumn+5], NULL));
+		levelInfo.bIsUpdate = bool(strtod(re[iRow*nColumn+6], NULL));
+
+		levels.push_back(levelInfo);
+	}
+
+	sqlite3_free_table(re);
+
+	return levels;
+}
+
+bool LevelTable::updateLevel(LevelInfo levelInfo)
+{
+	String sql = "update Levels Set";
+	sql.appendWithFormat(" Chapter=%d,", levelInfo.iChapter);
+	sql.appendWithFormat(" Star=%d,", levelInfo.iStar);
+	sql.appendWithFormat(" Score=%d,", levelInfo.iScore);
+	sql.appendWithFormat(" BonusQuest=%d,", levelInfo.iBonusQuest);
+	sql.appendWithFormat(" IsUnlock=%d", levelInfo.bIsUnlock);
+	sql.appendWithFormat(" IsUpdate=%d", levelInfo.bIsUpdate);
+	sql.appendWithFormat(" where Level=%d", levelInfo.iLevel);
+	CCLOG("%s", sql.getCString());
+
+	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
+	if(iResult != SQLITE_OK)
+		return false;
+
+	return true;
+}
