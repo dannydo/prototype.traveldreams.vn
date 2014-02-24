@@ -139,7 +139,7 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 	m_LevelBossInfo.m_bJustReleaseALetter = false;
 	
 
-	int iRow, iColumn, iGemID;
+	int iRow, iColumn;
 
 	// if this phase trigger only by waiting combo 6 then not need to create temporary list
 	if (!(iSelectedRow < 0 && iSelectedColumn < 0 && m_WaitingTriggerSecondTimeComboList.size()>0))
@@ -249,7 +249,7 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 
 	//std::vector<Cell> basicMatchingDestroyedCells;
 	
-	int iSameValueCellCount;
+	//int iSameValueCellCount;
 	// bool bIsValidMove = false;
 
 	// create temporary list to compute result for shifting move
@@ -940,7 +940,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	m_iLinkedBlockCount = 0;
 	m_UnlockedGemLetterCellList.clear();
 
-	int iRow, iColumn, iGemID;
+	int iRow, iColumn;
 
 
 	// if this phase trigger only by waiting combo 6 then not need to create temporary list
@@ -1749,7 +1749,7 @@ int NewGameBoardManager::GetBonusScoreForUnlockMainWord(bool bIncludeIndividualL
 {
 	int iRealLetterCount = m_pGameWordManager->GetMainWord().m_iWordLength;
 	for(int i=0; i<  m_pGameWordManager->GetMainWord().m_iWordLength; i++)
-		if (m_pGameWordManager->GetMainWord().m_sSoundFile[i] == ' ')
+		if (m_pGameWordManager->GetMainWord().m_sWord[i] == ' ')
 			iRealLetterCount--;
 	int iBonusScore = iRealLetterCount *  m_GameConfig.m_iScoreRatioCompleteMainWord;	
 

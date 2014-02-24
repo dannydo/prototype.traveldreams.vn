@@ -22,6 +22,7 @@ public:
 			m_IsBonusQuestDirtyFlags[eQuestType] = false;
 			return true;
 		}
+		return false;
 	}
 
 	inline bool IsQuestActivated(const BonusQuestType& eQuestType) { return m_IsBonusQuestActivatedFlags[eQuestType];}
@@ -32,6 +33,7 @@ public:
 			m_IsBonusQuestDirtyFlags[eQuestType] = false;
 			return true;
 		}
+		return false;
 	}
 
 	inline const BonusQuestCollectGemDescription& GetCollectGemParam() { return m_CollectGemParam;}
