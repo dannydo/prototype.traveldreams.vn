@@ -14,7 +14,8 @@ public:
 	void update(float dt) override;
 
 private:
-	void loadingData();
+	void loadData();
+	void initDatase();
 	void finishLoading();
 
 	bool m_bFinishLoad;

@@ -16,8 +16,14 @@
     <Filter Include="Classes\Source Files">
       <UniqueIdentifier>{ed5fd3b1-d13a-4300-b36f-5ecd05e7f898}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Facebook">
-      <UniqueIdentifier>{a5e00149-467a-42ee-82d7-4d4afc5d2631}</UniqueIdentifier>
+    <Filter Include="Social">
+      <UniqueIdentifier>{13c397a5-2c31-451e-8f04-7c2833a45137}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="APIService">
+      <UniqueIdentifier>{d7c11505-8dd0-48e2-9244-a1b6288f4017}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Database">
+      <UniqueIdentifier>{a136f585-2772-4bb0-91be-d1e9bb710317}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -96,8 +102,35 @@
     <ClCompile Include="..\Classes\GemLetterManager.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\FacebookManager.cpp">
-      <Filter>Facebook</Filter>
+    <ClCompile Include="..\Classes\Social\FacebookManager.cpp">
+      <Filter>Social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\APIService\UserService.cpp">
+      <Filter>APIService</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\LifeSystemNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\InitDatabase.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\sqlite3.c">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\UserTable.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\ChapterTable.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\LevelTable.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\FriendTable.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\SettingMenuNode.cpp">
+      <Filter>Classes\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\BonusQuestManager.cpp">
       <Filter>Classes\Source Files</Filter>
@@ -182,8 +215,38 @@
     <ClInclude Include="..\Classes\GemLetterManager.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\FacebookManager.h">
-      <Filter>Facebook</Filter>
+    <ClInclude Include="..\Classes\Social\FacebookManager.h">
+      <Filter>Social</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\APIService\Constants.h">
+      <Filter>APIService</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\APIService\UserService.h">
+      <Filter>APIService</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\LifeSystemNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\InitDatabase.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\sqlite3.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\UserTable.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\ChapterTable.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\LevelTable.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\FriendTable.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\SettingMenuNode.h">
+      <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\BonusQuestManager.h">
       <Filter>Classes\Header Files</Filter>

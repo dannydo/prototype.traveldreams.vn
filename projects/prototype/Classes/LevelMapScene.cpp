@@ -5,6 +5,8 @@
 #include "SoundManager.h"
 #include "WorldMapScene.h"
 #include "FlashCardScene.h"
+#include "Database\UserTable.h"
+#include "LifeSystemNode.h"
 
 using namespace cocos2d;
 
@@ -109,6 +111,10 @@ bool LevelMapLayer::init()
 
 		SoundManager::PlayIntroMusic();
 
+		LifeSystemNode* pLifeNode = LifeSystemNode::create();
+		pLifeNode->setPosition(Point(50.0f, 910.0f));
+		this->addChild(pLifeNode);
+
 		return true;
 	}
 	else
@@ -119,14 +125,21 @@ bool LevelMapLayer::init()
 
 void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 {
-	CCMenuItem* pMenuItem = (CCMenuItem*)pSender;
-	int iLevel = pMenuItem->getTag();
+	if(UserTable::getInstance()->getUserInfo().iLife > 0)
+	{
+		CCMenuItem* pMenuItem = (CCMenuItem*)pSender;
+		int iLevel = pMenuItem->getTag();
 
-	GameWordManager* pGameWordManager = GameWordManager::getInstance();
-	pGameWordManager->GenerateWordForNewLevel(iLevel);
+		GameWordManager* pGameWordManager = GameWordManager::getInstance();
+		pGameWordManager->GenerateWordForNewLevel(iLevel);
 
-	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel);
-	this->addChild(pGameTargetNode, 10);
+		GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel);
+		this->addChild(pGameTargetNode, 10);
+	}
+	else
+	{
+		MessageBox("You have no life!", "Play Level");
+	}
 }
 
 void LevelMapLayer::menuBackToWorldMap()

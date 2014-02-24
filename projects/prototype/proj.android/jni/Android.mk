@@ -29,7 +29,11 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/GemLetterManager.cpp \
 				   ../../Classes/LeaderBoardNode.cpp \
 				   ../../Classes/LoadingScene.cpp \
-				   ../../Classes/FacebookManager.cpp \
+				   ../../Classes/LifeSystemNode.cpp \
+				   ../../Classes/Social/FacebookManager.cpp \
+				   ../../Classes/APIService/UserService.cpp \
+				   ../../Classes/Database/InitDatabase.cpp \
+				   ../../Classes/Database/sqlite3.c \
                    ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \

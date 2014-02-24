@@ -2,6 +2,7 @@
 #include "LevelMapScene.h"
 #include "HelloWorldScene.h"
 #include "DictionaryNode.h"
+#include "Database\UserTable.h"
 
 USING_NS_CC;
 
@@ -349,11 +350,19 @@ void EndGameNode::menuNextLevelCallBack()
 
 void EndGameNode::menuRetryLevelCallBack()
 {
-	GameWordManager* pGameWordManager = GameWordManager::getInstance();
-	pGameWordManager->RetryCurrentLevel();
+	UserTable::getInstance()->updateLife(0);
+	if(UserTable::getInstance()->getUserInfo().iLife > 0)
+	{
+		GameWordManager* pGameWordManager = GameWordManager::getInstance();
+		pGameWordManager->RetryCurrentLevel();
 
-	CCScene *pGameScene = HelloWorld::createScene(m_iCurrentLevel);
-	CCDirector::getInstance()->replaceScene(pGameScene);
+		CCScene *pGameScene = HelloWorld::createScene(m_iCurrentLevel);
+		CCDirector::getInstance()->replaceScene(pGameScene);
+	}
+	else
+	{
+		MessageBox("You have no life!", "Play Level");
+	}
 }
 
 void EndGameNode::menuCloseCallBack()
