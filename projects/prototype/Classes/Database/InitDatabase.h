@@ -18,5 +18,6 @@ private:
 
 	static InitDatabase* m_InitDatabase;
 	sqlite3* m_DatabaseSqlite;
+	std::string m_spath;
 };
 #endif
