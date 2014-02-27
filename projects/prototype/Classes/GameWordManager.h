@@ -40,10 +40,9 @@ public:
 	void GenerateWordForNewLevel(int iLevel);
 	void RetryCurrentLevel();
 
-	inline const Word& GetMainWord() { return m_WordList[m_iMainWordIndex];}
-	int GetSubWordCount() { return m_iSubWordCount;}
-	inline const Word& GetSubWord(const int& iSubWordIndex) {  return m_WordList[m_SubWordList[iSubWordIndex]];}
+	inline const Word& GetMainWord() { return m_WordList[m_iMainWordIndex];}	
 	bool IsMainWordUnlocked() { return (m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount == 0);}
+	inline int GetTotalCollectibleLettersOfMainWord() { return m_iTotalCollectibleLettersOfMainWord;}
 
 	int GetLengthOfMainWord();
 	int GetLengthOfSubWord();
@@ -62,13 +61,12 @@ public:
 	//bool GenerateNewLetter(unsigned char& sOuputLetter, const GemComboType_e& eComboType);	
 	void UpdateParamForNewMove();
 
-	bool UnlockLetter(const unsigned char& iLetter, const bool& bIsInMainWord, int& iUnlockedLetterIndexOfMainWord, std::vector<int> (&unlockedLettersIndexOfSubWords)[_GDS_SUB_WORD_MAX_COUNT_],
-		bool& bIsMainWordJustUnlocked, bool (&justUnlockedSubWords)[_GDS_SUB_WORD_MAX_COUNT_]);
+	bool UnlockLetter(const unsigned char& iLetter, int& iUnlockedLetterIndexOfMainWord, 
+		bool& bIsMainWordJustUnlocked);
 		//bool& bIsMainWordFullUnlocked);	
 private:
 	void ResetDataForNewPlay();
-	
-	bool GenerateLetterFromSubWords(unsigned char& sLetter);
+		
 	bool GenerateLetterFromTrashCollection(unsigned char& sLetter);
 
 	void AddLetterToTrashCollection(const unsigned char sLetter);
@@ -82,24 +80,19 @@ private:
 	Word m_WordList[_GDS_WORD_MAX_COUNT_];
 
 	int m_iMainWordIndex;
-	//int m_iMainWordLength;
-
-	int m_SubWordList[_GDS_SUB_WORD_MAX_COUNT_];
-	int m_iSubWordCount;
-	//int m_SubWordLength[_GDS_SUB_WORD_MAX_COUNT_];
+	int m_iTotalCollectibleLettersOfMainWord;
+	//int m_iMainWordLength;	
 
 	// current state
 	int m_iCountOfLettersOnBoard;
 
 	// generate word rate
-	int m_iMainWordGenerateRate;
-	int m_iSubWordGenerateRate;
+	int m_iMainWordGenerateRate;	
 	int m_iTrashWordGenerateRate;
 
 	bool m_bAddDirectLetterOfMainWordToTrash;
 
-	// 
-	std::vector<unsigned char> m_SubWordLettersCollection;
+	// 	
 	std::vector<unsigned char> m_TrashLettersCollection;
 };
 

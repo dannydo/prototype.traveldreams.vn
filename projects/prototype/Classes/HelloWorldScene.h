@@ -110,15 +110,13 @@ protected:
 	void AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, int iRowMove, int iColumnMove);
 	
 	void PlayEffect2(const bool& bIsBonusEndGamePhase,  std::vector<ComboEffectCell>& convertedToComboCells, 
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo> doubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
+		std::vector<Cell>& basicMatchingDestroyedCells,
+		std::vector<ComboEffectBundle*>& comboChainList,
 		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells, bool bIsNewMove);
-	
-	//Sprite* GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime);
-	//Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const float& fDelayTime);
-	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID);
+		
+	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror=false);
 	void AddNewComboCell(const ComboEffectCell& cell, const float& fDelayTime, const float& fEffectTime, bool bCreateMirror = true);
 
 	void OnEndDragEffect();
@@ -130,8 +128,7 @@ protected:
 
 	void HorizontalMoveUlti(float fDeltaX);
 	void VerticalMoveUlti(float fDeltaY);
-
-	void DrawComboHint();
+	
 
 	void PlayCombo4Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
 	void PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
@@ -148,14 +145,15 @@ protected:
 
 	void PlayCombo6_6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime);	
 
+	void PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime);
+
 	void ActivateImageEffect(Node* pSender);
 	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float fEffectDuration);
 	void PlayChangeColorEffectOnSprite(Sprite* pSprite,const float& fDelayTime);
 
 
 	// unlock letter flow
-	void PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime);
-	void PlayUnlockLettersOfBonusWordsAnimation();
+	void PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime);	
 	void EndUnlockLetterAnimation();
 
 	// execute win game effect flow
@@ -163,12 +161,7 @@ protected:
 	void StartWinBonusPhase();
 
 	void ExecuteBonusWinGameEffect();	
-	/*void PlayBonusEndEffect( std::vector<ComboEffectCell>& convertedToComboCells,
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboEffectBundle> doubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList,std::vector<ComboEffectCell>& newComboCells,
-		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<Cell>& newCells);*/
-
+	
 	void ShowLevelCompleteEffect();
 	void ShowWinGamePopup();
 
@@ -187,11 +180,6 @@ private:
 	cocos2d::CCSpriteBatchNode* m_pComboEffectBatchNode;
 	cocos2d::Sprite* m_pBossSprite;
 
-	//cocos2d::CCSprite* m_BoardSpriteMatrix[ _BOARD_MAX_ROW_NUMBER_*3][ _BOARD_MAX_COLUMN_NUMBER_*3];
-	/*cocos2d::CCSprite* m_BoardSpriteMatrixLeft[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
-	cocos2d::CCSprite* m_BoardSpriteMatrixTop[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
-	cocos2d::CCSprite* m_BoardSpriteMatrixRight[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
-	cocos2d::CCSprite* m_BoardSpriteMatrixBottom[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];*/
 
 	CellView m_BoardViewMatrix[_BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
 	CellView m_BoardViewMirrorMatrix[_BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
@@ -224,8 +212,7 @@ private:
 	bool m_bIsEndGamePhase;
 
 	ComboCountRenderNode* m_pComboCountRenderNode;
-	StatusLayer* m_pStatusLayer;
-	BonusWordNodeNew* m_pBonusWordNode;
+	StatusLayer* m_pStatusLayer;	
 	Layer* m_pHUDLayer;
 
 	// 

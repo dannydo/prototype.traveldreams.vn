@@ -20,14 +20,18 @@ public:
 
 	void UpdateGemList(int iGemID, int iCount);	
 	void UpdateComboList(int iTypeID, int iComboCount);	
-	void GenerateLabels(int iType);
+	void UpdateBonusWordQuest(int iRemainLetterCount);
+	void GenerateLabels(int iType, int iValue =0);
 	void CompleteQuest(int iType);
 private:	
 	int m_ComboCountList[_COMBO_TYPE_COUNT_];	
 	int m_DestroyGemCountList[_MAX_GEM_ID_];
-	LabelTTF* m_QuestLabelList[2];
+	int m_iTotalBonusLetterLength;
+
+	LabelTTF* m_QuestLabelList[3];
 	LabelTTF* m_LabelGemCountList[_MAX_GEM_ID_];	
 	LabelTTF* m_LabelComboCountList[_COMBO_TYPE_COUNT_];	
+	LabelTTF* m_LabelBonusWord;
 };
 
 

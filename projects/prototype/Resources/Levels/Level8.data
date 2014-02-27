@@ -1,7 +1,7 @@
 ;size map
 8	8
 ;number of move
-40
+30
 ;number of color
 6
 ;score of stars
@@ -16,7 +16,7 @@
 1	1	1	1	1	1	1	1
 1	1	1	0	0	1	1	0
 ;main word
-CLASSMATE
+GLOBE
 1
 2
 0
@@ -29,12 +29,18 @@ LECTURE
 0
 ;bonus quest
 2
-0	1	3	
+0 2 3
 1
-5	0	0	5	0	0
-2
-1	0	0
+2	0	0	5	0	0
+3
+3	4
+A PEN
+LECTURE
+CRAYON
 
+
+2
+5	0	0
 
 COUNTDOWN	3
 3

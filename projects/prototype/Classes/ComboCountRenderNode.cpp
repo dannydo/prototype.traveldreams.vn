@@ -47,7 +47,15 @@ void ComboCountRenderNode::CompleteQuest(int iType)
 	m_QuestLabelList[iType]->setString("Complete!");	
 }
 
-void ComboCountRenderNode::GenerateLabels(int iType)
+void ComboCountRenderNode::UpdateBonusWordQuest(int iRemainLetterCount)
+{
+	char sText[10];
+	sprintf( sText, "%d/%d", m_iTotalBonusLetterLength-iRemainLetterCount, m_iTotalBonusLetterLength);
+
+	m_LabelBonusWord->setString(sText);	
+}
+
+void ComboCountRenderNode::GenerateLabels(int iType, int iValue)
 {
 	char sText[10];
 
@@ -84,5 +92,19 @@ void ComboCountRenderNode::GenerateLabels(int iType)
 		
 			this->addChild(m_LabelComboCountList[i]);		
 		}
+	}
+	else if (iType == 2)
+	{
+		m_iTotalBonusLetterLength = iValue;
+		m_QuestLabelList[iType]= CCLabelTTF::create("Collect bonus word:", "Arial", 22);
+		m_QuestLabelList[iType]->setPosition(Point( 10, -20));
+		this->addChild(m_QuestLabelList[iType]);
+
+		char sText[10];
+		sprintf( sText, "0/%d", iValue);
+		m_LabelBonusWord = CCLabelTTF::create(sText, "Arial", 22);
+		m_LabelBonusWord->setPositionX( 140);
+		m_LabelBonusWord->setPositionY( -20);		
+		this->addChild(m_LabelBonusWord);
 	}
 }

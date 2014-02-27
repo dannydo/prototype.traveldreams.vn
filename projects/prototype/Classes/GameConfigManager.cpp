@@ -245,6 +245,21 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 						inputStream >> levelConfig.m_BonusQuestConfig.m_CollectComboQuest.m_CountPerComboGem[j];
 					break;
 				}
+				case _BQT_COLLECT_BONUS_WORD_: //collect bonus word
+				{
+					levelConfig.m_BonusQuestConfig.m_IsBonusEnabledQuestFlags[iTemp] = true;
+					inputStream >> levelConfig.m_BonusQuestConfig.m_CollectBonusWordQuest.m_iBonusWordCount;
+					inputStream >> levelConfig.m_BonusQuestConfig.m_CollectBonusWordQuest.m_iRequiredLetterCount;
+					std::getline(inputStream, sTemp);
+					for(int j=0; j< levelConfig.m_BonusQuestConfig.m_CollectBonusWordQuest.m_iBonusWordCount; j++)
+					{
+						std::getline(inputStream, sTemp);
+						while (sTemp[sTemp.length()-1] == '\r' || sTemp[sTemp.length()-1] == ' ')
+							sTemp.erase( sTemp.size()-1, 1);  // remove \r at the end of line
+						levelConfig.m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[j] = GameWordManager::getInstance()->GetWordIndexFromContent(sTemp);
+					}
+					break;
+				}
 			}
 		}
 	}
@@ -306,9 +321,9 @@ void GameConfigManager::LoadGameConfig()
 	//simple combo 4,5,6
 	std::getline( inputStream, sComment);
 	std::getline( inputStream, sComment);
-	inputStream >> m_GameConfig.m_iBonusScoreCreateComboCreate4;
-	inputStream >> m_GameConfig.m_iBonusScoreCreateComboCreate5;
-	inputStream >> m_GameConfig.m_iBonusScoreCreateComboCreate6;
+	inputStream >> m_GameConfig.m_iBonusScoreCreateCombo4;
+	inputStream >> m_GameConfig.m_iBonusScoreCreateCombo5;
+	inputStream >> m_GameConfig.m_iBonusScoreCreateCombo6;
 	std::getline( inputStream, sComment);
 
 	
@@ -349,8 +364,10 @@ void GameConfigManager::LoadGameConfig()
 	inputStream >> m_GameConfig.m_iScoreLetterOfBonusWord;
 	std::getline( inputStream, sComment);
 	std::getline( inputStream, sComment);
-	inputStream >> m_GameConfig.m_iScoreRatioCompleteBonusWord;	
-
+	inputStream >> m_GameConfig.m_iBonusScoreCompleteBonusQuest;	
+	std::getline( inputStream, sComment);
+	std::getline( inputStream, sComment);
+	inputStream >> m_GameConfig.m_iBonusScoreActivateBonusEndGameCombo;
 	delete[] data;
 	delete[] orginalData;	
 }

@@ -68,13 +68,7 @@ Scene* HelloWorld::createScene(int iLevel)
 	boardLayer->m_pComboCountRenderNode = pComboCountRenderNode;	
 
 	// bonus word node
-	GameWordManager* pGameWordManager = GameWordManager::getInstance();
-	std::vector<Word> subWordList;
-	for(int i=0; i< pGameWordManager->GetSubWordCount(); i++)
-		subWordList.push_back( pGameWordManager->GetSubWord(i));
-	boardLayer->m_pBonusWordNode = BonusWordNodeNew::createLayout(subWordList);
-	boardLayer->m_pBonusWordNode->setPosition( 243.f, 756.f);
-	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pBonusWordNode, 10);
+	GameWordManager* pGameWordManager = GameWordManager::getInstance();	
 
 	/*Node* btnShowPopup = boardLayer->m_pBonusWordNode->createButtonShowPopupBonus();
 	btnShowPopup->setPosition(-80, 300);
@@ -514,6 +508,8 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 			//return "combo5_2.png";
 		case _GCT_COMBO6_:
 			return "combo6.png";
+		case _GCT_BONUS_END_GAME_COMBO_:
+			return "Combo4_2.png";
 		//case _GCT_COMBO6_2_:
 			//return "combo6_2.png";
 	}
@@ -909,7 +905,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 		m_ePlayingDragEffect = _TMS_MOVE_HORIZONTAL_;
 
 		if (!bIsBlocked && m_GameBoardManager.RecheckAfterMoveV2( m_SelectedCell.m_iRow,-1,  -1, iMoveUnit, 
-			m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList,
+			m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_ComboChainList,
 				m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, true))
 		//if (false)
 		{
@@ -989,7 +985,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 		m_ePlayingDragEffect = _TMS_MOVE_VERTICAL_;
 
 		if (!bIsBlocked && m_GameBoardManager.RecheckAfterMoveV2( -1, m_SelectedCell.m_iColumn, iMoveUnit, -1, 
-				m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList,
+				m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_ComboChainList,
 				m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, true))
 		//if (false)
 		{
@@ -1066,8 +1062,8 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 		// update obstacle manager right begin of move
 		m_GameBoardManager.GetObstacleProcessManager()->UpdateAfterMove();
 
-		PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, true);
+		PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells,
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, true);
 	}
 
 	/*
@@ -1230,11 +1226,11 @@ void HelloWorld::CheckBoardStateAfterMove()
 	bool bMoveIsValid = false;
 	m_ComputeMoveResult.Reset(false);
 
-	if (m_GameBoardManager.RecheckAfterMoveV2( -1, -1, -1, -1, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false))
+	if (m_GameBoardManager.RecheckAfterMoveV2( -1, -1, -1, -1, m_ComputeMoveResult.m_BasicMatchingDestroyedCells,
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false))
 	{
-		PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false);		
+		PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells,
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false);		
 	}
 	else
 	{		
@@ -1266,7 +1262,7 @@ void HelloWorld::CheckBoardStateAfterMove()
 		else //game is not end yet*/
 		{
 			PlayUnlockLettersOfMainWordAnimation(0.f);			
-		}		
+		}				
 
 		// update obstacle manager after move
 		//m_GameBoardManager.GetObstacleProcessManager()->UpdateAfterMove();
@@ -1280,29 +1276,25 @@ void HelloWorld::ExecuteBonusWinGameEffect()
 	m_ComputeMoveResult.Reset(true);
 
 	//if (m_GameBoardManager.GetCurrentMove() > 0)
-	if (m_GameBoardManager.ExecuteEndGameBonus(m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-		m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells))
+	if (m_GameBoardManager.ExecuteEndGameBonus(m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, 
+		m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells))
 	{
-		PlayEffect2( true, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_NewDoubleComboList, 
-			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_TriggeredCombo6ChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells,  m_ComputeMoveResult.m_NewCells, false);
+		PlayEffect2( true, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells,
+			m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells,  m_ComputeMoveResult.m_NewCells, false);
 
 		m_pStatusLayer->setCurrentMove( m_GameBoardManager.GetCurrentMove());
 		//m_pStatusLayer->update(0);
 	}
 	else
 	{
-		PlayUnlockLettersOfBonusWordsAnimation();
+		//PlayUnlockLettersOfBonusWordsAnimation();
+		EndUnlockLetterAnimation();		
 	}
 }
 
 void HelloWorld::ShowWinGamePopup()
 {
-	std::vector<Word> subWordList;
-	for(int i=0; i < m_GameBoardManager.GetGameWordManager()->GetSubWordCount(); i++)
-	{
-		subWordList.push_back(m_GameBoardManager.GetGameWordManager()->GetSubWord(i));
-	}
-
+	std::vector<Word> subWordList;	
 	EndGameNode* pEndGameNode = EndGameNode::createLayoutWin( m_GameBoardManager.GetCurrentScore(),
 		m_GameBoardManager.GetGameWordManager()->GetMainWord(), subWordList, m_GameBoardManager.GetCurrentLevel());
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStars());
@@ -1390,62 +1382,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 							bMeetSide = false;
 					}
 				}
-			}
-
-			/*
-
-			iBlankCellInOriginMoving = 0;
-			iBlankCellInMirrorMoving = 0;
-			
-			bool bMeetSide = false;
-
-			for(int iDelta = 1; iDelta <= iMoveUnit; iDelta++)
-				//if (m_GameBoardManager.IsBlankCell(m_SelectedCell.m_iRow, (iColumn + iDelta * iSign + m_iMovingCellListLength) % m_iMovingCellListLength))
-				if (m_MovingCellList[(iColumn + iDelta * iSign + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite == NULL)
-				{
-					iBlankCellInOriginMoving++;
-					iBlankCellInMirrorMoving++;
-				}
-				
-			
-			if ((fDeltaX>0 && fDeltaX > fMoveUnit * m_SymbolSize.width) || (fDeltaX<0 && fDeltaX < fMoveUnit * m_SymbolSize.width))
-			{
-				//if(iMoveUnit==1 && iColumn == 4)
-				//	iColumn = iColumn;
-
-				int iDelta = 0;
-				while //(m_GameBoardManager.IsBlankCell(m_SelectedCell.m_iRow, (iColumn + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength)
-					((m_MovingCellList[(iColumn + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite == NULL)
-					||  (iColumn + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign == m_iMovingCellListLength) || (iColumn + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign == -1))
-				{					
-					if ((iColumn + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign == m_iMovingCellListLength) || (iColumn + (iMoveUnit + iBlankCellInMirrorMoving + iDelta + 1) * iSign == -1))
-						bMeetSide = true;
-
-					iDelta++;
-
-					// this is real condition to continue
-					//if (!m_GameBoardManager.IsBlankCell(m_SelectedCell.m_iRow, (iColumn + (iMoveUnit + iBlankCellInMirrorMoving + iDelta) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength))
-					if (m_MovingCellList[ (iColumn + (iMoveUnit + iBlankCellInMirrorMoving + iDelta) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength].m_pSprite != NULL)
-						break;
-				}
-
-				iBlankCellInMirrorMoving += iDelta;
-			}
-			
-			m_MovingCellList[iColumn].m_pSprite->setPositionX(
-				m_fBoardLeftPosition + ((iColumn + (iMoveUnit +iBlankCellInOriginMoving) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength ) * m_SymbolSize.width + fDeltaX - fMoveUnit  * m_SymbolSize.width);
-			
-			if (iBlankCellInMirrorMoving != iBlankCellInOriginMoving)
-			{
-				m_MovingCellMirrorList[iColumn].m_pSprite->setVisible(true);
-				m_MovingCellMirrorList[iColumn].m_pSprite->setPositionX(
-					m_fBoardLeftPosition + ((iColumn + (iMoveUnit + iBlankCellInMirrorMoving) * iSign + m_iMovingCellListLength) % m_iMovingCellListLength ) * m_SymbolSize.width + fDeltaX - ( fMoveUnit + bMeetSide*iSign) * m_SymbolSize.width);
-			}
-			else
-			{
-				m_MovingCellMirrorList[iColumn].m_pSprite->setVisible(false);
-				m_MovingCellMirrorList[iColumn].m_pSprite->setPosition(m_MovingCellList[iColumn].m_pSprite->getPosition());
-			}*/
+			}		
 
 			m_MovingCellList[iColumn].m_pSprite->setPositionX(
 				m_fBoardLeftPosition + ((iColumn + iTranslatedOriginCell) % m_iMovingCellListLength ) * m_SymbolSize.width + fDeltaX - fMoveUnit * m_SymbolSize.width);
@@ -1714,8 +1651,8 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 }
 
 void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<ComboEffectCell>& convertedToComboCells, 
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo> doubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList,  std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
+		std::vector<Cell>& basicMatchingDestroyedCells,
+		std::vector<ComboEffectBundle*>& comboChainList,
 		std::vector<ComboEffectCell>& newComboCells, std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,		
 		std::vector<NewCellInfo>& unlockedLetterCells, std::vector<NewCellInfo>& newCells, bool bIsNewMove)
 {
@@ -1733,8 +1670,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	//if (bIsBonusEndGamePhase)
 		//fDelayTime = 0;
 
-	float fTotalDestroyCellTime = _TME_BASIC_DESTROY_CELL_TIME_;
-
+	float fTotalDestroyCellTime = fDelayTime+ _TME_BASIC_DESTROY_CELL_TIME_;
 	//CCLOG("Begin effect");
 
 	if (bIsBonusEndGamePhase)
@@ -1742,14 +1678,14 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		// play effect convert normal cells to combo cells
 		if (convertedToComboCells.size() > 0)
 		{
-			float fDelayPerConvertedCell = 0.1f;
+			float fDelayPerConvertedCell = 0.05f;
 			auto pCombo5AnimBolt = AnimationCache::getInstance()->getAnimation("effectCombo5_Bolt");		
 			Point rootEffect( 530.f, 820.f);
 			int iIndex = 0;
 
 			for(auto cell: convertedToComboCells)
 			{
-				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime + (iIndex+1) * fDelayPerConvertedCell, _TME_BASIC_DESTROY_CELL_TIME_);
+				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, iIndex * fDelayPerConvertedCell, _TME_BASIC_DESTROY_CELL_TIME_);
 
 				// create combo cell
 				Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(cell.m_iGemID, cell.m_eGemComboType).c_str());
@@ -1765,15 +1701,17 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				pSprite->setOpacity(0);
 				pSprite->runAction( 
 					Sequence::create( 
-						DelayTime::create(fDelayTime  + (iIndex+1) * fDelayPerConvertedCell),
-						EaseIn::create( FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_), 2.f),
+						DelayTime::create( iIndex * fDelayPerConvertedCell),
+						FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_/2.f),
+						//EaseIn::create( FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_/3.f), 2.f),
 						NULL));
 
 				pSprite->setScale(2.f);//1.5f);
 				pSprite->runAction( 
 					Sequence::create( 
-						DelayTime::create(fDelayTime  + (iIndex+1) * fDelayPerConvertedCell),
-						EaseIn::create(ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_, 1.f, 1.f), 2.f),
+						DelayTime::create( iIndex * fDelayPerConvertedCell),
+						ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_/2.f, 1.f, 1.f),
+						//EaseIn::create(ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_/3.f, 1.f, 1.f), 2.f),
 						NULL));					
 
 
@@ -1792,15 +1730,16 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				m_pComboEffectBatchNode->addChild(pComboEffectSprite);
 				pComboEffectSprite->runAction( 
 					Sequence::create( 
-						DelayTime::create(fDelayTime + iIndex * fDelayPerConvertedCell),
+						DelayTime::create( iIndex * fDelayPerConvertedCell),
 						Animate::create( pCombo5AnimBolt),
 						RemoveSelf::create(),
 						NULL));
 				
+				m_GameBoardManager.IncreaseScoreForEachEndGameCombo();
 				iIndex++;
 			}
 
-			fDelayTime += _TME_BASIC_DESTROY_CELL_TIME_ + (iIndex+3) * fDelayPerConvertedCell;			
+			fDelayTime += _TME_BASIC_DESTROY_CELL_TIME_  + (iIndex+3) * fDelayPerConvertedCell;			
 		}
 	}
 
@@ -1823,31 +1762,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		else
 		{
 			cell.m_iRow = 0;
-		}
-
-		/*m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->runAction(
-			Sequence::create( 
-				DelayTime::create(fDelayTime),
-				ScaleTo::create( fDestroyTime, 0.05f, 0.05f),
-				RemoveSelf::create( true),
-				//FadeOut::create(0.01f),
-				NULL));
-
-		if (m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iCharacterID >= 0)
-		{
-			m_pWordCollectBoardRenderNode->UnlockCharacter(m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iCharacterID);
-		}
-
-		//m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->runAction(
-			//Sequence::create(
-				//DelayTime::create(fDelayTime + fDestroyTime),
-				//RemoveSelf::create( true),
-				////FadeOut::create(0.01f),
-				//NULL));
-
-		m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = NULL;
-		m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iCharacterID = -1;
-		m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = NULL;*/
+		}		
 	}
 
 	// increase score by basic matching
@@ -1912,10 +1827,14 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				PlayChangeColorEffectOnSprite( m_BoardViewMatrix[ pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite, fCurrentDelayComboChain);
 			}
 		}
+		else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_BONUS_END_GAME_EFFECT_)
+		{
+			PlayComboEndGameBonusEffect(pComboEffect, fCurrentDelayComboChain, _TME_BASIC_COMBO_EXECUTE_TIME_);
+		}
 
 		// ******************************
-		if (pComboEffect->m_fTriggerTime + _TME_BASIC_COMBO_EXECUTE_TIME_ > fTotalDestroyCellTime)
-			fTotalDestroyCellTime = pComboEffect->m_fTriggerTime + _TME_BASIC_COMBO_EXECUTE_TIME_;		
+		if (pComboEffect->m_fTriggerTime + _TME_BASIC_COMBO_EXECUTE_TIME_ + fDelayTime> fTotalDestroyCellTime)
+			fTotalDestroyCellTime =  fDelayTime + pComboEffect->m_fTriggerTime + _TME_BASIC_COMBO_EXECUTE_TIME_;		
 
 
 		// destroy cells by combo
@@ -1933,64 +1852,76 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			{			
 				newComboCell.m_iRow = cell.m_iRow;
 				newComboCell.m_iColumn = cell.m_iColumn;
-				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, cell.m_fDestroyAtTime, _TME_BASIC_DESTROY_CELL_TIME_); //0.03f);				
+				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime + cell.m_fDestroyAtTime, _TME_BASIC_DESTROY_CELL_TIME_); //0.03f);				
 				
-				AddNewComboCell (newComboCell, cell.m_fDestroyAtTime, 0.03f, false);
+				AddNewComboCell (newComboCell, fDelayTime + cell.m_fDestroyAtTime, 0.03f, false);
 			}
 			else if (cell.m_bIsCompleteDestroyed)
 			{
-				iTotalDestroyCell++;
-				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, cell.m_fDestroyAtTime, _TME_BASIC_DESTROY_CELL_TIME_);
+				if (cell.m_bIsEarnScore)
+					iTotalDestroyCell++;
+
+				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime + cell.m_fDestroyAtTime, _TME_BASIC_DESTROY_CELL_TIME_);
 				
-				if (cell.m_fDestroyAtTime + _TME_BASIC_DESTROY_CELL_TIME_ > fTotalDestroyCellTime)
-					fTotalDestroyCellTime = cell.m_fDestroyAtTime + _TME_BASIC_DESTROY_CELL_TIME_;
+				if (fDelayTime + cell.m_fDestroyAtTime + _TME_BASIC_DESTROY_CELL_TIME_ > fTotalDestroyCellTime)
+					fTotalDestroyCellTime = fDelayTime + cell.m_fDestroyAtTime + _TME_BASIC_DESTROY_CELL_TIME_;
 			}		
 		}
 
 		// increase score by combo		
-		m_GameBoardManager.IncreaseScoreForDestroyCells( basicMatchingDestroyedCells.size(), pComboEffect->m_ComboEffectDescription.m_eComboEffectType);
+		m_GameBoardManager.IncreaseScoreForDestroyCells( iTotalDestroyCell, pComboEffect->m_ComboEffectDescription.m_eComboEffectType, pComboEffect->m_ComboEffectDescription.m_iActivationScoreRatio);
 
 		// clean data
 		delete pComboEffect;
 	}
 
-	// check destroy bonus gem list
-	std::vector<DestroyedByComboCell>& destroyBonusQuestGemList = m_GameBoardManager.GetDestroyBonusQuestGemList();
-	//iTotalDestroyCell= 0;
-	if (destroyBonusQuestGemList.size() > 0)
+	// check logic on bonus quest
+	if (!m_bIsEndGamePhase)
 	{
-		for(auto cell: destroyBonusQuestGemList)
-		{			
-			//iTotalDestroyCell++;
-			BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, cell.m_fDestroyAtTime,_TME_BASIC_DESTROY_CELL_TIME_);
+		// check destroy bonus gem list
+		std::vector<DestroyedByComboCell>& destroyBonusQuestGemList = m_GameBoardManager.GetDestroyBonusQuestGemList();
+		//iTotalDestroyCell= 0;
+		if (destroyBonusQuestGemList.size() > 0)
+		{
+			for(auto cell: destroyBonusQuestGemList)
+			{			
+				//iTotalDestroyCell++;
+				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, cell.m_fDestroyAtTime,_TME_BASIC_DESTROY_CELL_TIME_);
+			}
+
+			// check for new bonus quests those're just activated
+			if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustActivated(_BQT_COLLECT_GEM_))
+				m_pComboCountRenderNode->GenerateLabels(_BQT_COLLECT_GEM_);
+			if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustActivated(_BQT_COLLECT_COMBO_))
+				m_pComboCountRenderNode->GenerateLabels(_BQT_COLLECT_COMBO_);
+		
+			destroyBonusQuestGemList.clear();
 		}
 
-		// check for new bonus quests those're just activated
-		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustActivated(_BQT_COLLECT_GEM_))
-			m_pComboCountRenderNode->GenerateLabels(_BQT_COLLECT_GEM_);
-		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustActivated(_BQT_COLLECT_COMBO_))
-			m_pComboCountRenderNode->GenerateLabels(_BQT_COLLECT_COMBO_);
-		
-		destroyBonusQuestGemList.clear();
+		// update state of bonus quest here (for test only)
+		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_GEM_))
+		{
+			auto& collectGemParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectGemParam();
+			for(int i=0; i < _MAX_GEM_ID_; i++)
+				m_pComboCountRenderNode->UpdateGemList(i, collectGemParam.m_CountPerGemType[i]);
+		}
+		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_COMBO_))
+		{
+			auto& collectComboParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectComboParam();
+			for(int i=0; i < _GCT_SINGLE_COMBO_COUNT_; i++)
+				m_pComboCountRenderNode->UpdateComboList(i, collectComboParam.m_CountPerComboGem[i]);
+		}
+		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_GEM_))
+		{
+			m_GameBoardManager.IncreaseScoreForCompleteBonusQuest();
+			m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_GEM_);
+		}
+		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_COMBO_))
+		{
+			m_GameBoardManager.IncreaseScoreForCompleteBonusQuest();
+			m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_COMBO_);
+		}
 	}
-
-	// update state of bonus quest here (for test only)
-	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_GEM_))
-	{
-		auto& collectGemParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectGemParam();
-		for(int i=0; i < _MAX_GEM_ID_; i++)
-			m_pComboCountRenderNode->UpdateGemList(i, collectGemParam.m_CountPerGemType[i]);
-	}
-	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_COMBO_))
-	{
-		auto& collectComboParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectComboParam();
-		for(int i=0; i < _GCT_SINGLE_COMBO_COUNT_; i++)
-			m_pComboCountRenderNode->UpdateComboList(i, collectComboParam.m_CountPerComboGem[i]);
-	}
-	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_GEM_))
-		m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_GEM_);
-	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_COMBO_))
-		m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_COMBO_);
 
 
 	// compute effect on boss
@@ -2017,12 +1948,10 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				if (m_pBossSprite->getTag() > 0)
 				{
 					iLetter = (unsigned char) m_pBossSprite->getTag();
-					int iUnlockedLetterOfMainWord;
-					std::vector<int> unlockedLettersIndexOfSubWords[_GDS_SUB_WORD_MAX_COUNT_];
-					bool bIsMainWordJustUnlocked;
-					bool justUnlockedSubWords[_GDS_SUB_WORD_MAX_COUNT_];
+					int iUnlockedLetterOfMainWord;					
+					bool bIsMainWordJustUnlocked;					
 
-					if (m_GameBoardManager.GetGameWordManager()->UnlockLetter( iLetter, true, iUnlockedLetterOfMainWord, unlockedLettersIndexOfSubWords, bIsMainWordJustUnlocked, justUnlockedSubWords))
+					if (m_GameBoardManager.GetGameWordManager()->UnlockLetter( iLetter,  iUnlockedLetterOfMainWord,  bIsMainWordJustUnlocked))
 					{
 						const LevelBossConfig& bossLevelConfig = m_GameBoardManager.GetLevelConfig().m_BossConfig;
 
@@ -2188,71 +2117,79 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			m_pBoardBatchNode->addChild(pSprite);						
 		}		
 	}
+		
 
-	
-	/*
-	bool bFirstCell = true;	
-	int iCharacterID;
-	if (m_iMoveCount % 5 == 0)
-		iCharacterID = m_pWordCollectBoardRenderNode->GetNextCharacterID();
-	for(auto cell: newCells)
-	{		
-		for(int i=0; i< 2; i++)
-		{		
-			Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn)).c_str());
-			//pSprite->setAnchorPoint(ccp(0,0));
-			//pSprite->setColor(ccc3( 255-(m_iMoveCount+1)*5,  255, 255));
-			if (i!= 0)
+	// last check: activation of collect word bonus quest
+	if (!bIsBonusEndGamePhase)
+	{
+		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustActivated(_BQT_COLLECT_BONUS_WORD_))
+		{			
+			auto& collectBonusWordParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectBonusWordParam();
+			m_pComboCountRenderNode->GenerateLabels(_BQT_COLLECT_BONUS_WORD_, collectBonusWordParam.m_iRemainLettersCount);
+
+			std::vector<NewCellInfo> bonusWordCellList;
+			m_GameBoardManager.CheckAndActivateBonusWordQuest(bonusWordCellList);
+
+			fTotalDestroyCellTime += _TME_MOVE_CELL_TIME_ * 1.4f + 0.3f;
+			GemLetterData data;
+			Sprite* pSprite;
+
+			for(auto& cell:bonusWordCellList)
 			{
-				pSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn  * m_SymbolSize.width, 
-					m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height));
+				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fTotalDestroyCellTime, _TME_BASIC_DESTROY_CELL_TIME_);
 
-				pSprite->setVisible(false);
-				m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
+				data = m_GameBoardManager.GetGemLetterData(cell.m_iGemLetterBlockID);	
+				// create new cell contain letter				
+				for(int i=0; i< 2; i++)
+				{				
+					pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn)).c_str());
+					Point pos(m_fBoardLeftPosition + cell.m_iColumn  * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height);
+					pSprite->setPosition(pos);
+					m_pBoardBatchNode->addChild(pSprite);
+
+					if (i==0)
+					{
+						m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
+						Sprite* letterSprite = AddLetterToGem(cell, m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), data.m_iLetter, cell.m_iGemLetterBlockID, false);
+
+						// delay fade in
+						pSprite->setOpacity(0);
+						pSprite->runAction( 
+							Sequence::create( 
+								DelayTime::create(fTotalDestroyCellTime),
+								EaseIn::create( FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_), 2.f),
+								NULL));
+
+						letterSprite->setOpacity(0);
+						letterSprite->runAction( 
+							Sequence::create( 
+								DelayTime::create(fTotalDestroyCellTime),
+								EaseIn::create( FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_), 2.f),
+								NULL));
+					}
+					else
+					{
+						pSprite->setVisible(false);
+						m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;					
+						AddLetterToGem(cell, m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), data.m_iLetter, cell.m_iGemLetterBlockID, true);
+					}					
+				}
 			}
-			else
+		}
+		else if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_BONUS_WORD_))
+		{
+			// update display info
+			auto& collectBonusWordParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectBonusWordParam();
+			m_pComboCountRenderNode->UpdateBonusWordQuest( collectBonusWordParam.m_iRemainLettersCount);
+
+			if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_BONUS_WORD_))
 			{
-				pSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, 
-					m_fBoardBottomPosition + (cell.m_iRow + iNumberOfRow*2) * m_SymbolSize.height));
-				pSprite->runAction(
-					Sequence::create(
-						DelayTime::create(fDelayTime + fDestroyTime * (iMaxComboPhase+1)),
-						MoveTo::create(fMoveTime,
-							ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, 
-									m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height)),
-							NULL));
-
-				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
+				m_GameBoardManager.IncreaseScoreForCompleteBonusQuest();
+				m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_BONUS_WORD_);
 			}
-			//pSprite->setScale(0.65f);
-					
-			m_pBoardBatchNode->addChild(pSprite);
-				
-			if (m_iMoveCount % 5 == 0 && bFirstCell && iCharacterID >= 0)
-			{				
-				Sprite* pCharacterSprite = Sprite::createWithSpriteFrameName(
-					m_pWordCollectBoardRenderNode->GetImageFileFromCharacterID(iCharacterID).c_str());
-				
-				pCharacterSprite->setScale(0.5f);
-				//pCharacterSprite->setAnchorPoint(ccp(0,0));
-				pCharacterSprite->setPosition(ccp( 25.f, 25.f));
-
-				pSprite->addChild(pCharacterSprite);
-
-				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iCharacterID = iCharacterID;
-			}
-			else if (i == 0)
-			{
-				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iCharacterID = -1;
-			}
-
-			if (bFirstCell)
-				bFirstCell = false;
-			
-		}		
+		}
 	}
-	*/
-	
+
 
 	if (bIsBonusEndGamePhase)
 	{
@@ -2516,38 +2453,28 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 		m_pWordCollectBoardRenderNode->PlayCharacterAnim(2, false);
 
 
-		int iUnlockedLetterIndexOfMainWord;
-		std::vector<int> unlockedLettersIndexOfSubWords[_GDS_SUB_WORD_MAX_COUNT_];
-		bool bIsMainWordJustUnlocked;
-		bool justUnlockedSubWords[_GDS_SUB_WORD_MAX_COUNT_];
+		int iUnlockedLetterIndexOfMainWord;		
+		bool bIsMainWordJustUnlocked;		
 
-		if (m_GameBoardManager.GetGameWordManager()->UnlockLetter( gemLetterData.m_iLetter, gemLetterData.m_bIsInMainWord, iUnlockedLetterIndexOfMainWord, unlockedLettersIndexOfSubWords,
-																	bIsMainWordJustUnlocked, justUnlockedSubWords))
+		if (!gemLetterData.m_bIsInMainWord) //this is bonus word - quest
 		{
-			m_pBonusWordNode->addLetter(gemLetterData.m_iLetter);
+			m_GameBoardManager.GetBonusQuestManager()->IncreaseCollectedLetterOfBonusWord();
 
+			m_GameBoardManager.IncreaseScoreForLetterInBonusWords(1);
+		}
+		else if (m_GameBoardManager.GetGameWordManager()->UnlockLetter( gemLetterData.m_iLetter, iUnlockedLetterIndexOfMainWord, bIsMainWordJustUnlocked))
+		{			
 			if (iUnlockedLetterIndexOfMainWord >=0)
 				m_pWordCollectBoardRenderNode->UnlockLetter(iUnlockedLetterIndexOfMainWord);
 				//m_pWordCollectBoardRenderNode->UnlockCharacter(fDelay, iUnlockedLetterIndexOfMainWord);
 
 			// increase score
 			if (iUnlockedLetterIndexOfMainWord >=0)
-				m_GameBoardManager.IncreaseScoreForLetterInMainWord();
-
-			int iUnlockedLettersOfSubWordCount = 0;
-			for(auto letters : unlockedLettersIndexOfSubWords)
-				iUnlockedLettersOfSubWordCount += letters.size();
-			m_GameBoardManager.IncreaseScoreForLetterInSubWords(iUnlockedLettersOfSubWordCount);
+				m_GameBoardManager.IncreaseScoreForLetterInMainWord();			
 
 			if (bIsMainWordJustUnlocked)
 				m_GameBoardManager.IncreaseScoreForUnlockMainWord();
 			
-			for(int i=0; i< _GDS_SUB_WORD_MAX_COUNT_; i++)
-				if (justUnlockedSubWords[i])
-				{
-					m_GameBoardManager.IncreaseScoreForUnlockSubWord(i);
-				}			
-
 			// play sound effect 
 			SoundManager::PlaySoundEffect(_SET_GET_CHARACTER_);
 		}							
@@ -2646,7 +2573,7 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 }
 */
 
-Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID)
+Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror)
 {
 	Sprite* pCharacterSprite = Sprite::createWithSpriteFrameName(
 			m_pWordCollectBoardRenderNode->GetImageInGemFileFromLetter(iLetter).c_str());
@@ -2675,10 +2602,13 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 			break;
 	}
 
-
-	m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pCharacterSprite);
-	m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = iGemLetterBlockID; //m_iLetter = iLetter;
-
+	if (!bIsMirror)
+	{
+		m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pCharacterSprite);
+		m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = iGemLetterBlockID; //m_iLetter = iLetter;
+	}
+	else
+		m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pCharacterSprite);
 	return pCharacterSprite;
 }
 
@@ -3203,6 +3133,37 @@ void HelloWorld::PlayCombo4Effect(ComboEffectBundle* pComboEffect, float fDelayT
 	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
 }
 
+void HelloWorld::PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
+{
+	auto pComboEffectSprite = Sprite::createWithSpriteFrameName("bonus_effect.png");
+	pComboEffectSprite->setAnchorPoint( Point( 0.5f, 0));
+	pComboEffectSprite->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
+				m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height));
+	pComboEffectSprite->setOpacity(0);
+	m_pComboEffectBatchNode->addChild(pComboEffectSprite);
+
+	pComboEffectSprite->runAction(
+		Sequence::createWithTwoActions(
+			DelayTime::create(fDelayTime),
+			ScaleTo::create( fDisplayTime, 1.f, 4.f)));
+
+	pComboEffectSprite->runAction(
+		Sequence::createWithTwoActions(
+			DelayTime::create(fDelayTime),
+			MoveBy::create( fDisplayTime, Point( 0, 300.f))));// 1.f, 50.f)));
+
+
+	pComboEffectSprite->runAction(
+			Sequence::create(				
+				DelayTime::create(fDelayTime),
+				FadeIn::create(0.02f),
+				FadeOut::create(fDisplayTime + 0.05f),
+				RemoveSelf::create(),
+				NULL));
+
+	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
+}
+
 void HelloWorld::PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
 {
 	auto pComboEffectSprite1 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
@@ -3681,34 +3642,14 @@ void HelloWorld::PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime)
 		this->runAction(
 			Sequence::create(
 			DelayTime::create( fDisplayTime),
-				CallFunc::create( this,  callfunc_selector(HelloWorld::PlayUnlockLettersOfBonusWordsAnimation)),
-				NULL));
-	}
-	else
-	{
-		PlayUnlockLettersOfBonusWordsAnimation();
-	}
-}
-
-void HelloWorld::PlayUnlockLettersOfBonusWordsAnimation()
-{
-	float fDisplayTime = m_pBonusWordNode->displayEffect(0.8f);
-	if (fDisplayTime > 0)
-	{
-		m_pWordCollectBoardRenderNode->PlayCharacterAnim(6, false);
-
-		this->runAction(
-			Sequence::create(
-			DelayTime::create( fDisplayTime + 0.1f),
 				CallFunc::create( this,  callfunc_selector(HelloWorld::EndUnlockLetterAnimation)),
 				NULL));
 	}
 	else
 	{
+		//PlayUnlockLettersOfBonusWordsAnimation();
 		EndUnlockLetterAnimation();
 	}
-
-	
 }
 
 void HelloWorld::EndUnlockLetterAnimation()
@@ -3750,54 +3691,4 @@ void HelloWorld::EndUnlockLetterAnimation()
 			UserTable::getInstance()->updateLife(1);
 		}
 	}
-}
-
-// NOTE: only implement combo4 now
-void HelloWorld::DrawComboHint()
-{
-	for(auto sprite:m_HintSprites)
-		sprite->removeFromParentAndCleanup(true);
-	m_HintSprites.clear();
-
-	if (m_eTouchMoveState == _TMS_BEGIN_ACTIVATE_COMBO_)
-		return;
-	ComboActivateDirection_e eComboDireciton;
-	switch (m_eTouchMoveState)
-	{	
-		default:
-		case _TMS_ACTIVATE_COMBO_LEFT_:
-			eComboDireciton = _CAD_LEFT_;
-			break;
-		case _TMS_ACTIVATE_COMBO_UP_:
-			eComboDireciton = _CAD_UP_;
-			break;
-		case _TMS_ACTIVATE_COMBO_RIGHT_:
-			eComboDireciton = _CAD_RIGHT_;
-			break;
-		case _TMS_ACTIVATE_COMBO_DOWN_:
-			eComboDireciton = _CAD_DOWN_;
-			break;		
-	}
-
-
-	// should get effective area from gameBoardManager
-	m_ComputeMoveResult.Reset(false);
-	
-	m_GameBoardManager.PreCheckComboEffect( m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn, eComboDireciton, m_ComputeMoveResult.m_BasicMatchingDestroyedCells);
-	
-	m_pMoveHintNode = Sprite::createWithSpriteFrameName("Gem_A.png");
-	m_pMoveHintNode->setOpacity(0);
-	m_pBoardBatchNode->addChild(m_pMoveHintNode);
-
-	for(auto cell : m_ComputeMoveResult.m_BasicMatchingDestroyedCells)
-	{
-		Sprite* pHintSprite = Sprite::createWithSpriteFrameName("Blue_Border.png");
-		//pHintSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height));
-		Size size = m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->getContentSize();
-		m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pHintSprite);		
-
-		pHintSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
-			
-		m_HintSprites.push_back(pHintSprite);
-	}	
 }

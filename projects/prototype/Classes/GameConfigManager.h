@@ -5,7 +5,7 @@
 #include <map>
 
 #define _MAX_OBSTACLE_TYPE_COUNT_	5
-
+#define _MAXIMUM_BONUS_WORD_LENGTH_	10
 
 struct Level_ObstacleConfig
 {
@@ -65,6 +65,14 @@ public:
 	int m_CountPerComboGem[_GCT_SINGLE_COMBO_COUNT_];//only count combo4, combo5, combo6
 };
 
+struct BonusQuestCollectBonusWordDescription
+{
+public:
+	int m_BonusWordIDList[_MAXIMUM_BONUS_WORD_LENGTH_];
+	int m_iBonusWordCount;
+	int m_iRequiredLetterCount;
+};
+
 struct BonusQuestConfig
 {
 public:	
@@ -78,6 +86,7 @@ public:
 	BonusQuestCollectGemDescription m_CollectGemQuest;
 	//bool m_bIsEnableCollectComboQuest;
 	BonusQuestCollectComboDescription m_CollectComboQuest;
+	BonusQuestCollectBonusWordDescription m_CollectBonusWordQuest;
 
 	BonusQuestConfig()
 	{

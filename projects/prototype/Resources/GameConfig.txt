@@ -43,5 +43,7 @@
 1000
 ;score letter of bonus word
 500
-;ratio complete bonus word
-500
+;bonus  when complete bonus quest
+5000
+; bonus score when activate bonus end game combo
+1000

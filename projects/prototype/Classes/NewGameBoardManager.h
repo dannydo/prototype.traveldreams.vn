@@ -28,7 +28,9 @@ enum ComboEffectType
 	_CET_6_5_EFFECT_,
 	_CET_6_6_EFFECT_,
 	_CET_6_6_6_EFFECT_,
-	_CET_6_6_6_SECOND_EFFECT_
+	_CET_6_6_6_SECOND_EFFECT_,
+
+	_CET_BONUS_END_GAME_EFFECT_
 };
 
 struct ComboEffectDescription
@@ -39,12 +41,14 @@ public:
 	int m_Phase0CellCount;
 	ComboEffectType m_eComboEffectType;
 	int m_iGemID;
+	int m_iActivationScoreRatio; //percent, if this combo activated by other combos, its activation score will be multiplied
 
 	ComboEffectDescription()
 	{
 		m_Phase0CellCount = 0;
 		m_iGemID = -1;
 		m_eComboEffectType = _CET_EXPLOSION_;
+		m_iActivationScoreRatio = 100;
 	}
 };
 
@@ -148,8 +152,8 @@ public:
 	inline std::vector<DestroyedByComboCell>& GetDestroyBonusQuestGemList() { return m_DestroyBonusQuestGemList;}
 
 	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
+		std::vector<Cell>& basicMatchingDestroyedCells, // std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
+		std::vector<ComboEffectBundle*>& comboChainList, //std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<NewCellInfo>& unlockedLetterCells,
@@ -157,16 +161,7 @@ public:
 		bool bIsNewMove);		
 
 	bool FastCheckBlocks( int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
-		std::vector<Cell>& basicMatchingDestroyedCells);
-
-	void PreCheckComboEffect(int iSelectedRow, int iSelectedColumn, ComboActivateDirection_e eDirection, std::vector<Cell>& basicMatchingDestroyedCells);
-	void ExecuteComboEffect(int iSelectedRow, int iSelectedColumn, ComboActivateDirection_e eDirection,
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
-		std::vector<ComboEffectCell>& newComboCells,
-		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
-		std::vector<NewCellInfo>& unlockedLetterCells,
-		std::vector<NewCellInfo>& newCells);
+		std::vector<Cell>& basicMatchingDestroyedCells);		
 
 	int DecreaseMove() { return (m_iCurrentMove--);}
 
@@ -175,22 +170,28 @@ public:
 	//int GetScoreForUnlockLetterInSubWord();
 
 	int IncreaseScoreForLetterInMainWord();
-	int IncreaseScoreForLetterInSubWords(const int& iLetterCount);
+	int IncreaseScoreForLetterInBonusWords(const int& iLetterCount);
 	int IncreaseScoreForUnlockMainWord();
-	int IncreaseScoreForUnlockSubWord(const int& iSubWordID);
+	int IncreaseScoreForCompleteBonusQuest();
 	
-	int IncreaseScoreForDestroyCells(const int& iGemCount, const ComboEffectType& eComboEffectType);
+	int IncreaseScoreForEachEndGameCombo();
+
+	int IncreaseScoreForDestroyCells(const int& iGemCount, const ComboEffectType& eComboEffectType, int iActivateComboRatio = 100);
 	//int IncreaseScoreComboEffect(const int& iGemCount, const GemComboType_e& eComboType)
 	int IncreaseScoreForCreateCombo(const GemComboType_e& eComboType);
 
 	int GetEarnedStars();
 
 
+
+	// special method for activate collect bonus word quest
+	void CheckAndActivateBonusWordQuest(std::vector<NewCellInfo>& bonusWordCellList);
+
 	// Bonus end game
 	bool ExecuteEndGameBonus(
 		std::vector<ComboEffectCell>& convertedToComboCells,
-		std::vector<Cell>& basicMatchingDestroyedCells, std::vector<DoubleComboCreationInfo>& doubleComboList, 
-		std::vector<ComboEffectBundle*>& comboChainList, std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
+		std::vector<Cell>& basicMatchingDestroyedCells, //std::vector<DoubleComboCreationInfo>& doubleComboList, 
+		std::vector<ComboEffectBundle*>& comboChainList, //std::vector<ComboEffectBundle*>& triggeredCombo5ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,
 		std::vector<NewCellInfo>& unlockedLetterCells,
@@ -201,14 +202,14 @@ protected:
 	inline bool IsCellDestroyable(const int& iRow, const int& iColumn) { return (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType < _GCT_COMBO6_WAITING_TRIGGER_ 
 																				|| m_BoardValueMatrix[iRow][iColumn].m_eGemComboType > _GCT_COMBO6_6_6_TRIGGER_SECOND_TIME_ ));}
 	inline bool DestroySingleCellUtil(const int& iRow, const int& iColumn, const float& fDestroyAtTime);	
-	inline void DestroySingleCellByComboUtil(const int& iRow, const int& iColumn, ComboEffectBundle* pTriggerCombo, std::vector<ComboEffectBundle*>& nextComboChainList, const float& fDestroyAtTime,
+	inline void DestroySingleCellByComboUtil(const int& iActivateComboRatio, const int& iRow, const int& iColumn, ComboEffectBundle* pTriggerCombo, std::vector<ComboEffectBundle*>& nextComboChainList, const float& fDestroyAtTime,
 		const float& fActivateSubsequenceComboAtTime);
 
 	inline bool IsSimpleCombo(const GemComboType_e& eGemComboType) { return (eGemComboType >= _GCT_COMBO4_ && eGemComboType <= _GCT_COMBO6_);}
 
 	// Execute move util methods
 	void CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn);
-	void CreateBlockForBasicMatching(bool& bIsNewBlockCreated, std::vector<Cell>& basicMatchingDestroyedCells);
+	void CreateBlockForBasicMatching(std::vector<Cell>& basicMatchingDestroyedCells);
 	void RemoveCellsByBasicMatching( std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectBundle*>& comboChainList, const int& iMoveRow, const int& iMoveColumn);
 	void CreateComboCells(const int& iSelectedRow, const int& iSelectedColumn, const std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectCell>& newComboCells);
 
@@ -217,11 +218,11 @@ protected:
 	void CalculateMoveCells(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells); //, std::vector<Cell>& newCells);
 	void CreateUnlockedGemLetterFromWaitingList(std::vector<NewCellInfo>& newCells);
 	void GenerateNewGems(std::vector<NewCellInfo>& newCells, bool bIsNewMove);
-
-	void CalculateMoveEffectOnBoss(bool& bIsBossStateChanged);
+	
 
 	int GetBonusScoreForUnlockMainWord(bool bIncludeIndividualLetters=false);
-	int GetBonusScoreForUnlockSubWord(const int& iSubWordID, bool bIncludeIndividualLetters=false);
+	int GetBonusScoreForCompleteBonusQuest();
+	int GetComboDestroyCellRatio(const ComboEffectType& eComboEffectType);
 
 	//  trigger combos at its second phase
 	void TriggerWaitingCombo6(const ComboEffectDescription& comboDescription, ComboEffectBundle* &pTriggeredCombo, std::vector<ComboEffectBundle*>& comboChainList);
@@ -230,8 +231,7 @@ protected:
 	void FindSortAndFilterAdvanceCombos(std::vector<ComboEffectDescription>& advanceComboList, const int& iSelectedRow, const int& iSelectedColumn);
 	ComboEffectType GetComboEffectTypeOfAdvanceCombo(ComboEffectCell (&linkCellList)[3], const int& iLinkCellCount, const int& iSelectedRow, const int& iSelectedColumn);
 
-	void TriggerAdvanceComboList(const std::vector<ComboEffectDescription>& advanceComboList, std::vector<ComboEffectBundle*>& nextComboChainList, std::vector<ComboEffectBundle*>& outputComboChainList, const bool& bIsTriggerComboSecondTimeList);
-	
+	void TriggerAdvanceComboList(const std::vector<ComboEffectDescription>& advanceComboList, std::vector<ComboEffectBundle*>& nextComboChainList, std::vector<ComboEffectBundle*>& outputComboChainList, const bool& bIsTriggerComboSecondTimeList);		
 protected:
 	GameWordManager* m_pGameWordManager;	
 	ObstacleProcessManager* m_pObstacleProcessManager;

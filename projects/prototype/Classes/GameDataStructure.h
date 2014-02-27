@@ -10,7 +10,9 @@
 
 #define _MAX_GEM_ID_	6
 #define _SPECIAL_COMBO_GEM_ID	10
-#define _BONUS_QUEST_GEM_ID_		11
+#define _BONUS_QUEST_GEM_ID_	11
+#define _BONUS_WORD_GEM_ID_		12
+#define _BONUS_END_GAME_COMBO_GEM_ID	13
 
 #define _BOARD_MAX_ROW_NUMBER_	9
 #define _BOARD_MAX_COLUMN_NUMBER_	9
@@ -60,9 +62,9 @@ public:
 
 	// *********** bonus score when create combo
 	//simple combo 4,5,6
-	int m_iBonusScoreCreateComboCreate4;
-	int m_iBonusScoreCreateComboCreate5;
-	int m_iBonusScoreCreateComboCreate6;
+	int m_iBonusScoreCreateCombo4;
+	int m_iBonusScoreCreateCombo5;
+	int m_iBonusScoreCreateCombo6;
 
 	// *********** bonus score when activate combo
 	//simple combo 4,5,6
@@ -85,7 +87,9 @@ public:
 	int m_iScoreRatioCompleteMainWord;
 
 	int m_iScoreLetterOfBonusWord;
-	int m_iScoreRatioCompleteBonusWord;
+
+	int m_iBonusScoreCompleteBonusQuest;
+	int m_iBonusScoreActivateBonusEndGameCombo;
 };
 
 struct LevelTarget
@@ -133,6 +137,8 @@ enum GemComboType_e
 	_GCT_COMBO5_5_TRIGGER_SECOND_TIME_,
 	_GCT_COMBO6_6_6_TRIGGER_SECOND_TIME_,
 	
+	_GCT_BONUS_END_GAME_COMBO_,
+
 	_GCT_SINGLE_COMBO_COUNT_ = 3
 };
 
@@ -266,6 +272,7 @@ public:
 	int m_iDestroyPhaseIndex; //remove this???
 	int m_iGroupIndex;
 	bool m_bIsCompleteDestroyed; //this cell only used to trigger combo step so it's used even if not complete destroy
+	bool m_bIsEarnScore; 
 	// NOTE: some combo may effect 1 cell 2 times!!!! ==> used dirty flag of obstacle to check it!!!
 	// 2 van de lon: - O combo 6 nam giua 2 cell trong. - Da lo keo dong chua combo 6 thi ko the huy??? ==> neu keo no tro ve vi tri ban dau thi co trigger hay ko?
 	// *** Chua co hint
@@ -276,6 +283,7 @@ public:
 		m_iDestroyPhaseIndex = 0;
 		m_iGroupIndex = 0;
 		m_bIsCompleteDestroyed = true;
+		m_bIsEarnScore = true;
 	}
 
 	DestroyedByComboCell (const int& iRow, const int& iColumn) : Cell(iRow, iColumn)
@@ -284,6 +292,7 @@ public:
 		m_iDestroyPhaseIndex = 0;
 		m_iGroupIndex = 0;
 		m_bIsCompleteDestroyed = true;
+		m_bIsEarnScore = true;
 	}	
 
 	DestroyedByComboCell(Cell cell): Cell(cell)
@@ -292,15 +301,17 @@ public:
 		m_iDestroyPhaseIndex = 0;
 		m_iGroupIndex = 0;
 		m_bIsCompleteDestroyed = true;
+		m_bIsEarnScore = true;
 	}
 
-	DestroyedByComboCell (const int& iRow, const int& iColumn, const int& iDestroyPhaseIndex, const float& fDestroyAtTime) : Cell(iRow, iColumn)
+	DestroyedByComboCell (const int& iRow, const int& iColumn, const int& iDestroyPhaseIndex, const float& fDestroyAtTime, bool bIsEarnScore=true) : Cell(iRow, iColumn)
 	{	
 		m_fDestroyAtTime = 0;
 		m_iDestroyPhaseIndex = iDestroyPhaseIndex;
 		m_iGroupIndex = 0;
 		m_bIsCompleteDestroyed = true;
 		m_fDestroyAtTime = fDestroyAtTime;
+		m_bIsEarnScore = bIsEarnScore;
 	}	
 };
 
@@ -332,7 +343,6 @@ public:
 		m_iGemID = iGemID;
 	}
 };
-
 /*
 struct ActivatedComboInChain
 {

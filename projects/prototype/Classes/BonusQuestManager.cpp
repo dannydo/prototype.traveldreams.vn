@@ -33,6 +33,15 @@ void BonusQuestManager::InitLevel()
 					memset(m_CollectComboParam.m_CountPerComboGem, 0, sizeof( m_CollectComboObjective.m_CountPerComboGem));
 					break;
 				}
+				case _BQT_COLLECT_BONUS_WORD_:
+				{
+					m_CollectBonusWordObjective.Set(m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest);
+					m_CollectBonusWordParam.m_iRemainLettersCount = m_CollectBonusWordObjective.m_iRequiredLetterCount;
+					
+					//random bonus word
+					m_CollectBonusWordObjective.m_iSelectedBonusWordID = m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[rand() % m_CollectBonusWordObjective.m_iBonusWordCount];
+					break;
+				}
 			}
 		}
 	}
@@ -94,5 +103,48 @@ void BonusQuestManager::IncreaseBasicCellCountForBonusQuest(const int& iGemID)
 			m_IsBonusQuestCompletedFlags[_BQT_COLLECT_GEM_] = true;
 			m_IsBonusQuestDirtyFlags[_BQT_COLLECT_GEM_] = true;
 		}
+	}
+}
+
+void BonusQuestManager::IncreaseCollectedLetterOfBonusWord()
+{
+	if (m_IsBonusQuestActivatedFlags[_BQT_COLLECT_BONUS_WORD_ ] && !m_IsBonusQuestCompletedFlags[_BQT_COLLECT_BONUS_WORD_])
+	{
+		m_CollectBonusWordParam.m_iRemainLettersCount--;
+		if (m_CollectBonusWordParam.m_iRemainLettersCount == 0)
+		{
+			m_IsBonusQuestCompletedFlags[_BQT_COLLECT_BONUS_WORD_]=  true;
+			m_IsBonusQuestDirtyFlags[_BQT_COLLECT_BONUS_WORD_] = true;
+		}
+	}
+}
+
+void BonusQuestManager::GetLettersOfCollectBonusWordQuest(std::vector<char>& letterList, const int& iMaxLetterCount)
+{
+	auto&  bonusWord = GameWordManager::getInstance()->GetWord(m_CollectBonusWordObjective.m_iSelectedBonusWordID);
+
+	char sBuffer[_GDS_WORD_MAX_LENGTH_];
+	int iBufferLenght = 0;
+	int i, iLetterIndex;
+
+	for(i=0; i < bonusWord.m_iWordLength; i++)
+		if (bonusWord.m_sWord[i] != ' ')
+		{
+			sBuffer[iBufferLenght] = bonusWord.m_sWord[i];
+			iBufferLenght++;
+		}
+	
+	if (m_CollectBonusWordParam.m_iRemainLettersCount > iBufferLenght)
+		m_CollectBonusWordParam.m_iRemainLettersCount = iBufferLenght;
+	if (m_CollectBonusWordParam.m_iRemainLettersCount > iMaxLetterCount)
+		m_CollectBonusWordParam.m_iRemainLettersCount = iMaxLetterCount;
+
+	for(i=0; i < m_CollectBonusWordParam.m_iRemainLettersCount; i++)
+	{
+		iLetterIndex = rand() % iBufferLenght;
+		letterList.push_back( sBuffer[iLetterIndex]);
+		
+		sBuffer[iLetterIndex] = sBuffer[iBufferLenght-1];
+		iBufferLenght--;
 	}
 }
