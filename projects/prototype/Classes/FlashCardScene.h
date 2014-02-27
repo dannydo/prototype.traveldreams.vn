@@ -3,40 +3,51 @@
 
 #include "cocos2d.h"
 #include "GameDataStructure.h"
+#include "Database\ChapterTable.h"
+#include "SettingMenuNode.h"
+#include "Database\LevelTable.h"
 
-class FlashCardLayer : public cocos2d::Layer
+class FlashCardLayer : public cocos2d::LayerColor
 {
 public:
 	FlashCardLayer() {};
 	virtual ~FlashCardLayer();
 	bool init();
-	CREATE_FUNC(FlashCardLayer);
-	void setNameClassParent(const char* sNameClassParent);
+	static FlashCardLayer* createLayout(const ChapterInfo& chapterInfo);
 
 private:
 	bool onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 	void onTouchMoved(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 	void onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 
+	void openStringMenu();
 	void createNodeSlideShow();
-	void menuBackCallBack();
 	void showSlideShowFlashCard();
-	void menuCloseSlideShowFlashCardCallBack();
+	void updateLayout();
+	void playVoiceWord();
+
+	cocos2d::Node* createLayoutFlashCard(const int& iIndexFlashCard);
 
 	cocos2d::Node* m_pFlashCardDisplay;
 	cocos2d::Node* m_pSlideShow;
-	cocos2d::Sprite* m_pFlashCardCollection;
+	cocos2d::LabelTTF* m_pLabelIndex;
+	cocos2d::Point m_touchPositionMoved;
 
-	bool m_bRunningEffect;
-	bool m_bShowSlideShow;
+	std::vector<LevelInfo> m_levelInfo;
+	ChapterInfo m_chapterInfo;
+	Word wordInfo;
+
+	bool m_bIsSwipe;
 
 	float m_fXMoved;
 	float m_fBeginX;
 
+	int m_iMoveLeftOrRight;
 	int m_iTotalFlashCard;
 	int m_iIndexFlashCard;
 
-	const char* m_sNameClassParent;
+	SettingMenuNode* m_pSettingNode	;
+	bool m_isShowSetting;
 };
 
 class FlashCardScene : public cocos2d::CCScene
@@ -45,9 +56,12 @@ public:
 	FlashCardScene():_layer(NULL) {};
 	~FlashCardScene();
 	bool init();
-	CREATE_FUNC(FlashCardScene);
+	static FlashCardScene* createScene(const ChapterInfo& chapterInfo);
 
-	CC_SYNTHESIZE_READONLY(FlashCardLayer*, _layer, Layer);	
+	CC_SYNTHESIZE_READONLY(FlashCardLayer*, _layer, LayerColor);
+
+private:
+	ChapterInfo m_chapterInfo;
 };
 
 #endif;

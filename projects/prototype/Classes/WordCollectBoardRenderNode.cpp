@@ -429,22 +429,25 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 void WordCollectBoardRenderNode::PlaySpellingSound()
 {
 	char sSoundFile[40];
-	
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-	sprintf(sSoundFile, "EnglishSoundPC/%s.wav", m_pMainWord->m_sSoundFile.c_str());
-#else
-	sprintf(sSoundFile, "EnglishSound/%s.ogg", m_pMainWord->m_sSoundFile.c_str());
-#endif
 
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
+	// check play voice on setting
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) == 1)
+	{
+		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+			sprintf(sSoundFile, "EnglishSoundPC/%s.wav", m_pMainWord->m_sSoundFile.c_str());
+		#else
+			sprintf(sSoundFile, "EnglishSound/%s.ogg", m_pMainWord->m_sSoundFile.c_str());
+		#endif
+
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
 		//m_pMainWord->m_sSoundFile.c_str());
 
-	/*this->runAction(
+		/*this->runAction(
 		Sequence::create( 
 			DelayTime::create(3.5f),
 			CallFunc::create(this, callfunc_selector(WordCollectBoardRenderNode::PlayVietnameseSpelling)),
 			NULL));*/
-
+	}
 }
 
 

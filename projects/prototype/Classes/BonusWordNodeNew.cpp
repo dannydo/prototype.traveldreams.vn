@@ -409,13 +409,17 @@ void BonusWordNodeNew::playEffectFinishCollectWord()
 		pMark->runAction(actionMove);
 	}
 
-	char sSoundFile[40];
-	#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-		sprintf(sSoundFile, "EnglishSoundPC/%s.wav", word.m_sSoundFile.c_str());
-	#else
-		sprintf(sSoundFile, "EnglishSound/%s.ogg", word.m_sSoundFile.c_str());
-	#endif
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
+	// check play voice on setting
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) == 1)
+	{
+		char sSoundFile[40];
+		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+			sprintf(sSoundFile, "EnglishSoundPC/%s.wav", word.m_sSoundFile.c_str());
+		#else
+			sprintf(sSoundFile, "EnglishSound/%s.ogg", word.m_sSoundFile.c_str());
+		#endif
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
+	}
 }
 
 void BonusWordNodeNew::removeLabelFinishColectWord()
@@ -558,13 +562,17 @@ void BonusWordNodeNew::popupBonusWordCallBack(Object* pSender)
 			auto actionUpdateTag =  CallFuncN::create(this, callfuncN_selector(BonusWordNodeNew::updateTagSpriteMark));
 			pMark->runAction(Sequence::create(actionMove,  NULL));
 
-			char sSoundFile[40];
-			#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-				sprintf(sSoundFile, "EnglishSoundPC/%s.wav", m_bonusWords[pParent->getTag()].m_sSoundFile.c_str());
-			#else
-				sprintf(sSoundFile, "EnglishSound/%s.ogg", m_bonusWords[pParent->getTag()].m_sSoundFile.c_str());
-			#endif
-			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
+			// check play voice on setting
+			if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) == 1)
+			{
+				char sSoundFile[40];
+				#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+					sprintf(sSoundFile, "EnglishSoundPC/%s.wav", m_bonusWords[pParent->getTag()].m_sSoundFile.c_str());
+				#else
+					sprintf(sSoundFile, "EnglishSound/%s.ogg", m_bonusWords[pParent->getTag()].m_sSoundFile.c_str());
+				#endif
+				CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
+			}
 		}
 	}
 }

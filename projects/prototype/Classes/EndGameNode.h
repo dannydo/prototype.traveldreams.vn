@@ -3,7 +3,8 @@
 
 #include "cocos2d.h"
 #include "GameDataStructure.h"
-#include "LeaderBoardNode.h"
+#include "LeaderBoardNode.h"	
+#include "Database\LevelTable.h"
 
 class EndGameNode : public cocos2d::Node
 {
@@ -15,17 +16,20 @@ public:
 	bool initWin(const int& iScore, const Word& pMainWord, const std::vector<Word>& pSubWord);
 	bool initLose(const int& iScore, const Word& pMainWord);
 
-	void addYellowStar(int iYellowStar);
+	void addYellowStar(const int& iYellowStar);
+	void addBonusQuestCompleted(const int& iBonusQuestCompleted);
 
 private:
 	void menuNextLevelCallBack();
-	void menuRetryLevelCallBack();
+	void menuRetryLevelLoseCallBack();
+	void menuRetryLevelWinCallBack();
 	void menuCloseCallBack();
 	void menuOpenDictCallBack();
 
 	std::vector<int> generateArrayNumber(int iNumber);
 	cocos2d::Node* generateLayoutScore(int iScore);
 	cocos2d::Node* generateLayoutStar();
+	cocos2d::Node* generateLayoutBonusQuest();
 
 	cocos2d::Node* generateLayoutSubWord(const std::vector<Word>& subWord);
 	cocos2d::Node* generateLayoutLevel(int iLevel);
@@ -34,11 +38,21 @@ private:
 	void sequenceUpdateStar();
 	void updateStar();
 
+	void loopUpdateBonusQuest();
+	void sequenceUpdateBonusQuest();
+	void updateBonusQuest();
+
 	cocos2d::Node* m_pStarNode;
+	cocos2d::Node* m_pBonusQuestNode;
+
+	LevelInfo m_levelInfo;
 
 	int m_iYellowStar;
 	int m_iCountYellowStar;
 	int m_iCurrentLevel;
+	int m_iTotalBonusQuest;
+	int m_iBonusQuestCompleted;
+	int m_iCountBonusQuest;
 
 	LeaderBoardtNode* m_pLeaderBoard;
 };

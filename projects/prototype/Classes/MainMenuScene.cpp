@@ -75,7 +75,7 @@ bool MainMenuLayer::init()
 	pMenu->setPosition(CCPointZero);
 
 	this->addChild(pMenu, 1);
-	SoundManager::PlayIntroMusic();
+	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
 
     LabelTTF* label2 = LabelTTF::create("Logout", "Arial", 32);
     MenuItemLabel* m_pItemLogout = MenuItemLabel::create(label2, CC_CALLBACK_0(MainMenuLayer::LogoutFacebook, this));
@@ -101,6 +101,23 @@ bool MainMenuLayer::init()
 	this->addChild(pLifeNode);
 
 	this->scheduleUpdate();
+
+	// menu layer with close item	
+	auto closeItem = MenuItemImage::create("Setting.png",
+                                           "Setting.png",
+                                           CC_CALLBACK_0(MainMenuLayer::openSettingMenu, this));
+    
+	closeItem->setAnchorPoint(ccp(0,0));
+	closeItem->setPosition(ccp(-12, -8));
+
+    // create menu, it's an autorelease object
+    auto menu = Menu::create(closeItem, NULL);
+    menu->setPosition(Point::ZERO);
+	this->addChild(menu);
+
+	m_pSettingNode = NULL;
+	m_isShowSetting = false;
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
 
 	return true;
 }
@@ -204,4 +221,27 @@ void MainMenuLayer::shareDialogFacebook()
 #else
 	MessageBox("Facebook not run with platform window", "Facebook");
 #endif
+}
+
+void MainMenuLayer::openSettingMenu()
+{
+	if(m_pSettingNode == NULL)
+	{
+		m_pSettingNode = SettingMenuNode::create();
+		m_pSettingNode->setPosition(Point(-500.0f, 0));
+		this->addChild(m_pSettingNode);
+	}
+
+	if (m_isShowSetting == false)
+	{
+		m_isShowSetting = true;
+		m_pSettingNode->show();
+		this->setTouchEnabled(false);
+	}
+	else
+	{
+		m_isShowSetting = false;
+		m_pSettingNode->hide();
+		this->setTouchEnabled(true);
+	}
 }

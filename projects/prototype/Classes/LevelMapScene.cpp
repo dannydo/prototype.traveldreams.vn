@@ -4,7 +4,7 @@
 #include "GameTargetNode.h"
 #include "SoundManager.h"
 #include "WorldMapScene.h"
-#include "FlashCardScene.h"
+#include "FlashCardCollection.h"
 #include "Database\UserTable.h"
 #include "LifeSystemNode.h"
 
@@ -108,12 +108,15 @@ bool LevelMapLayer::init()
 		pMenu->setPosition(CCPointZero);
 			
 		this->addChild(pMenu, 1);
-
-		SoundManager::PlayIntroMusic();
+		SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
 
 		LifeSystemNode* pLifeNode = LifeSystemNode::create();
 		pLifeNode->setPosition(Point(50.0f, 910.0f));
 		this->addChild(pLifeNode);
+
+		m_pSettingNode = NULL;
+		m_isShowSetting = false;
+		Breadcrumb::getInstance()->addSceneMode(SceneMode::kLevelMap);
 
 		return true;
 	}
@@ -144,15 +147,32 @@ void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 
 void LevelMapLayer::menuBackToWorldMap()
 {
-	WorldMapScene* pWorldMap = WorldMapScene::create();
-	Director::getInstance()->replaceScene(pWorldMap);
+	if(m_pSettingNode == NULL)
+	{
+		m_pSettingNode = SettingMenuNode::create();
+		m_pSettingNode->setPosition(Point(-500.0f, 0));
+		this->addChild(m_pSettingNode);
+	}
+
+	if (m_isShowSetting == false)
+	{
+		m_isShowSetting = true;
+		m_pSettingNode->show();
+		this->setTouchEnabled(false);
+	}
+	else
+	{
+		m_isShowSetting = false;
+		m_pSettingNode->hide();
+		this->setTouchEnabled(true);
+	}
 }
 
 void LevelMapLayer::menuOpenFlashCardCallBack()
 {
-	FlashCardScene* pFlashCard = FlashCardScene::create();
-	pFlashCard->getLayer()->setNameClassParent("WorldMapScene");
-	Director::getInstance()->replaceScene(pFlashCard);
+	FlashCardCollectionScene* pFlashCardCollection = FlashCardCollectionScene::create();
+	pFlashCardCollection->getLayerColor()->setNameClassParent("LevelMap");
+	Director::getInstance()->replaceScene(pFlashCardCollection);
 }
 
 void LevelMapLayer::showPopupTargetGame(const int& iLevel)

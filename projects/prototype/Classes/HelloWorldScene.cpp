@@ -83,8 +83,6 @@ Scene* HelloWorld::createScene(int iLevel)
 
 HelloWorld::~HelloWorld()
 {
-	SoundManager::StopBackgroundMusic();
-
 	if (m_pTempSpriteForAction)
 	{
 		m_pTempSpriteForAction->release();
@@ -168,6 +166,9 @@ bool HelloWorld::init()
 	this->setTouchEnabled(true);	
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 	this->scheduleUpdate();
+
+	m_pSettingNode = NULL;
+	m_isShowSetting = false;
 
     return true;
 }
@@ -460,15 +461,31 @@ void HelloWorld::initLevel(int iLevel)
 	m_pBoardBatchNode->addChild(m_pTempSpriteForAction);
 
 	// play sound
-	SoundManager::PlayBackgroundMusic();
+	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kGameMusic);
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kPlayGame);
 }
 
 void HelloWorld::menuCloseCallback(Object* pSender)
 {
-	auto scene =  LevelMapScene::create(); //HelloWorld::createScene();	
+	if(m_pSettingNode == NULL)
+	{
+		m_pSettingNode = SettingMenuNode::create();
+		m_pSettingNode->setPosition(Point(-500.0f, 0));
+		this->getParent()->addChild(m_pSettingNode, 100);
+	}
 
-    // run
-	Director::getInstance()->replaceScene(scene);
+	if (m_isShowSetting == false)
+	{
+		m_isShowSetting = true;
+		m_pSettingNode->show();
+		this->setTouchEnabled(false);
+	}
+	else
+	{
+		m_isShowSetting = false;
+		m_pSettingNode->hide();
+		this->setTouchEnabled(true);
+	}
 
     //Director::getInstance()->end();
 

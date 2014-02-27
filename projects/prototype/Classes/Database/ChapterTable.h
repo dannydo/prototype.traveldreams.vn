@@ -9,6 +9,7 @@ struct ChapterInfo
 	std::string sName;
 	int iMinLevel;
 	int iMaxLevel;
+	int iTotalLevelUnlock;
 	int iTotalStar;
 	int iTotalScore;
 	bool bIsUnlock;
@@ -21,7 +22,7 @@ public:
 	static ChapterTable* getInstance();
 	bool init();
 
-	inline std::vector<ChapterInfo> getUserInfo() { return m_Chapters; };
+	inline std::vector<ChapterInfo> getChaptersInfo() { return m_Chapters; };
 	void fetchAllChapter();
 	bool updateChapter(ChapterInfo chapterInfo);
 

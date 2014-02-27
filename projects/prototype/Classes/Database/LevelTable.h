@@ -12,6 +12,7 @@ struct LevelInfo
 	int iBonusQuest;
 	bool bIsUnlock;
 	bool bIsUpdate;
+	std::string sWordKey;
 };
 
 class LevelTable
@@ -20,6 +21,7 @@ public:
 	static LevelTable* getInstance();
 	bool init();
 	std::vector<LevelInfo> fetchLevelsForChapter(const int& iChapter);
+	LevelInfo fetchLevel(const int& iLevel);
 	bool updateLevel(LevelInfo levelInfo);
 
 private:

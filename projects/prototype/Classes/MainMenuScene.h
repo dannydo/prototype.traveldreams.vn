@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "APIService\UserService.h"
+#include "SettingMenuNode.h"
 
 class MainMenuLayer : public cocos2d::Layer
 {
@@ -20,6 +21,7 @@ private:
 	void LogoutFacebook();
 	void shareLinkFacebook();
 	void shareDialogFacebook();
+	void openSettingMenu();
 
 	void onHttpRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
 
@@ -27,6 +29,9 @@ private:
 	cocos2d::MenuItemLabel* m_pItemLogout;
 	cocos2d::MenuItemLabel* m_pItemShareLink;
 	cocos2d::MenuItemLabel* m_pItemShareDialog;
+
+	SettingMenuNode* m_pSettingNode	;
+	bool m_isShowSetting;
 };
 
 class MainMenuScene : public cocos2d::Scene

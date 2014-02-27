@@ -48,7 +48,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pBackgroundTargetCard->setPosition(Point(320, 600));
 	this->addChild(pBackgroundTargetCard);
 
-	std::string sPath = "FlashCard/";
+	std::string sPath = "FlashCard/flashcardimage/";
 	sPath.append(pMainWord.m_sFlashCardImage);
 	Sprite* pFlashCard = Sprite::create(sPath.c_str());
 	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 96));
