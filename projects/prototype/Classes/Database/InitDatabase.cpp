@@ -54,7 +54,6 @@ bool InitDatabase::init()
 		return false;
 	}
 
-	UserDefault::getInstance()->setIntegerForKey("InitDatabase", 0);
 	if (UserDefault::getInstance()->getIntegerForKey("InitDatabase", 0) == 0)
 	{
 		if (createDatabase())
