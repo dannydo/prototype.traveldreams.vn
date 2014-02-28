@@ -57,6 +57,7 @@ public:
 	}
 
 	inline bool IsQuestActivated(const BonusQuestType& eQuestType) { return m_IsBonusQuestActivatedFlags[eQuestType];}
+	inline bool IsQuestCompleted(const BonusQuestType& eQuestType) { return m_IsBonusQuestCompletedFlags[eQuestType];}
 
 	inline bool IsQuestJustCompleted(const BonusQuestType& eQuestType, bool bResetFlag = true) { 
 		if (m_IsBonusQuestDirtyFlags[eQuestType] && m_IsBonusQuestCompletedFlags[eQuestType])

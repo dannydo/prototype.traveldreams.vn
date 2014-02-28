@@ -1,5 +1,6 @@
 #include "BonusQuestManager.h"
 #include "NewGameBoardManager.h"
+#include "cocos2d.h"
 
 BonusQuestManager::BonusQuestManager()
 {

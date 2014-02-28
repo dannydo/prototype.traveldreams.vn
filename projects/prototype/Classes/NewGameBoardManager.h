@@ -185,6 +185,11 @@ public:
 	// special method for activate collect bonus word quest
 	void CheckAndActivateBonusWordQuest(std::vector<NewCellInfo>& bonusWordCellList);
 
+	// check remain  bonus quest gem at end-game, if there're any, remove them before bonus phase
+	bool HasBonusQuestGemOnBoard();
+	void ClearBonusQuestGemOnBoard(std::vector<Cell>& basicMatchingDestroyedCells, 		
+		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,	std::vector<NewCellInfo>& newCells);
+
 	// Bonus end game
 	bool ExecuteEndGameBonus(
 		std::vector<ComboEffectCell>& convertedToComboCells,

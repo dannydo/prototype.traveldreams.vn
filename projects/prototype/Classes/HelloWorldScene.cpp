@@ -175,6 +175,8 @@ bool HelloWorld::init()
 
 void HelloWorld::initLevel(int iLevel)
 {	
+	CCLOG("Init 1");
+
 	/*switch( iLevel)
 	{
 		case 1:
@@ -249,6 +251,8 @@ void HelloWorld::initLevel(int iLevel)
 			break;
 	};
 
+	CCLOG("Init 2");
+
 	m_eTouchMoveState = _TMS_NONE_;	
 
 	// init data for status layer
@@ -268,6 +272,7 @@ void HelloWorld::initLevel(int iLevel)
 	//m_pBoardBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);
 	this->addChild(m_pBoardBatchNode);
 
+	CCLOG("Init 3");
 	// move hint
 	m_pMoveHintNode = Sprite::createWithSpriteFrameName("Gem_A.png");
 	m_pMoveHintNode->setOpacity(0);
@@ -284,6 +289,8 @@ void HelloWorld::initLevel(int iLevel)
 	animCache->addAnimationsWithFile("ComboEffect/combo5Animations.plist");
 
 	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/AnimationDetach/Animation detach.ExportJson");
+
+	CCLOG("Init 4");
 
 	// get symbol size
 	CCSprite* pSprite;
@@ -387,6 +394,7 @@ void HelloWorld::initLevel(int iLevel)
 			}
 		}
 	
+	CCLOG("Init 5");
 
 	// add letter to gems if existing
 	if (levelConfig.m_bIsMainWordExistedOnBoard)
@@ -406,6 +414,8 @@ void HelloWorld::initLevel(int iLevel)
 			}
 		}
 	}
+
+	CCLOG("Init 6");
 
 	// add boss if this is versus mode
 	m_pBossSprite = NULL;
@@ -1912,32 +1922,34 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				m_pComboCountRenderNode->GenerateLabels(_BQT_COLLECT_COMBO_);
 		
 			destroyBonusQuestGemList.clear();
-		}
-
-		// update state of bonus quest here (for test only)
-		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_GEM_))
-		{
-			auto& collectGemParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectGemParam();
-			for(int i=0; i < _MAX_GEM_ID_; i++)
-				m_pComboCountRenderNode->UpdateGemList(i, collectGemParam.m_CountPerGemType[i]);
-		}
-		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_COMBO_))
-		{
-			auto& collectComboParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectComboParam();
-			for(int i=0; i < _GCT_SINGLE_COMBO_COUNT_; i++)
-				m_pComboCountRenderNode->UpdateComboList(i, collectComboParam.m_CountPerComboGem[i]);
-		}
-		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_GEM_))
-		{
-			m_GameBoardManager.IncreaseScoreForCompleteBonusQuest();
-			m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_GEM_);
-		}
-		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_COMBO_))
-		{
-			m_GameBoardManager.IncreaseScoreForCompleteBonusQuest();
-			m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_COMBO_);
-		}
+		}		
 	}
+
+	// Quest still can be completed at bonus phase
+	// update state of bonus quest here (for test only)
+	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_GEM_) && !m_GameBoardManager.GetBonusQuestManager()->IsQuestCompleted(_BQT_COLLECT_GEM_))
+	{
+		auto& collectGemParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectGemParam();
+		for(int i=0; i < _MAX_GEM_ID_; i++)
+			m_pComboCountRenderNode->UpdateGemList(i, collectGemParam.m_CountPerGemType[i]);
+	}
+	else if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_GEM_) )
+	{
+		m_GameBoardManager.IncreaseScoreForCompleteBonusQuest();
+		m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_GEM_);
+	}
+
+	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_COMBO_)  && !m_GameBoardManager.GetBonusQuestManager()->IsQuestCompleted(_BQT_COLLECT_COMBO_))
+	{
+		auto& collectComboParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectComboParam();
+		for(int i=0; i < _GCT_SINGLE_COMBO_COUNT_; i++)
+			m_pComboCountRenderNode->UpdateComboList(i, collectComboParam.m_CountPerComboGem[i]);
+	}
+	else if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_COMBO_))
+	{
+		m_GameBoardManager.IncreaseScoreForCompleteBonusQuest();
+		m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_COMBO_);
+	}	
 
 
 	// compute effect on boss
@@ -2192,18 +2204,21 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				}
 			}
 		}
-		else if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_BONUS_WORD_))
-		{
-			// update display info
-			auto& collectBonusWordParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectBonusWordParam();
-			m_pComboCountRenderNode->UpdateBonusWordQuest( collectBonusWordParam.m_iRemainLettersCount);
+	}
+	
+	// quest still can be completed at bonus phase
+	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_BONUS_WORD_) && !m_GameBoardManager.GetBonusQuestManager()->IsQuestCompleted(_BQT_COLLECT_BONUS_WORD_))
+	{
+		// update display info
+		auto& collectBonusWordParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectBonusWordParam();
+		m_pComboCountRenderNode->UpdateBonusWordQuest( collectBonusWordParam.m_iRemainLettersCount);
 
-			if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_BONUS_WORD_))
-			{
-				m_GameBoardManager.IncreaseScoreForCompleteBonusQuest();
-				m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_BONUS_WORD_);
-			}
+		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_BONUS_WORD_))
+		{
+			m_GameBoardManager.IncreaseScoreForCompleteBonusQuest();
+			m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_BONUS_WORD_);
 		}
+		
 	}
 
 
@@ -3682,18 +3697,31 @@ void HelloWorld::EndUnlockLetterAnimation()
 		//check end game
 		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked()) // complete objective ==> win		
 		//if (true)
-		//if (false)
+		//if (false)		
 		{
-			// play sound effect 
-			SoundManager::PlaySoundEffect(_SET_COMPLETE_WORD_);
+			// should remove all bonus-quest gem before start bonus phase
+			if (m_GameBoardManager.HasBonusQuestGemOnBoard())
+			{
+				m_ComputeMoveResult.Reset();
+				m_GameBoardManager.ClearBonusQuestGemOnBoard( m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_OriginalMovedCells,
+															m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells);
 
-			m_bIsEffectPlaying = true;//stop all interaction on board from now
-			m_bIsEndGamePhase = true; 
+				PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells,
+						m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false);
+			}
+			else // start bonus phase
+			{
+				// play sound effect 
+				SoundManager::PlaySoundEffect(_SET_COMPLETE_WORD_);
 
-			ShowMainWordUnlockEffect();
-			//ExecuteBonusWinGameEffect();
+				m_bIsEffectPlaying = true;//stop all interaction on board from now
+				m_bIsEndGamePhase = true; 
 
-			UserTable::getInstance()->updateLife(0);
+				ShowMainWordUnlockEffect();
+				//ExecuteBonusWinGameEffect();
+
+				UserTable::getInstance()->updateLife(0);
+			}
 		}
 		else  if (m_GameBoardManager.GetCurrentMove() == 0) // out of move ==> lose
 		{

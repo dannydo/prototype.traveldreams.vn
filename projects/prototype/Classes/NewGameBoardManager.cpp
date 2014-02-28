@@ -119,6 +119,44 @@ bool NewGameBoardManager::IsColumnLocked(const int& iColumn)
 }
 
 
+bool NewGameBoardManager::HasBonusQuestGemOnBoard()
+{
+	int iRow, iColumn;
+	for(iRow =0; iRow < m_iRowNumber; iRow++)
+		for(iColumn =0; iColumn < m_iColumnNumber; iColumn++)
+		{
+			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID == _BONUS_QUEST_GEM_ID_)
+			{
+				return true;
+			}
+		}
+	return false;
+}
+
+void NewGameBoardManager::ClearBonusQuestGemOnBoard(std::vector<Cell>& basicMatchingDestroyedCells, 		
+		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells,	std::vector<NewCellInfo>& newCells)
+{
+	m_iPhaseMoveInComboChain = 1;
+
+	int iRow, iColumn;
+	for(iRow =0; iRow < m_iRowNumber; iRow++)
+		for(iColumn =0; iColumn < m_iColumnNumber; iColumn++)
+		{
+			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID == _BONUS_QUEST_GEM_ID_)
+			{
+				m_BoardValueMatrix[iRow][iColumn].Reset();
+				basicMatchingDestroyedCells.push_back(Cell(iRow, iColumn));				
+			}
+		}
+			
+
+	// calculate move cells and create new cells
+	CalculateMoveCells( originalMovedCells, targetMovedCells);
+
+	// generate new cells
+	GenerateNewGems(newCells, false);
+}
+
 bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& basicMatchingDestroyedCells, //std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList,// std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
@@ -1029,12 +1067,15 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 					&& m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType == _GCT_NONE_ && m_TemporaryValueMatrix[iRow][iColumn].m_iGemID < _MAX_GEM_ID_)
 					randomCellEachColumnList.push_back(Cell(iRow, iColumn));							
 			}
+			if ( randomCellEachColumnList.size() == 0)
+				continue;
+
 			int iRandomIndex = rand() % randomCellEachColumnList.size();
 			notComboCells.push_back( randomCellEachColumnList[iRandomIndex]);		
 		}
 
 		int iRandomIndex;
-		int iMaxConvertedCell = MIN(m_iCurrentMove, 5);
+		int iMaxConvertedCell = MIN( MIN(m_iCurrentMove, 5), notComboCells.size());
 		m_iCurrentMove -= iMaxConvertedCell;
 
 		for(int i=0; i< iMaxConvertedCell; i++)

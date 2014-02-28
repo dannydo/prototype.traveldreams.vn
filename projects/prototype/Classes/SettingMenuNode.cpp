@@ -113,7 +113,7 @@ bool SettingMenuNode::init()
 	FacebookManager::getInstance()->loadPlugin();
 	if(!FacebookManager::getInstance()->isLogined())
 	{
-		m_pItemShareDialog->setVisible(false);
+		m_pItemLogoutFacebook->setVisible(false);
 	}
 #endif
 	

@@ -25,7 +25,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	if (!Node::init())
 	{
 		return false;
-	}
+	}	
 
 	LayerColor* pBackground = LayerColor::create(ccc4(191, 103, 241, 229));
 	pBackground->setContentSize(CCSizeMake(640, 960));
@@ -48,6 +48,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pBackgroundTargetCard->setPosition(Point(320, 600));
 	this->addChild(pBackgroundTargetCard);
 
+
 	std::string sPath = "FlashCard/flashcardimage/";
 	sPath.append(pMainWord.m_sFlashCardImage);
 	Sprite* pFlashCard = Sprite::create(sPath.c_str());
@@ -57,12 +58,12 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	Node* pLevelNode = this->generateLayoutLevel(m_iCurrentLevel);
 	pLevelNode->setPosition(Point(365, 905));
 	this->addChild(pLevelNode);
-
+	
 	Label* pLabelMainWord = Label::createWithTTF("???", "fonts/ARLRDBD.ttf", 32);
 	pLabelMainWord->setColor(ccc3(0, 0, 0));
 	pLabelMainWord->setAnchorPoint(Point(0.5f, 0.0f));
 	pLabelMainWord->setPosition(Point(315, 645));
-	this->addChild(pLabelMainWord);
+	this->addChild(pLabelMainWord);	
 
 	MenuItemImage* pPlayLevel = MenuItemImage::create(
 		"Target-End-Game/Play_Button.png",

@@ -137,10 +137,7 @@
     </ClCompile>
     <ClCompile Include="..\Classes\FlashCardCollection.cpp">
       <Filter>Classes\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\CustomNode.cpp">
-      <Filter>Classes\Source Files</Filter>
-    </ClCompile>
+    </ClCompile>    
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">

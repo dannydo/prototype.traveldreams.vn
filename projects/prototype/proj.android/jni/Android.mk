@@ -32,6 +32,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/LifeSystemNode.cpp \
 				   ../../Classes/BonusQuestManager.cpp \
 				   ../../Classes/SettingMenuNode.cpp \
+				   ../../Classes/FlashCardCollection.cpp \
 				   ../../Classes/Social/FacebookManager.cpp \
 				   ../../Classes/APIService/UserService.cpp \
 				   ../../Classes/Database/InitDatabase.cpp \
