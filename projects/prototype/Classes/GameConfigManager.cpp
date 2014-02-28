@@ -368,6 +368,11 @@ void GameConfigManager::LoadGameConfig()
 	std::getline( inputStream, sComment);
 	std::getline( inputStream, sComment);
 	inputStream >> m_GameConfig.m_iBonusScoreActivateBonusEndGameCombo;
+	std::getline( inputStream, sComment);
+	std::getline( inputStream, sComment);
+	inputStream >>  m_GameConfig.m_iEndGameComboEffectDestroyCellRatio;
+
+
 	delete[] data;
 	delete[] orginalData;	
 }

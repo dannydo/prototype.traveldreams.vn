@@ -932,7 +932,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells)
 {	
-	m_iPhaseMoveInComboChain = 1;
+	m_iPhaseMoveInComboChain++;
 
 	// reset
 	m_iLinkedBlockCount = 0;
@@ -942,7 +942,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 
 	// NOTE: temporary disable double/triple at end game bonus
 	// if this phase trigger only by waiting combo 6 then not need to create temporary list
-	 /*if (!( m_WaitingTriggerSecondTimeComboList.size()>0))
+	if ( m_WaitingTriggerSecondTimeComboList.size() ==0)
 	{
 		// create temporary list to compute result for shifting move
 		CopyDataToTempBoardMatrixAndResetFlags( -1, -1, 0, 0);
@@ -975,7 +975,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 			return true;
 
 		}
-	}	*/
+	}	
 
 	// activate marked combo 6 and other trigger-2-times combos from last check
 	if (m_WaitingTriggerSecondTimeComboList.size()>0)
@@ -1007,13 +1007,16 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	bool bHasExistingCombo = false;
 
 	// create temporary list to compute result for shifting move
-	CopyDataToTempBoardMatrixAndResetFlags( -1, -1, 0, 0);
+	//CopyDataToTempBoardMatrixAndResetFlags( -1, -1, 0, 0);
 
 	// ************* create block for basic matching ******************************************
 	CreateBlockForBasicMatching( basicMatchingDestroyedCells);
 
 	if (basicMatchingDestroyedCells.size() == 0)
 	{
+		m_iPhaseMoveInComboChain = 1; //reset phase index
+
+
 		// convert some cells to special combo based on remain move count
 		std::vector<Cell> notComboCells;
 		std::vector<Cell> randomCellEachColumnList;
@@ -1791,14 +1794,6 @@ int NewGameBoardManager::GetBonusScoreForCompleteBonusQuest()
 	return iBonusScore;
 }
 
-int NewGameBoardManager::IncreaseScoreForEachEndGameCombo()
-{
-	int iBonusScore = m_GameConfig.m_iBonusScoreActivateBonusEndGameCombo;
-	m_iCurrentScore += iBonusScore;
-
-	return iBonusScore;
-}
-
 
 int NewGameBoardManager::IncreaseScoreForCreateCombo(const GemComboType_e& eComboType)
 {	
@@ -1883,6 +1878,9 @@ int NewGameBoardManager::GetComboDestroyCellRatio(const ComboEffectType& eComboE
 		case ComboEffectType::_CET_6_6_6_SECOND_EFFECT_:
 			iRatio = m_GameConfig.m_iCombEffectDestroyCellRatio6_6_6;			
 			break;
+		case ComboEffectType::_CET_BONUS_END_GAME_EFFECT_:
+			iRatio = m_GameConfig.m_iEndGameComboEffectDestroyCellRatio;
+			break;
 	}
 
 	return iRatio;
@@ -1941,6 +1939,9 @@ int NewGameBoardManager::IncreaseScoreForDestroyCells(const int& iGemCount, cons
 		//case ComboEffectType::_CET_6_6_6_EFFECT_:
 		case ComboEffectType::_CET_6_6_6_SECOND_EFFECT_:			
 			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateCombo6_6_6;
+			break;
+		case ComboEffectType::_CET_BONUS_END_GAME_EFFECT_:
+			iActivationBonusScore = m_GameConfig.m_iBonusScoreActivateBonusEndGameCombo;
 			break;
 	}
 	int iIncrementScore = (m_GameConfig.m_iScoreOfGem * iRatio * iGemCount/100 + iActivationBonusScore * iActivateComboRatio/100) * m_iPhaseMoveInComboChain;	

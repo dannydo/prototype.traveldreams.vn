@@ -89,7 +89,9 @@ public:
 	int m_iScoreLetterOfBonusWord;
 
 	int m_iBonusScoreCompleteBonusQuest;
+
 	int m_iBonusScoreActivateBonusEndGameCombo;
+	int m_iEndGameComboEffectDestroyCellRatio;
 };
 
 struct LevelTarget

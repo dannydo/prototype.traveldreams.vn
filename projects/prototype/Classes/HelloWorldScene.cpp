@@ -34,7 +34,7 @@ Scene* HelloWorld::createScene(int iLevel)
 	boardLayer->m_pStatusLayer->setCurrentScore(0);
 	boardLayer->m_pStatusLayer->setCurrentMove(0);
 	boardLayer->m_pStatusLayer->setPosition(420.f, 695.f);
-	boardLayer->m_pStatusLayer->setSpeedUpdateScore(40.f);
+	boardLayer->m_pStatusLayer->setSpeedUpdateScore(120.f);
 	scene->addChild(boardLayer->m_pStatusLayer);
 
 	// init level
@@ -1734,8 +1734,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 						Animate::create( pCombo5AnimBolt),
 						RemoveSelf::create(),
 						NULL));
-				
-				m_GameBoardManager.IncreaseScoreForEachEndGameCombo();
+								
 				iIndex++;
 			}
 

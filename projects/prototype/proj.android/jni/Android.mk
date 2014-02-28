@@ -30,10 +30,16 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/LeaderBoardNode.cpp \
 				   ../../Classes/LoadingScene.cpp \
 				   ../../Classes/LifeSystemNode.cpp \
+				   ../../Classes/BonusQuestManager.cpp \
+				   ../../Classes/SettingMenuNode.cpp \
 				   ../../Classes/Social/FacebookManager.cpp \
 				   ../../Classes/APIService/UserService.cpp \
 				   ../../Classes/Database/InitDatabase.cpp \
 				   ../../Classes/Database/sqlite3.c \
+				   ../../Classes/Database/ChapterTable.cpp \
+				   ../../Classes/Database/FriendTable.cpp \
+				   ../../Classes/Database/LevelTable.cpp \
+				   ../../Classes/Database/UserTable.cpp \
                    ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \

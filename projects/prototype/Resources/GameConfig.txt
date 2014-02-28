@@ -47,3 +47,5 @@
 5000
 ; bonus score when activate bonus end game combo
 1000
+; end-game combo effect - destroy cell ratio (percent)
+200

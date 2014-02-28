@@ -172,9 +172,7 @@ public:
 	int IncreaseScoreForLetterInMainWord();
 	int IncreaseScoreForLetterInBonusWords(const int& iLetterCount);
 	int IncreaseScoreForUnlockMainWord();
-	int IncreaseScoreForCompleteBonusQuest();
-	
-	int IncreaseScoreForEachEndGameCombo();
+	int IncreaseScoreForCompleteBonusQuest();	
 
 	int IncreaseScoreForDestroyCells(const int& iGemCount, const ComboEffectType& eComboEffectType, int iActivateComboRatio = 100);
 	//int IncreaseScoreComboEffect(const int& iGemCount, const GemComboType_e& eComboType)
