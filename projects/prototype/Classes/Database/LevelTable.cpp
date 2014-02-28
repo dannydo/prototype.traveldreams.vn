@@ -35,8 +35,12 @@ std::vector<LevelInfo> LevelTable::fetchLevelsForChapter(const int& iChapter)
 	std::vector<LevelInfo> levels;
 	char **re;
 	int nRow, nColumn;
-		
-	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), "select * from Chapters", &re, &nRow, &nColumn,NULL);
+
+	String sql = "select * from Levels where Chapter=";
+	sql.appendWithFormat("%d", iChapter);
+	CCLOG("%s", sql.getCString());
+
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
 	CCLOG("row is %d,column is %d", nRow, nColumn);
 
 	for (int iRow=1; iRow<=nRow; iRow++)
@@ -49,6 +53,7 @@ std::vector<LevelInfo> LevelTable::fetchLevelsForChapter(const int& iChapter)
 		levelInfo.iBonusQuest = int(strtod(re[iRow*nColumn+4], NULL));
 		levelInfo.bIsUnlock = bool(strtod(re[iRow*nColumn+5], NULL));
 		levelInfo.bIsUpdate = bool(strtod(re[iRow*nColumn+6], NULL));
+		levelInfo.sWordKey = re[iRow*nColumn+7];
 
 		levels.push_back(levelInfo);
 	}
@@ -58,6 +63,34 @@ std::vector<LevelInfo> LevelTable::fetchLevelsForChapter(const int& iChapter)
 	return levels;
 }
 
+LevelInfo LevelTable::fetchLevel(const int& iLevel)
+{
+	
+	char **re;
+	int nRow, nColumn;
+
+	String sql = "select * from Levels where Level=";
+	sql.appendWithFormat("%d", iLevel);
+	CCLOG("%s", sql.getCString());
+
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+	CCLOG("row is %d,column is %d", nRow, nColumn);
+
+	LevelInfo levelInfo;
+	levelInfo.iLevel = int(strtod(re[nColumn+0], NULL));
+	levelInfo.iChapter = int(strtod(re[nColumn+1], NULL));
+	levelInfo.iStar = int(strtod(re[nColumn+2], NULL));
+	levelInfo.iScore = int(strtod(re[nColumn+3], NULL));
+	levelInfo.iBonusQuest = int(strtod(re[nColumn+4], NULL));
+	levelInfo.bIsUnlock = bool(strtod(re[nColumn+5], NULL));
+	levelInfo.bIsUpdate = bool(strtod(re[nColumn+6], NULL));
+	levelInfo.sWordKey = re[nColumn+7];
+
+	sqlite3_free_table(re);
+
+	return levelInfo;
+}
+
 bool LevelTable::updateLevel(LevelInfo levelInfo)
 {
 	String sql = "update Levels Set";
@@ -65,8 +98,9 @@ bool LevelTable::updateLevel(LevelInfo levelInfo)
 	sql.appendWithFormat(" Star=%d,", levelInfo.iStar);
 	sql.appendWithFormat(" Score=%d,", levelInfo.iScore);
 	sql.appendWithFormat(" BonusQuest=%d,", levelInfo.iBonusQuest);
-	sql.appendWithFormat(" IsUnlock=%d", levelInfo.bIsUnlock);
-	sql.appendWithFormat(" IsUpdate=%d", levelInfo.bIsUpdate);
+	sql.appendWithFormat(" IsUnlock=%d,", levelInfo.bIsUnlock);
+	sql.appendWithFormat(" IsUpdate=%d,", levelInfo.bIsUpdate);
+	sql.appendWithFormat(" WordKey='%s'", levelInfo.sWordKey.c_str());
 	sql.appendWithFormat(" where Level=%d", levelInfo.iLevel);
 	CCLOG("%s", sql.getCString());
 

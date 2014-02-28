@@ -2,6 +2,7 @@
 #include "MainMenuScene.h"
 #include "Database\InitDatabase.h"
 #include "Database\UserTable.h"
+#include "SettingMenuNode.h"
 
 using namespace cocos2d;
 
@@ -57,6 +58,7 @@ bool LoadingLayer::init()
 	m_bFinishLoad = false;
 	this->scheduleUpdate();
 	this->loadData();
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kExitGame);
 
 	return true;
 }
@@ -72,14 +74,29 @@ void LoadingLayer::update(float dt)
 
 void LoadingLayer::loadData()
 {
-	auto actionLoading = CallFunc::create(this, callfunc_selector(LoadingLayer::initDatase));
+	auto actionLoading = CallFunc::create(this, callfunc_selector(LoadingLayer::initData));
 	auto actionFinishLoading = CallFunc::create(this, callfunc_selector(LoadingLayer::finishLoading));
 
 	this->runAction(Sequence::create(actionLoading, actionFinishLoading, NULL));
 }
 
-void LoadingLayer::initDatase()
+void LoadingLayer::initData()
 {
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnMusic", -1) == -1)
+	{
+		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnMusic", 1);
+	}
+
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnEffect", -1) == -1)
+	{
+		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnEffect", 1);
+	}
+
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", -1) == -1)
+	{
+		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnVoice", 1);
+	}
+
 	InitDatabase::getInstance();
 	UserTable::getInstance();
 }

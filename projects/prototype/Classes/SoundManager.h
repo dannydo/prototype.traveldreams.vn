@@ -25,18 +25,23 @@ enum SoundEffectType
 class SoundManager : Object
 {
 public:
+	 typedef enum {
+		kNone = 0,
+    	kGameMusic,
+    	kIntroMusic,
+    } StateBackGroundMusic;
+
 	static void PreloadSoundResource();
 
-	static void PlayBackgroundMusic();
+	static void PlayBackgroundMusic(StateBackGroundMusic stateBackGroundMusic);
 	static void StopBackgroundMusic();
-
-	static void PlayIntroMusic();
-	static void StopIntroMusic();
 
 	static void PlaySoundEffect(const SoundEffectType& eSoundEffectType, float fDelayTime = 0.f);	
 private:
 	void PlaySoundEffectUtil(Node* pNode, void* data);
 	static SoundManager m_InternalSoundManager;
+	static StateBackGroundMusic m_stateBackGroundMusic;
+	
 };
 
 #endif _SOUND_MANAGER_H_

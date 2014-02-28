@@ -15,7 +15,7 @@ public:
 
 private:
 	void loadData();
-	void initDatase();
+	void initData();
 	void finishLoading();
 
 	bool m_bFinishLoad;

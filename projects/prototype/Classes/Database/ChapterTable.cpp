@@ -46,10 +46,11 @@ void ChapterTable::fetchAllChapter()
 		chapterInfo.sName = re[iRow*nColumn+1];
 		chapterInfo.iMinLevel = int(strtod(re[iRow*nColumn+2], NULL));
 		chapterInfo.iMaxLevel = int(strtod(re[iRow*nColumn+3], NULL));
-		chapterInfo.iTotalStar = int(strtod(re[iRow*nColumn+4], NULL));
-		chapterInfo.iTotalScore = int(strtod(re[iRow*nColumn+5], NULL));
-		chapterInfo.bIsUnlock = bool(strtod(re[iRow*nColumn+6], NULL));
-		chapterInfo.bIsUpdate = bool(strtod(re[iRow*nColumn+7], NULL));
+		chapterInfo.iTotalLevelUnlock = int(strtod(re[iRow*nColumn+4], NULL));
+		chapterInfo.iTotalStar = int(strtod(re[iRow*nColumn+5], NULL));
+		chapterInfo.iTotalScore = int(strtod(re[iRow*nColumn+6], NULL));
+		chapterInfo.bIsUnlock = bool(strtod(re[iRow*nColumn+7], NULL));
+		chapterInfo.bIsUpdate = bool(strtod(re[iRow*nColumn+8], NULL));
 
 		m_Chapters.push_back(chapterInfo);
 	}
@@ -63,9 +64,10 @@ bool ChapterTable::updateChapter(ChapterInfo chapterInfo)
 	sql.appendWithFormat(" Name='%s',", chapterInfo.sName.c_str());
 	sql.appendWithFormat(" MinLevel=%d,", chapterInfo.iMinLevel);
 	sql.appendWithFormat(" MaxLevel=%d,", chapterInfo.iMaxLevel);
+	sql.appendWithFormat(" TotalLevelUnlock=%d,", chapterInfo.iTotalLevelUnlock);
 	sql.appendWithFormat(" TotalStar=%d,", chapterInfo.iTotalStar);
 	sql.appendWithFormat(" TotalScore=%d,", chapterInfo.iTotalScore);
-	sql.appendWithFormat(" IsUnlock=%d", chapterInfo.bIsUnlock);
+	sql.appendWithFormat(" IsUnlock=%d,", chapterInfo.bIsUnlock);
 	sql.appendWithFormat(" IsUpdate=%d", chapterInfo.bIsUpdate);
 	sql.appendWithFormat(" where Chapter=%d", chapterInfo.iChapter);
 	CCLOG("%s", sql.getCString());

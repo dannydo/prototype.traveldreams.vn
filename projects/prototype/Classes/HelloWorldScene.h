@@ -10,7 +10,8 @@
 #include "ComboCountRenderNode.h"
 #include "StatusLayer.h"
 //#include "BonusWordNode.h"
-#include "BonusWordNodeNew.h"
+#include "BonusWordNodeNew.h"	 
+#include "SettingMenuNode.h"
 
 
 #define _MAX_CHARACTER_ID_	5
@@ -220,6 +221,9 @@ private:
 
 	// special region for end game effect
 	cocos2d::LayerColor* m_pEndGameEffectLayer;
+
+	SettingMenuNode* m_pSettingNode	;
+	bool m_isShowSetting;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

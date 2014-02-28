@@ -24,6 +24,7 @@ EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& pMainWo
 {
 	EndGameNode* pEndGameNode = new EndGameNode();	  
 	pEndGameNode->m_iCurrentLevel = iCurrentLevel;
+	pEndGameNode->m_iTotalBonusQuest = 0;
 	if(pEndGameNode->initWin(iScore, pMainWord, pSubWord))
 	{			
 		pEndGameNode->autorelease();
@@ -62,7 +63,7 @@ bool EndGameNode::initLose(const int& iScore, const Word& pMainWord)
 	MenuItemImage* pRetryLevel = MenuItemImage::create(
 		"Target-End-Game/Retry_Button.png",
 		"Target-End-Game/Retry_Button_Click.png",
-		CC_CALLBACK_0(EndGameNode::menuRetryLevelCallBack, this));
+		CC_CALLBACK_0(EndGameNode::menuRetryLevelLoseCallBack, this));
 
 	Menu* pMenuLose = Menu::create(pRetryLevel, NULL);
 	pMenuLose->setPosition(Point(this->getContentSize().width/2.0f, 370));
@@ -94,6 +95,10 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 	m_pStarNode->setPosition(Point(228, 800));
 	this->addChild(m_pStarNode);
 
+	m_pBonusQuestNode = this->generateLayoutBonusQuest();
+	m_pBonusQuestNode->setPosition(Point(500, 905));
+	this->addChild(m_pBonusQuestNode);
+
 	Node* pScoreNode = this->generateLayoutScore(iScore);
 	pScoreNode->setPosition(Point(320, 745));
 
@@ -103,7 +108,7 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 	pBackgroundTargetCard->setPosition(Point(320, 600));
 	this->addChild(pBackgroundTargetCard);
 
-	std::string sPath = "FlashCard/";
+	std::string sPath = "FlashCard/flashcardimage/";
 	sPath.append(pMainWord.m_sFlashCardImage);
 	Sprite* pFlashCard = Sprite::create(sPath.c_str());
 	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 96));
@@ -128,7 +133,7 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 	MenuItemImage* pRetryLevel = MenuItemImage::create(
 		"Target-End-Game/Retry_Button.png",
 		"Target-End-Game/Retry_Button_Click.png",
-		CC_CALLBACK_0(EndGameNode::menuRetryLevelCallBack, this));
+		CC_CALLBACK_0(EndGameNode::menuRetryLevelWinCallBack, this));
 	pRetryLevel->setPosition(Point(this->getContentSize().width/2.0f - 115.0f, 370));
 
 	Menu* pMenuWin = Menu::create(pRetryLevel, pNextLevel, NULL);
@@ -136,6 +141,16 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 	this->addChild(pMenuWin);
 	
 	m_pLeaderBoard->addButtonShowMe();
+
+	//Update level data, hackcode chapter
+	LevelInfo m_levelInfo = LevelTable::getInstance()->fetchLevel(m_iCurrentLevel);
+	m_levelInfo.bIsUnlock = true;
+	m_levelInfo.bIsUpdate = true;
+	m_levelInfo.sWordKey = pMainWord.m_sWord;
+	m_levelInfo.iScore = iScore;
+	m_levelInfo.iBonusQuest = pSubWord.size();
+	LevelTable::getInstance()->updateLevel(m_levelInfo);
+
 	
 	return true;
 }
@@ -240,10 +255,15 @@ Node* EndGameNode::generateLayoutStar()
 	return pNode;
 }
 
-void EndGameNode::addYellowStar(int iYellowStar)
+void EndGameNode::addYellowStar(const int& iYellowStar)
 {
 	m_iYellowStar = iYellowStar;
 	m_iCountYellowStar = 0;
+
+	LevelInfo m_levelInfo = LevelTable::getInstance()->fetchLevel(m_iCurrentLevel);
+	m_levelInfo.iStar = iYellowStar;
+	LevelTable::getInstance()->updateLevel(m_levelInfo);
+
 	this->sequenceUpdateStar();
 }
 
@@ -260,6 +280,10 @@ void EndGameNode::loopUpdateStar()
 	if (m_iCountYellowStar < m_iYellowStar)
 	{
 		this->sequenceUpdateStar();
+	}
+	else
+	{
+		this->sequenceUpdateBonusQuest();
 	}
 }
 
@@ -285,6 +309,56 @@ void EndGameNode::updateStar()
 		m_iCountYellowStar++;
 	}
 }
+
+Node* EndGameNode::generateLayoutBonusQuest()
+{
+	Node* pNode = Node::create();
+	int iWidth = 0;;
+	for (int iIndex=0; iIndex<m_iTotalBonusQuest; iIndex++) {
+		Sprite* pBonusquest = Sprite::create("Target-End-Game/Bonus_Quest_Disable.png");
+		pBonusquest->setPosition(Point(iWidth, 0));
+		pNode->addChild(pBonusquest);
+		iWidth+= 91;
+	}
+	
+	return pNode;
+}
+
+void EndGameNode::addBonusQuestCompleted(const int& iBonusQuestCompleted)
+{
+	m_iBonusQuestCompleted = iBonusQuestCompleted;
+	m_iCountBonusQuest = 0;
+}
+
+void EndGameNode::sequenceUpdateBonusQuest()
+{
+	auto actionUpdateBonusQuest = CallFunc::create(this, callfunc_selector(EndGameNode::updateBonusQuest));
+	auto delay = DelayTime::create(0.7f);
+	auto actionLoopUpdateBonusQuest = CallFunc::create(this, callfunc_selector(EndGameNode::loopUpdateBonusQuest));
+	this->runAction(Sequence::create(delay->clone(), actionLoopUpdateBonusQuest, actionUpdateBonusQuest, NULL));
+}
+
+void EndGameNode::loopUpdateBonusQuest()
+{
+	if (m_iCountBonusQuest < m_iBonusQuestCompleted)
+	{
+		this->sequenceUpdateBonusQuest();
+	}
+}
+
+void EndGameNode::updateBonusQuest()
+{
+	Node* pNode = Node::create();
+	int iWidth = 0;;
+	for (int iIndex=0; iIndex<m_iTotalBonusQuest; iIndex++) {
+		Sprite* pBonusquest = Sprite::create("Target-End-Game/Bonus_Quest_Enable.png");
+		pBonusquest->setPosition(Point(iWidth, 0));
+		pNode->addChild(pBonusquest);
+		m_pBonusQuestNode->addChild(pBonusquest);
+		iWidth+= 91;
+	}
+}
+
 
 Node* EndGameNode::generateLayoutSubWord(const std::vector<Word>& subWords)
 {
@@ -348,7 +422,7 @@ void EndGameNode::menuNextLevelCallBack()
 	CCDirector::getInstance()->replaceScene(pLevelMap);
 }
 
-void EndGameNode::menuRetryLevelCallBack()
+void EndGameNode::menuRetryLevelLoseCallBack()
 {
 	UserTable::getInstance()->updateLife(0);
 	if(UserTable::getInstance()->getUserInfo().iLife > 0)
@@ -363,6 +437,15 @@ void EndGameNode::menuRetryLevelCallBack()
 	{
 		MessageBox("You have no life!", "Play Level");
 	}
+}
+
+void EndGameNode::menuRetryLevelWinCallBack()
+{
+	GameWordManager* pGameWordManager = GameWordManager::getInstance();
+	pGameWordManager->RetryCurrentLevel();
+
+	CCScene *pGameScene = HelloWorld::createScene(m_iCurrentLevel);
+	CCDirector::getInstance()->replaceScene(pGameScene);
 }
 
 void EndGameNode::menuCloseCallBack()

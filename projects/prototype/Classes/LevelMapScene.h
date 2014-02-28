@@ -2,8 +2,8 @@
 #define _LEVEL MAP_H_
 
 #include "cocos2d.h"
-
-#include "SimpleAudioEngine.h"
+#include "SimpleAudioEngine.h" 
+#include "SettingMenuNode.h"
 
 class LevelMapLayer : public cocos2d::CCLayer
 {
@@ -17,6 +17,10 @@ public:
 	void menuBackToWorldMap();
 	void menuOpenFlashCardCallBack();
 	void showPopupTargetGame(const int& iLevel);
+
+private:
+	SettingMenuNode* m_pSettingNode	;
+	bool m_isShowSetting;
 };
 
 class LevelMapScene : public cocos2d::CCScene

@@ -2,6 +2,7 @@
 
 SoundManager SoundManager::m_InternalSoundManager;
 
+SoundManager::StateBackGroundMusic SoundManager::m_stateBackGroundMusic = SoundManager::StateBackGroundMusic::kNone;
 // TODO: preload sound music and effects
 
 void SoundManager::PreloadSoundResource()
@@ -15,33 +16,50 @@ void SoundManager::PreloadSoundResource()
 #endif	
 }
 
-void SoundManager::PlayBackgroundMusic()
-{
-	//CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/MusicTheme.ogg", true);
-	
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-	CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffectPC/MusicTheme.wav", true);
-#else
-	CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/MusicTheme.ogg", true);
-#endif
+void SoundManager::PlayBackgroundMusic(StateBackGroundMusic stateBackGroundMusic)
+{	
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnMusic", 1) == 1)
+	{
+		bool isPlayMusic = false;
+		if (stateBackGroundMusic != m_stateBackGroundMusic)
+		{
+			isPlayMusic = true;
+		}
+
+		if(stateBackGroundMusic == StateBackGroundMusic::kNone)
+		{
+			stateBackGroundMusic = m_stateBackGroundMusic;
+		}
+
+		if (stateBackGroundMusic == StateBackGroundMusic::kGameMusic && isPlayMusic)
+		{
+			CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+			#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffectPC/MusicTheme.wav", true);
+			#else
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/MusicTheme.ogg", true);
+			#endif
+		}
+		else if(stateBackGroundMusic == StateBackGroundMusic::kIntroMusic && isPlayMusic)
+		{
+			CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+			#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffectPC/intro.wav", true);
+			#else
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/intro.ogg", true);
+			#endif
+		}
+	}
+
+	if(stateBackGroundMusic != StateBackGroundMusic::kNone)
+	{
+		m_stateBackGroundMusic = stateBackGroundMusic;
+	}
 }
 
 void SoundManager::StopBackgroundMusic()
-{		
-	//CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
-}
-
-void SoundManager::PlayIntroMusic()
 {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-	CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffectPC/intro.wav", true);
-#else
-	CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/intro.ogg", true);
-#endif
-}
-
-void SoundManager::StopIntroMusic()
-{
+	CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 }
 	
 
@@ -145,5 +163,9 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 
 void SoundManager::PlaySoundEffectUtil(Node* pNode, void* data)
 {
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect((const char*)data);
+	// check play voice on setting
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnEffect", 1) == 1)
+	{
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect((const char*)data);
+	}
 }

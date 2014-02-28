@@ -1,9 +1,10 @@
 #include "WorldMapScene.h"
 #include "LevelMapScene.h"
 #include "IntroductionLayer.h"
-#include "FlashCardScene.h"
+#include "FlashCardCollection.h"
 #include "MainMenuScene.h"
 #include "LifeSystemNode.h"
+#include "SoundManager.h"
 
 USING_NS_CC;
 
@@ -79,19 +80,24 @@ bool WorldMapLayer::init()
 		CC_CALLBACK_0(WorldMapLayer::menuOpenFlashCardCallBack, this));
 	pFlashCard->setPosition(ccp(365, 52));
 
-	CCMenuItemImage* pBackItem = CCMenuItemImage::create(
+	CCMenuItemImage* pItemSetting = CCMenuItemImage::create(
 		"World-Map/mask-button-back.png",
 		"World-Map/mask-button-back.png",
-		CC_CALLBACK_0(WorldMapLayer::menuBackToMainMenuCallBack, this));
-	pBackItem->setPosition(ccp(56, 49));
+		CC_CALLBACK_0(WorldMapLayer::openSettingMenu, this));
+	pItemSetting->setPosition(ccp(56, 49));
 
-	Menu* menuChapter = Menu::create(pChapterItem1 , pChapterItem2, pChapterItem3, pIntroduction, pFlashCard, pBackItem, NULL);
+	Menu* menuChapter = Menu::create(pChapterItem1 , pChapterItem2, pChapterItem3, pIntroduction, pFlashCard, pItemSetting, NULL);
 	menuChapter->setPosition(CCPointZero);
 	this->addChild(menuChapter);
 
 	LifeSystemNode* pLifeNode = LifeSystemNode::create();
 	pLifeNode->setPosition(Point(50.0f, 910.0f));
 	this->addChild(pLifeNode);
+
+	m_pSettingNode = NULL;
+	m_isShowSetting = false;
+	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kWorldMap);
 
 	return true;
 }
@@ -110,13 +116,30 @@ void WorldMapLayer::menuOpenIntroductionCallBack()
 
 void WorldMapLayer::menuOpenFlashCardCallBack()
 {
-	FlashCardScene* pFlashCard = FlashCardScene::create();
-	pFlashCard->getLayer()->setNameClassParent("WorldMapScene");
-	Director::getInstance()->replaceScene(pFlashCard);
+	FlashCardCollectionScene* pFlashCardCollection = FlashCardCollectionScene::create();
+	pFlashCardCollection->getLayerColor()->setNameClassParent("WorldMap");
+	Director::getInstance()->replaceScene(pFlashCardCollection);
 }
 
-void WorldMapLayer::menuBackToMainMenuCallBack()
+void WorldMapLayer::openSettingMenu()
 {
-	MainMenuScene* scene = MainMenuScene::create();
-	Director::getInstance()->replaceScene(scene);
+	if(m_pSettingNode == NULL)
+	{
+		m_pSettingNode = SettingMenuNode::create();
+		m_pSettingNode->setPosition(Point(-500.0f, 0));
+		this->addChild(m_pSettingNode);
+	}
+
+	if (m_isShowSetting == false)
+	{
+		m_isShowSetting = true;
+		m_pSettingNode->show();
+		this->setTouchEnabled(false);
+	}
+	else
+	{
+		m_isShowSetting = false;
+		m_pSettingNode->hide();
+		this->setTouchEnabled(true);
+	}
 }

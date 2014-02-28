@@ -18,7 +18,7 @@ class FriendTable
 public:
 	static FriendTable* getInstance();
 	bool init();
-	inline std::vector<FriendInfo> getUserInfo() { return m_Friends; };
+	inline std::vector<FriendInfo> getFriendsInfo() { return m_Friends; };
 	void fetchAllFriend();
 
 private:
