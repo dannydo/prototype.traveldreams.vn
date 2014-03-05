@@ -59,7 +59,8 @@ bool DictionaryDatabase::init()
 		fwrite(orginalData, iDataSize, 1, fp);
 		fclose(fp);
 
-		CC_SAFE_DELETE_ARRAY(orginalData);
+		// Detroy memmory
+		// CC_SAFE_DELETE_ARRAY(orginalData);
 	}
 
 	std::string sql;  
