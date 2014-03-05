@@ -137,7 +137,8 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\BonusQuestManager.cpp" />
     <ClCompile Include="..\Classes\BonusWordNode.cpp" />
     <ClCompile Include="..\Classes\BonusWordNodeNew.cpp" />
-    <ClCompile Include="..\Classes\ComboCountRenderNode.cpp" />    
+    <ClCompile Include="..\Classes\ComboCountRenderNode.cpp" />
+    <ClCompile Include="..\Classes\CustomNode.cpp" />
     <ClCompile Include="..\Classes\Database\ChapterTable.cpp" />
     <ClCompile Include="..\Classes\Database\DictionaryDatabase.cpp" />
     <ClCompile Include="..\Classes\Database\FriendTable.cpp" />

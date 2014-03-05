@@ -19,9 +19,13 @@ void DictionaryDatabase::releaseInstance()
 		delete m_DictionaryDatabase;
 	}
 
-	sqlite3_close(m_DictionaryDatabase->m_DatabaseSqlite);
-	m_DictionaryDatabase->m_DatabaseSqlite = NULL;
-	m_DictionaryDatabase = NULL;	
+	if (m_DictionaryDatabase != NULL)
+	{
+		sqlite3_close(m_DictionaryDatabase->m_DatabaseSqlite);
+		m_DictionaryDatabase->m_DatabaseSqlite = NULL;
+			
+	}
+	m_DictionaryDatabase = NULL;
 }
 
 DictionaryDatabase* DictionaryDatabase::getInstance()
@@ -59,8 +63,7 @@ bool DictionaryDatabase::init()
 		fwrite(orginalData, iDataSize, 1, fp);
 		fclose(fp);
 
-		// Detroy memmory
-		// CC_SAFE_DELETE_ARRAY(orginalData);
+		 CC_SAFE_DELETE_ARRAY(orginalData);
 	}
 
 	std::string sql;  

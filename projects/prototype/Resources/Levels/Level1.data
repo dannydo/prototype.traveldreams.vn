@@ -13,10 +13,11 @@
 1	1	1	1	1
 1	1	1	1	1
 ;main word row/collum
-BLACKBOARD
+PEN
 1
 3
-0
+1
+3 1 3 2 3 3 3 4 3 5
 ;bonus word
 0
 ;boss

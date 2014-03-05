@@ -137,15 +137,15 @@
     </ClCompile>
     <ClCompile Include="..\Classes\FlashCardCollection.cpp">
       <Filter>Classes\Source Files</Filter>
-    </ClCompile> 
-    <ClCompile Include="..\Classes\CustomNode.cpp">
-      <Filter>Classes\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\LoadingImageNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Database\DictionaryDatabase.cpp">
       <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\CustomNode.cpp">
+      <Filter>Classes\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
