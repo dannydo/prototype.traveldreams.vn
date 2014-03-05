@@ -409,8 +409,9 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 			Size winSize = Director::getInstance()->getWinSize();
 
 			// show dictionary
-			DictionaryNode* pDictionary = DictionaryNode::create();
-			this->getParent()->addChild(pDictionary, 20);			
+			DictionaryNode* pDictionary = DictionaryNode::createLayout(GameWordManager::getInstance()->GetMainWord().m_sWord);
+			pDictionary->setPosition(Point(320.0f, 680.0f));
+			this->getParent()->addChild(pDictionary, 20);
 		}
 		else
 		{
@@ -428,15 +429,15 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 
 void WordCollectBoardRenderNode::PlaySpellingSound()
 {
-	char sSoundFile[40];
+	char sSoundFile[100];
 
 	// check play voice on setting
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) == 1)
 	{
 		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-			sprintf(sSoundFile, "EnglishSoundPC/%s.wav", m_pMainWord->m_sSoundFile.c_str());
+			sprintf(sSoundFile, "EnglishSoundPC/Words/%s.wav", m_pMainWord->m_sSoundFile.c_str());
 		#else
-			sprintf(sSoundFile, "EnglishSound/%s.ogg", m_pMainWord->m_sSoundFile.c_str());
+			sprintf(sSoundFile, "EnglishSound/Words/%s.ogg", m_pMainWord->m_sSoundFile.c_str());
 		#endif
 
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);

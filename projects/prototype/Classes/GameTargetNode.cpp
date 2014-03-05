@@ -77,20 +77,12 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 		CC_CALLBACK_0(GameTargetNode::menuCloseCallBack, this));
 	pCloseItem->setPosition(Point(561, 855));
 
-	/*
-	MenuItemImage* pDictItem = MenuItemImage::create(
-		"Target-End-Game/Dict_Button.png",
-		"Target-End-Game/Dict_Button_Click.png",
-		CC_CALLBACK_0(GameTargetNode::menuOpenDictCallBack, this));
-	pDictItem->setPosition(Point(150, 300));
-	*/
-
 	Menu* pMenu = Menu::create(pPlayLevel, pCloseItem, NULL);
 	pMenu->setPosition(Point::ZERO);
 	this->addChild(pMenu, 10);
 
-	LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::create();
-	pLeaderBoard->setPosition(Point(320, 136));
+	LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel);
+	pLeaderBoard->setPosition(Point(320, 130));
 	this->addChild(pLeaderBoard);
 
 	return true;
@@ -105,12 +97,6 @@ void GameTargetNode::menuPlayLevelCallBack()
 void GameTargetNode::menuCloseCallBack()
 {
 	this->getParent()->removeChild(this);
-}
-
-void GameTargetNode::menuOpenDictCallBack()
-{
-	DictionaryNode* pDictionary = DictionaryNode::create();
-	this->addChild(pDictionary, 10);
 }
 
 void GameTargetNode::onTouchBackground(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)

@@ -26,6 +26,8 @@ class UserTable
 public:
 	static UserTable* getInstance();
 	bool init();
+	UserTable();
+	static void releaseInstance();
 
 	inline UserInfo getUserInfo() { return m_userInfo; };
 	void fetchhUser();
@@ -34,8 +36,6 @@ public:
 	bool updateLife(const unsigned int& iLoseLife);
 
 private:
-	UserTable();
-	virtual ~UserTable();
 	unsigned long getTimeLocalCurrent();
 
 	static UserTable* m_UserTable;

@@ -8,12 +8,13 @@ class InitDatabase
 {
 public:
 	static InitDatabase* getInstance();
+	InitDatabase();
 	bool init();
+	static void releaseInstance();
+
 	inline sqlite3* getDatabseSqlite() { return m_DatabaseSqlite; };
 
 private:
-	InitDatabase();
-	virtual ~InitDatabase();
 	bool createDatabase();
 
 	static InitDatabase* m_InitDatabase;

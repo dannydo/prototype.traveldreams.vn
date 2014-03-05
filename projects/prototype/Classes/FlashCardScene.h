@@ -23,19 +23,27 @@ private:
 	void openStringMenu();
 	void createNodeSlideShow();
 	void showSlideShowFlashCard();
-	void updateLayout();
+
 	void playVoiceWord();
+	void playVoiceSentence();
+	void openDictionary(const char* sWord);
+
 
 	cocos2d::Node* createLayoutFlashCard(const int& iIndexFlashCard);
 
-	cocos2d::Node* m_pFlashCardDisplay;
 	cocos2d::Node* m_pSlideShow;
 	cocos2d::LabelTTF* m_pLabelIndex;
 	cocos2d::Point m_touchPositionMoved;
 
-	std::vector<LevelInfo> m_levelInfo;
+	cocos2d::LabelTTF* m_pLabelWord;
+	cocos2d::Sprite* m_pIconSoundWordSprite;
+	cocos2d::Sprite* m_pIconSoundSenetenceSprite;
+
+	std::vector<LevelInfo> m_levels;
 	ChapterInfo m_chapterInfo;
-	Word wordInfo;
+	Word m_currentWordInfo;
+	LevelInfo m_currentLevelInfo;
+
 
 	bool m_bIsSwipe;
 

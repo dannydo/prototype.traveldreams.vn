@@ -108,6 +108,12 @@ void GameWordManager::LoadWords()
 
 		inputStream >> m_WordList[iWordIndex].m_sFlashCardImage;
 		inputStream >> m_WordList[iWordIndex].m_fSoundLength;
+
+		std::getline(inputStream, sTemp);
+		std::getline(inputStream, m_WordList[iWordIndex].m_sPhonetic);
+		std::getline(inputStream, m_WordList[iWordIndex].m_sSentence);
+		inputStream >> m_WordList[iWordIndex].m_sSentenceSoundFile;
+		inputStream >> m_WordList[iWordIndex].m_fSentenceSoundLength;
 	}
 
 	delete[] data;

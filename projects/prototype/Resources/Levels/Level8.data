@@ -22,7 +22,7 @@ GLOBE
 0
 ;bonus word
 1
-LECTURE
+UNIFORM
 ;boss
 0
 ;obstacle list: count, list
@@ -34,8 +34,8 @@ LECTURE
 2	0	0	5	0	0
 3
 3	4
-A PEN
-LECTURE
+PAPER
+MICROWAVE
 CRAYON
 
 

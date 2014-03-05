@@ -4,8 +4,9 @@
 #include "cocos2d.h"
 #include "APIService\UserService.h"
 #include "SettingMenuNode.h"
+#include "APIService\UserService.h"
 
-class MainMenuLayer : public cocos2d::Layer
+class MainMenuLayer : public cocos2d::Layer, InterfaceService
 {
 public:
 	MainMenuLayer() {};
@@ -23,7 +24,7 @@ private:
 	void shareDialogFacebook();
 	void openSettingMenu();
 
-	void onHttpRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
+	void resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey) override;
 
 	cocos2d::CCMenuItemImage* m_pLoginfacebook;
 	cocos2d::MenuItemLabel* m_pItemLogout;

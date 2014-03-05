@@ -10,9 +10,13 @@ ChapterTable::ChapterTable()
 
 }
 
-ChapterTable::~ChapterTable()
+void ChapterTable::releaseInstance()
 {
-	
+	if (m_ChapterTable == NULL)
+	{
+		delete m_ChapterTable;
+	}
+	m_ChapterTable = NULL;	
 }
 
 ChapterTable* ChapterTable::getInstance()

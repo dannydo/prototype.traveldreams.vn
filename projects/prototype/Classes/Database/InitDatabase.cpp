@@ -10,13 +10,16 @@ InitDatabase::InitDatabase()
 
 }
 
-InitDatabase::~InitDatabase()
+void InitDatabase::releaseInstance()
 {
-	if (m_DatabaseSqlite)
+	if (m_InitDatabase == NULL)
 	{
-		sqlite3_close(m_DatabaseSqlite);
-		m_DatabaseSqlite = NULL;
+		delete m_InitDatabase;
 	}
+
+	sqlite3_close(m_InitDatabase->m_DatabaseSqlite);
+	m_InitDatabase->m_DatabaseSqlite = NULL;
+	m_InitDatabase = NULL;	
 }
 
 InitDatabase* InitDatabase::getInstance()
@@ -38,12 +41,16 @@ InitDatabase* InitDatabase::getInstance()
 bool InitDatabase::init()
 {
 	m_spath = FileUtils::sharedFileUtils()->getWritablePath() + "ohmyword.db3";
+	
 	if(!FileUtils::getInstance()->isFileExist(m_spath))
 	{
 		UserDefault::getInstance()->setIntegerForKey("InitDatabase", 0);
 	}
-
-	std::string sql;  
+	else if (UserDefault::getInstance()->getIntegerForKey("InitDatabase", 0) == 0)
+	{
+		unlink(m_spath.c_str());
+	}
+ 
 	int iResult;  
 	iResult = sqlite3_open(m_spath.c_str(),&m_DatabaseSqlite);  
 	if(iResult != SQLITE_OK)

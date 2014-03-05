@@ -17,14 +17,14 @@ class FriendTable
 {
 public:
 	static FriendTable* getInstance();
+	FriendTable();
 	bool init();
+	static void releaseInstance();
+
 	inline std::vector<FriendInfo> getFriendsInfo() { return m_Friends; };
 	void fetchAllFriend();
 
 private:
-	FriendTable();
-	virtual ~FriendTable();
-
 	static FriendTable* m_FriendTable;
 	std::vector<FriendInfo> m_Friends;
 };

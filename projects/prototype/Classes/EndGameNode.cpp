@@ -140,18 +140,30 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 	pMenuWin->setPosition(Point::ZERO);
 	this->addChild(pMenuWin);
 	
-	m_pLeaderBoard->addButtonShowMe();
-
 	//Update level data, hackcode chapter
-	LevelInfo m_levelInfo = LevelTable::getInstance()->fetchLevel(m_iCurrentLevel);
+	m_levelInfo = LevelTable::getInstance()->fetchLevel(m_iCurrentLevel);
+	std::vector<ChapterInfo> chapters = ChapterTable::getInstance()->getChaptersInfo();
+	m_chapterInfo = chapters[m_levelInfo.iChapter-1];
+
+	if (m_levelInfo.bIsUnlock == false)
+	{
+		m_chapterInfo.iTotalLevelUnlock++;
+	}
+
 	m_levelInfo.bIsUnlock = true;
 	m_levelInfo.bIsUpdate = true;
 	m_levelInfo.sWordKey = pMainWord.m_sWord;
-	m_levelInfo.iScore = iScore;
-	m_levelInfo.iBonusQuest = pSubWord.size();
-	LevelTable::getInstance()->updateLevel(m_levelInfo);
+	if (m_levelInfo.iScore < iScore)
+	{
+		m_levelInfo.iScore = iScore;
+	}
 
-	
+	if (m_levelInfo.iBonusQuest < pSubWord.size())
+	{
+		m_levelInfo.iBonusQuest = pSubWord.size();
+	}
+
+
 	return true;
 }
 
@@ -177,19 +189,11 @@ bool EndGameNode::init()
 		CC_CALLBACK_0(EndGameNode::menuCloseCallBack, this));
 	pCloseItem->setPosition(Point(561, 855));
 
-	/*
-	MenuItemImage* pDictItem = MenuItemImage::create(
-		"Target-End-Game/Dict_Button.png",
-		"Target-End-Game/Dict_Button_Click.png",
-		CC_CALLBACK_0(EndGameNode::menuOpenDictCallBack, this));
-	pDictItem->setPosition(Point(150, 300));
-	*/
-
 	Menu* pMenu = Menu::create(pCloseItem, NULL);
 	pMenu->setPosition(Point::ZERO);
 	this->addChild(pMenu, 10);
 
-	m_pLeaderBoard = LeaderBoardtNode::create();
+	m_pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel);
 	m_pLeaderBoard->setPosition(Point(320, 136));
 	this->addChild(m_pLeaderBoard);
 
@@ -260,8 +264,13 @@ void EndGameNode::addYellowStar(const int& iYellowStar)
 	m_iYellowStar = iYellowStar;
 	m_iCountYellowStar = 0;
 
-	LevelInfo m_levelInfo = LevelTable::getInstance()->fetchLevel(m_iCurrentLevel);
-	m_levelInfo.iStar = iYellowStar;
+	if(m_levelInfo.iStar < iYellowStar)
+	{
+		m_chapterInfo.iTotalStar += iYellowStar - m_levelInfo.iStar;
+		m_levelInfo.iStar = iYellowStar;
+	}
+	
+	ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 	LevelTable::getInstance()->updateLevel(m_levelInfo);
 
 	this->sequenceUpdateStar();
@@ -452,10 +461,4 @@ void EndGameNode::menuCloseCallBack()
 {
 	LevelMapScene* pLevelMap =  LevelMapScene::create();
 	Director::getInstance()->replaceScene(pLevelMap);
-}
-
-void EndGameNode::menuOpenDictCallBack()
-{
-	DictionaryNode* pDictionary = DictionaryNode::create();
-	this->addChild(pDictionary, 10);
 }

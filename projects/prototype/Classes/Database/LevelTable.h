@@ -20,14 +20,14 @@ class LevelTable
 public:
 	static LevelTable* getInstance();
 	bool init();
+	LevelTable();
+	static void releaseInstance();
+
 	std::vector<LevelInfo> fetchLevelsForChapter(const int& iChapter);
 	LevelInfo fetchLevel(const int& iLevel);
 	bool updateLevel(LevelInfo levelInfo);
 
 private:
-	LevelTable();
-	virtual ~LevelTable();
-
 	static LevelTable* m_LevelTable;
 };
 #endif
