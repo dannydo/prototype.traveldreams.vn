@@ -147,6 +147,9 @@
     <ClCompile Include="..\Classes\CustomNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Database\GameTracking.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -279,6 +282,9 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Database\DictionaryDatabase.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\GameTracking.h">
       <Filter>Database</Filter>
     </ClInclude>
   </ItemGroup>
