@@ -15,6 +15,8 @@
 
 
 #define _MAX_CHARACTER_ID_	5
+#define _BOSS_ZORDER_ 200
+
 
 using namespace cocos2d;
 USING_NS_CC_EXT;
@@ -108,6 +110,8 @@ protected:
 	std::string GetImageFileFromGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
 	int GetUnmoveCellsFromCurrentMovingRowOrColumn();
 
+	inline int GetZOrder(const int& iRow, const int& iColumn, const bool& bIsBush) { return (m_GameBoardManager.GetRowNumber()-1-iRow)*m_GameBoardManager.GetColumnNumber() + iColumn + bIsBush*100;}
+
 	void AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, int iRowMove, int iColumnMove);
 	
 	void PlayEffect2(const bool& bIsBonusEndGamePhase,  std::vector<ComboEffectCell>& convertedToComboCells, 
@@ -117,6 +121,7 @@ protected:
 		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells, bool bIsNewMove);
 		
+	Sprite* AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID);
 	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror=false);
 	void AddNewComboCell(const ComboEffectCell& cell, const float& fDelayTime, const float& fEffectTime, bool bCreateMirror = true);
 
@@ -147,6 +152,7 @@ protected:
 	void PlayCombo6_6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime);	
 
 	void PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime);
+	void PlayCrazyPetEndGameBonusEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime);
 
 	void ActivateImageEffect(Node* pSender);
 	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float fEffectDuration);

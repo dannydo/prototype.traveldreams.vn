@@ -80,8 +80,8 @@ void WordCollectBoardRenderNode::UpdateList()
 
 void WordCollectBoardRenderNode::update(float dt)
 {
-	if (m_pCharacter->getAnimation()->getIsComplete())
-		m_pCharacter->getAnimation()->playByIndex(0);
+	//if (m_pCharacter->getAnimation()->getIsComplete())
+		//m_pCharacter->getAnimation()->playByIndex(0);
 }
 
 bool WordCollectBoardRenderNode::init()
@@ -101,14 +101,14 @@ bool WordCollectBoardRenderNode::init()
 	m_iUnlockedLetterEffectEndTime = m_iPreviousMainWordTapTime;
 
 	// preload character animation
-	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/PigHero/PigHero.ExportJson");
+	/*ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/PigHero/PigHero.ExportJson");
 
 	m_pCharacter = Armature::create("PigHero");
 	m_pCharacter->setBlendFunc(BlendFunc::ALPHA_NON_PREMULTIPLIED);	
 	m_pCharacter->getAnimation()->playByIndex(4);//0);
 	m_pCharacter->setAnchorPoint(Point(0,0));
 	m_pCharacter->setPosition( 5.f, 740.f);
-	this->addChild(m_pCharacter);
+	this->addChild(m_pCharacter);*/
 
 	this->setTouchEnabled(true);	
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);	
@@ -311,14 +311,14 @@ float WordCollectBoardRenderNode::PlayUnlockLettersAnimation(float fDelayTime)
 	return fTotalTime;
 }
 
-void WordCollectBoardRenderNode::PlayCharacterAnim(int iAnimIndex, bool bIsLoop)
+/*void WordCollectBoardRenderNode::PlayCharacterAnim(int iAnimIndex, bool bIsLoop)
 {
 	if (!bIsLoop)
 		m_pCharacter->getAnimation()->playByIndex(iAnimIndex, -1, -1,false);
 	else
 		m_pCharacter->getAnimation()->playByIndex(3, -1, -1,true);
 }
-
+*/
 /*int WordCollectBoardRenderNode::GetNextCharacterID()
 {	
 	m_iNextCharacterID++;

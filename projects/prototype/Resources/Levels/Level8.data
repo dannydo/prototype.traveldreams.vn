@@ -20,9 +20,12 @@ GLOBE
 1
 2
 0
-;bonus word
+;init rate, increase after move, decrease when destroyed, decrease when appeared, ratio betweens letters same generation
+5	10	20	80	10
+; config columns appear, 1: all columns, 0: specific columns + column count + columns list
 1
-LECTURE
+;end game bonus type
+1
 ;boss
 0
 ;obstacle list: count, list

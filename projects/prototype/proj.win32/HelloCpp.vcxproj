@@ -137,7 +137,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\BonusQuestManager.cpp" />
     <ClCompile Include="..\Classes\BonusWordNode.cpp" />
     <ClCompile Include="..\Classes\BonusWordNodeNew.cpp" />
-    <ClCompile Include="..\Classes\ComboCountRenderNode.cpp" />    
+    <ClCompile Include="..\Classes\ComboCountRenderNode.cpp" />
     <ClCompile Include="..\Classes\Database\ChapterTable.cpp" />
     <ClCompile Include="..\Classes\Database\FriendTable.cpp" />
     <ClCompile Include="..\Classes\Database\InitDatabase.cpp" />
@@ -210,6 +210,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\StatusLayer.h" />
     <ClInclude Include="..\Classes\WordCollectBoardRenderNode.h" />
     <ClInclude Include="..\Classes\WorldMapScene.h" />
+    <ClInclude Include="AccelerometerManager.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>

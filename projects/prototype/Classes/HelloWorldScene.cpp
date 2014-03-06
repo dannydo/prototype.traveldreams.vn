@@ -7,16 +7,16 @@
 USING_NS_CC;
 
 Scene* HelloWorld::createScene(int iLevel)
-{	
+{		
     // 'scene' is an autorelease object
     auto scene = Scene::create();
     
 	auto backgroundLayer = LayerColor::create(ccc4(10, 10, 10, 255)); //64, 88, 119, 255));
-	Sprite* pBackground = Sprite::create("Background.png");
+	Sprite* pBackground = Sprite::create("Background.pvr.ccz");
 	pBackground->setAnchorPoint(ccp(0,0));
 	backgroundLayer->addChild(pBackground);
 
-	scene->addChild(backgroundLayer);
+	scene->addChild(backgroundLayer);	
 
     // 'layer' is an autorelease object
     auto boardLayer = HelloWorld::create();	
@@ -24,6 +24,11 @@ Scene* HelloWorld::createScene(int iLevel)
 
     // add layer as a child to scene
     scene->addChild(boardLayer);
+
+	// footer
+	Sprite* pFooter = Sprite::create("Footer.pvr.ccz");
+	pFooter->setAnchorPoint(ccp(0,0));
+	boardLayer->m_pHUDLayer->addChild(pFooter);
 
 	//
 	boardLayer->m_pWordCollectBoardRenderNode = WordCollectBoardRenderNode::create();		
@@ -33,7 +38,7 @@ Scene* HelloWorld::createScene(int iLevel)
 	boardLayer->m_pStatusLayer->setScale(0.88f);
 	boardLayer->m_pStatusLayer->setCurrentScore(0);
 	boardLayer->m_pStatusLayer->setCurrentMove(0);
-	boardLayer->m_pStatusLayer->setPosition(420.f, 695.f);
+	boardLayer->m_pStatusLayer->setPosition(420.f, 765.f);
 	boardLayer->m_pStatusLayer->setSpeedUpdateScore(120.f);
 	scene->addChild(boardLayer->m_pStatusLayer);
 
@@ -174,9 +179,7 @@ bool HelloWorld::init()
 }
 
 void HelloWorld::initLevel(int iLevel)
-{	
-	CCLOG("Init 1");
-
+{		
 	/*switch( iLevel)
 	{
 		case 1:
@@ -205,24 +208,24 @@ void HelloWorld::initLevel(int iLevel)
 	{
 		case 8:
 		default:
-			m_fBoardBottomPosition = 102.f + 37.f;	
-			m_fBoardBottomClipPosition = 102.f;	
-			m_fMaskHeight = 518.f;
+			m_fBoardBottomPosition = 60.f + 120.f;	
+			m_fBoardBottomClipPosition = 60.f;	
+			m_fMaskHeight = 800.f;
 			break;
 		case 7:
-			m_fBoardBottomPosition = 135.f + 40.f;
-			m_fBoardBottomClipPosition = 135.f;	
-			m_fMaskHeight = 413.f;
+			m_fBoardBottomPosition = 60.f + 120.f;
+			m_fBoardBottomClipPosition = 60.f;	
+			m_fMaskHeight = 720.f;
 			break;
 		case 6:
-			m_fBoardBottomPosition = 165.f + 40.f;
-			m_fBoardBottomClipPosition = 165.f;	
-			m_fMaskHeight = 303.f;
+			m_fBoardBottomPosition = 140.f + 120.f;
+			m_fBoardBottomClipPosition = 140.f;	
+			m_fMaskHeight = 640.f;
 			break;
 		case 5:
-			m_fBoardBottomPosition = 195.f + 40.f;
-			m_fBoardBottomClipPosition = 195.f;	
-			m_fMaskHeight = 199.f;
+			m_fBoardBottomPosition = 140.f + 120.f;
+			m_fBoardBottomClipPosition = 140.f;	
+			m_fMaskHeight = 560.f;
 			break;
 	};
 
@@ -230,28 +233,26 @@ void HelloWorld::initLevel(int iLevel)
 	{
 		case 8:
 		default:
-			m_fBoardLeftPosition = 6.f + 38.f;			
-			m_fBoardLeftClipPosition = 6.f;
-			m_fMaskWidth = 618.f;
+			m_fBoardLeftPosition = 0 + 40.f;			
+			m_fBoardLeftClipPosition = 0.f;
+			m_fMaskWidth = 640.f;
 			break;
 		case 7:		
-			m_fBoardLeftPosition = 46.f + 38.f;			
-			m_fBoardLeftClipPosition = 46.f;
-			m_fMaskWidth = 506.f;
+			m_fBoardLeftPosition = 0.f + 120.f;			
+			m_fBoardLeftClipPosition = 0.f;
+			m_fMaskWidth = 640.f;
 			break;
 		case 6:		
-			m_fBoardLeftPosition = 86.f + 38.f;			
-			m_fBoardLeftClipPosition = 86.f;
-			m_fMaskWidth = 386.f;
+			m_fBoardLeftPosition = 0.f + 120.f;			
+			m_fBoardLeftClipPosition = 0.f;
+			m_fMaskWidth = 640.f;
 			break;
 		case 5:		
-			m_fBoardLeftPosition = 126.f + 38.f;			
-			m_fBoardLeftClipPosition = 126.f;
-			m_fMaskWidth = 272.f;
+			m_fBoardLeftPosition = 0.f + 120.f;			
+			m_fBoardLeftClipPosition = 0.f;
+			m_fMaskWidth = 560.f;
 			break;
-	};
-
-	CCLOG("Init 2");
+	};	
 
 	m_eTouchMoveState = _TMS_NONE_;	
 
@@ -269,10 +270,9 @@ void HelloWorld::initLevel(int iLevel)
 	// init graphic for gameBoard
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResourceDemo.plist");
 	m_pBoardBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
-	//m_pBoardBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);
+	m_pBoardBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);
 	this->addChild(m_pBoardBatchNode);
-
-	CCLOG("Init 3");
+	
 	// move hint
 	m_pMoveHintNode = Sprite::createWithSpriteFrameName("Gem_A.png");
 	m_pMoveHintNode->setOpacity(0);
@@ -289,13 +289,12 @@ void HelloWorld::initLevel(int iLevel)
 	animCache->addAnimationsWithFile("ComboEffect/combo5Animations.plist");
 
 	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/AnimationDetach/Animation detach.ExportJson");
-
-	CCLOG("Init 4");
+	
 
 	// get symbol size
 	CCSprite* pSprite;
 	pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(0).c_str());
-	m_SymbolSize = Point(78.f, 78.f); //pSprite->getContentSize() * 0.5;
+	m_SymbolSize = Point(80.f, 80.f); //pSprite->getContentSize() * 0.5;
 
 	int iRow, iColumn, iFlag, iObstacleTypeID;
 	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
@@ -303,6 +302,44 @@ void HelloWorld::initLevel(int iLevel)
 
 	memset( m_BoardObstaclesList, 0, sizeof(m_BoardObstaclesList));
 	bool bIsGemContainLetter = false;
+
+
+	// Add extra brushes at top and bottom rows
+	Point position;
+	for( iColumn = 0; iColumn < iNumberOfColumn; iColumn++)
+	{
+		// add top -2 brush
+		pSprite = Sprite::createWithSpriteFrameName( "Bush.png");		
+		position = Point(m_fBoardLeftPosition + iColumn * m_SymbolSize.width, m_fBoardBottomPosition + -2 * m_SymbolSize.height - 10.f);
+		pSprite->setPosition(position);
+		m_pBoardBatchNode->addChild(pSprite, GetZOrder(-2, iColumn, true));
+
+		// add top brushes
+		// add brush background
+		pSprite = Sprite::createWithSpriteFrameName( "Bush_Background.png");		
+		position = Point(m_fBoardLeftPosition + iColumn * m_SymbolSize.width, m_fBoardBottomPosition + -1 * m_SymbolSize.height - 10.f);
+		pSprite->setPosition(position);
+		m_pBoardBatchNode->addChild(pSprite);
+
+		// add brush
+		pSprite = Sprite::createWithSpriteFrameName( "Bush.png");		
+		pSprite->setPosition(Point(position.x, position.y ));
+		m_pBoardBatchNode->addChild(pSprite, GetZOrder(-1, iColumn, true));
+
+		// add bot brushes
+		// add brush background
+		pSprite = Sprite::createWithSpriteFrameName( "Bush_Background.png");		
+		position = Point(m_fBoardLeftPosition + iColumn * m_SymbolSize.width, m_fBoardBottomPosition + iNumberOfRow * m_SymbolSize.height - 10.f);
+		pSprite->setPosition(position);
+		m_pBoardBatchNode->addChild(pSprite);
+
+		// add brush 
+		pSprite = Sprite::createWithSpriteFrameName( "Bush.png");		
+		pSprite->setPosition(Point(position.x, position.y));
+		m_pBoardBatchNode->addChild(pSprite, GetZOrder( iNumberOfRow, iColumn, true));
+	}
+
+	Size spriteSize;
 
 	for(iRow=0; iRow < iNumberOfRow; iRow++)
 		for( iColumn = 0; iColumn < iNumberOfColumn; iColumn++)
@@ -312,12 +349,15 @@ void HelloWorld::initLevel(int iLevel)
 				m_BoardViewMatrix[iRow][iColumn].m_pSprite = NULL;
 				m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = NULL;
 
-				// mask
-				pSprite = Sprite::createWithSpriteFrameName( "brick.png");
-				//pSprite->setAnchorPoint(ccp(0,0));
-				pSprite->setPosition( ccp(m_fBoardLeftPosition + iColumn * m_SymbolSize.width, m_fBoardBottomPosition + iRow * m_SymbolSize.height));
-				pSprite->setScale(0.929f);
-				m_pBoardBatchNode->addChild(pSprite, 10);
+				pSprite = Sprite::createWithSpriteFrameName( "Bush_Background.png");		
+				position = Point(m_fBoardLeftPosition + iColumn * m_SymbolSize.width, m_fBoardBottomPosition + iRow * m_SymbolSize.height - 10.f);
+				pSprite->setPosition(position);
+				m_pBoardBatchNode->addChild(pSprite);
+
+				// add brush
+				pSprite = Sprite::createWithSpriteFrameName( "Bush.png");		
+				pSprite->setPosition(Point(position.x, position.y));
+				m_pBoardBatchNode->addChild(pSprite, GetZOrder( iRow, iColumn, true));
 
 				//continue;
 			}
@@ -359,7 +399,7 @@ void HelloWorld::initLevel(int iLevel)
 						m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = pSprite;								
 					}
 
-					m_pBoardBatchNode->addChild(pSprite);
+					m_pBoardBatchNode->addChild(pSprite, GetZOrder( iRow, iColumn, false));
 
 					// extra, add obstacle to map
 					/*if (m_GameBoardManager.GetCellObstacleType( iRow, iColumn) != _OT_NONE_)
@@ -374,27 +414,17 @@ void HelloWorld::initLevel(int iLevel)
 						iBlockID = m_GameBoardManager.GetObstacleBlockID(iRow, iColumn);
 						if (iBlockID < 0)
 							continue;
+						spriteSize = pSprite->getContentSize();
 
 						for(iObstacleTypeID = iObstacleTypeCount-1; iObstacleTypeID >=0; iObstacleTypeID--) // from low to highest priority
 						{							
-							ObstacleData& obstacleData = pObstacleProcessManager->GetObstacleData(iBlockID, iObstacleTypeID);
-							if (obstacleData.m_bIsActive)
-							{
-								Sprite* pMaskSprite = 
-									Sprite::createWithSpriteFrameName( GameConfigManager::getInstance()->GetObstacleLevelDescription(iObstacleTypeID, obstacleData.m_iObstacleLevel).m_sSpriteFileName.c_str()); //"Lock.png");														
-								pMaskSprite->setAnchorPoint(Point(0,0));
-								pSprite->addChild(pMaskSprite, 10);
-
-								if (obstacleData.m_iObstacleLevel > 0)
-									m_BoardObstaclesList[iBlockID][iObstacleTypeID] = pMaskSprite;
-							}
+							AddObstacleToGem(pSprite, iBlockID, iObstacleTypeID);
 						}
 					}
 				}
 			}
 		}
-	
-	CCLOG("Init 5");
+		
 
 	// add letter to gems if existing
 	if (levelConfig.m_bIsMainWordExistedOnBoard)
@@ -414,8 +444,7 @@ void HelloWorld::initLevel(int iLevel)
 			}
 		}
 	}
-
-	CCLOG("Init 6");
+	
 
 	// add boss if this is versus mode
 	m_pBossSprite = NULL;
@@ -426,7 +455,7 @@ void HelloWorld::initLevel(int iLevel)
 		m_pBossSprite->setPosition( ccp(m_fBoardLeftPosition + (levelConfig.m_BossConfig.m_Position.m_iColumn + levelConfig.m_BossConfig.m_iWidth/4.f)  * m_SymbolSize.width, 
 			m_fBoardBottomPosition + (levelConfig.m_BossConfig.m_Position.m_iRow + levelConfig.m_BossConfig.m_iHeight/4.f) * m_SymbolSize.height));
 		//pSprite->setScale(1.f);
-		m_pBoardBatchNode->addChild(m_pBossSprite, 11);
+		m_pBoardBatchNode->addChild(m_pBossSprite, _BOSS_ZORDER_);
 
 		// add letter to boss
 		AddNewLetterToBossSprite(0);
@@ -461,7 +490,7 @@ void HelloWorld::initLevel(int iLevel)
 
 
 	// create temp sprite, this's used to animate the drag line
-	m_pTempSpriteForAction = Sprite::createWithSpriteFrameName( "brick.png");
+	m_pTempSpriteForAction = Sprite::createWithSpriteFrameName( "Bush_Background.png");
 	m_pTempSpriteForAction->retain();
 	//m_pTempSpriteForAction->setAnchorPoint(ccp(0,0));
 	m_pTempSpriteForAction->setPosition( ccp(0,0));
@@ -535,7 +564,7 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 			//return "combo5_2.png";
 		case _GCT_COMBO6_:
 			return "combo6.png";
-		case _GCT_BONUS_END_GAME_COMBO_:
+		case _GCT_BONUS_END_GAME_SPECIAL_GEM_:
 			return "Combo4_2.png";
 		//case _GCT_COMBO6_2_:
 			//return "combo6_2.png";
@@ -545,108 +574,119 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 	{
 		case  _BONUS_QUEST_GEM_ID_:
 			return "BonusQuestGem.png";			
-		case 0:
+		case _GT_CAT_:
 		{
 			switch (eGemComboType)
 			{
 				case _GCT_NONE_:
-					return "Orange.png"; //"Candy_Cam.png";
+					return "Orange_Cat.png"; //"Candy_Cam.png";
 				case _GCT_COMBO4_:
-					return "Orange_Combo4.png";
+					return "Orange_Combo_4.png";
 				case _GCT_COMBO5_:				
-					return "Orange_Combo6.png";
+					return "Orange_Combo_5.png";
 				case _GCT_COMBO6_:				
 					return "Orange_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "alienOrange.png";
-
+					return "Orange_Letter.png";
+				case _GCT_BONUS_END_GAME_CRAZY_PET_:
+					return "Orange_Combo4_2.png"; 
 			}
 
 		}
-		case 1:
+		case _GT_BIRD_:
 		{
 			switch (eGemComboType)
 			{
 				case _GCT_NONE_:
-					return "Red.png"; //"Candy_Do.png";
+					return "Red_Bird.png"; //"Candy_Do.png";
 				case _GCT_COMBO4_:
-					return "Red_Combo4.png";				
+					return "Red_Combo_4.png";
 				case _GCT_COMBO5_:				
-					return "Red_Combo6.png";
+					return "Red_Combo_5.png";
 				case _GCT_COMBO6_:				
 					return "Red_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "alienRed.png";
+					return "Red_Letter.png";
+				case _GCT_BONUS_END_GAME_CRAZY_PET_:
+					return "Red_Combo4_2.png";
 			}			
 		}
-		case 2:
+		case _GT_HAMSTER_:
 		{
 			switch (eGemComboType)
 			{
 				case _GCT_NONE_:
-					return "Pink.png"; //"Candy_Tim.png";
+					return "Pink_Hamster.png"; //"Candy_Tim.png";
 				case _GCT_COMBO4_:
-					return "Pink_Combo4.png";				
+					return "Pink_Combo_4.png";
 				case _GCT_COMBO5_:				
-					return "Pink_Combo6.png";
+					return "Pink_Combo_5.png";
 				case _GCT_COMBO6_:				
 					return "Pink_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "alienPink.png";
+					return "Pink_Letter.png";
+				case _GCT_BONUS_END_GAME_CRAZY_PET_:
+					return "Pink_Combo4_2.png";
 			}						
 		}
-		case 3:
+		case _GT_SHEEP_:
 		{
 			switch (eGemComboType)
 			{
 				case _GCT_NONE_:
-					return "White.png"; //"Candy_Vang.png";
+					return "White_Sheep.png"; //"Candy_Vang.png";
 				case _GCT_COMBO4_:
-					return "White_Combo4.png";				
+					return "White_Combo_4.png";
 				case _GCT_COMBO5_:				
-					return "White_Combo6.png";
+					return "White_Combo_5.png";
 				case _GCT_COMBO6_:				
 					return "White_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "alienWhite.png";
+					return "White_Letter.png";
+				case _GCT_BONUS_END_GAME_CRAZY_PET_:
+					return "White_Combo4_2.png";
 			}									
 		}
-		case 4:
+		case _GT_ELEPHANT_:
 		{
 			switch (eGemComboType)
 			{
 				case _GCT_NONE_:
-					return "Blue.png"; //"Candy_XanhDuong.png";
+					return "Blue_Elephant.png"; //"Candy_XanhDuong.png";
 				case _GCT_COMBO4_:
-					return "Blue_Combo4.png";				
+					return "Blue_Combo_4.png";		
 				case _GCT_COMBO5_:				
-					return "Blue_Combo6.png";
+					return "Blue_Combo_5.png";
 				case _GCT_COMBO6_:				
 					return "Blue_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "alienBlue.png";
+					return "Blue_Letter.png";
+				case _GCT_BONUS_END_GAME_CRAZY_PET_:
+					return "Blue_Combo4_2.png";
 			}												
 		}
-		case 5:
+		case _GT_FROG_:
 		{
 			switch (eGemComboType)
 			{
 				case _GCT_NONE_:
-					return "Green.png"; //"Candy_XanhLa.png";
+					return "Green_Frog.png"; //"Candy_XanhLa.png";
 				case _GCT_COMBO4_:
-					return "Green_Combo4.png";				
+					return "Green_Combo_4.png";
 				case _GCT_COMBO5_:				
-					return "Green_Combo6.png";
+					return "Green_Combo_5.png";
 				case _GCT_COMBO6_:				
 					return "Green_Combo6.png";
 				//case _GCT_COMBO4_:
 				case _GCT_HAS_LETTER_:
-					return "alienGreen.png";
+					return "Green_Letter.png";
+				case _GCT_BONUS_END_GAME_CRAZY_PET_:
+					return "Green_Combo4_2.png";
 			}					
 		}
 	}
@@ -1703,7 +1743,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	if (bIsBonusEndGamePhase)
 	{
 		// play effect convert normal cells to combo cells
-		if (convertedToComboCells.size() > 0)
+		if (convertedToComboCells.size() > 0) // && convertedToComboCells[0].m_eGemComboType != _GCT_BONUS_END_GAME_CRAZY_PET_) //temporary disable transform of crasy pet
 		{
 			float fDelayPerConvertedCell = 0.05f;
 			auto pCombo5AnimBolt = AnimationCache::getInstance()->getAnimation("effectCombo5_Bolt");		
@@ -1712,35 +1752,40 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 			for(auto cell: convertedToComboCells)
 			{
-				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, iIndex * fDelayPerConvertedCell, _TME_BASIC_DESTROY_CELL_TIME_);
-
-				// create combo cell
-				Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(cell.m_iGemID, cell.m_eGemComboType).c_str());
-				//pSprite->setAnchorPoint(ccp(0,0));
 				Point pos(m_fBoardLeftPosition + cell.m_iColumn  * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height);
-				pSprite->setPosition(pos);
 
-				//pSprite->setScale(0.65f);
-				m_pBoardBatchNode->addChild(pSprite);
+				if (convertedToComboCells[0].m_eGemComboType != _GCT_BONUS_END_GAME_CRAZY_PET_)
+				{
+					BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, iIndex * fDelayPerConvertedCell, _TME_BASIC_DESTROY_CELL_TIME_);
 
-				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
+					// create combo cell
+					Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(cell.m_iGemID, cell.m_eGemComboType).c_str());
+					//pSprite->setAnchorPoint(ccp(0,0));					
+					pSprite->setPosition(pos);
 
-				pSprite->setOpacity(0);
-				pSprite->runAction( 
-					Sequence::create( 
-						DelayTime::create( iIndex * fDelayPerConvertedCell),
-						FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_/2.f),
-						//EaseIn::create( FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_/3.f), 2.f),
-						NULL));
+					//pSprite->setScale(0.65f);
+					m_pBoardBatchNode->addChild(pSprite, GetZOrder( cell.m_iRow, cell.m_iColumn, false));
 
-				pSprite->setScale(2.f);//1.5f);
-				pSprite->runAction( 
-					Sequence::create( 
-						DelayTime::create( iIndex * fDelayPerConvertedCell),
-						ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_/2.f, 1.f, 1.f),
-						//EaseIn::create(ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_/3.f, 1.f, 1.f), 2.f),
-						NULL));					
+					m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
 
+					pSprite->setOpacity(0);
+					pSprite->runAction( 
+						Sequence::create( 
+							DelayTime::create( iIndex * fDelayPerConvertedCell),
+							FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_/2.f),
+							//EaseIn::create( FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_/3.f), 2.f),
+							NULL));
+
+					pSprite->setScale(2.f);//1.5f);
+					pSprite->runAction( 
+						Sequence::create( 
+							DelayTime::create( iIndex * fDelayPerConvertedCell),
+							ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_/2.f, 1.f, 1.f),
+							//EaseIn::create(ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_/3.f, 1.f, 1.f), 2.f),
+							NULL));					
+				}
+				else
+					PlayChangeColorEffectOnSprite( m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite, iIndex * fDelayPerConvertedCell );
 
 				// bolt effect
 				Point vector( pos.x - rootEffect.x, pos.y - rootEffect.y);
@@ -1853,10 +1898,15 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				PlayChangeColorEffectOnSprite( m_BoardViewMatrix[ pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite, fCurrentDelayComboChain);
 			}
 		}
-		else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_BONUS_END_GAME_EFFECT_)
+		else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_BONUS_END_GAME__SPECIAL_GEM_EFFECT_)
 		{
 			PlayComboEndGameBonusEffect(pComboEffect, fCurrentDelayComboChain, _TME_BASIC_COMBO_EXECUTE_TIME_);
 		}
+		else  if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType >= _CET_BIRD_EXPLOSION_EFFECT_ && pComboEffect->m_ComboEffectDescription.m_eComboEffectType <= _CET_HAMSTER_RUN_RIGHT_DOWN_EFFECT_)
+		{
+			PlayCrazyPetEndGameBonusEffect(pComboEffect, fCurrentDelayComboChain, _TME_BASIC_COMBO_EXECUTE_TIME_);
+		}
+
 
 		// ******************************
 		if (pComboEffect->m_fTriggerTime + _TME_BASIC_COMBO_EXECUTE_TIME_ + fDelayTime> fTotalDestroyCellTime)
@@ -2065,6 +2115,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	}
 	
 	// move cells
+	int iUpdatedZOrder;
 	for (int i=0; i < originalMovedCells.size(); i++)
 	{		
 		//if ( m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite == NULL)
@@ -2078,9 +2129,16 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				NULL));
 
 
-		m_BoardViewMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn] = m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];		
-		
+
+
+		m_BoardViewMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn] = m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];				
 		m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn] = m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];					
+
+		iUpdatedZOrder = GetZOrder(targetMovedCells[i].m_iRow, targetMovedCells[i].m_iColumn, false);
+
+		m_BoardViewMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setZOrder( iUpdatedZOrder);		
+		if (m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite != NULL)
+			m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setZOrder(iUpdatedZOrder);
 	}	
 
 
@@ -2119,13 +2177,17 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			else
 			{
 				pSprite->setPosition( ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, 
+					//m_fBoardBottomPosition + (iNumberOfRow + 1) * m_SymbolSize.height));
 					m_fBoardBottomPosition + (cell.m_iRow + iNumberOfRow) * m_SymbolSize.height));
 				pSprite->runAction(
 					Sequence::create(
 						DelayTime::create(fTotalDestroyCellTime + 0.027f* (m_GameBoardManager.GetRowNumber() - cell.m_iRow)),
-						EaseOut::create( MoveTo::create(_TME_MOVE_CELL_TIME_ * 1.4f,
+						MoveTo::create(_TME_MOVE_CELL_TIME_,
 							ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, 
-									m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height)), 1.f),
+									m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height)),
+						//EaseOut::create( MoveTo::create(_TME_MOVE_CELL_TIME_,
+							//ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, 
+								//	m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height)), 2.f),
 							NULL));
 
 				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
@@ -2142,7 +2204,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				}
 			}*/
 					
-			m_pBoardBatchNode->addChild(pSprite);						
+			m_pBoardBatchNode->addChild(pSprite, GetZOrder( cell.m_iRow, cell.m_iColumn, false));
 		}		
 	}
 		
@@ -2173,7 +2235,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 					pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn)).c_str());
 					Point pos(m_fBoardLeftPosition + cell.m_iColumn  * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height);
 					pSprite->setPosition(pos);
-					m_pBoardBatchNode->addChild(pSprite);
+					m_pBoardBatchNode->addChild(pSprite,  GetZOrder( cell.m_iRow, cell.m_iColumn, false));
 
 					if (i==0)
 					{
@@ -2207,13 +2269,14 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	}
 	
 	// quest still can be completed at bonus phase
-	if (m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_BONUS_WORD_) && !m_GameBoardManager.GetBonusQuestManager()->IsQuestCompleted(_BQT_COLLECT_BONUS_WORD_))
+	if ((m_GameBoardManager.GetBonusQuestManager()->IsQuestActivated(_BQT_COLLECT_BONUS_WORD_) && !m_GameBoardManager.GetBonusQuestManager()->IsQuestCompleted(_BQT_COLLECT_BONUS_WORD_))
+		|| m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_BONUS_WORD_))
 	{
 		// update display info
 		auto& collectBonusWordParam = m_GameBoardManager.GetBonusQuestManager()->GetCollectBonusWordParam();
 		m_pComboCountRenderNode->UpdateBonusWordQuest( collectBonusWordParam.m_iRemainLettersCount);
 
-		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestJustCompleted(_BQT_COLLECT_BONUS_WORD_))
+		if (m_GameBoardManager.GetBonusQuestManager()->IsQuestCompleted(_BQT_COLLECT_BONUS_WORD_))
 		{
 			m_GameBoardManager.IncreaseScoreForCompleteBonusQuest();
 			m_pComboCountRenderNode->CompleteQuest(_BQT_COLLECT_BONUS_WORD_);
@@ -2296,7 +2359,7 @@ void HelloWorld::AddNewComboCell(const ComboEffectCell& cell, const float& fDela
 				m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height));
 
 		//pSprite->setScale(0.65f);
-		m_pBoardBatchNode->addChild(pSprite);
+		m_pBoardBatchNode->addChild(pSprite,  GetZOrder( cell.m_iRow, cell.m_iColumn, false));
 
 		if (i!= 0)
 		{			
@@ -2395,6 +2458,7 @@ void HelloWorld::UpdateObstacleListAfterMove()
 	}
 
 	// update dirty list
+	Size spriteSize;
 	for(iRow =0; iRow < iNumberOfRow; iRow++)
 		for(iColumn =0; iColumn < iNumberOfColumn; iColumn++)
 		{
@@ -2413,16 +2477,8 @@ void HelloWorld::UpdateObstacleListAfterMove()
 						m_BoardObstaclesList[iBlockID][iObstacleTypeID] = NULL;
 					}											
 
-					if (obstacleData.m_bIsActive)
-					{
-						Sprite* pMaskSprite = 
-							Sprite::createWithSpriteFrameName( GameConfigManager::getInstance()->GetObstacleLevelDescription(iObstacleTypeID, obstacleData.m_iObstacleLevel).m_sSpriteFileName.c_str()); //"Lock.png");														
-						pMaskSprite->setAnchorPoint(Point(0,0));
-						m_BoardViewMatrix[iRow][iColumn].m_pSprite->addChild(pMaskSprite, 10);
-
-						if (obstacleData.m_iObstacleLevel > 0)
-							m_BoardObstaclesList[iBlockID][iObstacleTypeID] = pMaskSprite;
-					}
+					AddObstacleToGem(m_BoardViewMatrix[iRow][iColumn].m_pSprite, iBlockID, iObstacleTypeID);
+					
 					obstacleData.m_bIsDirty = false;						
 				}
 			}
@@ -2481,7 +2537,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 			ccp(m_fBoardLeftPosition + iColumn  * m_SymbolSize.width, 
 					m_fBoardBottomPosition + iRow * m_SymbolSize.height));
 		
-		m_pWordCollectBoardRenderNode->PlayCharacterAnim(2, false);
+		//m_pWordCollectBoardRenderNode->PlayCharacterAnim(2, false);
 
 
 		int iUnlockedLetterIndexOfMainWord;		
@@ -2604,31 +2660,82 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 }
 */
 
+Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID)
+{	
+	ObstacleData& obstacleData = m_GameBoardManager.GetObstacleProcessManager()->GetObstacleData(iBlockID, iObstacleTypeID);
+	if (obstacleData.m_bIsActive)
+	{
+		Size spriteSize = pGemSprite->getContentSize();
+		Sprite* pMaskSprite = Sprite::createWithSpriteFrameName( GameConfigManager::getInstance()->GetObstacleLevelDescription(iObstacleTypeID, obstacleData.m_iObstacleLevel).m_sSpriteFileName.c_str()); //"Lock.png");														
+				
+		pGemSprite->addChild(pMaskSprite, 10);
+
+		const ObstacleDescription* pObstacleDesciption = GameConfigManager::getInstance()->GetObstacleDescription(iObstacleTypeID);
+		pMaskSprite->setPosition( Point( spriteSize.width /2.f + pObstacleDesciption->m_TranslatePosition.x, 
+			spriteSize.height /2.f + pObstacleDesciption->m_TranslatePosition.y));
+
+		if (pObstacleDesciption->m_bIsDrawLevelLabel)
+		{
+			char sLevelLabel[4];
+			char sTemp[30];
+			int iLabelLength, i;
+			sprintf( sLevelLabel, "%d", obstacleData.m_iObstacleLevel);
+			iLabelLength = strlen(sLevelLabel);
+			
+			if (iLabelLength > 0)
+			{
+				Sprite* levelSpriteList[3];
+				for(i=0; i<iLabelLength; i++)
+				{
+					sprintf(sTemp, "Number_%c.png", sLevelLabel[i]);
+					levelSpriteList[i] = Sprite::createWithSpriteFrameName(sTemp);
+				}
+			 
+				Size letterSize = levelSpriteList[0]->getContentSize();
+				Size obstacleSpriteSize = pMaskSprite->getContentSize();
+				for(i=0; i<iLabelLength; i++)
+				{
+					levelSpriteList[i]->setPosition( Point( obstacleSpriteSize.width/2.f + (i-(iLabelLength-1)/2.f) * letterSize.width, obstacleSpriteSize.height/2.f));
+					pMaskSprite->addChild(levelSpriteList[i]);
+				}
+			}
+		}
+
+		if (obstacleData.m_iObstacleLevel > 0)
+			m_BoardObstaclesList[iBlockID][iObstacleTypeID] = pMaskSprite;
+
+		return pMaskSprite;
+	}	
+	return NULL;
+}
+
 Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror)
 {
 	Sprite* pCharacterSprite = Sprite::createWithSpriteFrameName(
 			m_pWordCollectBoardRenderNode->GetImageInGemFileFromLetter(iLetter).c_str());
-					
-	pCharacterSprite->setPosition(ccp( 42.f, 42.f));
+		
+	Size parentSpriteSize = m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->getContentSize();
+	pCharacterSprite->setScale(0.8f);
+	pCharacterSprite->setPosition(Point(parentSpriteSize.width/2.f, parentSpriteSize.height/2.f));  //( 42.f, 42.f));
 
 	switch(iGemID)
 	{
-		case 0: //Orange
+		case _GT_CAT_: //Orange
 			pCharacterSprite->setColor(ccc3(252, 234, 160));
 			break;
-		case 1: //red
+		case _GT_BIRD_: //red
 			pCharacterSprite->setColor(ccc3(242, 209, 163));
 			break;
-		case 2: //pink
+		case _GT_HAMSTER_: //pink
 			pCharacterSprite->setColor(ccc3(242, 217, 179));
 			break;
-		case 3: //white
+		case _GT_SHEEP_: //white
 			pCharacterSprite->setColor(ccc3(148, 135, 102));
 			break;
-		case 4: //blue
+		case _GT_ELEPHANT_: //blue
 			pCharacterSprite->setColor(ccc3(17, 215, 250));
 			break;
-		case 5: //green
+		case _GT_FROG_: //green
 			pCharacterSprite->setColor(ccc3(184, 212, 6));
 			break;
 	}
@@ -2976,7 +3083,7 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 
 void HelloWorld::ShowMainWordUnlockEffect()
 {
-	m_pWordCollectBoardRenderNode->PlayCharacterAnim(3, true);
+	//m_pWordCollectBoardRenderNode->PlayCharacterAnim(3, true);
 
 	
 	m_pEndGameEffectLayer = LayerColor::create(ccc4( 0,0,0, 100));
@@ -3195,6 +3302,84 @@ void HelloWorld::PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, fl
 	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
 }
 
+void HelloWorld::PlayCrazyPetEndGameBonusEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
+{
+	if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_BIRD_EXPLOSION_EFFECT_ ||
+		pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_FROG_EXPLOSION_EFFECT_ ||
+		pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_ELEPHANT_EXPLOSION_EFFECT_ )
+	{
+		Sprite* pGemSprite = m_BoardViewMatrix[pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite;
+		pGemSprite->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime),
+				MoveBy::create(0.02f, Point(0, 6.f)),
+				MoveBy::create(0.03f, Point(0, -7.f)),
+				NULL));
+
+		PlayCombo5Effect(pComboEffect, fDelayTime + 0.05f, _TME_BASIC_COMBO_EXECUTE_TIME_);
+	}
+	else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_SHEEP_RUN_LEFT_EFFECT_)
+	{
+		Sprite* pGemSprite = m_BoardViewMatrix[pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite;
+		pGemSprite->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime),
+				MoveBy::create( fDisplayTime * 1.5f, Point( -400.f, 0)),
+				RemoveSelf::create(),
+				NULL));
+	}
+	else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_SHEEP_RUN_RIGHT_EFFECT_)
+	{
+		Sprite* pGemSprite = m_BoardViewMatrix[pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite;
+		pGemSprite->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime),
+				MoveBy::create( fDisplayTime * 1.5f, Point( 400.f, 0)),
+				RemoveSelf::create(),
+				NULL));
+	}
+	else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_CAT_RUN_UP_EFFECT_)
+	{
+		Sprite* pGemSprite = m_BoardViewMatrix[pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite;
+		pGemSprite->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime),
+				MoveBy::create( fDisplayTime * 1.5f, Point( 0, 400.f)),
+				RemoveSelf::create(),
+				NULL));
+	}
+	else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_CAT_RUN_DOWN_EFFECT_)
+	{
+		Sprite* pGemSprite = m_BoardViewMatrix[pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite;
+		pGemSprite->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime),
+				MoveBy::create( fDisplayTime * 1.5f, Point( 0, -400.f)),
+				RemoveSelf::create(),
+				NULL));
+	}
+	else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_HAMSTER_RUN_LEFT_UP_EFFECT_)
+	{
+		Sprite* pGemSprite = m_BoardViewMatrix[pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite;
+		pGemSprite->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime),
+				MoveBy::create( fDisplayTime * 1.5f, Point( 400, -400.f)),
+				RemoveSelf::create(),
+				NULL));
+	}
+	else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_HAMSTER_RUN_RIGHT_DOWN_EFFECT_)
+	{
+		Sprite* pGemSprite = m_BoardViewMatrix[pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite;
+		pGemSprite->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime),
+				MoveBy::create( fDisplayTime * 1.5f, Point( -400, 400.f)),
+				RemoveSelf::create(),
+				NULL));
+	}
+}
+
 void HelloWorld::PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
 {
 	auto pComboEffectSprite1 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
@@ -3381,8 +3566,8 @@ void HelloWorld::PlayCombo5_5Effect(ComboEffectBundle* pComboEffect, float fDela
 
 	pComboEffectSprite->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
 			m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height));
-
-	m_pBoardBatchNode->addChild(pComboEffectSprite);
+	
+	m_pBoardBatchNode->addChild(pComboEffectSprite, 200);
 
 	pComboEffectSprite->setOpacity(0);
 	pComboEffectSprite->runAction(Sequence::create( 
@@ -3668,7 +3853,7 @@ void HelloWorld::PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime)
 	float fDisplayTime = m_pWordCollectBoardRenderNode->PlayUnlockLettersAnimation(fDelayTime);
 	if (fDisplayTime > 0)
 	{
-		m_pWordCollectBoardRenderNode->PlayCharacterAnim(5, false);
+		//m_pWordCollectBoardRenderNode->PlayCharacterAnim(5, false);
 
 		this->runAction(
 			Sequence::create(

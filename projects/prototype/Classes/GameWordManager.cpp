@@ -37,6 +37,7 @@ void GameWordManager::LoadWordGenerateConfig()
 	std::getline(inputStream, sTemp);	
 
 	// config of main word
+	/*
 	std::getline(inputStream, sTemp);		
 	inputStream >> m_WordGenerateConfig.m_iInitRateOfMainLetter;
 	std::getline(inputStream, sTemp);		
@@ -51,7 +52,7 @@ void GameWordManager::LoadWordGenerateConfig()
 	std::getline(inputStream, sTemp);	
 	std::getline(inputStream, sTemp);		
 	inputStream >> m_WordGenerateConfig.m_iRatioBetweenLettersOfMainWord;
-	std::getline(inputStream, sTemp);	
+	std::getline(inputStream, sTemp);	*/
 
 	// config of sub words
 	std::getline(inputStream, sTemp);		
@@ -217,7 +218,7 @@ void GameWordManager::ResetDataForNewPlay()
 	if (m_pLevelConfig->m_bIsMainWordExistedOnBoard)
 		m_iMainWordGenerateRate = 0;
 	else
-		m_iMainWordGenerateRate = m_WordGenerateConfig.m_iInitRateOfMainLetter;	
+		m_iMainWordGenerateRate = m_pLevelConfig->m_iInitRateOfMainLetter;	
 	m_iTrashWordGenerateRate = m_WordGenerateConfig.m_iFixRatioOfTrashWords;
 
 	// reset trash letters collection
@@ -264,7 +265,7 @@ bool GameWordManager::UnlockLetter(const unsigned char& iLetter, int& iUnlockedL
 	}
 	// if letter of main word is unlocked then decrease the appear rate of remain letters
 	if (iUnlockedLetterIndexOfMainWord >=0)
-		m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate- m_WordGenerateConfig.m_iDecreasePercentAfterLetterDestroyedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);	
+		m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate- m_pLevelConfig->m_iDecreasePercentAfterLetterDestroyedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);	
 
 	m_iCountOfLettersOnBoard--;
 	if (bNewCharacterIsUnlocked)
@@ -281,11 +282,11 @@ bool SuccessWithPercentRatio(const int& iPercentRatio)
 		return false;
 }
 
-void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<GemLetterData>& outputLettersForGems, bool bIsNewMove)
+void GameWordManager::GenerateNewLetters(const std::vector<bool>& gemCanContainLetterFlagList,const int& iGemCount, std::vector<GemLetterData>& outputLettersForGems, bool bIsNewMove)
 {
 	// init outputLettersForGems as empty list
 	outputLettersForGems.clear();
-	for(int i=0; i< iGemCount; i++)
+	for(int i=0; i< gemCanContainLetterFlagList.size(); i++)
 		outputLettersForGems.push_back(GemLetterData());	
 
 	// check maximum possible new letters
@@ -312,8 +313,8 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<GemLe
 			{
 				if (GenerateLetterFromMainWord(sLetter))
 				{
-					characterOutput.push_back(GemLetterData( sLetter, true));				
-					iAppearRatio *= m_WordGenerateConfig.m_iRatioBetweenLettersOfMainWord / 100;				
+					characterOutput.push_back(GemLetterData( sLetter, true));						
+					iAppearRatio *=  m_pLevelConfig->m_iRatioBetweenLettersOfMainWord / 100;				
 				}
 				else
 					bShouldGenerateLetter = false;
@@ -322,7 +323,7 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<GemLe
 
 		if (characterOutput.size() > 0) //appear letter in main word ==> update ratio for next generation
 		{
-			m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate-m_WordGenerateConfig.m_iDecreasePercentAfterLetterAppearedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);
+			m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate-m_pLevelConfig->m_iDecreasePercentAfterLetterAppearedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);
 		}
 	}
 	
@@ -350,8 +351,13 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<GemLe
 	{
 		int indexList[_BOARD_MAX_ROW_NUMBER_ * _BOARD_MAX_COLUMN_NUMBER_];
 		int iIndexListLength = iGemCount;
-		for(int i=0; i< iGemCount; i++)
-			indexList[i] = i;
+		int iIndex = 0;
+		for(int i=0; i< gemCanContainLetterFlagList.size(); i++)
+			if (gemCanContainLetterFlagList[i])
+			{				
+				indexList[iIndex] = i;
+				iIndex++;
+			}
 		
 		int iRandomIndex;
 		for(auto gemData: characterOutput)
@@ -369,7 +375,7 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<GemLe
 
 	if (bIsNewMove)
 	{
-		m_iMainWordGenerateRate = MIN( m_iMainWordGenerateRate + m_WordGenerateConfig.m_iIncreasePercentAfterEachMoveOfMainLetter, m_WordGenerateConfig.m_iMaximumRate);			
+		m_iMainWordGenerateRate = MIN( m_iMainWordGenerateRate + m_pLevelConfig->m_iIncreasePercentAfterEachMoveOfMainLetter, m_WordGenerateConfig.m_iMaximumRate);			
 	}
 }
 
@@ -470,7 +476,7 @@ void GameWordManager::GenerateNewLetters(const int& iGemCount, std::vector<GemLe
 
 void GameWordManager::UpdateParamForNewMove()
 {
-	m_iMainWordGenerateRate = MIN( m_iMainWordGenerateRate + m_WordGenerateConfig.m_iIncreasePercentAfterEachMoveOfMainLetter, m_WordGenerateConfig.m_iMaximumRate);			
+	m_iMainWordGenerateRate = MIN( m_iMainWordGenerateRate + m_pLevelConfig->m_iIncreasePercentAfterEachMoveOfMainLetter, m_WordGenerateConfig.m_iMaximumRate);			
 }
 
 bool GameWordManager::GenerateLetterFromMainWord(unsigned char& sLetter)

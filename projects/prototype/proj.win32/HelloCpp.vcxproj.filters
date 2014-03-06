@@ -137,7 +137,7 @@
     </ClCompile>
     <ClCompile Include="..\Classes\FlashCardCollection.cpp">
       <Filter>Classes\Source Files</Filter>
-    </ClCompile>    
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -258,6 +258,9 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\CustomNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AccelerometerManager.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

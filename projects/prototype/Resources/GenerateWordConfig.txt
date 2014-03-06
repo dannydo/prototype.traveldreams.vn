@@ -4,16 +4,6 @@
 90
 ;maximum letters at the same time
 5
-;init rate for main letter (percent)
-5
-;increase percent after each move (letter of main word)
-10
-;decrease percent when letter destroyed  (letter of main word)
-20
-;decrease percent when letter appeared  (letter of main word)
-80
-; ratio betweens letters of main word in the same generation
-10
 ; fix ratio of letters of sub-words
 40
 ; ratio betweens letters of sub-words in the same generation

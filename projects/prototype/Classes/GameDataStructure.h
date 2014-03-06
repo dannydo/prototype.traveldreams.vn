@@ -13,6 +13,7 @@
 #define _BONUS_QUEST_GEM_ID_	11
 #define _BONUS_WORD_GEM_ID_		12
 #define _BONUS_END_GAME_COMBO_GEM_ID	13
+//#define _BONUS_END_GAME_CRAZY_GEM_ID	14
 
 #define _BOARD_MAX_ROW_NUMBER_	9
 #define _BOARD_MAX_COLUMN_NUMBER_	9
@@ -35,6 +36,9 @@
 #define _TME_COMBO_6_5_EXECUTE_TIME_			0.75f
 #define _TME_COMBO_4_5_PHASE2_DELAY_TIME_	0.2f //this delay used for 5-5-5 too, execution of each phase = basic combo execute time	
 
+#define _TME_END_GAME_BONUS_PET_RUN_TIME_ 0.35f
+#define _TME_END_GAME_PET_EXPLOSION_PHASE_1_TIME_	0.06f
+#define _TME_END_GAME_PET_EXPLOSION_PHASE_2_TIME_	0.35f
 
 struct GameConfig
 {
@@ -109,11 +113,11 @@ public:
 	int m_iMaximumLettersAtTheSame;
 
 	// config of main word
-	int m_iInitRateOfMainLetter; //letter of main word
-	int m_iIncreasePercentAfterEachMoveOfMainLetter;
-	int m_iDecreasePercentAfterLetterDestroyedOfMainLetter;
-	int m_iDecreasePercentAfterLetterAppearedOfMainLetter;
-	int m_iRatioBetweenLettersOfMainWord; //in the same generation
+	//int m_iInitRateOfMainLetter; //letter of main word
+	//int m_iIncreasePercentAfterEachMoveOfMainLetter;
+	//int m_iDecreasePercentAfterLetterDestroyedOfMainLetter;
+	//int m_iDecreasePercentAfterLetterAppearedOfMainLetter;
+	//int m_iRatioBetweenLettersOfMainWord; //in the same generation
 
 	//config of sub-words
 	int m_iFixRatioOfSubWords;
@@ -139,7 +143,8 @@ enum GemComboType_e
 	_GCT_COMBO5_5_TRIGGER_SECOND_TIME_,
 	_GCT_COMBO6_6_6_TRIGGER_SECOND_TIME_,
 	
-	_GCT_BONUS_END_GAME_COMBO_,
+	_GCT_BONUS_END_GAME_SPECIAL_GEM_,
+	_GCT_BONUS_END_GAME_CRAZY_PET_,
 
 	_GCT_SINGLE_COMBO_COUNT_ = 3
 };
@@ -160,6 +165,16 @@ enum ObstacleType_e : int
 	_OT_LOCK_COLUMN_,	
 	_OT_SHIELDED_ALIEN_,
 	_OT_FROGEN_ALIEN_
+};
+
+enum GemType_e : int
+{
+	_GT_SHEEP_ = 2,
+	_GT_CAT_ = 3,
+	_GT_HAMSTER_ = 5,
+	_GT_BIRD_ = 0,
+	_GT_FROG_ = 4,
+	_GT_ELEPHANT_ = 1
 };
 
 struct Cell

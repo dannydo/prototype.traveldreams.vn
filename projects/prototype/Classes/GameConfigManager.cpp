@@ -126,7 +126,7 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 	}
 	std::getline(inputStream, sTemp);
 
-	// bonus word
+	/*// bonus word
 	std::getline(inputStream, sTemp);
 	inputStream >> levelConfig.m_iBonusWordsCount;
 	std::getline(inputStream, sTemp);
@@ -136,8 +136,48 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 		std::getline(inputStream, sTemp);
 		sTemp.erase( sTemp.size()-1, 1); // remove \r
 		levelConfig.m_BonusWordIDList[i] = GameWordManager::getInstance()->GetWordIndexFromContent(sTemp);
-	}
+	}*/
 	//std::getline(inputStream, sTemp);
+
+
+	// config of dropping of main word
+	if (!levelConfig.m_bIsMainWordExistedOnBoard)
+	{
+		// ratio
+		std::getline(inputStream, sTemp);		
+		inputStream >> levelConfig.m_iInitRateOfMainLetter;
+		inputStream >> levelConfig.m_iIncreasePercentAfterEachMoveOfMainLetter;
+		inputStream >> levelConfig.m_iDecreasePercentAfterLetterDestroyedOfMainLetter;
+		inputStream >> levelConfig.m_iDecreasePercentAfterLetterAppearedOfMainLetter;
+		inputStream >> levelConfig.m_iRatioBetweenLettersOfMainWord;
+		std::getline(inputStream, sTemp);		
+
+		// drop on all column or not
+		std::getline(inputStream, sTemp);
+		inputStream >> iTemp;
+		levelConfig.m_bCanDropOnAllColumn = (iTemp != 0);
+		if (!levelConfig.m_bCanDropOnAllColumn)
+		{
+			memset( levelConfig.m_DropOnColumnsFlagList, 0, sizeof(levelConfig.m_DropOnColumnsFlagList));
+
+			int iColumnCount;
+			inputStream >> iColumnCount;
+			for(int i=0; i< iColumnCount; i++)
+			{
+				inputStream >> iTemp;
+				iTemp--;
+				if (iTemp < _BOARD_MAX_COLUMN_NUMBER_)
+					levelConfig.m_DropOnColumnsFlagList[iTemp] =  true;
+			}
+		}
+		std::getline(inputStream, sTemp);
+	}
+
+	// end game bonus type
+	std::getline(inputStream, sTemp);
+	inputStream >> iTemp;
+	levelConfig.m_eEndGameBonusType = (EndGameBonusType)iTemp;
+	std::getline(inputStream, sTemp);
 
 	// boss config
 	std::getline(inputStream, sTemp);
@@ -412,7 +452,7 @@ void GameConfigManager::LoadObstacleConfig()
 	// read obstacle detail
 	string sObstacleName;
 	cs::JsonDictionary* pObstacleDetailDict;
-	cs::JsonDictionary* pObstacleLevellDict;
+	cs::JsonDictionary* pObstacleLevellDict, *pObstacleTranslatePosDict;
 
 	for(int i=0; i < iObstacleCount; i++)
 	{
@@ -443,7 +483,20 @@ void GameConfigManager::LoadObstacleConfig()
 
 			pObstacleDescription->m_LevelList.push_back(levelObstacle);
 
-			CC_SAFE_DELETE(pObstacleLevellDict);
+			CC_SAFE_DELETE(pObstacleLevellDict);		
+		}
+
+		// read translate position
+		pObstacleTranslatePosDict = pObstacleDetailDict->getSubDictionary("translatePosition");
+		pObstacleDescription->m_TranslatePosition.x = pObstacleTranslatePosDict->getItemIntValue("x",0);
+		pObstacleDescription->m_TranslatePosition.y = pObstacleTranslatePosDict->getItemIntValue("y",0);
+		CC_SAFE_DELETE(pObstacleTranslatePosDict);
+
+		// read draw level label config
+		pObstacleDescription->m_bIsDrawLevelLabel = pObstacleDetailDict->getItemBoolvalue("drawLevelLabel", false);
+		if (pObstacleDescription->m_bIsDrawLevelLabel)
+		{
+			pObstacleDescription->m_sLevelLabelImageFolder = pObstacleDetailDict->getItemStringValue("levelLabelImageFolder");
 		}
 
 		pObstacleDescription->m_bDecreaseLevelAfterDestroyed = pObstacleDetailDict->getItemBoolvalue("decreaseLevelAfterDestroyed", true);

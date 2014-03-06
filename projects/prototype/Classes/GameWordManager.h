@@ -56,7 +56,7 @@ public:
 	//void ActivateFirstInactivatedLetterOfMainWord();
 
 	// generate new letters for new gems, also update rate
-	void GenerateNewLetters(const int& iGemCount, std::vector<GemLetterData>& outputLettersForGems, bool bIsNewMove);	
+	void GenerateNewLetters(const std::vector<bool>& gemCanContainLetterFlagList, const int& iGemCount, std::vector<GemLetterData>& outputLettersForGems, bool bIsNewMove);	
 	
 	//bool GenerateNewLetter(unsigned char& sOuputLetter, const GemComboType_e& eComboType);	
 	void UpdateParamForNewMove();

@@ -39,7 +39,6 @@ public:
 
 	void PlayUnlockLetterEffect(const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position);
 
-	void PlayCharacterAnim(int iAnimIndex, bool bIsLoop = false);
 private:
 	//void LoadWords();
 	//void GetWordIndex();
@@ -70,7 +69,7 @@ private:
 	unsigned long m_iPreviousMainWordTapTime;
 	unsigned long m_iUnlockedLetterEffectEndTime;
 
-	Armature* m_pCharacter;
+	//Armature* m_pCharacter;
 
 	bool m_NewUnlockedLetterFlags[_GDS_WORD_MAX_LENGTH_];
 };

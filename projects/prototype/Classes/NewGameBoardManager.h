@@ -30,7 +30,17 @@ enum ComboEffectType
 	_CET_6_6_6_EFFECT_,
 	_CET_6_6_6_SECOND_EFFECT_,
 
-	_CET_BONUS_END_GAME_EFFECT_
+	_CET_BIRD_EXPLOSION_EFFECT_,
+	_CET_FROG_EXPLOSION_EFFECT_,
+	_CET_ELEPHANT_EXPLOSION_EFFECT_,
+	_CET_SHEEP_RUN_LEFT_EFFECT_,
+	_CET_SHEEP_RUN_RIGHT_EFFECT_,
+	_CET_CAT_RUN_UP_EFFECT_,
+	_CET_CAT_RUN_DOWN_EFFECT_,
+	_CET_HAMSTER_RUN_LEFT_UP_EFFECT_,
+	_CET_HAMSTER_RUN_RIGHT_DOWN_EFFECT_,
+
+	_CET_BONUS_END_GAME__SPECIAL_GEM_EFFECT_
 };
 
 struct ComboEffectDescription
@@ -200,7 +210,8 @@ public:
 		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells);		
 protected:
-	inline ComboEffectType GetComboEffectTypeFromComboType(GemComboType_e eGemComboType, const int& iDeltaMoveRow, const int& iDeltaMoveColumn);	
+	inline ComboEffectType GetComboEffectTypeFromComboType(const GemComboType_e& eGemComboType, const int& iDeltaMoveRow, const int& iDeltaMoveColumn);	
+	inline ComboEffectType GetEndGameBonusComboEffectTypeFrom(const GemComboType_e& eGemComboType, const int& iGemID);
 
 	inline bool IsCellDestroyable(const int& iRow, const int& iColumn) { return (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 && (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType < _GCT_COMBO6_WAITING_TRIGGER_ 
 																				|| m_BoardValueMatrix[iRow][iColumn].m_eGemComboType > _GCT_COMBO6_6_6_TRIGGER_SECOND_TIME_ ));}

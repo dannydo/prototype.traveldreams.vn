@@ -21,7 +21,7 @@
             "canBeMoveThrough": false,
             "dropable": true,
             "lockRow":true,
-            "lockColumn":true,
+            "lockColumn":true,			
             "levelList":
                 [
                     { 
@@ -29,6 +29,9 @@
                         "spriteFileName":"Lock.png"
                     }
                 ],
+			"translatePosition":{ "x":0, "y":-25},
+			"drawLevelLabel":false,
+			"levelLabelImageFolder":"",
             "decreaseLevelAfterDestroyed": true,
             "decreaseLevelAfterMoved": false,
             "transformToObjectAtLevel0": "",
@@ -61,8 +64,19 @@
 					{ 
                         "level":3,
                         "spriteFileName":"Shield_3.png"
+                    },
+					{ 
+                        "level":4,
+                        "spriteFileName":"Shield_4.png"
+                    },
+					{ 
+                        "level":5,
+                        "spriteFileName":"Shield_5.png"
                     }
                 ],
+			"translatePosition":{ "x":0, "y":22},
+			"drawLevelLabel":false,
+			"levelLabelImageFolder":"",
             "decreaseLevelAfterDestroyed": true,
             "decreaseLevelAfterMoved": false,
             "transformToObjectAtLevel0": "",            
@@ -86,26 +100,57 @@
                 [
                     { 
                         "level":1,
-                        "spriteFileName":"CountDown1.png"
+                        "spriteFileName":"Countdown.png"
                     },
 					{ 
                         "level":2,
-                        "spriteFileName":"CountDown2.png"
+                        "spriteFileName":"Countdown.png"
                     },
 					{ 
                         "level":3,
-                        "spriteFileName":"CountDown3.png"
+                        "spriteFileName":"Countdown.png"
                     },
 					{ 
                         "level":4,
-                        "spriteFileName":"CountDown4.png"
-                    },					
+                        "spriteFileName":"Countdown.png"
+                    },
 					{ 
                         "level":5,
-                        "spriteFileName":"CountDown5.png"
+                        "spriteFileName":"Countdown.png"
+                    },
+					{ 
+                        "level":6,
+                        "spriteFileName":"Countdown.png"
+                    },
+					{ 
+                        "level":7,
+                        "spriteFileName":"Countdown.png"
+                    },
+					{ 
+                        "level":8,
+                        "spriteFileName":"Countdown.png"
+                    },
+					{ 
+                        "level":9,
+                        "spriteFileName":"Countdown.png"
+                    },
+					{ 
+                        "level":10,
+                        "spriteFileName":"Countdown.png"
+                    },
+					{ 
+                        "level":11,
+                        "spriteFileName":"Countdown.png"
+                    },
+					{ 
+                        "level":12,
+                        "spriteFileName":"Countdown.png"
                     }
-                ],
-            "decreaseLevelAfterDestroyed": false,
+                ],				
+			"translatePosition":{ "x":22, "y":-22},
+			"drawLevelLabel":true,
+			"levelLabelImageFolder":"LockNumber",			
+            "decreaseLevelAfterDestroyed":false,
             "decreaseLevelAfterMoved": true,
             "transformToObjectAtLevel0": "LOCK",
 			"levelOfTransformedObject": 0,			

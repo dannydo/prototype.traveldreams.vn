@@ -1,44 +1,38 @@
 ;size map
 8	8
 ;number of move
-25
+30
 ;number of color
 6
 ;score of stars
-3000	4000	6000
+4000	5000	6000
 ;map matrix
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	1
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1	1   1
+0	0	0	0	0	0	0   0
+1	1	1	1	1	1	1   1
 ;main word
-CRAYON
+NOTEBOOK
 0
-0
-;bonus word
 1
-CLASSMATE
+1 1 1 2 1 3 1 4 1 5 1 6 1 7 1 8
+;end game bonus type
+2
 ;boss
-1
-4 4 2 2 
-3
+0
 ;obstacle list: count, list
+3
+SHIELD	1
+8
+1 1 1 2 1 3 1 4 1 5 1 6 1 7 1 8
+0
+LOCK	0
+8
+1 1 1 2 1 3 1 4 1 5 1 6 1 7 1 8
 0
 ;bonus quest
 0
-
-
-COUNTDOWN	5
-3
-3 4 8 5 7 1
-0
-SHIELD 	3
-4
-1 2 7 5 4 7 5 6 8 2
-0
-
-

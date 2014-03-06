@@ -3,6 +3,9 @@
 
 #include "GameDataStructure.h"
 #include <map>
+#include "cocos2d.h"
+
+USING_NS_CC;
 
 #define _MAX_OBSTACLE_TYPE_COUNT_	5
 #define _MAXIMUM_BONUS_WORD_LENGTH_	10
@@ -96,6 +99,12 @@ public:
 	}
 };
 
+enum EndGameBonusType : int
+{
+	_EGBT_SPECIAL_GEMS_ = 1,
+	_EGBT_CRAZY_PETS_ = 2
+};
+
 struct LevelConfig
 {
 public:
@@ -113,16 +122,24 @@ public:
 	bool m_MainWordUnlockedFlagList[_GDS_WORD_MAX_LENGTH_];
 	bool m_bIsMainWordExistedOnBoard;
 	Cell m_MainWordLetterPosition[_GDS_WORD_MAX_LENGTH_];
-	// bonus words
-	int m_iBonusWordsCount;
-	int m_BonusWordIDList[_GDS_SUB_WORD_MAX_COUNT_];
+	// config of main word
+	int m_iInitRateOfMainLetter; //letter of main word
+	int m_iIncreasePercentAfterEachMoveOfMainLetter;
+	int m_iDecreasePercentAfterLetterDestroyedOfMainLetter;
+	int m_iDecreasePercentAfterLetterAppearedOfMainLetter;
+	int m_iRatioBetweenLettersOfMainWord; //in the same generation
+	bool m_bCanDropOnAllColumn;
+	bool m_DropOnColumnsFlagList[_BOARD_MAX_COLUMN_NUMBER_]; //true: enable
+
+	// end-game bonus type
+	EndGameBonusType m_eEndGameBonusType;
 	// obstacles
 	std::vector<Level_ObstacleConfig*> m_ObstacleConfigList;
 	// boss config
 	bool m_bEnableBoss;
 	LevelBossConfig m_BossConfig;
 	// bonus quest config
-	BonusQuestConfig m_BonusQuestConfig;
+	BonusQuestConfig m_BonusQuestConfig;	
 
 	~LevelConfig()
 	{		
@@ -157,7 +174,12 @@ public:
 	bool m_bLockColumn;
 	
 	std::vector<ObstacleLevelDescription> m_LevelList;
+
+	Point m_TranslatePosition;
 	
+	bool m_bIsDrawLevelLabel;
+	std::string m_sLevelLabelImageFolder;
+
 	bool m_bDecreaseLevelAfterDestroyed;
 	bool m_bDecreaseLevelAfterMoved;
 	
