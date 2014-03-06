@@ -83,7 +83,10 @@ WordDictionaryInfo DictionaryDatabase::fectMeanWord(const char* sWord)
 {	
 	std::string sLovercase = "";
 	sLovercase.append(sWord);
-	std::transform(sLovercase.begin(), sLovercase.end(), sLovercase.begin(), ::tolower);
+	for(unsigned int k = 0; k < sLovercase.length(); k++)
+	{
+		sLovercase[k] = tolower(sLovercase[k]);
+	}
 
 	char **re;
 	int nRow, nColumn;

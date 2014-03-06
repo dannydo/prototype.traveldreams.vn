@@ -48,7 +48,7 @@ bool InitDatabase::init()
 	}
 	else if (UserDefault::getInstance()->getIntegerForKey("InitDatabase", 0) == 0)
 	{
-		unlink(m_spath.c_str());
+		remove(m_spath.c_str());
 	}
  
 	int iResult;  
@@ -57,7 +57,7 @@ bool InitDatabase::init()
 	{
 		sqlite3_close(m_DatabaseSqlite);
 		m_DatabaseSqlite = NULL;
-		unlink(m_spath.c_str());
+		remove(m_spath.c_str());
 		return false;
 	}
 
@@ -71,7 +71,7 @@ bool InitDatabase::init()
 		{
 			sqlite3_close(m_DatabaseSqlite);
 			m_DatabaseSqlite = NULL;
-			unlink(m_spath.c_str());
+			remove(m_spath.c_str());
 			return false;
 		}
 	}
