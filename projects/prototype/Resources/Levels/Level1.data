@@ -16,15 +16,15 @@
 1	1	1	0	0	1	1   1
 1	1	1	0	0	1	1   1
 ;main word
-PEN
+CHOPSTICKS
 0
 0
 ;init rate, increase after move, decrease when destroyed, decrease when appeared, ratio betweens letters same generation
-5	10	20	80	10
+20	20	10	50	5
 ; config columns appear, 1: all columns, 0: specific columns + column count + columns list
 1
 ;end game bonus type
-2
+1
 ;boss
 0
 ;obstacle list: count, list

@@ -227,8 +227,8 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 			for(iColumn =0; iColumn < m_iColumnNumber; iColumn++)
 			{
 				if (m_TemporaryValueMatrix[iSelectedRow][iColumn].m_eGemComboType == _GCT_COMBO6_
-					&& ( (iColumn>0 &&  m_TemporaryValueMatrix[iSelectedRow][iColumn-1].m_bIsBlankCell == false) ||
-					(iColumn< m_iColumnNumber-1 &&  m_TemporaryValueMatrix[iSelectedRow][iColumn+1].m_bIsBlankCell == false)))
+					&& ( (iSelectedRow>0 &&  m_TemporaryValueMatrix[iSelectedRow-1][iColumn].m_bIsBlankCell == false) ||
+					(iSelectedRow< m_iRowNumber-1 &&  m_TemporaryValueMatrix[iSelectedRow+1][iColumn].m_bIsBlankCell == false)))					
 				{										
 					ComboEffectDescription comboEffectDescription;
 					comboEffectDescription.m_eComboEffectType =  GetComboEffectTypeFromComboType(m_TemporaryValueMatrix[iSelectedRow][iColumn].m_eGemComboType,  iSelectedRow, iSelectedColumn); // _CET_EXPLOSION_;
@@ -243,8 +243,8 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 			for(iRow =0; iRow < m_iRowNumber; iRow++)
 			{
 				if (m_TemporaryValueMatrix[iRow][iSelectedColumn].m_eGemComboType == _GCT_COMBO6_
-					&& ( (iRow>0 &&  m_TemporaryValueMatrix[iRow-1][iSelectedColumn].m_bIsBlankCell == false) ||
-					(iRow< m_iRowNumber-1 &&  m_TemporaryValueMatrix[iRow+1][iSelectedColumn].m_bIsBlankCell == false)))
+					&& ( (iSelectedColumn>0 &&  m_TemporaryValueMatrix[iRow][iSelectedColumn-1].m_bIsBlankCell == false) ||
+					(iSelectedColumn< m_iColumnNumber-1 &&  m_TemporaryValueMatrix[iRow][iSelectedColumn+1].m_bIsBlankCell == false)))
 				{						
 					ComboEffectDescription comboEffectDescription;
 					comboEffectDescription.m_eComboEffectType =  GetComboEffectTypeFromComboType(m_TemporaryValueMatrix[iRow][iSelectedColumn].m_eGemComboType, iSelectedRow, iSelectedColumn); // _CET_EXPLOSION_;
@@ -383,11 +383,205 @@ bool NewGameBoardManager::FastCheckBlocks( int iSelectedRow, int iSelectedColumn
 		}
 	}
 
-	// first, check double/triple combo
+	// ************** first, check double/triple combo *******************
+	// step: find all tripple/double combos => sort combos ==> clean combos (not tripple 6 and double 6 is very special and should be executed alone
+	std::vector<ComboEffectDescription> tempAdvanceComboList;
+	ComboEffectCell linkCellList[3];	
+	int iLinkCellCount;
+	int iIndexRow = iRow, iIndexColumn = iColumn;
+	ComboEffectDescription tempComboDescription;
+	int i,j;
 
-	// if not, check combo 6 (if delta = 0 then not check combo 6)
+	while (iIndexRow != iLimitRow || iIndexColumn != iLimitColumn)
+	{
+		if (IsSimpleCombo(m_TemporaryValueMatrix[iIndexRow][iIndexColumn].m_eGemComboType))
+		{	
+			linkCellList[0].m_iRow = iIndexRow;
+			linkCellList[0].m_iColumn = iIndexColumn;
+			linkCellList[0].m_iGemID = m_TemporaryValueMatrix[iIndexRow][iIndexColumn].m_iGemID;
+			linkCellList[0].m_eGemComboType = m_TemporaryValueMatrix[iIndexRow][iIndexColumn].m_eGemComboType;
+			iLinkCellCount = 1;
 
-	// final, check basic matching
+			// check horizontal
+			if (iIndexColumn < m_iColumnNumber-1 && IsSimpleCombo(m_TemporaryValueMatrix[iIndexRow][iIndexColumn+1].m_eGemComboType))
+			{
+				linkCellList[iLinkCellCount].m_iRow = iIndexRow;
+				linkCellList[iLinkCellCount].m_iColumn = iIndexColumn+1;
+				linkCellList[iLinkCellCount].m_iGemID = m_TemporaryValueMatrix[iIndexRow][iIndexColumn+1].m_iGemID;
+				linkCellList[iLinkCellCount].m_eGemComboType = m_TemporaryValueMatrix[iIndexRow][iIndexColumn+1].m_eGemComboType;
+				iLinkCellCount++;
+			}
+
+			if (iIndexColumn > 0 && IsSimpleCombo(m_TemporaryValueMatrix[iIndexRow][iIndexColumn-1].m_eGemComboType))
+			{
+				linkCellList[iLinkCellCount].m_iRow = iIndexRow;
+				linkCellList[iLinkCellCount].m_iColumn = iIndexColumn-1;
+				linkCellList[iLinkCellCount].m_iGemID = m_TemporaryValueMatrix[iIndexRow][iIndexColumn-1].m_iGemID;
+				linkCellList[iLinkCellCount].m_eGemComboType = m_TemporaryValueMatrix[iIndexRow][iIndexColumn-1].m_eGemComboType;
+				iLinkCellCount++;
+			}
+
+			if (iLinkCellCount >= 2)
+			{					
+				tempComboDescription.m_eComboEffectType = GetComboEffectTypeOfAdvanceCombo(linkCellList, iLinkCellCount, iSelectedRow, iSelectedColumn);
+				tempComboDescription.m_Position = (Cell)linkCellList[0];
+				tempComboDescription.m_iGemID = linkCellList[0].m_iGemID;
+				tempComboDescription.m_Phase0CellCount = iLinkCellCount-1;
+				for(i=0; i < iLinkCellCount-1;i++)
+				{
+					tempComboDescription.m_Phase0CellList[i] = (Cell)linkCellList[i+1];
+					tempComboDescription.m_Phase0CellList[i].m_iGroupIndex = i;
+				}
+				tempAdvanceComboList.push_back(tempComboDescription);
+			}
+
+			// reset
+			iLinkCellCount = 1;
+
+			// check vertical
+			if (iIndexRow < m_iRowNumber-1 && IsSimpleCombo(m_TemporaryValueMatrix[iIndexRow+1][iIndexColumn].m_eGemComboType))
+			{
+				linkCellList[iLinkCellCount].m_iRow = iIndexRow+1;
+				linkCellList[iLinkCellCount].m_iColumn = iIndexColumn;
+				linkCellList[iLinkCellCount].m_iGemID = m_TemporaryValueMatrix[iIndexRow+1][iIndexColumn].m_iGemID;
+				linkCellList[iLinkCellCount].m_eGemComboType = m_TemporaryValueMatrix[iIndexRow+1][iIndexColumn].m_eGemComboType;
+				iLinkCellCount++;
+			}
+			if (iIndexRow > 0 && IsSimpleCombo(m_TemporaryValueMatrix[iIndexRow-1][iIndexColumn].m_eGemComboType))
+			{
+				linkCellList[iLinkCellCount].m_iRow = iIndexRow - 1;
+				linkCellList[iLinkCellCount].m_iColumn = iIndexColumn;
+				linkCellList[iLinkCellCount].m_iGemID = m_TemporaryValueMatrix[iIndexRow-1][iIndexColumn].m_iGemID;
+				linkCellList[iLinkCellCount].m_eGemComboType = m_TemporaryValueMatrix[iIndexRow-1][iIndexColumn].m_eGemComboType;
+				iLinkCellCount++;
+			}
+		
+			if (iLinkCellCount >= 2)
+			{					
+				tempComboDescription.m_eComboEffectType = GetComboEffectTypeOfAdvanceCombo(linkCellList, iLinkCellCount, iSelectedRow, iSelectedColumn);
+				tempComboDescription.m_Position = (Cell)linkCellList[0];
+				tempComboDescription.m_iGemID = linkCellList[0].m_iGemID;
+				tempComboDescription.m_Phase0CellCount = iLinkCellCount-1;
+				for(i=0; i < iLinkCellCount-1;i++)
+				{
+					tempComboDescription.m_Phase0CellList[i] = (Cell)linkCellList[i+1];
+					tempComboDescription.m_Phase0CellList[i].m_iGroupIndex = i;
+				}
+				tempAdvanceComboList.push_back(tempComboDescription);
+			}			
+		}
+
+		iIndexRow += iDeltaRow;
+		iIndexColumn += iDeltaColumn;
+	}
+	// sort advance combo list
+	int iListSize = tempAdvanceComboList.size();	
+	for(i=0; i< iListSize-1; i++)
+		for(j=i+1; j< iListSize; j++)
+			if (tempAdvanceComboList[i].m_eComboEffectType < tempAdvanceComboList[j].m_eComboEffectType)
+			{
+				tempComboDescription = tempAdvanceComboList[i];
+				tempAdvanceComboList[i] = tempAdvanceComboList[j];
+				tempAdvanceComboList[j] = tempComboDescription;
+			}
+	// clean list
+	if (iListSize > 0)
+	{
+		//std::vector<ComboEffectDescription> advanceComboList;
+
+		// if there's combo 6-6-6 or 6-6 at the first of list then disable all other advance combos!!!!
+		if (tempAdvanceComboList[0].m_eComboEffectType == _CET_6_6_6_EFFECT_ || tempAdvanceComboList[0].m_eComboEffectType == _CET_6_6_EFFECT_)
+		{
+			tempComboDescription = tempAdvanceComboList[0];
+			tempAdvanceComboList.clear();
+			tempAdvanceComboList.push_back(tempComboDescription);
+		}
+
+		for(auto& comboDescription : tempAdvanceComboList)
+		{
+			if (m_TemporaryValueMatrix[comboDescription.m_Position.m_iRow][comboDescription.m_Position.m_iColumn].m_eGemComboType != _GCT_NONE_
+				&& m_TemporaryValueMatrix[comboDescription.m_Phase0CellList[0].m_iRow][comboDescription.m_Phase0CellList[0].m_iColumn].m_eGemComboType != _GCT_NONE_
+				&& (comboDescription.m_Phase0CellCount == 1 || m_TemporaryValueMatrix[comboDescription.m_Phase0CellList[1].m_iRow][comboDescription.m_Phase0CellList[1].m_iColumn].m_eGemComboType != _GCT_NONE_))
+			{
+				// update combo count of bonus quest
+				m_BonusQuestManager.IncreaseComboCellCountForBonusQuest( m_TemporaryValueMatrix[comboDescription.m_Position.m_iRow][comboDescription.m_Position.m_iColumn].m_eGemComboType);
+				m_BonusQuestManager.IncreaseComboCellCountForBonusQuest( m_TemporaryValueMatrix[comboDescription.m_Phase0CellList[0].m_iRow][comboDescription.m_Phase0CellList[0].m_iColumn].m_eGemComboType);
+				if (comboDescription.m_Phase0CellCount > 1)
+				{
+					m_BonusQuestManager.IncreaseComboCellCountForBonusQuest( m_TemporaryValueMatrix[comboDescription.m_Phase0CellList[1].m_iRow][comboDescription.m_Phase0CellList[1].m_iColumn].m_eGemComboType);					
+				}
+
+				// clear cells
+				m_TemporaryValueMatrix[comboDescription.m_Position.m_iRow][comboDescription.m_Position.m_iColumn].Reset();
+				m_TemporaryValueMatrix[comboDescription.m_Phase0CellList[0].m_iRow][comboDescription.m_Phase0CellList[0].m_iColumn].Reset();
+				if (comboDescription.m_Phase0CellCount > 1)
+				{
+					m_TemporaryValueMatrix[comboDescription.m_Phase0CellList[1].m_iRow][comboDescription.m_Phase0CellList[1].m_iColumn].Reset();
+				}
+
+				//advanceComboList.push_back(comboDescription);
+
+				basicMatchingDestroyedCells.push_back( comboDescription.m_Position);
+				for(i=0; i< comboDescription.m_Phase0CellCount; i++)
+					basicMatchingDestroyedCells.push_back( comboDescription.m_Phase0CellList[i]);
+			}		
+		}
+
+		return true;
+	}
+
+	// ********************** if not, check combo 6 (if delta = 0 then not check combo 6) ********************** 	
+	if ((iSelectedRow >=0 && iDeltaColumn !=0) || (iSelectedColumn >= 0 && iDeltaRow != 0))
+	{
+		// ******** note: temporary hardcode and fix condition for combo 6 ************* 					
+		if (iSelectedRow >= 0)
+			for(iIndexColumn =0; iIndexColumn < m_iColumnNumber; iIndexColumn++)
+			{
+				if (m_TemporaryValueMatrix[iSelectedRow][iIndexColumn].m_eGemComboType == _GCT_COMBO6_
+					&& ( (iSelectedRow>0 &&  m_TemporaryValueMatrix[iSelectedRow-1][iIndexColumn].m_bIsBlankCell == false) ||
+					(iSelectedRow< m_iRowNumber-1 &&  m_TemporaryValueMatrix[iSelectedRow+1][iIndexColumn].m_bIsBlankCell == false)))
+				{					
+					basicMatchingDestroyedCells.push_back(Cell(iSelectedRow, iIndexColumn));
+					if (iSelectedRow>0 &&  m_TemporaryValueMatrix[iSelectedRow-1][iIndexColumn].m_bIsBlankCell == false)
+						basicMatchingDestroyedCells.push_back(Cell(iSelectedRow-1, iIndexColumn));
+					if (iSelectedRow< m_iRowNumber-1 &&  m_TemporaryValueMatrix[iSelectedRow+1][iIndexColumn].m_bIsBlankCell == false)
+						basicMatchingDestroyedCells.push_back(Cell(iSelectedRow+1, iIndexColumn));
+					/*ComboEffectDescription comboEffectDescription;
+					comboEffectDescription.m_eComboEffectType =  GetComboEffectTypeFromComboType(m_TemporaryValueMatrix[iSelectedRow][iColumn].m_eGemComboType,  iSelectedRow, iSelectedColumn); // _CET_EXPLOSION_;
+					comboEffectDescription.m_Position = Cell(iSelectedRow, iColumn);
+					comboEffectDescription.m_iGemID = m_TemporaryValueMatrix[iSelectedRow][iColumn].m_iGemID;					
+					m_WaitingTriggerSecondTimeComboList.push_back(comboEffectDescription);
+
+					m_TemporaryValueMatrix[iSelectedRow][iColumn].m_eGemComboType = _GCT_COMBO6_WAITING_TRIGGER_;*/
+				}
+			}
+		else if (iSelectedColumn >= 0)
+			for(iIndexRow =0; iIndexRow < m_iRowNumber; iIndexRow++)
+			{
+				if (m_TemporaryValueMatrix[iIndexRow][iSelectedColumn].m_eGemComboType == _GCT_COMBO6_
+					&& ( (iSelectedColumn>0 &&  m_TemporaryValueMatrix[iIndexRow][iSelectedColumn-1].m_bIsBlankCell == false) ||
+					(iSelectedColumn< m_iColumnNumber-1 &&  m_TemporaryValueMatrix[iIndexRow][iSelectedColumn+1].m_bIsBlankCell == false)))
+				{				
+					basicMatchingDestroyedCells.push_back(Cell(iIndexRow, iSelectedColumn));
+					if (iSelectedColumn>0 &&  m_TemporaryValueMatrix[iIndexRow][iSelectedColumn-1].m_bIsBlankCell == false)
+						basicMatchingDestroyedCells.push_back(Cell(iIndexRow, iSelectedColumn-1));
+					if (iSelectedColumn< m_iColumnNumber-1 &&  m_TemporaryValueMatrix[iIndexRow][iSelectedColumn+1].m_bIsBlankCell == false)
+						basicMatchingDestroyedCells.push_back(Cell(iIndexRow, iSelectedColumn+1));
+					/*ComboEffectDescription comboEffectDescription;
+					comboEffectDescription.m_eComboEffectType =  GetComboEffectTypeFromComboType(m_TemporaryValueMatrix[iRow][iSelectedColumn].m_eGemComboType, iSelectedRow, iSelectedColumn); // _CET_EXPLOSION_;
+					comboEffectDescription.m_Position = Cell(iRow, iSelectedColumn);
+					comboEffectDescription.m_iGemID = m_TemporaryValueMatrix[iRow][iSelectedColumn].m_iGemID;					
+					m_WaitingTriggerSecondTimeComboList.push_back(comboEffectDescription);
+
+					m_TemporaryValueMatrix[iRow][iSelectedColumn].m_eGemComboType = _GCT_COMBO6_WAITING_TRIGGER_;*/
+				}
+			}
+
+		if (basicMatchingDestroyedCells.size() >0)
+			return true;
+	}
+
+	// ********************** final, check basic matching ********************** 
 	bool bIsNewBlockCreated;
 
 	while (iRow != iLimitRow || iColumn != iLimitColumn)
@@ -948,10 +1142,12 @@ void NewGameBoardManager::TriggerWaitingCombo6(const ComboEffectDescription& com
 	{			
 		if ( !m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && ( m_BoardValueMatrix[iRow][iColumn].m_iGemID == iGemID1 || m_BoardValueMatrix[iRow][iColumn].m_iGemID == iGemID2)
 			&& IsCellDestroyable(iRow, iColumn))
+		{
 			//&& m_BoardValueMatrix[iRow][iColumn].m_eGemComboType !=_GCT_COMBO5_WAITING_TRIGGER_)
 			//if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID < 0 || m_pObstacleProcessManager->DestroyCell(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))
-			if (m_pObstacleProcessManager->DestroyCellWithObstacle(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))
-			{				
+			bool bIsPreventedDestroyByObstacle = !m_pObstacleProcessManager->DestroyCellWithObstacle(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID);
+			if (!bIsPreventedDestroyByObstacle)
+			{
 				bIsComboActivated =  false;
 				// this may trigger another combo ?
 				if (m_BoardValueMatrix[iRow][iColumn].m_eGemComboType >=0 && m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_)
@@ -973,46 +1169,49 @@ void NewGameBoardManager::TriggerWaitingCombo6(const ComboEffectDescription& com
 					// add it to chain to trigger later
 					comboChainList.push_back(pNextTriggeredCombo);
 				}		
-
-				// combo 6 cell wil be activated/destroyed later
-				int iObstacleBlockID = m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID;
-					
-				int iBackupGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
-				bool bIsCompleteDestroyed = DestroySingleCellUtil(iRow, iColumn, pTriggeredCombo->m_fTriggerTime + _TME_COMBO_6_PHASE1_EXECUTE_TIME_ + _TME_COMBO_6_PHASE2_REMOVE_CELL_AT_TIME_);
-				DestroyedByComboCell destroyedCell(iRow, iColumn);
-				destroyedCell.m_bIsCompleteDestroyed = bIsCompleteDestroyed;
-				destroyedCell.m_bIsEarnScore = !bIsComboActivated;
+			}
 				
-				if (iBackupGemID == iGemID1)
+			int iBackupGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
+			bool bIsCompleteDestroyed = !bIsPreventedDestroyByObstacle;
+			if (!bIsPreventedDestroyByObstacle)
+				bIsCompleteDestroyed = DestroySingleCellUtil(iRow, iColumn, pTriggeredCombo->m_fTriggerTime + _TME_COMBO_6_PHASE1_EXECUTE_TIME_ + _TME_COMBO_6_PHASE2_REMOVE_CELL_AT_TIME_);
+			else
+				bIsCompleteDestroyed = false;
+			
+			DestroyedByComboCell destroyedCell(iRow, iColumn);
+			destroyedCell.m_bIsCompleteDestroyed = bIsCompleteDestroyed;
+			destroyedCell.m_bIsEarnScore = (!bIsComboActivated)&&(!bIsPreventedDestroyByObstacle);
+				
+			if (iBackupGemID == iGemID1)
+			{
+				destroyedCell.m_iGroupIndex = 0;
+				if (cell1 == destroyedCell)
 				{
-					destroyedCell.m_iGroupIndex = 0;
-					if (cell1 == destroyedCell)
-					{
-						destroyedCell.m_iDestroyPhaseIndex = 0;
-						destroyedCell.m_fDestroyAtTime = pTriggeredCombo->m_fTriggerTime + _TME_COMBO_6_PHASE1_EXECUTE_TIME_;
-					}
-					else
-					{
-						destroyedCell.m_iDestroyPhaseIndex = 1;
-						destroyedCell.m_fDestroyAtTime = pTriggeredCombo->m_fTriggerTime + _TME_COMBO_6_PHASE1_EXECUTE_TIME_ + _TME_COMBO_6_PHASE2_REMOVE_CELL_AT_TIME_;
-					}
+					destroyedCell.m_iDestroyPhaseIndex = 0;
+					destroyedCell.m_fDestroyAtTime = pTriggeredCombo->m_fTriggerTime + _TME_COMBO_6_PHASE1_EXECUTE_TIME_;
 				}
 				else
 				{
-					destroyedCell.m_iGroupIndex = 1;
-					if (cell2 == destroyedCell)
-					{
-						destroyedCell.m_iDestroyPhaseIndex = 0;
-						destroyedCell.m_fDestroyAtTime = pTriggeredCombo->m_fTriggerTime + _TME_COMBO_6_PHASE1_EXECUTE_TIME_;
-					}
-					else
-					{
-						destroyedCell.m_iDestroyPhaseIndex = 1;
-						destroyedCell.m_fDestroyAtTime = pTriggeredCombo->m_fTriggerTime + _TME_COMBO_6_PHASE1_EXECUTE_TIME_ + _TME_COMBO_6_PHASE2_REMOVE_CELL_AT_TIME_;
-					}
+					destroyedCell.m_iDestroyPhaseIndex = 1;
+					destroyedCell.m_fDestroyAtTime = pTriggeredCombo->m_fTriggerTime + _TME_COMBO_6_PHASE1_EXECUTE_TIME_ + _TME_COMBO_6_PHASE2_REMOVE_CELL_AT_TIME_;
 				}
-				pTriggeredCombo->m_DestroyedCells.push_back(destroyedCell);					
 			}
+			else
+			{
+				destroyedCell.m_iGroupIndex = 1;
+				if (cell2 == destroyedCell)
+				{
+					destroyedCell.m_iDestroyPhaseIndex = 0;
+					destroyedCell.m_fDestroyAtTime = pTriggeredCombo->m_fTriggerTime + _TME_COMBO_6_PHASE1_EXECUTE_TIME_;
+				}
+				else
+				{
+					destroyedCell.m_iDestroyPhaseIndex = 1;
+					destroyedCell.m_fDestroyAtTime = pTriggeredCombo->m_fTriggerTime + _TME_COMBO_6_PHASE1_EXECUTE_TIME_ + _TME_COMBO_6_PHASE2_REMOVE_CELL_AT_TIME_;
+				}
+			}
+			pTriggeredCombo->m_DestroyedCells.push_back(destroyedCell);					
+		}
 	}
 
 	// reset combo cell
@@ -2132,6 +2331,7 @@ ComboEffectType NewGameBoardManager::GetEndGameBonusComboEffectTypeFrom(const Ge
 	{
 		switch ((GemType_e)iGemID)
 		{
+			default:
 			case _GT_BIRD_:
 				return _CET_BIRD_EXPLOSION_EFFECT_;
 			case _GT_FROG_:
@@ -2412,11 +2612,7 @@ void NewGameBoardManager::FindSortAndFilterAdvanceCombos(std::vector<ComboEffect
 					tempAdvanceComboList.push_back(tempComboDescription);
 				}
 
-				// reset
-				linkCellList[0].m_iRow = iRow;
-				linkCellList[0].m_iColumn = iColumn;
-				linkCellList[0].m_iGemID = m_TemporaryValueMatrix[iRow][iColumn].m_iGemID;
-				linkCellList[0].m_eGemComboType = m_TemporaryValueMatrix[iRow][iColumn].m_eGemComboType;
+				// reset				
 				iLinkCellCount = 1;
 
 				// check vertical

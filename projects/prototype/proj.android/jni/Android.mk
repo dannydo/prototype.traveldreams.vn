@@ -33,15 +33,19 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/BonusQuestManager.cpp \
 				   ../../Classes/SettingMenuNode.cpp \
 				   ../../Classes/FlashCardCollection.cpp \
+				   ../../Classes/CustomNode.cpp \
+				   ../../Classes/LoadingImageNode.cpp \
 				   ../../Classes/Social/FacebookManager.cpp \
 				   ../../Classes/APIService/UserService.cpp \
+				   ../../Classes/APIService/InterfaceService.cpp \
 				   ../../Classes/Database/InitDatabase.cpp \
 				   ../../Classes/Database/sqlite3.c \
 				   ../../Classes/Database/ChapterTable.cpp \
 				   ../../Classes/Database/FriendTable.cpp \
 				   ../../Classes/Database/LevelTable.cpp \
 				   ../../Classes/Database/UserTable.cpp \
-                   ../../Classes/HelloWorldScene.cpp
+				   ../../Classes/Database/DictionaryDatabase.cpp \
+				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
 					$(LOCAL_PATH)/../../../../plugin/protocols/platform/android
