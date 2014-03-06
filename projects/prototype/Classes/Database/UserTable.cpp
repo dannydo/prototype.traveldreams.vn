@@ -10,9 +10,13 @@ UserTable::UserTable()
 
 }
 
-UserTable::~UserTable()
+void UserTable::releaseInstance()
 {
-	
+	if (m_UserTable == NULL)
+	{
+		delete m_UserTable;
+	}
+	m_UserTable = NULL;	
 }
 
 UserTable* UserTable::getInstance()

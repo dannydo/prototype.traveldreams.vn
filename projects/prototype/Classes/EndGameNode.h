@@ -5,6 +5,7 @@
 #include "GameDataStructure.h"
 #include "LeaderBoardNode.h"	
 #include "Database\LevelTable.h"
+#include "Database\ChapterTable.h"
 
 class EndGameNode : public cocos2d::Node
 {
@@ -24,7 +25,6 @@ private:
 	void menuRetryLevelLoseCallBack();
 	void menuRetryLevelWinCallBack();
 	void menuCloseCallBack();
-	void menuOpenDictCallBack();
 
 	std::vector<int> generateArrayNumber(int iNumber);
 	cocos2d::Node* generateLayoutScore(int iScore);
@@ -46,6 +46,7 @@ private:
 	cocos2d::Node* m_pBonusQuestNode;
 
 	LevelInfo m_levelInfo;
+	ChapterInfo m_chapterInfo;
 
 	int m_iYellowStar;
 	int m_iCountYellowStar;

@@ -10,9 +10,13 @@ LevelTable::LevelTable()
 
 }
 
-LevelTable::~LevelTable()
+void LevelTable::releaseInstance()
 {
-	
+	if (m_LevelTable == NULL)
+	{
+		delete m_LevelTable;
+	}
+	m_LevelTable = NULL;	
 }
 
 LevelTable* LevelTable::getInstance()
@@ -64,8 +68,7 @@ std::vector<LevelInfo> LevelTable::fetchLevelsForChapter(const int& iChapter)
 }
 
 LevelInfo LevelTable::fetchLevel(const int& iLevel)
-{
-	
+{	
 	char **re;
 	int nRow, nColumn;
 
@@ -77,14 +80,17 @@ LevelInfo LevelTable::fetchLevel(const int& iLevel)
 	CCLOG("row is %d,column is %d", nRow, nColumn);
 
 	LevelInfo levelInfo;
-	levelInfo.iLevel = int(strtod(re[nColumn+0], NULL));
-	levelInfo.iChapter = int(strtod(re[nColumn+1], NULL));
-	levelInfo.iStar = int(strtod(re[nColumn+2], NULL));
-	levelInfo.iScore = int(strtod(re[nColumn+3], NULL));
-	levelInfo.iBonusQuest = int(strtod(re[nColumn+4], NULL));
-	levelInfo.bIsUnlock = bool(strtod(re[nColumn+5], NULL));
-	levelInfo.bIsUpdate = bool(strtod(re[nColumn+6], NULL));
-	levelInfo.sWordKey = re[nColumn+7];
+	if (nRow > 0)
+	{
+		levelInfo.iLevel = int(strtod(re[nColumn+0], NULL));
+		levelInfo.iChapter = int(strtod(re[nColumn+1], NULL));
+		levelInfo.iStar = int(strtod(re[nColumn+2], NULL));
+		levelInfo.iScore = int(strtod(re[nColumn+3], NULL));
+		levelInfo.iBonusQuest = int(strtod(re[nColumn+4], NULL));
+		levelInfo.bIsUnlock = bool(strtod(re[nColumn+5], NULL));
+		levelInfo.bIsUpdate = bool(strtod(re[nColumn+6], NULL));
+		levelInfo.sWordKey = re[nColumn+7];
+	}
 
 	sqlite3_free_table(re);
 

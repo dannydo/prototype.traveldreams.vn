@@ -1,126 +1,271 @@
-25
-A PEN
-Cây viết
-pen
-pen.jpg
-2
-RULER
-Thước kẻ
-ruler
-ruler.jpg
-3
-GLOBE
-Quả địa cầu
-globe
-globe.jpg
-3
-CRAYON
-Sáp màu
-crayon
-crayon.jpg
-3
-ERASER
-Cục tẩy
-eraser
-eraser.jpg
-3
-SCISSORS
-Cây kéo
-scissors
-scissors.jpg
-3
-BOOKCASE
-Tủ sách
-bookcase
-bookcase.jpg
-3
-CLASSMATE
-Bạn học
-classmate
-classmate.jpg
-3
-TEACHER
-Giáo viên
-teacher
-teacher.jpg
-2
-TIMETABLE
-Thời khóa biểu
-timetable
-timetable.jpg
+30
+BLACKBOARD
+bảng đen
+Blackboard
+Blackboard.jpg
+0
+/'blækbɔ:k/
+We are laughing because the teacher wrote the wrong answer on the blackboard.
+BlackboardSentence
 4
 CHALK
-Viên phấn
-chalk
-default.jpg
-3
-LESSON
-Bài học
-lesson
-default.jpg
-3
-GLUE
-Keo dán
-glue
-default.jpg
-3
-RUBBER
-Đồ lau bảng
-rubber
-default.jpg
-3
-STUDY
-Học
-study
-default.jpg
+phấn
+Chalk
+Chalk.jpg
+0
+/tʃɔ:k/
+Chalk is all over teacher's face.
+ChalkSentence
 2
-COURSE
-Khóa học
-course
-default.jpg
+TIMETABLE
+thời khóa biểu
+Timetable
+Timetable.jpg
+0
+/'taɪmteɪbl/
+He tattooed his timetable on his arm to remember it.
+TimetableSentence
 3
-NOTEBOOK
-Quyển vở
-notebook
-default.jpg
+BOOKCASE
+tủ sách
+Bookcase
+Bookcase.jpg
+1
+/ˈbʊkkeɪs/
+The heavy bookcase fell off on the fat librarian.
+BookcaseSentence
 3
-LIBRARY
-Thư viện
-library
-default.jpg
+UNIFORM
+đồng phục
+Uniform
+Uniform.jpg
+0
+/ˈjuːnɪfɔːm/
+My uniform makes me look like a prisoner.
+UniformSentence
+2
+PEN
+cây viết
+Pen
+Pen.jpg
+0
+/pen/
+He dropped his pen in the toilets.
+PenSentence
+2
+CRAYON
+bút chì màu
+Crayon
+Crayon.jpg
+0
+/ˈkreɪən/
+My mum used my crayon for make-up.
+CrayonSentence
+2
+SCISSORS
+cây kéo
+Scissors
+Scissors.jpg
+0
+/ˈsɪzəz/
+Never carry scissors in your pocket. What's the next sentence?
+ScissorsSentence
+4
+TEACHER
+giáo viên
+Teacher
+Teacher.jpg
+0
+/ˈtiːtʃə(r)/
+The teacher did not know the answer.
+TeacherSentence
+2
+CLASSMATE
+bạn cùng lớp
+Classmate
+Classmate.jpg
+0
+/ˈklɑːsmeɪt/
+My classmate only copied my wrong answers and got a zero.
+ClassmateSentence
+4
+STUDY
+học
+Study
+Study.jpg
+0
+/ˈstʌdi/
+They only study hard to impress their beautiful teacher.
+StudySentence
 3
-LABORATORY
-Phòng thí nghiệm
-laboratory
-default.jpg
+CLASSROOM
+lớp học
+Classroom
+Classroom.jpg
+1
+/ˈklɑːsruːm/
+During the exam, somebody farted but we could not leave the classroom.
+ClassroomSentence
+4
+PENCIL SHARPENER
+đồ chuốt viết chì
+PencilSharpener
+PencilSharpener.jpg
+1
+/ˈpensl ˈʃɑːpnə(r)/
+My little finger got stuck in the pencil sharpener.
+PencilSharpenerSentence
 3
-TUTOR
-Gia sư
-tutor
-default.jpg
+PAPER
+giấy
+Paper
+Paper.jpg
+0
+/ˈpeɪpə(r)/
+Ready, “1,2 ,3 “Rock. Scissors. Paper!” You have lost. I won”.
+PaperSentence
+6
+CHAIR
+cái ghế
+Chair
+Chair.jpg
+0
+/tʃeə(r)/
+There is a ghost sitting on my chair.
+ChairSentence
+2
+TABLE
+cái bàn
+Table
+Table.jpg
+0
+/ˈteɪbl/
+They were kissing under the table.
+TableSentence
+2
+COMPUTER
+máy tính
+Computer
+Computer.jpg
+1
+/kəmˈpjuːtə(r)/
+My computer never sleeps.
+ComputerSentence
+2
+RULER
+cây thước
+Ruler
+Ruler.jpg
+0
+/ˈruːlə(r)/
+Stop poking me with your ruler.
+RulerSentence
+2
+GLOBE
+quả địa cầu
+Globe
+Globe.jpg
+0
+/ɡləʊb/
+Stop spinning the globe! I feel dizzy.
+GlobeSentence
+2
+ERASER
+cục tẩy
+Eraser
+Eraser.jpg
+0
+/ɪˈreɪzə(r)/
+This eraser tastes like chewing-gum.
+EraserSentence
+2
+LIVING ROOM
+phòng khách
+LivingRoom
+LivingRoom.jpg
+1
+/ˈlɪvɪŋ ruːm/
+Hooray! I found 20 dollars under the sofa in the living room.
+LivingRoomSentence
+4
+KITCHEN
+nhà bếp
+Kitchen
+Kitchen.jpg
+0
+/ˈkɪtʃɪn/
+The kitchen is on fire.
+KitchenSentence
+1
+CURTAIN
+cái màn
+Curtain
+Curtain.jpg
+0
+/ˈkɜːtn/
+She forgot to close the curtain when she was getting dressed.
+CurtainSentence
 3
-MATHS
-Môn toán
-maths
-default.jpg
+WARDROBE
+tủ quần áo
+Wardrobe
+Wardrobe.jpg
+1
+/ˈwɔːdrəʊb/
+My husband found the neighbor hidden in our wardrobe.
+WardrobeSentence
 3
-LECTURE
-Bài giảng
-lecture
-default.jpg
+MICROWAVE
+lò vi sóng
+Microwave
+Microwave.jpg
+1
+/ˈmaɪkrəweɪv/
+He has forgotten the cat in the microwave.
+MicrowaveSentence
+2
+FRYING PAN
+cái chảo
+FryingPan
+FryingPan.jpg
+1
+/fraɪɪŋ pæn/
+My mother hitted the thief with a frying pan.
+FryingPanSentence
+2
+CHOPSTICKS
+đôi đũa
+Chopsticks
+Chopsticks.jpg
+1
+/ˈtʃɒpstɪks/
+The tourist tried to eat his soup with chopsticks.
+ChopsticksSentence
 3
-CANTEEN
-Căn tin
-canteen
-default.jpg
+HAIRDRYER
+máy sấy
+Hairdryer
+Hairdryer.jpg
+1
+/ˈheədraɪə(r)/
+Jack is trying to heat his coffee with a hair dryer.
+HairdryerSentence
 3
-HISTORY
-Môn sử
-history
-default.jpg
-3
-BLACKBOARD
-Cái bảng
-blackboard
-default.jpg
-3
+TOILET PAPER
+giấy vệ sinh
+ToiletPaper
+ToiletPaper.jpg
+1
+/ˈtɔɪlət ˈpeɪpə(r)/
+Oh no, there is no more toilet paper! What can I use now?
+ToiletPaperSentence
+4
+BLOCK OF FLATS
+chung cư
+BlockOfFlats
+BlockOfFlats.jpg
+1
+/blɒk əv flæts/
+There was a power cut in my block of flats and the delivery man had to walk 30 floors.
+BlockOfFlatsSentence
+5

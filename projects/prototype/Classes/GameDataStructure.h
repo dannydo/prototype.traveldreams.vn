@@ -379,6 +379,10 @@ public:
 	float m_fSoundLength;
 	//std::string m_sSoundVietnameseFile;
 	std::string m_sFlashCardImage;
+	std::string m_sPhonetic;
+	std::string m_sSentence;
+	std::string m_sSentenceSoundFile;
+	float m_fSentenceSoundLength;
 
 	bool m_ActivatedCharacterFlags[_GDS_WORD_MAX_LENGTH_];
 	int m_iRemainInactivatedCharacterCount;

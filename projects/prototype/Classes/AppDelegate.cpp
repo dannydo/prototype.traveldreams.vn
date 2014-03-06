@@ -4,6 +4,16 @@
 #include "SimpleAudioEngine.h"
 #include "LoadingScene.h"
 
+#include "APIService\UserService.h"
+#include "Social\FacebookManager.h"
+
+#include "Database\InitDatabase.h"
+#include "Database\ChapterTable.h"
+#include "Database\FriendTable.h"
+#include "Database\LevelTable.h"
+#include "Database\UserTable.h"
+#include "Database\DictionaryDatabase.h"
+
 USING_NS_CC;
 
 AppDelegate::AppDelegate() {
@@ -14,6 +24,19 @@ AppDelegate::~AppDelegate()
 {
 	GameWordManager::getInstance()->releaseInstance();
 	GameConfigManager::releaseInstance();
+
+	UserService::releaseInstance();
+
+	ChapterTable::releaseInstance();
+	FriendTable::releaseInstance();
+	LevelTable::releaseInstance();
+	UserTable::releaseInstance();
+	InitDatabase::releaseInstance();
+	DictionaryDatabase::releaseInstance();
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	//FacebookManager::getInstance()->unloadPlugin();
+#endif
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {

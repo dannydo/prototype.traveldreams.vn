@@ -16,7 +16,7 @@
 1	1	1	1	1	1	1	1
 1	1	1	0	0	1	1	0
 ;main word
-GLOBE
+UNIFORM
 1
 2
 0
@@ -37,8 +37,8 @@ GLOBE
 2	0	0	5	0	0
 3
 3	4
-A PEN
-LECTURE
+PAPER
+MICROWAVE
 CRAYON
 
 

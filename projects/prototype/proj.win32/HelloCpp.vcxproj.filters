@@ -138,6 +138,15 @@
     <ClCompile Include="..\Classes\FlashCardCollection.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\LoadingImageNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\DictionaryDatabase.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\CustomNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -262,6 +271,15 @@
     </ClInclude>
     <ClInclude Include="AccelerometerManager.h">
       <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\APIService\InterfaceService.h">
+      <Filter>APIService</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\LoadingImageNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\DictionaryDatabase.h">
+      <Filter>Database</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

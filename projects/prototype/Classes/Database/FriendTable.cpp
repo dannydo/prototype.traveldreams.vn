@@ -10,10 +10,15 @@ FriendTable::FriendTable()
 
 }
 
-FriendTable::~FriendTable()
+void FriendTable::releaseInstance()
 {
-	
+	if (m_FriendTable == NULL)
+	{
+		delete m_FriendTable;
+	}
+	m_FriendTable = NULL;	
 }
+
 
 FriendTable* FriendTable::getInstance()
 {

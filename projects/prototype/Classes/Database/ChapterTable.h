@@ -20,6 +20,8 @@ class ChapterTable
 {
 public:
 	static ChapterTable* getInstance();
+	ChapterTable();
+	static void releaseInstance();
 	bool init();
 
 	inline std::vector<ChapterInfo> getChaptersInfo() { return m_Chapters; };
@@ -27,9 +29,6 @@ public:
 	bool updateChapter(ChapterInfo chapterInfo);
 
 private:
-	ChapterTable();
-	virtual ~ChapterTable();
-
 	static ChapterTable* m_ChapterTable;
 	std::vector<ChapterInfo> m_Chapters;
 };

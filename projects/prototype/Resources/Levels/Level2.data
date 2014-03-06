@@ -16,10 +16,9 @@
 1	1	0	1	1	0	1   1
 1	1	0	1	1	0	1   1
 ;main word
-BOOKCASE
+CHALK
 0
-1
-1 1 2 1 2 2 1 2 1 7 2 7 2 8 1 8
+0
 ;end game bonus type
 2
 ;boss
@@ -36,3 +35,4 @@ LOCK	0
 0
 ;bonus quest
 0
+

@@ -138,7 +138,9 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\BonusWordNode.cpp" />
     <ClCompile Include="..\Classes\BonusWordNodeNew.cpp" />
     <ClCompile Include="..\Classes\ComboCountRenderNode.cpp" />
+    <ClCompile Include="..\Classes\CustomNode.cpp" />
     <ClCompile Include="..\Classes\Database\ChapterTable.cpp" />
+    <ClCompile Include="..\Classes\Database\DictionaryDatabase.cpp" />
     <ClCompile Include="..\Classes\Database\FriendTable.cpp" />
     <ClCompile Include="..\Classes\Database\InitDatabase.cpp" />
     <ClCompile Include="..\Classes\Database\LevelTable.cpp" />
@@ -158,6 +160,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\LeaderBoardNode.cpp" />
     <ClCompile Include="..\Classes\LevelMapScene.cpp" />
     <ClCompile Include="..\Classes\LifeSystemNode.cpp" />
+    <ClCompile Include="..\Classes\LoadingImageNode.cpp" />
     <ClCompile Include="..\Classes\LoadingScene.cpp" />
     <ClCompile Include="..\Classes\MainMenuScene.cpp" />
     <ClCompile Include="..\Classes\NewGameBoardManager.cpp" />
@@ -172,6 +175,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\APIService\Constants.h" />
+    <ClInclude Include="..\Classes\APIService\InterfaceService.h" />
     <ClInclude Include="..\Classes\APIService\UserService.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\BonusQuestManager.h" />
@@ -180,6 +184,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\ComboCountRenderNode.h" />
     <ClInclude Include="..\Classes\CustomNode.h" />
     <ClInclude Include="..\Classes\Database\ChapterTable.h" />
+    <ClInclude Include="..\Classes\Database\DictionaryDatabase.h" />
     <ClInclude Include="..\Classes\Database\FriendTable.h" />
     <ClInclude Include="..\Classes\Database\InitDatabase.h" />
     <ClInclude Include="..\Classes\Database\LevelTable.h" />
@@ -200,6 +205,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\LeaderBoardNode.h" />
     <ClInclude Include="..\Classes\LevelMapScene.h" />
     <ClInclude Include="..\Classes\LifeSystemNode.h" />
+    <ClInclude Include="..\Classes\LoadingImageNode.h" />
     <ClInclude Include="..\Classes\LoadingScene.h" />
     <ClInclude Include="..\Classes\MainMenuScene.h" />
     <ClInclude Include="..\Classes\NewGameBoardManager.h" />
