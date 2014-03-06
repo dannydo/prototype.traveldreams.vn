@@ -118,6 +118,24 @@ bool LevelMapLayer::init()
 		m_isShowSetting = false;
 		Breadcrumb::getInstance()->addSceneMode(SceneMode::kLevelMap);
 
+		for (int iIndex=1; iIndex<=30; iIndex++)
+		{
+			char sLevel[5];
+			sprintf(sLevel, "%d", iIndex);
+			LabelTTF* pLabelLevel = LabelTTF::create(sLevel, "Arial", 40);
+			MenuItemLabel* pLevelItem = MenuItemLabel::create(pLabelLevel, CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
+			pLevelItem->setTag(iIndex);
+			if (iIndex%10 == 0)
+			{
+				pLevelItem->setPosition(Point(((iIndex-1)%10 + 1)*59, 740-(int(iIndex/10)-1)*50));
+			}
+			else
+			{
+				pLevelItem->setPosition(Point(((iIndex-1)%10 + 1)*59, 740-(int(iIndex/10))*50));
+			}
+			pMenu->addChild(pLevelItem);
+		}
+
 		return true;
 	}
 	else
