@@ -3,6 +3,7 @@
 #include "EndGameNode.h"
 #include "LevelMapScene.h"
 #include "Database\UserTable.h"
+#include "Database\GameTracking.h"
 
 USING_NS_CC;
 
@@ -3170,6 +3171,8 @@ void HelloWorld::ShowMainWordUnlockEffect()
 			CallFunc::create( this,  callfunc_selector(HelloWorld::StartWinBonusPhase)),
 			NULL));
 
+	//Game Tracking Level
+	GameTracking::saveFileTrackingLevel(m_GameBoardManager.GetCurrentLevel(), m_GameBoardManager.GetCurrentMove(), mainWord.m_iWordLength, "Win");
 }
 
 using namespace cocos2d::extension::armature;
@@ -3918,6 +3921,10 @@ void HelloWorld::EndUnlockLetterAnimation()
 
 			SoundManager::PlaySoundEffect(_SET_LOSE);
 			UserTable::getInstance()->updateLife(1);
+
+			//Game Tracking Level
+			const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+			GameTracking::saveFileTrackingLevel(m_GameBoardManager.GetCurrentLevel(), 0, mainWord.m_iWordLength-mainWord.m_iRemainInactivatedCharacterCount, "Lose");
 		}
 	}
 }

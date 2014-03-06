@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+#define _TURN_ON_WIRTE_FILE_TRACKING 1
+
 #define _GDS_WORD_MAX_LENGTH_		20
 #define _GDS_WORD_MAX_COUNT_		30
 #define _GDS_SUB_WORD_MAX_COUNT_	2
