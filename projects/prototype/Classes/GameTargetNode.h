@@ -18,9 +18,10 @@ private:
 	std::vector<int> generateArrayNumber(int iNumber);
 	cocos2d::Node* generateLayoutLevel(int iLevel);
 
-	int m_iCurrentLevel;
+	void generateLayoutStartAndBonusQuest();
 
-	cocos2d::Sprite* m_pBackgroundBoard; 
+	cocos2d::SpriteBatchNode* m_pSpriteBatchNode;
+	int m_iCurrentLevel;
 };
 
 #endif;

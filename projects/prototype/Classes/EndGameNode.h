@@ -10,12 +10,12 @@
 class EndGameNode : public cocos2d::Node
 {
 public:
-	static EndGameNode* createLayoutWin(const int& iScore, const Word& pMainWord, const std::vector<Word>& pSubWord, const int& iCurrentLevel);
-	static EndGameNode* createLayoutLose(const int& iScore, const Word& pMainWord, const int& iCurrentLevel);
+	static EndGameNode* createLayoutWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel);
+	static EndGameNode* createLayoutLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel);
 
 	bool init() override;
-	bool initWin(const int& iScore, const Word& pMainWord, const std::vector<Word>& pSubWord);
-	bool initLose(const int& iScore, const Word& pMainWord);
+	bool initWin();
+	bool initLose();
 
 	void addYellowStar(const int& iYellowStar);
 	void addBonusQuestCompleted(const int& iBonusQuestCompleted);
@@ -26,13 +26,7 @@ private:
 	void menuRetryLevelWinCallBack();
 	void menuCloseCallBack();
 
-	std::vector<int> generateArrayNumber(int iNumber);
-	cocos2d::Node* generateLayoutScore(int iScore);
-	cocos2d::Node* generateLayoutStar();
-	cocos2d::Node* generateLayoutBonusQuest();
-
-	cocos2d::Node* generateLayoutSubWord(const std::vector<Word>& subWord);
-	cocos2d::Node* generateLayoutLevel(int iLevel);
+	void generateLayoutStartAndBonusQuest();
 
 	void loopUpdateStar();
 	void sequenceUpdateStar();
@@ -42,12 +36,13 @@ private:
 	void sequenceUpdateBonusQuest();
 	void updateBonusQuest();
 
-	cocos2d::Node* m_pStarNode;
-	cocos2d::Node* m_pBonusQuestNode;
+	cocos2d::SpriteBatchNode* m_pSpriteBatchNode;
 
 	LevelInfo m_levelInfo;
 	ChapterInfo m_chapterInfo;
+	Word m_mainWord;
 
+	int m_iScore;
 	int m_iYellowStar;
 	int m_iCountYellowStar;
 	int m_iCurrentLevel;

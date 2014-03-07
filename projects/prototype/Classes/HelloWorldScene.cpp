@@ -1364,7 +1364,7 @@ void HelloWorld::ShowWinGamePopup()
 {
 	std::vector<Word> subWordList;	
 	EndGameNode* pEndGameNode = EndGameNode::createLayoutWin( m_GameBoardManager.GetCurrentScore(),
-		m_GameBoardManager.GetGameWordManager()->GetMainWord(), subWordList, m_GameBoardManager.GetCurrentLevel());
+		m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStars());
 	m_pHUDLayer->addChild( pEndGameNode, 100);
 }
