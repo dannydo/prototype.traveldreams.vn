@@ -176,13 +176,8 @@ bool EndGameNode::init()
 	pFlashCardImage->setRotation(-3.5);
 	this->addChild(pFlashCardImage);
 
-	Sprite* pTargetImage = Sprite::create("Target-End-Game/target.png");
-	pTargetImage->setPosition(Point(320.0f, 755.0f));
-	pTargetImage->setRotation(-3.5);
-	this->addChild(pTargetImage);
-
-	LabelTTF* pLabelWord = LabelTTF::create(m_mainWord.m_sWord, "Arial", 25);
-	pLabelWord->setPosition(Point(320.0f, 720.0f));
+	LabelTTF* pLabelWord = LabelTTF::create(m_mainWord.m_sWord, "Arial", 32);
+	pLabelWord->setPosition(Point(320.0f, 750.0f));
 	pLabelWord->setRotation(-3.5);
 	this->addChild(pLabelWord);
 
