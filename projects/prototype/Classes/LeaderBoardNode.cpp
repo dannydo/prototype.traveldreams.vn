@@ -36,16 +36,11 @@ bool LeaderBoardtNode::init()
 		return false;
 	}
 
-	Sprite* pSpriteBackground = Sprite::create("Target-End-Game/high-score.png");
+	Sprite* pSpriteBackground = Sprite::create("Target-End-Game/panel-avatar.png");
 	pSpriteBackground->setAnchorPoint(Point(0.5f, 0.5f));
+	pSpriteBackground->setPosition(Point(0.0f, 0.0f));
 	this->addChild(pSpriteBackground);
 	this->setContentSize(pSpriteBackground->getContentSize());
-
-	Label* pLabelTitle = Label::createWithTTF("HIGHSCORE", "fonts/ARLRDBD.ttf", 28);
-	pLabelTitle->setColor(ccc3(0, 0, 0));
-	pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelTitle->setPositionY(60.0f);
-	this->addChild(pLabelTitle);
 
 	m_pSlideShow = Node::create();
 	m_pSlideShow->setAnchorPoint(Point(0.0f, 0.5f));
@@ -54,12 +49,12 @@ bool LeaderBoardtNode::init()
 
 	Sprite* pSpriteLeft = Sprite::create("Target-End-Game/bleft.png");
 	pSpriteLeft->setAnchorPoint(Point(0.5f, 0.5f));
-	pSpriteLeft->setPosition(Point(-304.0f, -2.0f));
+	pSpriteLeft->setPosition(Point(-304.0f, 0.0f));
 	this->addChild(pSpriteLeft);
 
 	Sprite* pSpriteRight = Sprite::create("Target-End-Game/bright.png");
 	pSpriteRight->setAnchorPoint(Point(0.5f, 0.5f));
-	pSpriteRight->setPosition(Point(305.0f, -2.0f));
+	pSpriteRight->setPosition(Point(305.0f, 0.0f));
 	this->addChild(pSpriteRight);
 
 	

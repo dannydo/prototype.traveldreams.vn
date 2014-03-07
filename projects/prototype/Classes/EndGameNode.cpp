@@ -6,11 +6,13 @@
 
 USING_NS_CC;
 
-EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& pMainWord, const int& iCurrentLevel)
+EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel)
 {
-	EndGameNode* pEndGameNode = new EndGameNode();	  
+	EndGameNode* pEndGameNode = new EndGameNode();
 	pEndGameNode->m_iCurrentLevel = iCurrentLevel;
-	if(pEndGameNode->initLose(iScore, pMainWord))
+	pEndGameNode->m_mainWord = mainWord;
+	pEndGameNode->m_iScore = iScore;
+	if(pEndGameNode->initLose())
 	{
 		pEndGameNode->autorelease();
 		return pEndGameNode;
@@ -20,12 +22,13 @@ EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& pMainW
 	return NULL;
 }
 
-EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& pMainWord, const std::vector<Word>& pSubWord, const int& iCurrentLevel)
+EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel)
 {
 	EndGameNode* pEndGameNode = new EndGameNode();	  
 	pEndGameNode->m_iCurrentLevel = iCurrentLevel;
-	pEndGameNode->m_iTotalBonusQuest = 0;
-	if(pEndGameNode->initWin(iScore, pMainWord, pSubWord))
+	pEndGameNode->m_mainWord = mainWord;
+	pEndGameNode->m_iScore = iScore;
+	if(pEndGameNode->initWin())
 	{			
 		pEndGameNode->autorelease();
 		return pEndGameNode;
@@ -35,106 +38,64 @@ EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& pMainWo
 	return NULL;
 }
 
-bool EndGameNode::initLose(const int& iScore, const Word& pMainWord)
+bool EndGameNode::initLose()
 {
 	if (!this->init())
 	{
 		return false;
 	}
 
-	Sprite* pBackgroundFail = Sprite::create("Target-End-Game/Fail_Board.png");
-	pBackgroundFail->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 115));
-	this->addChild(pBackgroundFail);
+	Sprite* pLevelFailImage3 = Sprite::createWithSpriteFrameName("fail.png");
+	pLevelFailImage3->setPosition(Point(320.0f, 830.0f));
+	m_pSpriteBatchNode->addChild(pLevelFailImage3);
 
-	Node* pLevelNode = this->generateLayoutLevel(m_iCurrentLevel);
-	pLevelNode->setPosition(Point(365, 905));
-	this->addChild(pLevelNode);
+	Sprite* pSenetnceFailImage3 = Sprite::createWithSpriteFrameName("didnt collect card.png");
+	pSenetnceFailImage3->setPosition(Point(320.0f, 535.0f));
+	m_pSpriteBatchNode->addChild(pSenetnceFailImage3);
 
-	Sprite* pBackgroundTargetCard = Sprite::create("Target-End-Game/Fail_Card.png");
-	pBackgroundTargetCard->setPosition(Point(320, 600));
-	this->addChild(pBackgroundTargetCard);
-
-	Label* pLabelMainWord = Label::createWithTTF(pMainWord.m_sWord, "fonts/ARLRDBD.ttf", 32);
-	pLabelMainWord->setColor(ccc3(0, 0, 0));
-	pLabelMainWord->setAnchorPoint(Point(0.5f, 0.0f));
-	pLabelMainWord->setPosition(Point(315, 645));
-	this->addChild(pLabelMainWord);
+	Sprite* pPetImage = Sprite::createWithSpriteFrameName("pet-fail.png");
+	pPetImage->setPosition(Point(135.0f, 378.0f));
+	m_pSpriteBatchNode->addChild(pPetImage);
 
 	MenuItemImage* pRetryLevel = MenuItemImage::create(
-		"Target-End-Game/Retry_Button.png",
-		"Target-End-Game/Retry_Button_Click.png",
+		"Target-End-Game/btn_replay.png",
+		"Target-End-Game/btn_replay.png",
 		CC_CALLBACK_0(EndGameNode::menuRetryLevelLoseCallBack, this));
 
 	Menu* pMenuLose = Menu::create(pRetryLevel, NULL);
-	pMenuLose->setPosition(Point(this->getContentSize().width/2.0f, 370));
+	pMenuLose->setPosition(Point(320.0f, 302.0f));
 	this->addChild(pMenuLose);
 
 	return true;
 }
 
-bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::vector<Word>& pSubWord)
+bool EndGameNode::initWin()
 {
 	if (!this->init())
 	{
 		return false;
 	}
 
-	Sprite* pBackgroundShine = Sprite::create("Target-End-Game/Shine.png");
-	pBackgroundShine->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height - 160));
-	this->addChild(pBackgroundShine);
+	LevelConfig* pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(m_iCurrentLevel);
+	m_iTotalBonusQuest = pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount;
 
-	Sprite* pBackgroundWin = Sprite::create("Target-End-Game/Win_Board.png");
-	pBackgroundWin->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 115));
-	this->addChild(pBackgroundWin);
+	this->generateLayoutStartAndBonusQuest();
 
-	Node* pLevelNode = this->generateLayoutLevel(m_iCurrentLevel);
-	pLevelNode->setPosition(Point(365, 905));
-	this->addChild(pLevelNode);
-
-	m_pStarNode = this->generateLayoutStar();
-	m_pStarNode->setPosition(Point(228, 800));
-	this->addChild(m_pStarNode);
-
-	m_pBonusQuestNode = this->generateLayoutBonusQuest();
-	m_pBonusQuestNode->setPosition(Point(500, 905));
-	this->addChild(m_pBonusQuestNode);
-
-	Node* pScoreNode = this->generateLayoutScore(iScore);
-	pScoreNode->setPosition(Point(320, 745));
-
-	this->addChild(pScoreNode);
-
-	Sprite* pBackgroundTargetCard = Sprite::create("Target-End-Game/Win_Card.png");
-	pBackgroundTargetCard->setPosition(Point(320, 600));
-	this->addChild(pBackgroundTargetCard);
-
-	std::string sPath = "FlashCard/flashcardimage/";
-	sPath.append(pMainWord.m_sFlashCardImage);
-	Sprite* pFlashCard = Sprite::create(sPath.c_str());
-	pFlashCard->setPosition(Point(this->getContentSize().width/2.0f, this->getContentSize().height/2.0f + 96));
-	this->addChild(pFlashCard, 10);
-
-	Label* pLabelMainWord = Label::createWithTTF(pMainWord.m_sWord, "fonts/ARLRDBD.ttf", 32);
-	pLabelMainWord->setColor(ccc3(0, 0, 0));
-	pLabelMainWord->setAnchorPoint(Point(0.5f, 0.0f));
-	pLabelMainWord->setPosition(Point(315, 645));
-	this->addChild(pLabelMainWord);
-
-	Node* pSubWordNode = this->generateLayoutSubWord(pSubWord);
-	pSubWordNode->setPosition(Point(320, 440));
-	this->addChild(pSubWordNode);
+	Sprite* pPetImage = Sprite::createWithSpriteFrameName("pet.png");
+	pPetImage->setPosition(Point(102.0f, 378.0f));
+	m_pSpriteBatchNode->addChild(pPetImage);
 
 	MenuItemImage* pNextLevel = MenuItemImage::create(
-		"Target-End-Game/Next_Button.png",
-		"Target-End-Game/Next_Button_Click.png",
+		"Target-End-Game/btn_next.png",
+		"Target-End-Game/btn_next.png",
 		CC_CALLBACK_0(EndGameNode::menuNextLevelCallBack, this));
-	pNextLevel->setPosition(Point(this->getContentSize().width/2.0f + 115.0f, 370));
+	pNextLevel->setPosition(Point(432.0f, 302.0f));
 
 	MenuItemImage* pRetryLevel = MenuItemImage::create(
-		"Target-End-Game/Retry_Button.png",
-		"Target-End-Game/Retry_Button_Click.png",
+		"Target-End-Game/btn_replay.png",
+		"Target-End-Game/btn_replay.png",
 		CC_CALLBACK_0(EndGameNode::menuRetryLevelWinCallBack, this));
-	pRetryLevel->setPosition(Point(this->getContentSize().width/2.0f - 115.0f, 370));
+	pRetryLevel->setPosition(Point(234.0f, 302.0f));
 
 	Menu* pMenuWin = Menu::create(pRetryLevel, pNextLevel, NULL);
 	pMenuWin->setPosition(Point::ZERO);
@@ -152,17 +113,14 @@ bool EndGameNode::initWin(const int& iScore, const Word& pMainWord, const std::v
 
 	m_levelInfo.bIsUnlock = true;
 	m_levelInfo.bIsUpdate = true;
-	m_levelInfo.sWordKey = pMainWord.m_sWord;
-	if (m_levelInfo.iScore < iScore)
+	m_levelInfo.sWordKey = m_mainWord.m_sWord;
+	if (m_levelInfo.iScore < m_iScore)
 	{
-		m_levelInfo.iScore = iScore;
+		m_levelInfo.iScore = m_iScore;
 	}
 
-	if (m_levelInfo.iBonusQuest < pSubWord.size())
-	{
-		m_levelInfo.iBonusQuest = pSubWord.size();
-	}
-
+	ChapterTable::getInstance()->updateChapter(m_chapterInfo);
+	LevelTable::getInstance()->updateLevel(m_levelInfo);
 
 	return true;
 }
@@ -174,7 +132,7 @@ bool EndGameNode::init()
 		return false;
 	}
 	
-	LayerColor* pBackground = LayerColor::create(ccc4(191, 103, 241, 229));
+	LayerColor* pBackground = LayerColor::create(ccc4(101, 85, 130, 255));
 	pBackground->setContentSize(CCSizeMake(640, 960));
 	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
 	listener->setSwallowTouches(true);
@@ -183,80 +141,92 @@ bool EndGameNode::init()
 	this->addChild(pBackground);
 	this->setContentSize(pBackground->getContentSize());
 
+	m_pSpriteBatchNode = SpriteBatchNode::create("Target-End-Game/TargetEndgame.pvr.ccz");
+	SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("Target-End-Game/TargetEndgame.plist");
+	this->addChild(m_pSpriteBatchNode);
+
+	Sprite* pBackgroundBoard = Sprite::createWithSpriteFrameName("panel.png");
+	pBackgroundBoard->setPosition(Point(320.0f, 610.0f));
+	m_pSpriteBatchNode->addChild(pBackgroundBoard);
+
+	Sprite* pLevelImage = Sprite::createWithSpriteFrameName("level.png");
+	m_pSpriteBatchNode->addChild(pLevelImage);
+
+	Sprite* pBackgroundFlashCard = Sprite::createWithSpriteFrameName("flashcard_board.png");
+	pBackgroundFlashCard->setPosition(Point(320.0f, 695.0f));
+	m_pSpriteBatchNode->addChild(pBackgroundFlashCard);
+
+	Sprite* pScoreImage = Sprite::createWithSpriteFrameName("score.png");
+	pScoreImage->setAnchorPoint(Point(0.0f, 0.0f));
+	pScoreImage->setPosition(Point(180.0f, 430.0f));
+	m_pSpriteBatchNode->addChild(pScoreImage);
+
+	char sScore[10];
+	sprintf(sScore, "%d", m_iScore);
+	LabelTTF* pLabelScore = LabelTTF::create(sScore, "Arial", 40);
+	pLabelScore->setColor(ccc3(220, 143, 21));
+	pLabelScore->setAnchorPoint(Point(0.0f, 0.0f));
+	pLabelScore->setPosition(Point(295.0f, 430.0f));
+	this->addChild(pLabelScore);
+
+	std::string sPath = "FlashCard/flashcardimage/";
+	sPath.append(m_mainWord.m_sFlashCardImage);
+	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
+	pFlashCardImage->setPosition(Point(320.0f, 680.0f));
+	pFlashCardImage->setRotation(-3.5);
+	this->addChild(pFlashCardImage);
+
+	Sprite* pTargetImage = Sprite::create("Target-End-Game/target.png");
+	pTargetImage->setPosition(Point(320.0f, 755.0f));
+	pTargetImage->setRotation(-3.5);
+	this->addChild(pTargetImage);
+
+	LabelTTF* pLabelWord = LabelTTF::create(m_mainWord.m_sWord, "Arial", 25);
+	pLabelWord->setPosition(Point(320.0f, 720.0f));
+	pLabelWord->setRotation(-3.5);
+	this->addChild(pLabelWord);
+
+	char sLevel[10];
+	sprintf(sLevel, "%d", m_iCurrentLevel);
+	LabelTTF* pLabelLevel = LabelTTF::create(sLevel, "Arial", 32);
+	this->addChild(pLabelLevel);
+
+	int iWidth = pLabelLevel->getContentSize().width+pLevelImage->getContentSize().width;
+	pLabelLevel->setPosition(Point(320.0f+iWidth/4.0f+iWidth/4.0f, 920.0f));
+	pLevelImage->setPosition(Point(320.0f+iWidth/4.0f-iWidth/4.0f, 920.0f));
+
 	MenuItemImage* pCloseItem = MenuItemImage::create(
-		"Target-End-Game/Close_Button.png",
-		"Target-End-Game/Close_Button_Click.png",
+		"Target-End-Game/btn_close.png",
+		"Target-End-Game/btn_close.png",
 		CC_CALLBACK_0(EndGameNode::menuCloseCallBack, this));
-	pCloseItem->setPosition(Point(561, 855));
+	pCloseItem->setPosition(Point(582.0f, 914.0f));
 
 	Menu* pMenu = Menu::create(pCloseItem, NULL);
 	pMenu->setPosition(Point::ZERO);
 	this->addChild(pMenu, 10);
 
 	m_pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel);
-	m_pLeaderBoard->setPosition(Point(320, 136));
+	m_pLeaderBoard->setPosition(Point(320, 114));
 	this->addChild(m_pLeaderBoard);
 
 	return true;
 }
 
-std::vector<int> EndGameNode::generateArrayNumber(int iNumber)
+void EndGameNode::generateLayoutStartAndBonusQuest()
 {
-	int iTemp = iNumber;
-	std::vector<int> arrNumber;
-	while(iTemp >= 1)
+	for(int iIndex=0; iIndex<3; iIndex++) 
 	{
-		arrNumber.push_back(iTemp%10);
-		iTemp = iTemp/10.0f;
+		Sprite* pStarPurpleImage = Sprite::createWithSpriteFrameName("star_purple.png");
+		pStarPurpleImage->setPosition(Point(200.0f + iIndex*108.0f - m_iTotalBonusQuest*46, 823.0f + iIndex*5 - m_iTotalBonusQuest*5));
+		m_pSpriteBatchNode->addChild(pStarPurpleImage);
 	}
 
-	return arrNumber;
-}
-
-Node* EndGameNode::generateLayoutScore(int iScore)
-{
-	std::vector<int> arrNumber = this->generateArrayNumber(iScore);
-	int width = 0;
-	int height;
-	Node* pNode = Node::create();
-	int iTotal = arrNumber.size();
-	
-	while(!arrNumber.empty())
+	for(int iIndex=0; iIndex<m_iTotalBonusQuest; iIndex++) 
 	{
-		char sFileName[50];
-		sprintf(sFileName, "Target-End-Game/NumScore/NumScore_%d.png", arrNumber.back());
-		Sprite* sprite = Sprite::create(sFileName);
-
-		height = sprite->getContentSize().height;
-		sprite->setPosition(Point(width, height/2.0f));
-		width = width + sprite->getContentSize().width - 15;
-		pNode->addChild(sprite);
-		arrNumber.pop_back();
+		Sprite* pMushRoomFail = Sprite::createWithSpriteFrameName("mushroom-fail.PNG");
+		pMushRoomFail->setPosition(Point(529.0f + iIndex*98.0f - m_iTotalBonusQuest*50, 835.0f + iIndex*5 + 3));
+		m_pSpriteBatchNode->addChild(pMushRoomFail);
 	}
-	pNode->setContentSize(CCSizeMake(width - 18, height));
-	pNode->setAnchorPoint(Point(0.5f, 0.5f));
-	pNode->setScale(1.2f);
-
-	return pNode;
-}
-
-Node* EndGameNode::generateLayoutStar()
-{
-	Node* pNode = Node::create();
-
-	Sprite* pBlackStar1 = Sprite::create("Target-End-Game/Star_Disable.png");
-	pBlackStar1->setPosition(Point::ZERO);
-	pNode->addChild(pBlackStar1);
-
-	Sprite* pBlackStar2 = Sprite::create("Target-End-Game/Star_Disable.png");
-	pBlackStar2->setPosition(Point(91, 17));
-	pNode->addChild(pBlackStar2);
-
-	Sprite* pBlackStar3 = Sprite::create("Target-End-Game/Star_Disable.png");
-	pBlackStar3->setPosition(Point(182, 0));
-	pNode->addChild(pBlackStar3);
-	
-	return pNode;
 }
 
 void EndGameNode::addYellowStar(const int& iYellowStar)
@@ -279,9 +249,15 @@ void EndGameNode::addYellowStar(const int& iYellowStar)
 void EndGameNode::sequenceUpdateStar()
 {
 	auto actionUpdateStar = CallFunc::create(this, callfunc_selector(EndGameNode::updateStar));
-	auto delay = DelayTime::create(0.7f);
+	auto delay = DelayTime::create(0.5f);
 	auto actionLoopUpdateStar = CallFunc::create(this, callfunc_selector(EndGameNode::loopUpdateStar));
-	this->runAction(Sequence::create(delay->clone(), actionLoopUpdateStar, actionUpdateStar, NULL));
+	if (m_iCountYellowStar < m_iYellowStar-1) {
+		this->runAction(Sequence::create(delay->clone(), actionLoopUpdateStar, actionUpdateStar, NULL));
+	}
+	else
+	{
+		this->sequenceUpdateBonusQuest();
+	}
 }
 
 void EndGameNode::loopUpdateStar()
@@ -290,53 +266,28 @@ void EndGameNode::loopUpdateStar()
 	{
 		this->sequenceUpdateStar();
 	}
-	else
-	{
-		this->sequenceUpdateBonusQuest();
-	}
 }
 
 void EndGameNode::updateStar()
 {
-	if (m_iCountYellowStar < m_iYellowStar)
-	{
-		Sprite* pYellowStar = Sprite::create("Target-End-Game/Star_Enable.png");
-		if(m_iCountYellowStar == 0)
-		{
-			pYellowStar->setPosition(Point::ZERO);
-		}
-		else if(m_iCountYellowStar == 1)
-		{
-			pYellowStar->setPosition(Point(91, 17));
-		}
-		else if(m_iCountYellowStar == 2)
-		{
-			pYellowStar->setPosition(Point(182, 0));
-		}
-
-		m_pStarNode->addChild(pYellowStar);
+	if (m_iCountYellowStar < m_iYellowStar) {
+		Sprite* pStarYellowImage = Sprite::createWithSpriteFrameName("star_yellow.png");
+		pStarYellowImage->setPosition(Point(200.0f + m_iCountYellowStar*108.0f - m_iTotalBonusQuest*46, 823.0f + m_iCountYellowStar*5 - m_iTotalBonusQuest*5));
+		m_pSpriteBatchNode->addChild(pStarYellowImage);
 		m_iCountYellowStar++;
 	}
 }
 
-Node* EndGameNode::generateLayoutBonusQuest()
-{
-	Node* pNode = Node::create();
-	int iWidth = 0;;
-	for (int iIndex=0; iIndex<m_iTotalBonusQuest; iIndex++) {
-		Sprite* pBonusquest = Sprite::create("Target-End-Game/Bonus_Quest_Disable.png");
-		pBonusquest->setPosition(Point(iWidth, 0));
-		pNode->addChild(pBonusquest);
-		iWidth+= 91;
-	}
-	
-	return pNode;
-}
-
 void EndGameNode::addBonusQuestCompleted(const int& iBonusQuestCompleted)
 {
+	if(m_levelInfo.iBonusQuest < iBonusQuestCompleted)
+	{
+		m_levelInfo.iBonusQuest = iBonusQuestCompleted;
+	}
+
 	m_iBonusQuestCompleted = iBonusQuestCompleted;
 	m_iCountBonusQuest = 0;
+	LevelTable::getInstance()->updateLevel(m_levelInfo);
 }
 
 void EndGameNode::sequenceUpdateBonusQuest()
@@ -349,7 +300,7 @@ void EndGameNode::sequenceUpdateBonusQuest()
 
 void EndGameNode::loopUpdateBonusQuest()
 {
-	if (m_iCountBonusQuest < m_iBonusQuestCompleted)
+	if (m_iCountBonusQuest < m_iBonusQuestCompleted && m_iCountBonusQuest < m_iTotalBonusQuest)
 	{
 		this->sequenceUpdateBonusQuest();
 	}
@@ -357,65 +308,13 @@ void EndGameNode::loopUpdateBonusQuest()
 
 void EndGameNode::updateBonusQuest()
 {
-	Node* pNode = Node::create();
-	int iWidth = 0;;
-	for (int iIndex=0; iIndex<m_iTotalBonusQuest; iIndex++) {
-		Sprite* pBonusquest = Sprite::create("Target-End-Game/Bonus_Quest_Enable.png");
-		pBonusquest->setPosition(Point(iWidth, 0));
-		pNode->addChild(pBonusquest);
-		m_pBonusQuestNode->addChild(pBonusquest);
-		iWidth+= 91;
-	}
-}
-
-
-Node* EndGameNode::generateLayoutSubWord(const std::vector<Word>& subWords)
-{
-	Node* pNode = Node::create();
-	int iWidth = 0;
-	//while(!subWord.empty())
-	for(auto subword : subWords)
+	if (m_iCountBonusQuest < m_iBonusQuestCompleted && m_iCountBonusQuest < m_iTotalBonusQuest)
 	{
-		Label* pSubWord = Label::createWithTTF(subword.m_sWord, "fonts/ARLRDBD.ttf", 24);
-		pSubWord->setPosition(Point(iWidth, 0));
-		pSubWord->setColor(ccc3(0, 0, 0));
-		pNode->addChild(pSubWord);
-
-		iWidth += pSubWord->getContentSize().width + 60;
-		//subWord.pop_back();
+		Sprite* pMushRoom = Sprite::createWithSpriteFrameName("mushroom.png");
+		pMushRoom->setPosition(Point(529.0f + m_iCountBonusQuest*98.0f - m_iTotalBonusQuest*50, 835.0f + m_iCountBonusQuest*5 + 3));
+		m_pSpriteBatchNode->addChild(pMushRoom);
+		m_iCountBonusQuest++;
 	}
-
-	pNode->setContentSize(CCSizeMake(iWidth-60, 20));
-	pNode->setAnchorPoint(Point(0.5f, 0.5f));
-
-	return pNode;
-}
-
-Node* EndGameNode::generateLayoutLevel(int iLevel)
-{
-	std::vector<int> arrNumber = this->generateArrayNumber(iLevel);
-	int width = 0;
-	int height;
-	Node* pNode = Node::create();
-	int iTotal = arrNumber.size();
-	
-	while(!arrNumber.empty())
-	{
-		char sFileName[50];
-		sprintf(sFileName, "Target-End-Game/NumScore/NumScore_%d.png", arrNumber.back());
-		Sprite* sprite = Sprite::create(sFileName);
-
-		height = sprite->getContentSize().height;
-		sprite->setPosition(Point(width, height/2.0f));
-		width = width + sprite->getContentSize().width - 15;
-		pNode->addChild(sprite);
-		arrNumber.pop_back();
-	}
-	pNode->setContentSize(CCSizeMake(width - 18, height));
-	pNode->setAnchorPoint(Point(0.0f, 0.5f));
-	pNode->setScale(1.3f);
-
-	return pNode;
 }
 
 void EndGameNode::menuNextLevelCallBack()
