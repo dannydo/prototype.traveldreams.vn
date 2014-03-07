@@ -130,7 +130,6 @@ void GameTargetNode::generateLayoutStartAndBonusQuest()
 {
 	LevelConfig* pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(m_iCurrentLevel);
 	int iTotalBonusQuest = pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount;
-	iTotalBonusQuest = 2;
 
 	LevelInfo levelInfo = LevelTable::getInstance()->fetchLevel(m_iCurrentLevel);
 
