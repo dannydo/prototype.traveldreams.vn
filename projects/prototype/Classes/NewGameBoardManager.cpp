@@ -348,7 +348,7 @@ bool NewGameBoardManager::FastCheckBlocks( int iSelectedRow, int iSelectedColumn
 	iColumn = iSelectedColumn;
 	int iLimitRow = iSelectedRow, iLimitColumn = iSelectedColumn;
 
-	if (iSelectedRow > 0)
+	if (iSelectedRow >= 0)
 	{		
 		if (iDeltaColumn < 0)
 		{
@@ -1760,6 +1760,20 @@ void NewGameBoardManager::CreateBlockForBasicMatching(std::vector<Cell>& basicMa
 
 					if (iCurrentDestroyedCellIndex == basicMatchingDestroyedCells.size()) //no new cells added to list ==> stop
 					{
+						if (m_iLinkedBlockCount > 0) //update state for lastest block
+						{
+							LinkedBlockDescription& block = m_LinkedBlockList[m_iLinkedBlockCount-1];
+							if ( (basicMatchingDestroyedCells[block.m_iStartIndexInDestroyedList].m_iRow == basicMatchingDestroyedCells[block.m_iStartIndexInDestroyedList+1].m_iRow
+								&& basicMatchingDestroyedCells[block.m_iStartIndexInDestroyedList].m_iRow == basicMatchingDestroyedCells[block.m_iStartIndexInDestroyedList + block.m_iCellCount-1].m_iRow)
+								|| (basicMatchingDestroyedCells[block.m_iStartIndexInDestroyedList].m_iColumn == basicMatchingDestroyedCells[block.m_iStartIndexInDestroyedList+1].m_iColumn
+								&& basicMatchingDestroyedCells[block.m_iStartIndexInDestroyedList].m_iColumn == basicMatchingDestroyedCells[block.m_iStartIndexInDestroyedList + block.m_iCellCount-1].m_iColumn))
+							{
+								block.m_bAllCellOnTheSameLine = true;
+							}
+							else
+								block.m_bAllCellOnTheSameLine = false;
+						}
+
 						break;
 					}
 					else{
@@ -1841,16 +1855,7 @@ void NewGameBoardManager::CreateComboCells(const int& iSelectedRow, const int& i
 				}
 				else //5 cell in block
 				{
-					if (
-						(basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList].m_iRow == basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 1].m_iRow &&
-						basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 1].m_iRow == basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 2].m_iRow &&
-						basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 2].m_iRow == basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 3].m_iRow &&
-						basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 3].m_iRow == basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 4].m_iRow)
-						||
-						(basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList].m_iColumn == basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 1].m_iColumn &&
-						basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 1].m_iColumn == basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 2].m_iColumn &&
-						basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 2].m_iColumn == basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 3].m_iColumn &&
-						basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 3].m_iColumn == basicMatchingDestroyedCells[linkedBlock.m_iStartIndexInDestroyedList + 4].m_iColumn))
+					if (linkedBlock.m_bAllCellOnTheSameLine)
 					{
 						m_ComboCountList[1]++;
 						linkedBlock.m_eGemComboType = _GCT_COMBO5_;
@@ -2012,7 +2017,7 @@ void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bo
 	{
 		if (cell.m_iGemID < _MAX_GEM_ID_)
 		{
-			if (m_pLevelConfig->m_bCanDropOnAllColumn || m_pLevelConfig->m_DropOnColumnsFlagList[cell.m_iColumn])
+			if (m_pLevelConfig->m_bMainWordCanDropOnAllColumn || m_pLevelConfig->m_MainWordDropOnColumnsFlagList[cell.m_iColumn])
 			{
 				gemCanContainLetterFlagList.push_back(true);
 				iGemCanContainLetterCount++;

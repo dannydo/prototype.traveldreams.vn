@@ -11,6 +11,9 @@ USING_NS_CC_EXT;
 
 using namespace cocos2d::extension::armature;
 
+#define _WCBRN_MAX_FIRST_LINE_LETTERS_ 13
+#define _WCBRN_MAX_SECOND_LINE_LETTERS_ 12
+
 class WordCollectBoardRenderNode : public Layer //CCNodeRGBA
 {
 private:
@@ -58,12 +61,12 @@ private:
 	const Word* m_pMainWord;
 
 	Sprite* m_LabelList[_GDS_WORD_MAX_LENGTH_];
-
-	float m_fStartPositionX;
-	float m_LabelXPositionList[_GDS_WORD_MAX_LENGTH_];
+	Sprite* m_BubbleList[_GDS_WORD_MAX_LENGTH_];
+	
+	//float m_LabelXPositionList[_GDS_WORD_MAX_LENGTH_];
 
 	SpriteBatchNode* m_pBatchNode;
-	Sprite* m_pBackground;
+	//Sprite* m_pBackground;
 	DrawNode* m_pColorNode;
 
 	unsigned long m_iPreviousMainWordTapTime;
@@ -72,6 +75,10 @@ private:
 	//Armature* m_pCharacter;
 
 	bool m_NewUnlockedLetterFlags[_GDS_WORD_MAX_LENGTH_];
+
+	// position for bubble
+	Point m_CharacterFirstLinePositions[_WCBRN_MAX_FIRST_LINE_LETTERS_];
+	Point m_CharacterSecondLinePositions[_WCBRN_MAX_SECOND_LINE_LETTERS_];
 };
 
 

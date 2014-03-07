@@ -1481,7 +1481,8 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 	iMoveUnit = (int)fMoveUnit;
 
 	if ( iMoveUnit == m_iSaveLastCellMoveDelta || iMoveUnit == 0 )
-	{		
+	{
+		CCLOG("Remove hint");
 		if ( iMoveUnit == 0  && iMoveUnit != m_iSaveLastCellMoveDelta && m_HintSprites.size() >0 )
 		{
 			for(auto sprite:m_HintSprites)
@@ -1491,6 +1492,8 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 		}
 		return;
 	}
+
+	CCLOG("MOve unit: %d", iMoveUnit);
 
 	if ( m_HintSprites.size() >0 )
 	{

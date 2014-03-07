@@ -20,7 +20,7 @@ ChalkSentence
 TIMETABLE
 thời khóa biểu
 Timetable
-Timetable.jpg
+timetable.jpg
 0
 /'taɪmteɪbl/
 He tattooed his timetable on his arm to remember it.
@@ -182,7 +182,7 @@ EraserSentence
 LIVING ROOM
 phòng khách
 LivingRoom
-LivingRoom.jpg
+Livingroom.jpg
 1
 /ˈlɪvɪŋ ruːm/
 Hooray! I found 20 dollars under the sofa in the living room.

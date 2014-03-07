@@ -86,13 +86,42 @@ void WordCollectBoardRenderNode::update(float dt)
 
 bool WordCollectBoardRenderNode::init()
 {	
+	// init default position of letter
+	m_CharacterFirstLinePositions[0] = Point( 75.f, 124.f);
+	m_CharacterFirstLinePositions[1] = Point( 115.f, 113.f);
+	m_CharacterFirstLinePositions[2] = Point( 156.f, 103.f);
+	m_CharacterFirstLinePositions[3] = Point( 197.f, 91.f);
+	m_CharacterFirstLinePositions[4] = Point( 238.f, 87.f);
+	m_CharacterFirstLinePositions[5] = Point( 279.f, 82.f);
+	m_CharacterFirstLinePositions[6] = Point( 320.f, 80.f);
+	m_CharacterFirstLinePositions[7] = Point( 360.f, 82.f);
+	m_CharacterFirstLinePositions[8] = Point( 402.f, 87.f);
+	m_CharacterFirstLinePositions[9] = Point( 443.f, 91.f);
+	m_CharacterFirstLinePositions[10] = Point( 484.f, 103.f);
+	m_CharacterFirstLinePositions[11] = Point( 524.f, 113.f);
+	m_CharacterFirstLinePositions[12] = Point( 568.f, 124.f);	
+
+	m_CharacterSecondLinePositions[0] = Point(100.f, 150.f);
+	m_CharacterSecondLinePositions[1] = Point(140.f, 142.f);
+	m_CharacterSecondLinePositions[2] = Point(180.f, 133.f);
+	m_CharacterSecondLinePositions[3] = Point(220.f, 128.f);
+	m_CharacterSecondLinePositions[4] = Point(260.f, 124.f);
+	m_CharacterSecondLinePositions[5] = Point(300.f, 120.f);
+	m_CharacterSecondLinePositions[6] = Point(340.f, 120.f);
+	m_CharacterSecondLinePositions[7] = Point(381.f, 124.f);
+	m_CharacterSecondLinePositions[8] = Point(421.f, 128.f);
+	m_CharacterSecondLinePositions[9] = Point(461.f, 133.f);
+	m_CharacterSecondLinePositions[10] = Point(501.f, 142.f);
+	m_CharacterSecondLinePositions[11] = Point(541.f, 150.f);	
+
+
 	m_pColorNode = NULL;
 		 
 	// GenerateLabels
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResourceDemo.plist");
 	m_pBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
 
-	m_pBatchNode->setPosition(10.f, 866.f);
+	//m_pBatchNode->setPosition(10.f, 866.f);
 	this->addChild(m_pBatchNode, 10);
 
 	timeval now;
@@ -144,7 +173,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	{
 		m_LabelList[i] =  //CCLabelTTF::create("", "Arial", 34);
 			Sprite::createWithSpriteFrameName( GetImageFileFromLetter(m_pMainWord->m_sWord[i]).c_str());
-		m_LabelList[i]->setAnchorPoint(Point(0,0));		
+		//m_LabelList[i]->setAnchorPoint(Point(0,0));		
 
 		if (!m_pMainWord->m_ActivatedCharacterFlags[i])
 		{
@@ -159,9 +188,49 @@ void WordCollectBoardRenderNode::GenerateLabels()
 		m_pBatchNode->addChild(m_LabelList[i], 2);
 	}	 
 
+	// break line based on level config
+	int iLetterCountOfFirstLine;
+
+	const LevelConfig* pLevelConfig = GameWordManager::getInstance()->GetLevelConfig();
+	if (pLevelConfig->m_bBreakLineWhenDisplayMainWord)
+		iLetterCountOfFirstLine = pLevelConfig->m_iLetterCountOfFirstLine-1; //skip "SPACE"; 
+	else
+		iLetterCountOfFirstLine = m_pMainWord->m_iWordLength;
+
+	// draw first line, note that if has 2 row, must skip "SPACE" at the last of first line	
+	char sFirtLineLetter[_WCBRN_MAX_FIRST_LINE_LETTERS_];
+	memcpy( sFirtLineLetter, m_pMainWord->m_sWord, iLetterCountOfFirstLine);
+	int iIndexPositionOfFirstLine = (_WCBRN_MAX_FIRST_LINE_LETTERS_ - iLetterCountOfFirstLine + 1)/2;
+	int i;
+	for(i =0; i< iLetterCountOfFirstLine; i++)
+	{
+		m_BubbleList[i] = Sprite::createWithSpriteFrameName("Main_Bubble.png");
+		m_BubbleList[i]->setPosition( Point(m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].x, 960.f - m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].y));		
+		m_pBatchNode->addChild(m_BubbleList[i], 1);
+				
+		m_LabelList[i]->setPosition(Point(m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].x, 960.f - m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].y));
+	}	
+
+	// draw second line
+	if (pLevelConfig->m_bBreakLineWhenDisplayMainWord)
+	{
+		int iStartLetterIndexOfSecondLine = pLevelConfig->m_iLetterCountOfFirstLine;
+		int iLetterCountOfSecondLine = m_pMainWord->m_iWordLength - pLevelConfig->m_iLetterCountOfFirstLine;
+		int iIndexPositionOfSecondLine = (_WCBRN_MAX_SECOND_LINE_LETTERS_ - iLetterCountOfSecondLine + 1)/2;
+		for(i = 0; i<iLetterCountOfSecondLine; i++)
+		{
+			m_BubbleList[iStartLetterIndexOfSecondLine + i] = Sprite::createWithSpriteFrameName("Main_Bubble.png");
+			m_BubbleList[iStartLetterIndexOfSecondLine + i]->setPosition( Point(m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].x, 960.f - m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].y));		
+			m_pBatchNode->addChild(m_BubbleList[iStartLetterIndexOfSecondLine+i], 1);
+		
+			m_LabelList[iStartLetterIndexOfSecondLine + i]->setScale(0.7f);
+			m_LabelList[iStartLetterIndexOfSecondLine + i]->setPosition(Point(m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].x, 960.f - m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].y));
+		}
+	}
+
 	// create background
 	//Sprite* pBackground;
-	if ( iTotalLabelsWidth < 240.f)
+	/*if ( iTotalLabelsWidth < 240.f)
 		m_pBackground = Sprite::createWithSpriteFrameName("Main_Board_Small.png");
 	else if ( iTotalLabelsWidth < 410.f)
 		m_pBackground = Sprite::createWithSpriteFrameName("Main_Board_Medium.png");
@@ -181,18 +250,20 @@ void WordCollectBoardRenderNode::GenerateLabels()
 			m_LabelXPositionList[0] = m_fStartPositionX;
 		else
 			m_LabelXPositionList[i] = m_LabelXPositionList[i-1] + m_LabelList[i-1]->getContentSize().width + 1.f;		
-		m_LabelList[i]->setPosition(ccp(m_LabelXPositionList[i], 38.f));
-	}
+		m_LabelList[i]->setPosition(ccp(m_LabelXPositionList[i], m_fStartPositionX));
+	}*/
 
 	// draw meaning of word
-	LabelTTF* pMeaningLabel = CCLabelTTF::create("", "HelveticaNeueLTCom-Ex.ttf", 19); //"Arial", 17);//
+	float fWindowWidth = Director::getInstance()->getWinSize().width;
+
+	LabelTTF* pMeaningLabel = CCLabelTTF::create("", "HelveticaNeueLTCom-Ex.ttf", 21); //"Arial", 17);//
 	pMeaningLabel->setString(m_pMainWord->m_sMeaning.c_str());
 	pMeaningLabel->setAnchorPoint(Point(0,0));
 	//pMeaningLabel->setPosition(Point( 120.f, 860.f));
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-	pMeaningLabel->setPosition(Point( (fBackgroundWidth- pMeaningLabel->getContentSize().width)/2.f, 860.f));	
+	pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 890.f));	
 #else
-	pMeaningLabel->setPosition(Point( (fBackgroundWidth- pMeaningLabel->getContentSize().width)/2.f, 878.f));
+	pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 908.f));
 #endif
 	pMeaningLabel->setColor(ccc3( 90, 90, 90));
 	pMeaningLabel->disableStroke();
@@ -275,7 +346,8 @@ float WordCollectBoardRenderNode::PlayUnlockLettersAnimation(float fDelayTime)
 			Sprite* pSrite = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(m_pMainWord->m_sWord[iLetterIndex]).c_str());			
 			//pSrite->setColor( ccc3(100, 100, 100));
 			pSrite->setOpacity(0.f);
-			pSrite->setPosition(ccp( m_LabelXPositionList[iLetterIndex] + pSrite->getContentSize().width/2.f, 38.f + pSrite->getContentSize().height/2.f)); //_position.y));
+			pSrite->setPosition( m_LabelList[iLetterIndex]->getPosition());
+			//pSrite->setPosition(ccp( m_LabelXPositionList[iLetterIndex] + pSrite->getContentSize().width/2.f, 38.f + pSrite->getContentSize().height/2.f)); //_position.y));
 			m_pBatchNode->addChild(pSrite);
 		
 
@@ -291,19 +363,7 @@ float WordCollectBoardRenderNode::PlayUnlockLettersAnimation(float fDelayTime)
 					NULL));
 				
 			fTotalTime += fDelayPerLetter;
-		}	
-
-	if (fTotalTime > 0)
-	{
-		m_pBackground->runAction(
-			Sequence::create(
-				DelayTime::create( fDelayTime - 0.37f),
-				ScaleTo::create( 0.08f, 1.1f, 1.1f),
-				ScaleTo::create( 0.08f, 1.f, 1.f),
-				NULL));
-
-		fTotalTime  += fDisplayPerLetter *2 + fDelayTime;
-	}
+		}		
 
 	// reset flags
 	memset( m_NewUnlockedLetterFlags, 0, sizeof(m_NewUnlockedLetterFlags));
@@ -340,7 +400,7 @@ std::string WordCollectBoardRenderNode::GetImageFileFromLetter(unsigned char iLe
 	if (iLetter != ' ')
 		sprintf(sFileName, "%c.png", iLetter);
 	else
-		sprintf(sFileName, "_.png", iLetter);
+		sprintf(sFileName, "space.png", iLetter);
 	return std::string(sFileName);
 }
 

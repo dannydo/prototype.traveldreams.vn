@@ -147,13 +147,13 @@ bool LevelMapLayer::init()
 void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 {
 	if(UserTable::getInstance()->getUserInfo().iLife > 0)
-	{
-		
+	{		
 		CCMenuItem* pMenuItem = (CCMenuItem*)pSender;
 		int iLevel = pMenuItem->getTag();
 
 		GameWordManager* pGameWordManager = GameWordManager::getInstance();
 		pGameWordManager->GenerateWordForNewLevel(iLevel);		
+		
 
 		GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel);
 		this->addChild(pGameTargetNode, 10);		

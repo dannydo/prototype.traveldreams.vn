@@ -260,6 +260,7 @@ public:
 	int m_iCellCount;
 	int m_iStartIndexInDestroyedList;
 	int m_iGemID;
+	bool m_bAllCellOnTheSameLine;
 	GemComboType_e m_eGemComboType;
 };
 

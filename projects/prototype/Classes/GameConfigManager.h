@@ -122,14 +122,17 @@ public:
 	bool m_MainWordUnlockedFlagList[_GDS_WORD_MAX_LENGTH_];
 	bool m_bIsMainWordExistedOnBoard;
 	Cell m_MainWordLetterPosition[_GDS_WORD_MAX_LENGTH_];
+	// display of main word
+	bool m_bBreakLineWhenDisplayMainWord;
+	int m_iLetterCountOfFirstLine; //note: include space
 	// config of main word
 	int m_iInitRateOfMainLetter; //letter of main word
 	int m_iIncreasePercentAfterEachMoveOfMainLetter;
 	int m_iDecreasePercentAfterLetterDestroyedOfMainLetter;
 	int m_iDecreasePercentAfterLetterAppearedOfMainLetter;
 	int m_iRatioBetweenLettersOfMainWord; //in the same generation
-	bool m_bCanDropOnAllColumn;
-	bool m_DropOnColumnsFlagList[_BOARD_MAX_COLUMN_NUMBER_]; //true: enable
+	bool m_bMainWordCanDropOnAllColumn;
+	bool m_MainWordDropOnColumnsFlagList[_BOARD_MAX_COLUMN_NUMBER_]; //true: enable	
 
 	// end-game bonus type
 	EndGameBonusType m_eEndGameBonusType;

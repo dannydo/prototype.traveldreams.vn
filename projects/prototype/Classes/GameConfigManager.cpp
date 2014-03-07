@@ -139,6 +139,13 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 	}*/
 	//std::getline(inputStream, sTemp);
 
+	// display of main word
+	std::getline(inputStream, sTemp);
+	inputStream >> iTemp;
+	levelConfig.m_bBreakLineWhenDisplayMainWord = (iTemp != 0);
+	if (levelConfig.m_bBreakLineWhenDisplayMainWord)
+		inputStream >> levelConfig.m_iLetterCountOfFirstLine; //note: include space
+	std::getline(inputStream, sTemp);
 
 	// config of dropping of main word
 	if (!levelConfig.m_bIsMainWordExistedOnBoard)
@@ -155,10 +162,10 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 		// drop on all column or not
 		std::getline(inputStream, sTemp);
 		inputStream >> iTemp;
-		levelConfig.m_bCanDropOnAllColumn = (iTemp != 0);
-		if (!levelConfig.m_bCanDropOnAllColumn)
+		levelConfig.m_bMainWordCanDropOnAllColumn = (iTemp != 0);
+		if (!levelConfig.m_bMainWordCanDropOnAllColumn)
 		{
-			memset( levelConfig.m_DropOnColumnsFlagList, 0, sizeof(levelConfig.m_DropOnColumnsFlagList));
+			memset( levelConfig.m_MainWordDropOnColumnsFlagList, 0, sizeof(levelConfig.m_MainWordDropOnColumnsFlagList));
 
 			int iColumnCount;
 			inputStream >> iColumnCount;
@@ -167,7 +174,7 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 				inputStream >> iTemp;
 				iTemp--;
 				if (iTemp < _BOARD_MAX_COLUMN_NUMBER_)
-					levelConfig.m_DropOnColumnsFlagList[iTemp] =  true;
+					levelConfig.m_MainWordDropOnColumnsFlagList[iTemp] =  true;
 			}
 		}
 		std::getline(inputStream, sTemp);

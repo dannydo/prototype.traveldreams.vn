@@ -43,6 +43,7 @@ public:
 	inline const Word& GetMainWord() { return m_WordList[m_iMainWordIndex];}	
 	bool IsMainWordUnlocked() { return (m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount == 0);}
 	inline int GetTotalCollectibleLettersOfMainWord() { return m_iTotalCollectibleLettersOfMainWord;}
+	inline const LevelConfig* GetLevelConfig() { return m_pLevelConfig;}
 
 	int GetLengthOfMainWord();
 	int GetLengthOfSubWord();
