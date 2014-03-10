@@ -1,7 +1,6 @@
 #include "GameTargetNode.h"
 #include "LevelMapScene.h"
 #include "HelloWorldScene.h"
-#include "DictionaryNode.h"
 #include "LeaderBoardNode.h"
 #include "Database\LevelTable.h"
 
@@ -28,7 +27,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 		return false;
 	}
 
-	LayerColor* pBackground = LayerColor::create(ccc4(101, 85, 130, 255));
+	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 229));
 	pBackground->setContentSize(CCSizeMake(640, 960));
 	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
 	listener->setSwallowTouches(true);
@@ -45,9 +44,6 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pBackgroundBoard->setPosition(Point(320.0f, 610.0f));
 	m_pSpriteBatchNode->addChild(pBackgroundBoard);
 
-	Sprite* pLevelImage = Sprite::createWithSpriteFrameName("level.png");
-	m_pSpriteBatchNode->addChild(pLevelImage);
-
 	Sprite* pBackgroundFlashCard = Sprite::createWithSpriteFrameName("flashcard_board.png");
 	pBackgroundFlashCard->setPosition(Point(320.0f, 695.0f));
 	m_pSpriteBatchNode->addChild(pBackgroundFlashCard);
@@ -57,6 +53,10 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	Sprite* pBoostersImage = Sprite::createWithSpriteFrameName("booster.png");
 	pBoostersImage->setPosition(Point(216.0f, 531.0f));
 	m_pSpriteBatchNode->addChild(pBoostersImage);
+
+	Sprite* pIconBoosterImage = Sprite::createWithSpriteFrameName("icon-boosters.PNG");
+	pIconBoosterImage->setPosition(Point(320.0f, 465.0f));
+	m_pSpriteBatchNode->addChild(pIconBoosterImage);
 	
 	Sprite* pMonsterImage = Sprite::createWithSpriteFrameName("monster.png");
 	pMonsterImage->setPosition(Point(548.0f, 378.0f));
@@ -64,28 +64,34 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 
 	Sprite* pPetImage = Sprite::createWithSpriteFrameName("pet.png");
 	pPetImage->setPosition(Point(102.0f, 378.0f));
-	m_pSpriteBatchNode->addChild(pPetImage);
+	m_pSpriteBatchNode->addChild(pPetImage);	
+
+	Sprite* pTargetImage = Sprite::createWithSpriteFrameName("target.png");
+	pTargetImage->setPosition(Point(320.0f, 755.0f));
+	pTargetImage->setRotation(-3.5);
+	m_pSpriteBatchNode->addChild(pTargetImage);
 
 	std::string sPath = "FlashCard/flashcardimage/";
 	sPath.append(pMainWord.m_sFlashCardImage);
 	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
-	pFlashCardImage->setPosition(Point(320.0f, 680.0f));
+	pFlashCardImage->setPosition(Point(320.0f, 665.0f));
 	pFlashCardImage->setRotation(-3.5);
-	this->addChild(pFlashCardImage);		 
+	this->addChild(pFlashCardImage);
 
-	Sprite* pTargetImage = Sprite::create("Target-End-Game/target.png");
-	pTargetImage->setPosition(Point(320.0f, 755.0f));
-	pTargetImage->setRotation(-3.5);
-	this->addChild(pTargetImage);
+	Sprite* pLevelImage = Sprite::createWithSpriteFrameName("level.png");
+	pLevelImage->setPosition(Point(0.0f, 0.0f));
 
 	char sLevel[10];
 	sprintf(sLevel, "%d", m_iCurrentLevel);
-	LabelTTF* pLabelLevel = LabelTTF::create(sLevel, "Arial", 32);
-	this->addChild(pLabelLevel);
-
-	int iWidth = pLabelLevel->getContentSize().width+pLevelImage->getContentSize().width;
-	pLabelLevel->setPosition(Point(320.0f+iWidth/4.0f+iWidth/4.0f, 920.0f));
-	pLevelImage->setPosition(Point(320.0f+iWidth/4.0f-iWidth/4.0f, 920.0f));
+	LabelBMFont *pLabelLevel = LabelBMFont::create("1", "fonts/Level-bitmap-font-game.fnt");
+	pLabelLevel->setAnchorPoint(Point(0.5f, 0.5f));
+	pLabelLevel->setPosition(Point(pLevelImage->getContentSize().width/2 + pLabelLevel->getContentSize().width/2.0f, 5.0f));
+	
+	Node* pNodeLevel = Node::create();
+	pNodeLevel->addChild(pLabelLevel);
+	pNodeLevel->addChild(pLevelImage);
+	pNodeLevel->setPosition(Point(320.0f - pLevelImage->getContentSize().width/4.0f - pLabelLevel->getContentSize().width/4.0f + 22, 920.0f));
+	this->addChild(pNodeLevel);
 
 	MenuItemImage* pPlayLevel = MenuItemImage::create(
 		"Target-End-Game/btn_play.png",
