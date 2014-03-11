@@ -3,6 +3,8 @@
 #include "HelloWorldScene.h"
 #include "LeaderBoardNode.h"
 #include "Database\LevelTable.h"
+#include "ButtonManagerNode.h"
+#include "ButtonNode.h"
 
 USING_NS_CC;
 
@@ -31,7 +33,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pBackground->setContentSize(CCSizeMake(640, 960));
 	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
 	listener->setSwallowTouches(true);
-	listener->onTouchBegan = [this](Touch* touch, Event* event) { this->onTouchBackground(touch, event); return true;  };
+	listener->onTouchBegan = [this](Touch* touch, Event* event) { return true;  };
 	EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, pBackground);
 	this->addChild(pBackground);
 	this->setContentSize(pBackground->getContentSize());
@@ -83,7 +85,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 
 	char sLevel[10];
 	sprintf(sLevel, "%d", m_iCurrentLevel);
-	LabelBMFont *pLabelLevel = LabelBMFont::create("1", "fonts/Level-bitmap-font-game.fnt");
+	LabelBMFont *pLabelLevel = LabelBMFont::create(sLevel, "fonts/Level-bitmap-font-game.fnt");
 	pLabelLevel->setAnchorPoint(Point(0.5f, 0.5f));
 	pLabelLevel->setPosition(Point(pLevelImage->getContentSize().width/2 + pLabelLevel->getContentSize().width/2.0f, 5.0f));
 	
@@ -93,21 +95,18 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pNodeLevel->setPosition(Point(320.0f - pLevelImage->getContentSize().width/4.0f - pLabelLevel->getContentSize().width/4.0f + 22, 920.0f));
 	this->addChild(pNodeLevel);
 
-	MenuItemImage* pPlayLevel = MenuItemImage::create(
-		"Target-End-Game/btn_play.png",
-		"Target-End-Game/btn_play.png",
-		CC_CALLBACK_0(GameTargetNode::menuPlayLevelCallBack, this));
-	pPlayLevel->setPosition(Point(320.0f, 335.0f));
+	Sprite* pButtonPlayGameSprite = Sprite::create("Target-End-Game/btn_play.png");
+	ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonPlayGameSprite, CC_CALLBACK_1(GameTargetNode::menuPlayLevelCallBack, this));
+	buttonPlayNode->setPosition(Point(320.0f, 335.0f));
 
-	MenuItemImage* pCloseItem = MenuItemImage::create(
-		"Target-End-Game/btn_close.png",
-		"Target-End-Game/btn_close.png",
-		CC_CALLBACK_0(GameTargetNode::menuCloseCallBack, this));
-	pCloseItem->setPosition(Point(582.0f, 914.0f));
+	Sprite* pButtonCloseSprite = Sprite::create("Target-End-Game/btn_close.png");
+	ButtonNode* buttonCloseNode = ButtonNode::createButtonSprite(pButtonCloseSprite, CC_CALLBACK_1(GameTargetNode::menuCloseCallBack, this));
+	buttonCloseNode->setPosition(Point(582.0f, 914.0f));
 
-	Menu* pMenu = Menu::create(pPlayLevel, pCloseItem, NULL);
-	pMenu->setPosition(Point::ZERO);
-	this->addChild(pMenu, 10);
+	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
+	pButtonManagerNode->addButtonNode(buttonPlayNode);
+	pButtonManagerNode->addButtonNode(buttonCloseNode);
+	this->addChild(pButtonManagerNode);
 
 	LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel);
 	pLeaderBoard->setPosition(Point(320, 114));
@@ -116,20 +115,15 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	return true;
 }		
 
-void GameTargetNode::menuPlayLevelCallBack()
+void GameTargetNode::menuPlayLevelCallBack(Object* sender)
 {
 	CCScene *pGameScene = HelloWorld::createScene(m_iCurrentLevel);
 	CCDirector::getInstance()->replaceScene(pGameScene);
 }
 
-void GameTargetNode::menuCloseCallBack()
+void GameTargetNode::menuCloseCallBack(Object* sender)
 {
 	this->getParent()->removeChild(this);
-}
-
-void GameTargetNode::onTouchBackground(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
-{
-	pEvent->stopPropagation();
 }
 
 void GameTargetNode::generateLayoutStartAndBonusQuest()

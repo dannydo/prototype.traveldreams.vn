@@ -137,6 +137,8 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\BonusQuestManager.cpp" />
     <ClCompile Include="..\Classes\BonusWordNode.cpp" />
     <ClCompile Include="..\Classes\BonusWordNodeNew.cpp" />
+    <ClCompile Include="..\Classes\ButtonManagerNode.cpp" />
+    <ClCompile Include="..\Classes\ButtonNode.cpp" />
     <ClCompile Include="..\Classes\ComboCountRenderNode.cpp" />
     <ClCompile Include="..\Classes\CustomNode.cpp" />
     <ClCompile Include="..\Classes\Database\ChapterTable.cpp" />
@@ -182,6 +184,8 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\BonusQuestManager.h" />
     <ClInclude Include="..\Classes\BonusWordNode.h" />
     <ClInclude Include="..\Classes\BonusWordNodeNew.h" />
+    <ClInclude Include="..\Classes\ButtonManagerNode.h" />
+    <ClInclude Include="..\Classes\ButtonNode.h" />
     <ClInclude Include="..\Classes\ComboCountRenderNode.h" />
     <ClInclude Include="..\Classes\CustomNode.h" />
     <ClInclude Include="..\Classes\Database\ChapterTable.h" />

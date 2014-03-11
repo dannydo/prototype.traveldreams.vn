@@ -17,7 +17,7 @@ public:
 
 	inline CustomNodeClickMode getClickMode() { return m_clickMode; };
 
-	virtual void onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
+	virtual bool onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
 	virtual void onTouchCustomNodeMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent); 
 	virtual void onTouchCustomNodeEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
 

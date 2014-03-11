@@ -2,7 +2,8 @@
 #include "SoundManager.h"
 #include "WorldMapScene.h"
 #include "LifeSystemNode.h"	
-#include "DictionaryNode.h"
+#include "ButtonNode.h"
+#include "ButtonManagerNode.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -48,6 +49,7 @@ bool MainMenuLayer::init()
 		return false;
 	}
 
+	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
 	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 
 	Sprite* pSpriteBackground = Sprite::create("LoadingAndMainMenu/background.png");
@@ -55,29 +57,37 @@ bool MainMenuLayer::init()
 	pSpriteBackground->setPosition(Point(winSize.width/2.0f, winSize.height/2.0f));
 	this->addChild(pSpriteBackground);
 
-	Sprite* pSpriteTitle = Sprite::create("LoadingAndMainMenu/title.png");
-	pSpriteTitle->setAnchorPoint(Point(0.5f, 0.5f));
-	pSpriteTitle->setPosition(Point(winSize.width/2.0f, winSize.height - 215));
-	this->addChild(pSpriteTitle);
-	
+	Sprite* pButtonPlayGameSprite = Sprite::create("LoadingAndMainMenu/btn_play.png");
+	ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonPlayGameSprite, CC_CALLBACK_1(MainMenuLayer::playGame, this));
+	buttonPlayNode->setPosition(Point(320.0f, 515.0f));
+
+	Sprite* pButtonLoginFacebookSprite = Sprite::create("LoadingAndMainMenu/FB_btn.png");
+	ButtonNode* buttonLoginNode = ButtonNode::createButtonSprite(pButtonLoginFacebookSprite, CC_CALLBACK_1(MainMenuLayer::loginFacebook, this));
+	buttonLoginNode->setPosition(Point(320.0f, 355.0f));
+
+	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
+	pButtonManagerNode->addButtonNode(buttonPlayNode);
+	pButtonManagerNode->addButtonNode(buttonLoginNode);
+	this->addChild(pButtonManagerNode);
+
+	/*
 	CCMenuItemImage* pPlayGame = CCMenuItemImage::create(
-		"LoadingAndMainMenu/Play-button.png",
-		"LoadingAndMainMenu/Play-button.png",
+		"LoadingAndMainMenu/btn_play.png",
+		"LoadingAndMainMenu/btn_play.png",
 		CC_CALLBACK_0(MainMenuLayer::playGame, this));
-	pPlayGame->setPosition(Point(winSize.width /2.f, winSize.height/2.f - 105));
+	pPlayGame->setPosition(Point(320.0f, 254.0f));
 
 	CCMenuItemImage* m_pLoginfacebook = CCMenuItemImage::create(
-		"LoadingAndMainMenu/facebook_login_button.png",
-		"LoadingAndMainMenu/facebook_login_button.png",
+		"LoadingAndMainMenu/FB_btn.png",
+		"LoadingAndMainMenu/FB_btn.png",
 		CC_CALLBACK_0(MainMenuLayer::loginFacebook, this));
-	m_pLoginfacebook->setPosition(Point(winSize.width /2.f, winSize.height/2.f - 250));
+	m_pLoginfacebook->setPosition(Point(320.0f, 94.0f));
 
 	CCMenu* pMenu = CCMenu::create( pPlayGame, m_pLoginfacebook,  NULL);
 	pMenu->setPosition(CCPointZero);
 
 	this->addChild(pMenu, 1);
-	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
-
+	
     LabelTTF* label2 = LabelTTF::create("Logout", "Arial", 32);
     MenuItemLabel* m_pItemLogout = MenuItemLabel::create(label2, CC_CALLBACK_0(MainMenuLayer::LogoutFacebook, this));
     m_pItemLogout->setPosition(Point(winSize.width /2.f - 40, winSize.height/2.f - 350));
@@ -92,6 +102,7 @@ bool MainMenuLayer::init()
     MenuItemLabel* m_pItemShareDialog = MenuItemLabel::create(label4, CC_CALLBACK_0(MainMenuLayer::shareDialogFacebook, this));
     m_pItemShareDialog->setPosition(Point(winSize.width /2.f + 150, winSize.height/2.f - 350));
 	pMenu->addChild(m_pItemShareDialog);
+	*/
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	FacebookManager::getInstance()->loadPlugin();
@@ -136,13 +147,13 @@ void MainMenuLayer::update(float dt)
 #endif
 }
 
-void MainMenuLayer::playGame()
+void MainMenuLayer::playGame(Object* sender)
 {
 	WorldMapScene* scene = WorldMapScene::create();
 	Director::getInstance()->replaceScene(scene);
 }
 
-void MainMenuLayer::loginFacebook()
+void MainMenuLayer::loginFacebook(Object* sender)
 {
 	CCLOG("login");
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)

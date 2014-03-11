@@ -7,6 +7,9 @@
 #include "FlashCardCollection.h"
 #include "Database\UserTable.h"
 #include "LifeSystemNode.h"
+#include "Database\LevelTable.h"
+#include "ButtonManagerNode.h"
+#include "Database\UserTable.h"
 
 using namespace cocos2d;
 
@@ -41,115 +44,116 @@ LevelMapLayer::~LevelMapLayer()
 
 bool LevelMapLayer::init()
 {
-	if (CCLayer::init())
-	{
-		CCSize winSize = CCDirector::sharedDirector()->getWinSize();
-
-		Sprite* background = Sprite::create("World-Map/LEVEL.jpg");
-		background->setPosition(Point(winSize.width/2.0f, winSize.height/2.0f));
-		this->addChild(background);
-
-		//create level item
-		CCMenuItemImage* pLevel1Item = CCMenuItemImage::create(
-			"World-Map/mask-level.png",
-			"World-Map/mask-level.png",
-			CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
-		pLevel1Item->setTag(1);
-		pLevel1Item->setPosition(ccp(115, 185));
-
-		CCMenuItemImage* pLevel2Item = CCMenuItemImage::create(
-			"World-Map/mask-level.png",
-			"World-Map/mask-level.png",
-			CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
-		pLevel2Item->setTag(2);
-		pLevel2Item->setPosition(ccp(370, 190));
-
-		CCMenuItemImage* pLevel3Item = CCMenuItemImage::create(
-			"World-Map/mask-level.png",
-			"World-Map/mask-level.png",
-			CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
-		pLevel3Item->setTag(3);
-		pLevel3Item->setPosition(ccp(543, 300));	
-
-		CCMenuItemImage* pLevel4Item = CCMenuItemImage::create(
-			"World-Map/mask-level.png",
-			"World-Map/mask-level.png",
-			CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
-		pLevel4Item->setTag(4);
-		pLevel4Item->setPosition(ccp(265, 395));
-
-		CCMenuItemImage* pLevel5Item = CCMenuItemImage::create(
-			"World-Map/mask-level.png",
-			"World-Map/mask-level.png",
-			CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
-		pLevel5Item->setTag(5);
-		pLevel5Item->setPosition(ccp(96, 555));
-
-		CCMenuItemImage* pLevel6Item = CCMenuItemImage::create(
-			"World-Map/mask-level.png",
-			"World-Map/mask-level.png",
-			CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
-		pLevel6Item->setTag(8);
-		pLevel6Item->setPosition(ccp(526, 813));
-
-		CCMenuItemImage* pBackItem = CCMenuItemImage::create(
-			"World-Map/mask-button-back.png",
-			"World-Map/mask-button-back.png",
-			CC_CALLBACK_0(LevelMapLayer::menuBackToWorldMap, this));
-		pBackItem->setPosition(ccp(56, 49));
-
-		CCMenuItemImage* pFlashCard = CCMenuItemImage::create(
-		"World-Map/mask-button-flash-card.png",
-		"World-Map/mask-button-flash-card.png",
-		CC_CALLBACK_0(LevelMapLayer::menuOpenFlashCardCallBack, this));
-		pFlashCard->setPosition(ccp(365, 52));
-			
-		CCMenu* pMenu = CCMenu::create( pLevel1Item, pLevel2Item, pLevel3Item, pLevel4Item, pLevel5Item, pLevel6Item, pBackItem, pFlashCard, NULL);
-		pMenu->setPosition(CCPointZero);
-			
-		this->addChild(pMenu, 1);
-		SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
-
-		LifeSystemNode* pLifeNode = LifeSystemNode::create();
-		pLifeNode->setPosition(Point(50.0f, 910.0f));
-		this->addChild(pLifeNode);
-
-		m_pSettingNode = NULL;
-		m_isShowSetting = false;
-		Breadcrumb::getInstance()->addSceneMode(SceneMode::kLevelMap);
-
-		for (int iIndex=1; iIndex<=30; iIndex++)
-		{
-			char sLevel[5];
-			sprintf(sLevel, "%d", iIndex);
-			LabelTTF* pLabelLevel = LabelTTF::create(sLevel, "Arial", 40);
-			MenuItemLabel* pLevelItem = MenuItemLabel::create(pLabelLevel, CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
-			pLevelItem->setTag(iIndex);
-			if (iIndex%10 == 0)
-			{
-				pLevelItem->setPosition(Point(((iIndex-1)%10 + 1)*59, 740-(int(iIndex/10)-1)*50));
-			}
-			else
-			{
-				pLevelItem->setPosition(Point(((iIndex-1)%10 + 1)*59, 740-(int(iIndex/10))*50));
-			}
-			pMenu->addChild(pLevelItem);
-		}
-
-		return true;
-	}
-	else
+	if (!CCLayer::init())
 	{
 		return false;
 	}
+
+	int iChapter = UserDefault::getInstance()->getIntegerForKey("ChapterPlayGame", 1);
+	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+
+	this->loadConfigChapter(iChapter);
+
+	m_pBackgroundNode = Node::create();
+	m_pBackgroundNode->setAnchorPoint(Point(0.5f, 0.0f));
+	m_pBackgroundNode->setPosition(Point(0.0f, 94.0f));
+	this->addChild(m_pBackgroundNode);
+	m_maxHeight=0;;
+
+	for(int iIndex=1; iIndex<=m_iTotalImageBG; iIndex++)
+	{
+		char sBGChapter[50];
+		sprintf(sBGChapter, "World-Map/%d/bg%d.png", iChapter, iIndex);
+		Sprite* pBGImage = Sprite::create(sBGChapter);
+		pBGImage->setAnchorPoint(Point(0.5f, 0.0f));
+		pBGImage->setPosition(Point(320.0f, m_maxHeight));
+
+		m_pBackgroundNode->addChild(pBGImage);
+		m_maxHeight += pBGImage->getContentSize().height;
+	}
+
+	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
+	m_pBackgroundNode->addChild(pButtonManagerNode);
+
+	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
+	std::vector<LevelInfo> levels = LevelTable::getInstance()->fetchLevelsForChapter(iChapter);
+
+	while(!levels.empty())
+	{
+		LevelInfo levelInfo = levels.back();
+		Point point = m_pointLevel.back();
+
+		char sLevel[5];
+		sprintf(sLevel, "%d", levelInfo.iLevel);
+		LabelTTF* pLevelLabel = LabelTTF::create(sLevel, "Arial", 32);
+		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
+		pLevelLabel->setPosition(point);
+		
+		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel)
+		{
+			Sprite* pButtonLevelSprite = Sprite::create("World-Map/Level_lock.png");
+			pButtonLevelSprite->setTag(levelInfo.iLevel);
+			ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonLevelSprite, CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
+			buttonPlayNode->setPosition(point);
+			buttonPlayNode->setTag(levelInfo.iLevel);
+			pButtonManagerNode->addButtonNode(buttonPlayNode);
+
+			if(levelInfo.iLevel == userInfo.iCurrentLevel)
+			{
+				pLevelLabel->setColor(ccc3(0, 255, 0));
+			}
+		}
+		else
+		{
+			Sprite* pButtonLevelSprite = Sprite::create("World-Map/Level_lock.png");
+			pButtonLevelSprite->setPosition(point);
+			m_pBackgroundNode->addChild(pButtonLevelSprite);
+			pLevelLabel->setColor(ccc3(255, 0, 0));
+		}
+
+		m_pBackgroundNode->addChild(pLevelLabel);
+
+		levels.pop_back();
+		m_pointLevel.pop_back();
+	}
+
+	Sprite* pBarBottom = Sprite::create("FlashCard/bar-bottom.jpg");
+	pBarBottom->setAnchorPoint(Point(0.5f, 0.0f));
+	pBarBottom->setPosition(Point(winSize.width/2.0f, 0));
+	this->addChild(pBarBottom);
+
+	CCMenuItemImage* pItemSettingMenu = CCMenuItemImage::create(
+		"World-Map/mask-button-back.png",
+		"World-Map/mask-button-back.png",
+		CC_CALLBACK_0(LevelMapLayer::menuBackToWorldMap, this));
+	pItemSettingMenu->setPosition(ccp(56, 49));
+
+	CCMenu* pMenu = CCMenu::create(pItemSettingMenu, NULL);
+	pMenu->setPosition(CCPointZero);
+	this->addChild(pMenu);
+	
+	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
+
+	LifeSystemNode* pLifeNode = LifeSystemNode::create();
+	pLifeNode->setPosition(Point(50.0f, 910.0f));
+	this->addChild(pLifeNode);
+
+	m_pSettingNode = NULL;
+	m_isShowSetting = false;
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kLevelMap);
+	this->setTouchEnabled(true);
+	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
+	m_bMoveSlideShow = false;
+
+	return true;
 }
 
 void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 {
 	if(UserTable::getInstance()->getUserInfo().iLife > 0)
 	{
-		CCMenuItem* pMenuItem = (CCMenuItem*)pSender;
-		int iLevel = pMenuItem->getTag();
+		ButtonNode* pButtonNode = (ButtonNode*)pSender;
+		int iLevel = pButtonNode->getTag();
 
 		GameWordManager* pGameWordManager = GameWordManager::getInstance();
 		pGameWordManager->GenerateWordForNewLevel(iLevel);
@@ -204,4 +208,74 @@ void LevelMapLayer::showPopupTargetGame(const int& iLevel)
 
 	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel);
 	this->addChild(pGameTargetNode, 10);
+}
+
+void LevelMapLayer::loadConfigChapter(const int& iChapter)
+{
+	char sFilename[50];
+	sprintf(sFilename, "World-Map/%d/config.txt", iChapter);
+
+	unsigned long iDataSize;
+	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData(sFilename, "r", &iDataSize);
+	char* data = new char[iDataSize];
+	memcpy(data, orginalData, iDataSize);
+	membuf dataBuf(data, data + iDataSize);
+	std::istream inputStream(&dataBuf);
+
+	inputStream >> m_iTotalImageBG;
+	inputStream >> m_iTotalLevel;
+
+	std::string sTemp;
+	for(int iIndex = 0; iIndex < m_iTotalLevel; iIndex++)
+	{
+		float fX, fY;
+		inputStream >> fX;
+		inputStream >> fY;
+		Point point = Point(fX, fY);
+		m_pointLevel.push_back(point);
+	}
+
+	delete[] data;
+	delete[] orginalData;
+}
+
+bool LevelMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
+{
+	Point touchPosition = pTouch->getLocation();
+	m_fBeginY = touchPosition.y;
+
+	return true;
+}
+
+void LevelMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
+{	 
+	if(m_bMoveSlideShow == false)
+	{
+		Point touchPosition = pTouch->getLocation();
+		m_fYMoved = touchPosition.y - m_fBeginY;
+
+		if (m_fYMoved + m_pBackgroundNode->getPosition().y >= 94) {
+			m_fYMoved = -m_pBackgroundNode->getPosition().y + 94;
+		}
+		else if(m_fYMoved + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-960))
+		{
+			m_fYMoved = -(m_maxHeight-960) - m_pBackgroundNode->getPosition().y;
+		}
+	
+		m_bMoveSlideShow = true;
+		auto actionMove = MoveBy::create(0.0f, Point(0.0f, m_fYMoved));
+		auto actionUpdate = CallFunc::create(this, callfunc_selector(LevelMapLayer::updateScrollSlideShow));
+		m_pBackgroundNode->runAction(Sequence::create(actionMove, actionUpdate, NULL));
+		m_fBeginY = touchPosition.y;
+	}
+}
+
+void LevelMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
+{
+
+}
+
+void LevelMapLayer::updateScrollSlideShow()
+{
+	m_bMoveSlideShow = false;
 }

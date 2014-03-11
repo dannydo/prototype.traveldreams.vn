@@ -6,6 +6,7 @@
 #include "LeaderBoardNode.h"	
 #include "Database\LevelTable.h"
 #include "Database\ChapterTable.h"
+#include "ButtonManagerNode.h"
 
 class EndGameNode : public cocos2d::Node
 {
@@ -21,10 +22,10 @@ public:
 	void addBonusQuestCompleted(const int& iBonusQuestCompleted);
 
 private:
-	void menuNextLevelCallBack();
-	void menuRetryLevelLoseCallBack();
-	void menuRetryLevelWinCallBack();
-	void menuCloseCallBack();
+	void menuNextLevelCallBack(cocos2d::Object* sender);
+	void menuRetryLevelLoseCallBack(cocos2d::Object* sender);
+	void menuRetryLevelWinCallBack(cocos2d::Object* sender);
+	void menuCloseCallBack(cocos2d::Object* sender);
 
 	void generateLayoutStartAndBonusQuest();
 
@@ -37,6 +38,7 @@ private:
 	void updateBonusQuest();
 
 	cocos2d::SpriteBatchNode* m_pSpriteBatchNode;
+	ButtonManagerNode* m_pButtonManagerNode;
 
 	LevelInfo m_levelInfo;
 	ChapterInfo m_chapterInfo;
