@@ -244,7 +244,7 @@ public:
 private:
 	void LoadConfigOfLevel(int iLevel);		
 private:
-	LevelConfig m_LevelConfigList[_MAX_GAME_LEVEL_];
+	LevelConfig m_LevelConfigList[_MAX_GAME_LEVEL_+1];
 	GameConfig m_GameConfig;	
 
 	std::vector<ObstacleDescription*> m_ObstacleDescriptionArray;

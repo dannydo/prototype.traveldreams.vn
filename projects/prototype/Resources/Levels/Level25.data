@@ -1,32 +1,40 @@
 ;size map
 8	8
 ;number of move
-10
+30
 ;number of color
 6
 ;score of stars
 4000	5000	6000
 ;map matrix
-0	0	1	1	1	1	0   0
-0	1	1	1	1	1	1   0
 1	1	1	1	1	1	1   1
 1	1	1	1	1	1	1   1
 1	1	1	1	1	1	1   1
-1	1	1	1	1	1   1	1
-0	1	1	1	1	1	1   0
-0	0	1	1	1	1	0   0
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1	1   1
+0	0	0	0	0	0	0   0
+1	1	1	1	1	1	1   1
 ;main word
-PAPER
+LIVING ROOM
 0
 1
-5 3 5 4 5 5 5 6 5 7
+3 2 3 3 3 4 3 5 3 6 3 7 1 2 1 3 1 4 1 5 1 6
 ;display of main word, 1: break line ( + number letter of first line, not this include "SPACE" used to break line)
 0
 ;end game bonus type
-1
+2
 ;boss
 0
 ;obstacle list: count, list
+2
+SHIELD	1
+8
+1 1 1 2 1 3 1 4 1 5 1 6 1 7 1 8
+0
+LOCK	0
+8
+1 1 1 2 1 3 1 4 1 5 1 6 1 7 1 8
 0
 ;bonus quest
 0

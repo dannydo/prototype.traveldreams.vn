@@ -319,7 +319,7 @@ void EndGameNode::updateBonusQuest()
 
 void EndGameNode::menuNextLevelCallBack()
 {
-	if ( m_iCurrentLevel >= 30)
+	if ( m_iCurrentLevel >= _MAX_GAME_LEVEL_)
 		m_iCurrentLevel = 0;
 
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();

@@ -15,7 +15,7 @@ GameConfigManager::GameConfigManager()
 
 GameConfigManager::~GameConfigManager()
 {
-	for(int i=1; i<=8; i++)
+	for(int i=1; i<=_MAX_GAME_LEVEL_; i++)
 		for(auto pObstacle: m_LevelConfigList[i].m_ObstacleConfigList)
 			delete pObstacle;
 
@@ -25,7 +25,7 @@ GameConfigManager::~GameConfigManager()
 	
 void GameConfigManager::LoadLevelsConfig()
 {
-	for(int i=1; i<=8; i++)
+	for(int i=1; i<=_MAX_GAME_LEVEL_; i++)
 		LoadConfigOfLevel(i);
 }
 
@@ -50,7 +50,7 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 
 	//if (iLevel == 5)
 	//	iLevel = 5;
-	char sFileName[20];
+	char sFileName[25];
 	sprintf(sFileName, "Levels/Level%d.data", iLevel);	
 
 	unsigned long iDataSize;

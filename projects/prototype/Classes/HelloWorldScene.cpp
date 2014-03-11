@@ -271,7 +271,7 @@ void HelloWorld::initLevel(int iLevel)
 	// init graphic for gameBoard
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResourceDemo.plist");
 	m_pBoardBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
-	m_pBoardBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);
+	//m_pBoardBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);
 	this->addChild(m_pBoardBatchNode);
 	
 	// move hint
@@ -1480,11 +1480,11 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 
 	iMoveUnit = (int)fMoveUnit;
 
-	if ( iMoveUnit == m_iSaveLastCellMoveDelta || iMoveUnit == 0 )
-	{
-		CCLOG("Remove hint");
-		if ( iMoveUnit == 0  && iMoveUnit != m_iSaveLastCellMoveDelta && m_HintSprites.size() >0 )
+	if ( iMoveUnit == m_iSaveLastCellMoveDelta || iMoveUnit == 0 || iMoveUnit + iBlankCellOfFullLine == m_GameBoardManager.GetColumnNumber())
+	{		
+		if ( (iMoveUnit == 0 || iMoveUnit + iBlankCellOfFullLine == m_GameBoardManager.GetColumnNumber())  && iMoveUnit != m_iSaveLastCellMoveDelta && m_HintSprites.size() >0 )
 		{
+			CCLOG("Remove hint");
 			for(auto sprite:m_HintSprites)
 				sprite->removeFromParentAndCleanup(true);
 		
@@ -1648,9 +1648,9 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 	fMoveUnit = round(fMoveUnit);
 
 	iMoveUnit = (int)fMoveUnit;
-	if ( iMoveUnit == m_iSaveLastCellMoveDelta || iMoveUnit == 0 )
+	if ( iMoveUnit == m_iSaveLastCellMoveDelta || iMoveUnit == 0 || iMoveUnit + iBlankCellOfFullLine == m_GameBoardManager.GetRowNumber())
 	{		
-		if ( iMoveUnit == 0  && iMoveUnit != m_iSaveLastCellMoveDelta && m_HintSprites.size() >0 )
+		if ( (iMoveUnit == 0 || iMoveUnit + iBlankCellOfFullLine == m_GameBoardManager.GetRowNumber()) && iMoveUnit != m_iSaveLastCellMoveDelta && m_HintSprites.size() >0 )
 		{
 			for(auto sprite:m_HintSprites)
 				sprite->removeFromParentAndCleanup(true);
@@ -1832,7 +1832,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		if (cell.m_iRow >= 0 && cell.m_iColumn >= 0)
 		{
 			iTotalDestroyCell++;
-			BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime,_TME_BASIC_DESTROY_CELL_TIME_);
+			BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, fDelayTime,_TME_BASIC_DESTROY_CELL_TIME_, true);
 		}
 		else
 		{
@@ -2107,6 +2107,11 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 			if (cell.m_bIsUnlocked) // && pSprite != NULL) // safe check
 			{
+				// remove old question mark sprite
+				Sprite* pOldChildSprite = (Sprite*)pSprite->getChildren()->getLastObject();
+				if (pOldChildSprite != NULL)
+					pOldChildSprite->removeFromParentAndCleanup(true);
+
 				if (cell.m_iGemLetterBlockID >= 0) //iLetter < 255)
 				{
 					data = m_GameBoardManager.GetGemLetterData(cell.m_iGemLetterBlockID);							
@@ -2167,7 +2172,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		{					
 			Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID( cell.m_iGemID,  //m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), //_GCT_NONE_).c_str());
 						(cell.m_iGemLetterBlockID >= 0)?_GCT_HAS_LETTER_:_GCT_NONE_ ).c_str());
-			
+						
 			//pSprite->setAnchorPoint(ccp(0,0));
 			//pSprite->setColor(ccc3( 255-(m_iMoveCount+1)*5,  255, 255));
 			if (i!= 0)
@@ -2198,6 +2203,12 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = -1; //reset letter of gem				
 			}
 			//pSprite->setScale(0.65f);
+
+			if (cell.m_iGemLetterBlockID >= 0)
+			{
+				AddLetterToGem( cell, cell.m_iGemID, '?', -1, (i!=0));				
+			}
+
 
 			/*if (cell.m_bIsUnlocked)
 			{
@@ -2476,12 +2487,25 @@ void HelloWorld::UpdateObstacleListAfterMove()
 				if (obstacleData.m_bIsDirty)
 				{
 					if (m_BoardObstaclesList[iBlockID][iObstacleTypeID] != NULL)
-					{										
-						m_BoardObstaclesList[iBlockID][iObstacleTypeID]->removeFromParentAndCleanup(true);
-						m_BoardObstaclesList[iBlockID][iObstacleTypeID] = NULL;
-					}											
+					{	
+						m_BoardObstaclesList[iBlockID][iObstacleTypeID]->runAction(
+							Sequence::createWithTwoActions( 
+								ScaleTo::create( 0.25f, 1.1f, 1.1f),
+								RemoveSelf::create()));
 
-					AddObstacleToGem(m_BoardViewMatrix[iRow][iColumn].m_pSprite, iBlockID, iObstacleTypeID);
+						Object* childNode = NULL;
+						CCARRAY_FOREACH( m_BoardObstaclesList[iBlockID][iObstacleTypeID]->getChildren(), childNode) 
+							((Node*)childNode)->runAction(
+								ScaleTo::create( 0.25f, 1.6f, 1.6f));
+
+
+						//m_BoardObstaclesList[iBlockID][iObstacleTypeID]->removeFromParentAndCleanup(true);
+						m_BoardObstaclesList[iBlockID][iObstacleTypeID] = NULL;
+
+						AddObstacleToGem(m_BoardViewMatrix[iRow][iColumn].m_pSprite, iBlockID, iObstacleTypeID, true);
+					}											
+					else
+						AddObstacleToGem(m_BoardViewMatrix[iRow][iColumn].m_pSprite, iBlockID, iObstacleTypeID, false);
 					
 					obstacleData.m_bIsDirty = false;						
 				}
@@ -2510,7 +2534,7 @@ void HelloWorld::ActivateImageEffect(Node* pSender)
 	((Sprite*)pSender)->setOpacity(180);
 }
 
-void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float fEffectDuration)
+void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float fEffectDuration, bool bPlaySeparateEffect)
 {	
 	// NOTE: following code to hot fix error cause by cells destroy by double combo and other effect!!!
 	if (m_BoardViewMatrix[iRow][iColumn].m_pSprite == NULL)
@@ -2523,7 +2547,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 	{
 		m_BoardViewMatrix[iRow][iColumn].m_pSprite->stopAllActions();
 	}
-
+		
 	m_BoardViewMatrix[iRow][iColumn].m_pSprite->runAction(
 		Sequence::create( 
 			DelayTime::create(fDelay),			
@@ -2531,6 +2555,9 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 			RemoveSelf::create( true),
 			//FadeOut::create(0.01f),
 			NULL));
+
+	if (bPlaySeparateEffect)
+		PlaySplashLightDestroyEffectOnCell( iRow, iColumn, fDelay, fEffectDuration);
 
 	if (m_BoardViewMatrix[iRow][iColumn].m_iGemLetterBlockID >= 0)  //m_iLetter < 255)
 	{	
@@ -2587,6 +2614,57 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 	m_BoardViewMatrix[iRow][iColumn].m_pSprite = NULL;
 	m_BoardViewMatrix[iRow][iColumn].m_iGemLetterBlockID = -1;
 	m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = NULL;	
+}
+
+void HelloWorld::PlaySplashLightDestroyEffectOnCell(const int& iRow, const int & iColumn, const float& fDelayTime, const float& fEffectDuration)
+{	
+	Point position(m_fBoardLeftPosition + iColumn  * m_SymbolSize.width, 
+					m_fBoardBottomPosition + iRow * m_SymbolSize.height);
+
+	// active 1 sprite
+	Sprite* pActive1Sprite = Sprite::createWithSpriteFrameName("Active1.png");
+
+	pActive1Sprite->setPosition(position);	
+	m_pBoardBatchNode->addChild(pActive1Sprite, m_BoardViewMatrix[iRow][iColumn].m_pSprite->getZOrder() + 10);	
+	pActive1Sprite->setOpacity(0);
+	pActive1Sprite->setScale(0.1f);
+	pActive1Sprite->runAction(
+		Sequence::create(
+			DelayTime::create( fDelayTime),
+			FadeTo::create( 0.001f, 255),
+			ScaleTo::create( 0.06f, 0.033f),
+			ScaleTo::create( 0.15f, 0.9f),
+			ScaleTo::create( 0.1f, 1.f),
+			ScaleTo::create( 0.133f, 1.1f),
+			NULL));
+	pActive1Sprite->runAction(
+		Sequence::create(
+			DelayTime::create( fDelayTime + 0.31f),
+			FadeOut::create(0.134),
+			RemoveSelf::create(),
+			NULL));
+
+	// active 2 sprite
+	Sprite* pActive2Sprite = Sprite::createWithSpriteFrameName("Active2.png");	
+	pActive2Sprite->setPosition(position);
+	m_pBoardBatchNode->addChild(pActive2Sprite,  m_BoardViewMatrix[iRow][iColumn].m_pSprite->getZOrder() + 10);	
+	pActive2Sprite->setOpacity(0);
+	pActive2Sprite->setScale(0.1f);
+	pActive2Sprite->runAction(
+		Sequence::create(
+			DelayTime::create( fDelayTime),
+			FadeTo::create( 0.001f, 255),
+			ScaleTo::create( 0.0833f, 0.6f, 0.6f),
+			ScaleTo::create( 0.1f, 0.8f, 0.8f),
+			ScaleTo::create( 0.1f, 1.2f, 1.2f),
+			ScaleTo::create( 0.133f, 1.4f, 1.4f),
+			NULL));
+	pActive2Sprite->runAction(
+		Sequence::create(
+			DelayTime::create( fDelayTime + 0.31f),
+			FadeOut::create(0.134),
+			RemoveSelf::create(),
+			NULL));
 }
 
 /*Sprite* HelloWorld::GenerateAndAddLetterToComboGem(const ComboEffectCell& cell, const float& fDelayTime)
@@ -2664,7 +2742,7 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 }
 */
 
-Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID)
+Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID, bool bPlayEffect)
 {	
 	ObstacleData& obstacleData = m_GameBoardManager.GetObstacleProcessManager()->GetObstacleData(iBlockID, iObstacleTypeID);
 	if (obstacleData.m_bIsActive)
@@ -2677,6 +2755,20 @@ Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, co
 		const ObstacleDescription* pObstacleDesciption = GameConfigManager::getInstance()->GetObstacleDescription(iObstacleTypeID);
 		pMaskSprite->setPosition( Point( spriteSize.width /2.f + pObstacleDesciption->m_TranslatePosition.x, 
 			spriteSize.height /2.f + pObstacleDesciption->m_TranslatePosition.y));
+
+		// effect
+		if (bPlayEffect)
+		{
+			pMaskSprite->setScale(1.1f);
+			pMaskSprite->setOpacity(0);
+			pMaskSprite->runAction(
+				Sequence::create(
+					DelayTime::create(0.2f),
+					FadeIn::create(0.01f),
+					ScaleTo::create(0.1f, 1.f, 1.f),
+					NULL));
+		}
+
 
 		if (pObstacleDesciption->m_bIsDrawLevelLabel)
 		{
@@ -2701,6 +2793,19 @@ Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, co
 				{
 					levelSpriteList[i]->setPosition( Point( obstacleSpriteSize.width/2.f + (i-(iLabelLength-1)/2.f) * letterSize.width, obstacleSpriteSize.height/2.f));
 					pMaskSprite->addChild(levelSpriteList[i]);
+
+					// effect
+					if (bPlayEffect)
+					{
+						levelSpriteList[i]->setScale(1.6f);
+						levelSpriteList[i]->setOpacity(0);
+						levelSpriteList[i]->runAction(
+							Sequence::create(
+								DelayTime::create(0.2f),
+								FadeIn::create(0.01f),
+								ScaleTo::create(0.1f, 1.f, 1.f),
+								NULL));
+					}
 				}
 			}
 		}
@@ -2715,8 +2820,12 @@ Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, co
 
 Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror)
 {
-	Sprite* pCharacterSprite = Sprite::createWithSpriteFrameName(
+	Sprite* pCharacterSprite;
+	if (iGemLetterBlockID >=0)
+		pCharacterSprite = Sprite::createWithSpriteFrameName(
 			m_pWordCollectBoardRenderNode->GetImageInGemFileFromLetter(iLetter).c_str());
+	else
+		pCharacterSprite = Sprite::createWithSpriteFrameName("Gem_QuestionMask.png");
 		
 	Size parentSpriteSize = m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->getContentSize();
 	pCharacterSprite->setScale(0.8f);

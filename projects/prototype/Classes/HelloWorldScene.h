@@ -121,7 +121,7 @@ protected:
 		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells, bool bIsNewMove);
 		
-	Sprite* AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID);
+	Sprite* AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID, bool bPlayEffect = false);
 	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror=false);
 	void AddNewComboCell(const ComboEffectCell& cell, const float& fDelayTime, const float& fEffectTime, bool bCreateMirror = true);
 
@@ -155,8 +155,9 @@ protected:
 	void PlayCrazyPetEndGameBonusEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime);
 
 	void ActivateImageEffect(Node* pSender);
-	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float fEffectDuration);
+	void BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float fEffectDuration, bool bPlaySeparateEffect = false);
 	void PlayChangeColorEffectOnSprite(Sprite* pSprite,const float& fDelayTime);
+	void PlaySplashLightDestroyEffectOnCell(const int& iRow, const int & iColumn,const float& fDelayTime, const float& fEffectDuration);
 
 
 	// unlock letter flow

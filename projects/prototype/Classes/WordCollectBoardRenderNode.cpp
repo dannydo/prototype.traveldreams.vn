@@ -222,8 +222,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 			m_BubbleList[iStartLetterIndexOfSecondLine + i] = Sprite::createWithSpriteFrameName("Main_Bubble.png");
 			m_BubbleList[iStartLetterIndexOfSecondLine + i]->setPosition( Point(m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].x, 960.f - m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].y));		
 			m_pBatchNode->addChild(m_BubbleList[iStartLetterIndexOfSecondLine+i], 1);
-		
-			m_LabelList[iStartLetterIndexOfSecondLine + i]->setScale(0.7f);
+					
 			m_LabelList[iStartLetterIndexOfSecondLine + i]->setPosition(Point(m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].x, 960.f - m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].y));
 		}
 	}

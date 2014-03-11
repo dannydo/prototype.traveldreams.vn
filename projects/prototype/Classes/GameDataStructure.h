@@ -24,7 +24,7 @@
 #define _COMBO_TYPE_COUNT_	3
 #define _MAX_LINKED_BLOCK_COUNT_	(_BOARD_MAX_ROW_NUMBER_*_BOARD_MAX_COLUMN_NUMBER_/4)
 
-#define _MAX_GAME_LEVEL_	9
+#define _MAX_GAME_LEVEL_	30
 
 
 // timing effects, temporary place here

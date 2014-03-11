@@ -533,6 +533,7 @@ bool NewGameBoardManager::FastCheckBlocks( int iSelectedRow, int iSelectedColumn
 	// ********************** if not, check combo 6 (if delta = 0 then not check combo 6) ********************** 	
 	if ((iSelectedRow >=0 && iDeltaColumn !=0) || (iSelectedColumn >= 0 && iDeltaRow != 0))
 	{
+		CCLOG("selectedRow, delta, selectedColumn, delta: %d, %d, %d, %d", iSelectedRow, iDeltaColumn, iSelectedColumn, iDeltaRow);
 		// ******** note: temporary hardcode and fix condition for combo 6 ************* 					
 		if (iSelectedRow >= 0)
 			for(iIndexColumn =0; iIndexColumn < m_iColumnNumber; iIndexColumn++)
