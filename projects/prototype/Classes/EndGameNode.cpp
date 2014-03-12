@@ -110,6 +110,13 @@ bool EndGameNode::initWin()
 		m_chapterInfo.iTotalLevelUnlock++;
 		userInfo.iCurrentChapter = m_levelInfo.iChapter;
 		userInfo.iCurrentLevel = m_levelInfo.iLevel + 1;
+
+		if (m_levelInfo.iLevel == m_levelInfo.iChapter*20)
+		{
+			m_chapterInfo.bIsUnlock = true;
+			userInfo.iCurrentChapter = (int)m_levelInfo.iLevel/20 + 1;
+			UserDefault::getInstance()->setIntegerForKey("ChapterPlayGame", userInfo.iCurrentChapter);
+		}
 		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 		UserTable::getInstance()->updateUser(userInfo);
 	}

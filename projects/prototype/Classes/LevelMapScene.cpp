@@ -78,6 +78,8 @@ bool LevelMapLayer::init()
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
 	std::vector<LevelInfo> levels = LevelTable::getInstance()->fetchLevelsForChapter(iChapter);
 
+	Point pointScroll;
+
 	while(!levels.empty())
 	{
 		LevelInfo levelInfo = levels.back();
@@ -100,6 +102,7 @@ bool LevelMapLayer::init()
 
 			if(levelInfo.iLevel == userInfo.iCurrentLevel)
 			{
+				pointScroll = point;
 				pLevelLabel->setColor(ccc3(0, 255, 0));
 			}
 		}
@@ -115,6 +118,14 @@ bool LevelMapLayer::init()
 
 		levels.pop_back();
 		m_pointLevel.pop_back();
+	}
+
+	if (pointScroll.y > 960-94-200 && pointScroll.y < m_maxHeight-960) {
+		m_pBackgroundNode->setPositionY(-pointScroll.y + 450);
+	}
+	else if(pointScroll.y > m_maxHeight-960)
+	{
+		m_pBackgroundNode->setPositionY(-(m_maxHeight-960));
 	}
 
 	Sprite* pBarBottom = Sprite::create("World-Map/bar-bottom.png");
