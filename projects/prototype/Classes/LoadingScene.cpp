@@ -43,18 +43,15 @@ bool LoadingLayer::init()
 		return false;
 	}
 
-	Size winSize = Director::getInstance()->getWinSize();
+	Sprite* pBackgroundSprite = Sprite::create("LoadingAndMainMenu/loading-screen.png");
+	pBackgroundSprite->setAnchorPoint(Point(0.5f, 0.5f));
+	pBackgroundSprite->setPosition(Point(320.0f, 480.0f));
+	this->addChild(pBackgroundSprite);
 
-	Sprite* pSpriteLogo = Sprite::create("LoadingAndMainMenu/KISS-logo.png");
-	pSpriteLogo->setAnchorPoint(Point(0.5f, 0.5f));
-	pSpriteLogo->setPosition(Point(winSize.width/2.0f, winSize.height/2.0f));
-	this->addChild(pSpriteLogo);
-
-	Label* pLabelLoading = Label::createWithTTF("Loading...", "fonts/ARLRDBD.ttf", 30);
-	pLabelLoading->setColor(ccc3(0, 0, 0));
-	pLabelLoading->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelLoading->setPosition(Point(winSize.width/2.0f, winSize.height/2.0f - pSpriteLogo->getContentSize().height));
-	this->addChild(pLabelLoading);
+	Sprite* pLoadingSprite = Sprite::create("LoadingAndMainMenu/loading-text.png");
+	pLoadingSprite->setAnchorPoint(Point(0.5f, 0.5f));
+	pLoadingSprite->setPosition(Point(320.0f, 660.0f));
+	this->addChild(pLoadingSprite);
 
 	m_bFinishLoad = false;
 	this->scheduleUpdate();

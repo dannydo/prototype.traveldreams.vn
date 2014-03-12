@@ -17,8 +17,8 @@ public:
 	void update(float dt) override;
 
 private:
-	void playGame();
-	void loginFacebook();
+	void playGame(cocos2d::Object* sender);
+	void loginFacebook(cocos2d::Object* sender);
 	void LogoutFacebook();
 	void shareLinkFacebook();
 	void shareDialogFacebook();

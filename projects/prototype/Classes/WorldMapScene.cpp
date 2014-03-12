@@ -104,6 +104,7 @@ bool WorldMapLayer::init()
 
 void WorldMapLayer::menuPlayChapterCallBack()
 {
+	UserDefault::getInstance()->setIntegerForKey("ChapterPlayGame", 1);
 	LevelMapScene* pLevelMap =  LevelMapScene::create();
 	Director::getInstance()->replaceScene(pLevelMap);
 }

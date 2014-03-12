@@ -23,7 +23,7 @@ public:
 	static LeaderBoardtNode* createLayout(const int& iLevel);
 
 	void addButtonShowMe();
-	void onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
+	bool onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
 	void onTouchCustomNodeMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override; 
 	void onTouchCustomNodeEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
 	
@@ -36,6 +36,7 @@ private:
 	void parseJsonToLeadeBoard(cs::JsonDictionary* pJsonItem, const int& iRank, const int& iIndex);
 
 	cocos2d::Node* m_pSlideShow;
+	cocos2d::Sprite* m_pSpriteBackground;
 
 	float m_fBeginX;
 	float m_fSlideShowPositionX;
@@ -48,6 +49,8 @@ private:
 	int m_iNumMove;
 	int m_iLeaderBoardCount;
 	int m_arrIndex[6];
+
+	bool m_isClick;
 };
 
 #endif;

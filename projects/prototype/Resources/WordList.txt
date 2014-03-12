@@ -47,7 +47,7 @@ UniformSentence
 PEN
 cây viết
 Pen
-Pen.jpg
+pen.jpg
 0
 /pen/
 He dropped his pen in the toilets.
@@ -56,7 +56,7 @@ PenSentence
 CRAYON
 bút chì màu
 Crayon
-Crayon.jpg
+crayon.jpg
 0
 /ˈkreɪən/
 My mum used my crayon for make-up.
@@ -65,7 +65,7 @@ CrayonSentence
 SCISSORS
 cây kéo
 Scissors
-Scissors.jpg
+scissors.jpg
 0
 /ˈsɪzəz/
 Never carry scissors in your pocket. What's the next sentence?
@@ -74,7 +74,7 @@ ScissorsSentence
 TEACHER
 giáo viên
 Teacher
-Teacher.jpg
+teacher.jpg
 0
 /ˈtiːtʃə(r)/
 The teacher did not know the answer.
@@ -83,7 +83,7 @@ TeacherSentence
 CLASSMATE
 bạn cùng lớp
 Classmate
-Classmate.jpg
+classmate.jpg
 0
 /ˈklɑːsmeɪt/
 My classmate only copied my wrong answers and got a zero.
@@ -155,7 +155,7 @@ ComputerSentence
 RULER
 cây thước
 Ruler
-Ruler.jpg
+ruler.jpg
 0
 /ˈruːlə(r)/
 Stop poking me with your ruler.
@@ -164,7 +164,7 @@ RulerSentence
 GLOBE
 quả địa cầu
 Globe
-Globe.jpg
+globe.jpg
 0
 /ɡləʊb/
 Stop spinning the globe! I feel dizzy.

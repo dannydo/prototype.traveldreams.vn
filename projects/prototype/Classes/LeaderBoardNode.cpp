@@ -36,11 +36,11 @@ bool LeaderBoardtNode::init()
 		return false;
 	}
 
-	Sprite* pSpriteBackground = Sprite::create("Target-End-Game/panel-avatar.png");
-	pSpriteBackground->setAnchorPoint(Point(0.5f, 0.5f));
-	pSpriteBackground->setPosition(Point(0.0f, 0.0f));
-	this->addChild(pSpriteBackground);
-	this->setContentSize(pSpriteBackground->getContentSize());
+	m_pSpriteBackground = Sprite::create("Target-End-Game/panel-avatar.png");
+	m_pSpriteBackground->setAnchorPoint(Point(0.5f, 0.5f));
+	m_pSpriteBackground->setPosition(Point(0.0f, 0.0f));
+	this->addChild(m_pSpriteBackground);
+	this->setContentSize(m_pSpriteBackground->getContentSize());
 
 	m_pSlideShow = Node::create();
 	m_pSlideShow->setAnchorPoint(Point(0.0f, 0.5f));
@@ -70,6 +70,7 @@ bool LeaderBoardtNode::init()
 
 	UserService::getInstance()->addCallBackList(this);
 	UserService::getInstance()->getLeaderBoardLevel(m_iLevel);
+	m_isClick = false;
 
 	return true;
 }
@@ -132,43 +133,61 @@ void LeaderBoardtNode::menuShowMeCallback()
 }
 
 
-void LeaderBoardtNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
+bool LeaderBoardtNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
 {
 	Point touchPosition = pTouch->getLocation();
 	m_fBeginX = touchPosition.x;
+
+	CCRect *pRectButton = new CCRect(m_pSpriteBackground->getOffsetPosition().x, 
+			m_pSpriteBackground->getOffsetPosition().y, 
+			m_pSpriteBackground->getTextureRect().size.width, 
+			m_pSpriteBackground->getTextureRect().size.height);
+
+	Point touchButton = m_pSpriteBackground->convertToNodeSpace(touchPosition);
+
+	if(pRectButton->containsPoint(touchButton))
+	{
+		m_isClick = true;
+		return true;
+	}
+
+	return false;
 }
 
 void LeaderBoardtNode::onTouchCustomNodeMoved(Touch* pTouch,  Event* pEvent)
 {
-	if (m_iLeaderBoardCount > 4)
+	if (m_isClick)
 	{
-		if (m_bMoveSlideShow == false)
+		if (m_iLeaderBoardCount > 4)
 		{
-			Point touchPosition = pTouch->getLocation();
-			m_fXMoved = touchPosition.x - m_fBeginX;
-			m_fBeginX = touchPosition.x;
-			m_fSlideShowPositionX += m_fXMoved;
-
-			if(m_fSlideShowPositionX >= 0.0f)
+			if (m_bMoveSlideShow == false)
 			{
-				m_fSlideShowPositionX = 0.0f;
-				m_fXMoved = m_fSlideShowPositionX - m_pSlideShow->getPositionX();
-			}
-	
-			if(m_fSlideShowPositionX <= m_fMinPositionLeft)
-			{
-				m_fSlideShowPositionX = m_fMinPositionLeft;
-				m_fXMoved = m_fSlideShowPositionX - m_pSlideShow->getPositionX();
-			}
-
-			if (m_fXMoved != 0)
-			{
-				m_iNumMove++;
-				m_bMoveSlideShow = true;
-				auto actionMove = MoveBy::create(0.1f, Point(m_fXMoved, 0.0f));
-				auto actionUpdate = CallFunc::create(this, callfunc_selector(LeaderBoardtNode::updateScrollSlideShow));
-				m_pSlideShow->runAction(Sequence::create(actionMove, actionUpdate, NULL));
+				Point touchPosition = pTouch->getLocation();
+				m_fXMoved = touchPosition.x - m_fBeginX;
 				m_fBeginX = touchPosition.x;
+				m_fSlideShowPositionX += m_fXMoved;
+
+				if(m_fSlideShowPositionX >= 0.0f)
+				{
+					m_fSlideShowPositionX = 0.0f;
+					m_fXMoved = m_fSlideShowPositionX - m_pSlideShow->getPositionX();
+				}
+	
+				if(m_fSlideShowPositionX <= m_fMinPositionLeft)
+				{
+					m_fSlideShowPositionX = m_fMinPositionLeft;
+					m_fXMoved = m_fSlideShowPositionX - m_pSlideShow->getPositionX();
+				}
+
+				if (m_fXMoved != 0)
+				{
+					m_iNumMove++;
+					m_bMoveSlideShow = true;
+					auto actionMove = MoveBy::create(0.1f, Point(m_fXMoved, 0.0f));
+					auto actionUpdate = CallFunc::create(this, callfunc_selector(LeaderBoardtNode::updateScrollSlideShow));
+					m_pSlideShow->runAction(Sequence::create(actionMove, actionUpdate, NULL));
+					m_fBeginX = touchPosition.x;
+				}
 			}
 		}
 	}
@@ -176,45 +195,49 @@ void LeaderBoardtNode::onTouchCustomNodeMoved(Touch* pTouch,  Event* pEvent)
 
 void LeaderBoardtNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
 {
-	if (m_iNumMove == 1)
+	if(m_isClick)
 	{
-		
-		if (fabsf(m_fXMoved) < 100)
+		if (m_iNumMove == 1)
 		{
-			auto actionUpdate = CallFunc::create(this, callfunc_selector(LeaderBoardtNode::updateScrollSlideShow));
-			float fDeltaMove = 320.0f;
-			if (m_fXMoved > 0)
+		
+			if (fabsf(m_fXMoved) < 100)
 			{
-				if (m_fSlideShowPositionX < 0.0f)
+				auto actionUpdate = CallFunc::create(this, callfunc_selector(LeaderBoardtNode::updateScrollSlideShow));
+				float fDeltaMove = 320.0f;
+				if (m_fXMoved > 0)
 				{
-					if(m_fSlideShowPositionX + fDeltaMove > 0.0f)
+					if (m_fSlideShowPositionX < 0.0f)
 					{
-						fDeltaMove = -m_fSlideShowPositionX;
-					}
+						if(m_fSlideShowPositionX + fDeltaMove > 0.0f)
+						{
+							fDeltaMove = -m_fSlideShowPositionX;
+						}
 
-					m_fSlideShowPositionX += fDeltaMove;
-					auto actionMove = MoveBy::create(0.3f, Point(fDeltaMove, 0.0f));
-					m_pSlideShow->runAction(Sequence::create(DelayTime::create(0.1f)->clone(), actionMove, actionUpdate, NULL));
+						m_fSlideShowPositionX += fDeltaMove;
+						auto actionMove = MoveBy::create(0.3f, Point(fDeltaMove, 0.0f));
+						m_pSlideShow->runAction(Sequence::create(DelayTime::create(0.1f)->clone(), actionMove, actionUpdate, NULL));
+					}
 				}
-			}
-			else
-			{
-				if (m_fSlideShowPositionX > m_fMinPositionLeft)
+				else
 				{
-					fDeltaMove = -320.0f;
-					if(m_fSlideShowPositionX + fDeltaMove < m_fMinPositionLeft)
+					if (m_fSlideShowPositionX > m_fMinPositionLeft)
 					{
-						fDeltaMove = m_fMinPositionLeft - m_fSlideShowPositionX;
-					}
+						fDeltaMove = -320.0f;
+						if(m_fSlideShowPositionX + fDeltaMove < m_fMinPositionLeft)
+						{
+							fDeltaMove = m_fMinPositionLeft - m_fSlideShowPositionX;
+						}
 
-					m_fSlideShowPositionX += fDeltaMove;
-					auto actionMove = MoveBy::create(0.3f, Point(fDeltaMove, 0.0f));
-					m_pSlideShow->runAction(Sequence::create(DelayTime::create(0.1f)->clone(), actionMove, actionUpdate, NULL));
+						m_fSlideShowPositionX += fDeltaMove;
+						auto actionMove = MoveBy::create(0.3f, Point(fDeltaMove, 0.0f));
+						m_pSlideShow->runAction(Sequence::create(DelayTime::create(0.1f)->clone(), actionMove, actionUpdate, NULL));
+					}
 				}
 			}
 		}
 	}
 	m_iNumMove = 0;
+	m_isClick = false;
 }
 
 void LeaderBoardtNode::updateScrollSlideShow()

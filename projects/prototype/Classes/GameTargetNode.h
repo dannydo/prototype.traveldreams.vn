@@ -11,10 +11,9 @@ public:
 	bool initLayout(const Word& pMainWord);
 
 private:
-	void menuPlayLevelCallBack();
-	void menuCloseCallBack();
+	void menuPlayLevelCallBack(cocos2d::Object* sender);
+	void menuCloseCallBack(cocos2d::Object* sender);
 	
-	void onTouchBackground(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
 	std::vector<int> generateArrayNumber(int iNumber);
 	cocos2d::Node* generateLayoutLevel(int iLevel);
 

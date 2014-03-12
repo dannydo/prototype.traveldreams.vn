@@ -114,42 +114,6 @@ bool InitDatabase::createDatabase()
 		iResult = sqlite3_exec(m_DatabaseSqlite, sql.c_str(), NULL, NULL, NULL);
 		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
 			bCreateSuccess = false;
-
-		sql="insert into Chapters values(3, 'Office', 41, 60, 0, 0, 0, 0, 0)";
-		iResult = sqlite3_exec(m_DatabaseSqlite, sql.c_str(), NULL, NULL, NULL);
-		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
-			bCreateSuccess = false;
-		
-		sql="insert into Chapters values(4, 'The Zoo', 61, 80, 0, 0, 0, 0, 0)";
-		iResult = sqlite3_exec(m_DatabaseSqlite, sql.c_str(), NULL, NULL, NULL);
-		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
-			bCreateSuccess = false;
-
-		sql="insert into Chapters values(5, 'The Zoo', 81, 100, 0, 0, 0, 0, 0)";
-		iResult = sqlite3_exec(m_DatabaseSqlite, sql.c_str(), NULL, NULL, NULL);
-		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
-			bCreateSuccess = false;
-
-		sql="insert into Chapters values(6, 'Office', 101, 120, 0, 0, 0, 0, 0)";
-		iResult = sqlite3_exec(m_DatabaseSqlite, sql.c_str(), NULL, NULL, NULL);
-		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
-			bCreateSuccess = false;
-
-		sql="insert into Chapters values(7, 'School', 121, 140, 0, 0, 0, 0, 0)";
-		iResult = sqlite3_exec(m_DatabaseSqlite, sql.c_str(), NULL, NULL, NULL);
-		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
-			bCreateSuccess = false;
-		
-		sql="insert into Chapters values(8, 'House', 141, 160, 0, 0, 0, 0, 0)";
-		iResult = sqlite3_exec(m_DatabaseSqlite, sql.c_str(), NULL, NULL, NULL);
-		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
-			bCreateSuccess = false;
-
-		sql="insert into Chapters values(9, 'Office', 161, 180, 0, 0, 0, 0, 0)";
-		iResult = sqlite3_exec(m_DatabaseSqlite, sql.c_str(), NULL, NULL, NULL);
-		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
-			bCreateSuccess = false;
-
 	}
 
 	iResult = sqlite3_exec(m_DatabaseSqlite,"create table if not exists Levels(Level integer primary key, Chapter integer, Star integer, Score integer, BonusQuest integer, IsUnlock integer, IsUpdate integer, WordKey text)", NULL, NULL, NULL);

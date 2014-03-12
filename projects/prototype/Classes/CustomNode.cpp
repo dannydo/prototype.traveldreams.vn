@@ -13,7 +13,7 @@ bool CustomNode::init()
 
 	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
 	listener->setSwallowTouches(true);
-	listener->onTouchBegan = [this](Touch* touch, Event* event) { this->onTouchCustomNodeBegan(touch, event); return true; };
+	listener->onTouchBegan = [this](Touch* touch, Event* event) { return this->onTouchCustomNodeBegan(touch, event); };
 	listener->onTouchMoved = [this](Touch* touch, Event* event) { this->onTouchCustomNodeMoved(touch, event); };
 	listener->onTouchEnded = [this](Touch* touch, Event* event) { this->onTouchCustomNodeEnded(touch, event); };
 	EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, this);
@@ -21,9 +21,11 @@ bool CustomNode::init()
 	return true;
 }
 
-void CustomNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
+bool CustomNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
 {
 	m_pointClickBegin = pTouch->getLocation();
+
+	return false;
 }
 
 void CustomNode::onTouchCustomNodeMoved(Touch* pTouch,  Event* pEvent)
@@ -37,5 +39,5 @@ void CustomNode::onTouchCustomNodeMoved(Touch* pTouch,  Event* pEvent)
 
 void CustomNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
 {
-	pEvent->stopPropagation();
+	
 }
