@@ -282,7 +282,7 @@ void LevelMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 		}
 	
 		m_bMoveSlideShow = true;
-		auto actionMove = MoveBy::create(0.1f, Point(0.0f, m_fYMoved));
+		auto actionMove = MoveBy::create(0.0f, Point(0.0f, m_fYMoved));
 		auto actionUpdate = CallFunc::create(this, callfunc_selector(LevelMapLayer::updateScrollSlideShow));
 		m_pBackgroundNode->runAction(Sequence::create(actionMove, actionUpdate, NULL));
 		m_fBeginY = touchPosition.y;
