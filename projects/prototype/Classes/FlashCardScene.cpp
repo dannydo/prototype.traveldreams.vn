@@ -391,7 +391,7 @@ Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
 		pLabelWord->setPosition(Point(320.0f, 650.0f));
 		pNode->addChild(pLabelWord);
 
-		LabelTTF* pLabelWordPhonetic = LabelTTF::create("/'blækbɔ:k/", "Arial", 20.0f);
+		LabelTTF* pLabelWordPhonetic = LabelTTF::create(wordInfo.m_sPhonetic.c_str(), "Arial", 20.0f);
 		pLabelWordPhonetic->setColor(ccc3(0.0f, 0.0f, 0.0f));
 		pLabelWordPhonetic->setPosition(Point(320.0f, 620.0f));
 		pNode->addChild(pLabelWordPhonetic);
