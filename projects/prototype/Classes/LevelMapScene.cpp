@@ -58,7 +58,7 @@ bool LevelMapLayer::init()
 	m_pBackgroundNode->setAnchorPoint(Point(0.5f, 0.0f));
 	m_pBackgroundNode->setPosition(Point(0.0f, 94.0f));
 	this->addChild(m_pBackgroundNode);
-	m_maxHeight=0;;
+	m_maxHeight=0;
 
 	for(int iIndex=1; iIndex<=m_iTotalImageBG; iIndex++)
 	{
@@ -117,22 +117,29 @@ bool LevelMapLayer::init()
 		m_pointLevel.pop_back();
 	}
 
-	Sprite* pBarBottom = Sprite::create("FlashCard/bar-bottom.jpg");
+	Sprite* pBarBottom = Sprite::create("World-Map/bar-bottom.png");
 	pBarBottom->setAnchorPoint(Point(0.5f, 0.0f));
 	pBarBottom->setPosition(Point(winSize.width/2.0f, 0));
 	this->addChild(pBarBottom);
 
-	CCMenuItemImage* pItemSettingMenu = CCMenuItemImage::create(
-		"World-Map/mask-button-back.png",
-		"World-Map/mask-button-back.png",
-		CC_CALLBACK_0(LevelMapLayer::menuBackToWorldMap, this));
-	pItemSettingMenu->setPosition(ccp(56, 49));
+	CCMenuItemImage* pFlashCard = CCMenuItemImage::create(
+		"World-Map/mask-button-flash-card.png",
+		"World-Map/mask-button-flash-card.png",
+		CC_CALLBACK_0(LevelMapLayer::menuOpenFlashCardCallBack, this));
+	pFlashCard->setPosition(ccp(365, 52));
 
-	CCMenu* pMenu = CCMenu::create(pItemSettingMenu, NULL);
+	CCMenuItemImage* pItemSetting = CCMenuItemImage::create(
+		"World-Map/mask-button-back.png",
+		"World-Map/mask-button-back.png",
+		CC_CALLBACK_0(LevelMapLayer::openSettingMenu, this));
+	pItemSetting->setPosition(ccp(56, 49));
+
+	CCMenu* pMenu = CCMenu::create(pItemSetting, pFlashCard, NULL);
 	pMenu->setPosition(CCPointZero);
 	this->addChild(pMenu);
 	
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kLevelMap);
 
 	LifeSystemNode* pLifeNode = LifeSystemNode::create();
 	pLifeNode->setPosition(Point(50.0f, 910.0f));
@@ -140,7 +147,7 @@ bool LevelMapLayer::init()
 
 	m_pSettingNode = NULL;
 	m_isShowSetting = false;
-	Breadcrumb::getInstance()->addSceneMode(SceneMode::kLevelMap);
+
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 	m_bMoveSlideShow = false;
@@ -172,7 +179,7 @@ void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 	}
 }
 
-void LevelMapLayer::menuBackToWorldMap()
+void LevelMapLayer::openSettingMenu()
 {
 	if(m_pSettingNode == NULL)
 	{
@@ -264,7 +271,7 @@ void LevelMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 		}
 	
 		m_bMoveSlideShow = true;
-		auto actionMove = MoveBy::create(0.0f, Point(0.0f, m_fYMoved));
+		auto actionMove = MoveBy::create(0.1f, Point(0.0f, m_fYMoved));
 		auto actionUpdate = CallFunc::create(this, callfunc_selector(LevelMapLayer::updateScrollSlideShow));
 		m_pBackgroundNode->runAction(Sequence::create(actionMove, actionUpdate, NULL));
 		m_fBeginY = touchPosition.y;

@@ -25,6 +25,7 @@ bool LifeSystemNode::init()
 
 	LabelTTF* labelLife = LabelTTF::create("Life: ", "Arial", 32);
 	labelLife->setAnchorPoint(Point(0.0f, 0.5f));
+	labelLife->setColor(ccc3(255, 0, 0));
 	this->addChild(labelLife);
 
 	String life = "";
@@ -32,12 +33,14 @@ bool LifeSystemNode::init()
 	m_pLabelLife = LabelTTF::create(life.getCString(), "Arial", 32);
 	m_pLabelLife->setAnchorPoint(Point(0.0f, 0.5f));
 	m_pLabelLife->setPosition(Point(70.0f, 0.0f));
+	m_pLabelLife->setColor(ccc3(255, 0, 0));
 	this->addChild(m_pLabelLife);
 
 	String clock = formatSecondsToDiaplay(m_userInfo.iLifeTimeRemaining);
 	m_pLabelSecondsRemaing = LabelTTF::create(clock.getCString(), "Arial", 32);
 	m_pLabelSecondsRemaing->setAnchorPoint(Point(0.0f, 0.5f));
 	m_pLabelSecondsRemaing->setPosition(Point(110.0f, 0.0f));
+	m_pLabelSecondsRemaing->setColor(ccc3(255, 0, 0));
 
 	if (m_userInfo.iLifeTimeRemaining == 0)
 	{

@@ -21,7 +21,7 @@ private:
 	void onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
 
 	void menuLevelSelected(Object* pSender);
-	void menuBackToWorldMap();
+	void openSettingMenu();
 	void menuOpenFlashCardCallBack();
 
 	void loadConfigChapter(const int& iChapter);
