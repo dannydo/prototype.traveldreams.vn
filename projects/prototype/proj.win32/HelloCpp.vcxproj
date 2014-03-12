@@ -132,6 +132,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Classes\ActionExtension.cpp" />
     <ClCompile Include="..\Classes\APIService\UserService.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\BonusQuestManager.cpp" />
@@ -177,6 +178,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Classes\ActionExtension.h" />
     <ClInclude Include="..\Classes\APIService\Constants.h" />
     <ClInclude Include="..\Classes\APIService\InterfaceService.h" />
     <ClInclude Include="..\Classes\APIService\UserService.h" />
