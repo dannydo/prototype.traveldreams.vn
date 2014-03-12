@@ -91,7 +91,7 @@ bool LevelMapLayer::init()
 		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
 		pLevelLabel->setPosition(point);
 		
-		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel)
+		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel || 1 == 1)
 		{
 			Sprite* pButtonLevelSprite = Sprite::create("World-Map/Level_lock.png");
 			pButtonLevelSprite->setTag(levelInfo.iLevel);

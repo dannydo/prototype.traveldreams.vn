@@ -70,7 +70,7 @@ bool WorldMapLayer::init()
 		char sFilename[50];
 		sprintf(sFilename, "World-Map/%d.png", chapterInfo.iChapter); 
 
-		if(chapterInfo.bIsUnlock || chapterInfo.iChapter == userInfo.iCurrentChapter)
+		if(chapterInfo.bIsUnlock || chapterInfo.iChapter == userInfo.iCurrentChapter || 1 == 1)
 		{
 			Sprite* pButtonLevelSprite = Sprite::create(sFilename);
 			pButtonLevelSprite->setTag(chapterInfo.iChapter);

@@ -53,10 +53,10 @@ void UserService::registryUser(const std::string strAccessToken)
 
 	CCLOG("registryUser: %s", strURL.getCString());
 
-	HttpRequest* request = new HttpRequest();
-	request->setUrl(strURL.getCString());
-	request->setRequestType(HttpRequest::Type::GET);
-	request->setTag("RegistryToken");
+	m_pRequest = new HttpRequest();
+	m_pRequest->setUrl(strURL.getCString());
+	m_pRequest->setRequestType(HttpRequest::Type::GET);
+	m_pRequest->setTag("RegistryToken");
 
 	m_pRequest->setResponseCallback(this, httpresponse_selector(UserService::onHttpRequestCompleted));
 	m_pClient->send(m_pRequest);

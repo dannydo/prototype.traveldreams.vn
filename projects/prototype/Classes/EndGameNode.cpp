@@ -181,7 +181,7 @@ bool EndGameNode::init()
 	pFlashCardImage->setRotation(-3.5);
 	this->addChild(pFlashCardImage);
 
-	LabelBMFont *pLabelWord = LabelBMFont::create("PEN", "fonts/Flashcard-bitmap-font-game.fnt");
+	LabelBMFont *pLabelWord = LabelBMFont::create(m_mainWord.m_sWord, "fonts/Flashcard-bitmap-font-game.fnt");
 	pLabelWord->setPosition(Point(320.0f, 760.0f));
 	pLabelWord->setRotation(-3.5);
 	this->addChild(pLabelWord);	

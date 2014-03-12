@@ -10,54 +10,47 @@ bool StatusLayer::init()
 		return false;
 	}
 
-	m_SpriteNumberMove = new Array();
-	m_SpriteNumberMove->initWithCapacity(0);
-
-	m_SpriteNumberScore = new Array();
-	m_SpriteNumberScore->initWithCapacity(0);
-
-	m_pSpriteBatchNode = SpriteBatchNode::create("Score-Star/Score-Star.pvr.ccz");
-	this->addChild(m_pSpriteBatchNode);
-	SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("Score-Star/Score-Star.plist");
-
-	Sprite* background = Sprite::createWithSpriteFrameName("Board.png");
-	background->setPosition(Point(background->getContentSize().width/2.0f, background->getContentSize().height/2.0f));
-	m_pSpriteBatchNode->addChild(background);
-	this->setContentSize(background->getContentSize());
+	Sprite* background = Sprite::create("Score-Star/Board.png");
+	this->addChild(background);
+	
+	m_SpriteNumberMove = Node::create();
+	m_SpriteNumberMove->setAnchorPoint(Point(0.5, 0.5));
+	this->addChild(m_SpriteNumberMove);
 
 	m_iCurrentScore = 0;
 	m_iScoreOld = 0;
 	m_iCurrentMove = 0;
 
-	m_centerCircle = Point(117, 88);
+	m_centerCircle = Point(82.5, 82.5);
 	m_fRadiusCircle = 90.0f;
 
 	this->clippingNodeCircle();
 
-	m_pStarBlack1 = Sprite::createWithSpriteFrameName("Gray_Star.png");
-	m_pSpriteBatchNode->addChild(m_pStarBlack1);
+	m_pStarBlack1 = Sprite::create("Score-Star/Gray_Star.png");
+	this->addChild(m_pStarBlack1);
 
-	m_pStarBlack2 = Sprite::createWithSpriteFrameName("Gray_Star.png");
-	m_pSpriteBatchNode->addChild(m_pStarBlack2);
+	m_pStarBlack2 = Sprite::create("Score-Star/Gray_Star.png");
+	this->addChild(m_pStarBlack2);
 
-	m_pStarBlack3 = Sprite::createWithSpriteFrameName("Gray_Star.png");
-	m_pSpriteBatchNode->addChild(m_pStarBlack3);
+	m_pStarBlack3 = Sprite::create("Score-Star/Gray_Star.png");
+	this->addChild(m_pStarBlack3);
 
-	m_pStarYellow1 = Sprite::createWithSpriteFrameName("Gold_Star.png");
+	m_pStarYellow1 = Sprite::create("Score-Star/Gold_Star.png");
 	m_pStarYellow1->setVisible(false);
-	m_pSpriteBatchNode->addChild(m_pStarYellow1);
+	this->addChild(m_pStarYellow1);
 
-	m_pStarYellow2 = Sprite::createWithSpriteFrameName("Gold_Star.png");
+	m_pStarYellow2 = Sprite::create("Score-Star/Gold_Star.png");
 	m_pStarYellow2->setVisible(false);
-	m_pSpriteBatchNode->addChild(m_pStarYellow2);
+	this->addChild(m_pStarYellow2);
 
-	m_pStarYellow3 = Sprite::createWithSpriteFrameName("Gold_Star.png");
+	m_pStarYellow3 = Sprite::create("Score-Star/Gold_Star.png");
 	m_pStarYellow3->setVisible(false);
-	m_pSpriteBatchNode->addChild(m_pStarYellow3);
+	this->addChild(m_pStarYellow3);
 
 	m_fDeltaTime = 0;
 	m_iSpeedUpdateScore = 10;
 	this->scheduleUpdate();
+	this->setPosition(Point(35.0f, 25.0f));
 
 	return true;
 }
@@ -66,14 +59,13 @@ void StatusLayer::clippingNodeCircle()
 {
     Sprite* pYellowBar = Sprite::create("Score-Star/yellow_bar.png");
 	m_pMarkCircle = Sprite::create("Score-Star/mask.png");
-	m_pMarkCircle->setPosition(Point(0.0f, -40.0f));
 	
 	ClippingNode* clipperMask = ClippingNode::create();
     clipperMask->addChild(pYellowBar);
     clipperMask->setStencil(m_pMarkCircle);
 	clipperMask->setContentSize(pYellowBar->getContentSize());
-	clipperMask->setPosition(Point(m_centerCircle.x, m_centerCircle.y + pYellowBar->getContentSize().height/2.0f));
-	m_pMarkCircle->setAnchorPoint(Point(0.5, 1));
+	m_pMarkCircle->setAnchorPoint(Point(0.5f, 1.0f));
+	m_pMarkCircle->setRotation(-15.0f/180.0f);
     
 	this->addChild(clipperMask);
 }
@@ -108,11 +100,9 @@ void StatusLayer::updateScore()
 			}
 		}
 
-		this->generateLayoutScore(temp);
-
 		if (m_iScoreOld < m_iMaxScoreLevel)
 		{
-			float angle = bonus/m_iMaxScoreLevel*180;
+			float angle = -bonus/m_iMaxScoreLevel*120;
 			auto actionRotate = RotateBy::create(0.0f, angle);
 			m_pMarkCircle->runAction(actionRotate);
 			m_iScoreOld = temp;
@@ -134,10 +124,7 @@ void StatusLayer::updateScore()
 		}
 		m_iScoreOld = temp;
 	}
-	else if (m_iCurrentScore == 0)
-	{
-		this->generateLayoutScore(0);
-	}
+
 	m_fDeltaTime = 0;
 }
 
@@ -151,47 +138,59 @@ void StatusLayer::setCurrentScore(const int& iCurrentScore)
 	m_iCurrentScore = iCurrentScore;
 }
 
-void StatusLayer::setScoreForStar(const float& iScore1Star, const float& iScore2Star, const float& iScore3Star, const float& iMaxScoreLevel)
+void StatusLayer::setScoreForStar(const float& iScore1Star, const float& iScore2Star, const float& iScore3Star)
 {
 	m_iScore1Star = iScore1Star;
 	m_iScore2Star = iScore2Star;
 	m_iScore3Star = iScore3Star;
-	m_iMaxScoreLevel = iMaxScoreLevel;
+	m_iMaxScoreLevel = iScore3Star*118.0f/100.0f;
 
-	this->setPositionForStar(m_iScore1Star, m_pStarBlack1);
-	this->setPositionForStar(m_iScore2Star, m_pStarBlack2);
-	this->setPositionForStar(m_iScore3Star, m_pStarBlack3);
+	Point point;
+	float angle = (iScore1Star*115/iScore3Star -15)/180.0f*_C_PI_;
+	point.x = m_fRadiusCircle*cos(angle);
+	point.y = m_fRadiusCircle*sin(angle);
+	m_pStarYellow1->setPosition(point);
+	m_pStarBlack1->setPosition(point);
 
-	this->setPositionForStar(m_iScore1Star, m_pStarYellow1);
-	this->setPositionForStar(m_iScore2Star, m_pStarYellow2);
-	this->setPositionForStar(m_iScore3Star, m_pStarYellow3);
+	float angleRotate = -(iScore1Star*115/iScore3Star -15.0f) + 90.0f;
+	m_pStarBlack1->setRotation(angleRotate);
+	m_pStarYellow1 ->setRotation(angleRotate);
+
+	angle = (iScore2Star*115/iScore3Star -15)/180.0f*_C_PI_;
+	point.x = m_fRadiusCircle*cos(angle);
+	point.y = m_fRadiusCircle*sin(angle);
+	m_pStarYellow2->setPosition(point);
+	m_pStarBlack2->setPosition(point);
+
+	angleRotate = -(iScore2Star*115/iScore3Star - 15.0f) + 90.0f;
+	m_pStarBlack2->setRotation(angleRotate);
+	m_pStarYellow2 ->setRotation(angleRotate);
+
+
+	angle = 100.0f/180.0f*_C_PI_;
+	point.x = m_fRadiusCircle*cos(angle);
+	point.y = m_fRadiusCircle*sin(angle);
+	m_pStarYellow3->setPosition(point);
+	m_pStarBlack3->setPosition(point);
+
+	angleRotate = -100.0f + 90.0f;
+	m_pStarBlack3->setRotation(angleRotate);
+	m_pStarYellow3 ->setRotation(angleRotate);
 }
 
 void StatusLayer::setPositionForStar(const float& iScoreStar, Sprite* pStar)
 {
 	Point point;
-	float angle = _C_PI_ - iScoreStar/m_iMaxScoreLevel*_C_PI_;
+	float angeFull = 110.0f/360.0f*_C_PI_;
+	float angle = iScoreStar/m_iMaxScoreLevel*angeFull;
 
 	point.x = m_centerCircle.x + m_fRadiusCircle*cos(angle);
 	point.y = m_centerCircle.y + m_fRadiusCircle*sin(angle);
 	if (angle == 0 || angle == _C_PI_ || point.y < m_centerCircle.y + pStar->getContentSize().height/4.0f)
 	{
-		point.y = point.y + pStar->getContentSize().height/4.0f;
+		//point.y = point.y + pStar->getContentSize().height/4.0f;
 	}
-	pStar->setPosition(point);	
-
-	float angleRotate = iScoreStar/m_iMaxScoreLevel*180;
-	if (angleRotate < 90)
-	{
-		angleRotate = angleRotate - 90;
-	}
-	else if (angleRotate >= 90)
-	{
-		angleRotate = angleRotate - 90;
-	}
-	
-	auto action = RotateBy::create(0.0f, angleRotate);
-	pStar->runAction(action);
+	pStar->setPosition(point);
 }
 
 void StatusLayer::setCurrentMove(const int& iCurrentMove)
@@ -233,52 +232,19 @@ void StatusLayer::generateLayoutMove()
 	Node* node = Node::create();
 	int iTotal = arrNumber.size();
 
-	while(m_SpriteNumberMove->count() > 0)
-	{
-		m_pSpriteBatchNode->removeChild((Sprite*)m_SpriteNumberMove->getObjectAtIndex(0), false);
-		m_SpriteNumberMove->removeObjectAtIndex(0);
-	}
-	
+	m_SpriteNumberMove->removeAllChildren();
+
 	while(!arrNumber.empty())
 	{
-		char sFileName[35];
-		sprintf(sFileName, "NumMoves_%d.png", arrNumber.back());
-		Sprite* sprite = Sprite::createWithSpriteFrameName(sFileName);
-		
-		height = sprite->getContentSize().height;
-		sprite->setPosition(Point(137 - iTotal*18 + width, 101 + height/2.0f));
-		width = width + sprite->getContentSize().width - 5;
-		m_pSpriteBatchNode->addChild(sprite);
+		char sFileName[50];
+		sprintf(sFileName, "Score-Star/NumMoves/%d.png", arrNumber.back());
+		Sprite* sprite = Sprite::create(sFileName);
+		sprite->setPosition(Point(15.0f + width, 25.0f));
+		width = width + sprite->getContentSize().width;
+
+		m_SpriteNumberMove->addChild(sprite);
 		arrNumber.pop_back();
-		m_SpriteNumberMove->addObject(sprite);
 	}
-}
 
-void StatusLayer::generateLayoutScore(int iScore)
-{
-	std::vector<int> arrNumber = this->generateArrayNumber(iScore);
-	int width = 0;
-	int height;
-	Node* node = Node::create();
-	int iTotal = arrNumber.size();
-
-	while(m_SpriteNumberScore->count() > 0)
-	{
-		m_pSpriteBatchNode->removeChild((Sprite*)m_SpriteNumberScore->getObjectAtIndex(0), false);
-		m_SpriteNumberScore->removeObjectAtIndex(0);
-	}
-	
-	while(!arrNumber.empty())
-	{
-		char sFileName[35];
-		sprintf(sFileName, "NumScore_%d.png", arrNumber.back());
-		Sprite* sprite = Sprite::createWithSpriteFrameName(sFileName);
-
-		height = sprite->getContentSize().height;
-		sprite->setPosition(Point(127 - iTotal*8 + width, 42 + height/2.0f));
-		width = width + sprite->getContentSize().width - 17;
-		m_pSpriteBatchNode->addChild(sprite);
-		arrNumber.pop_back();
-		m_SpriteNumberScore->addObject(sprite);
-	}
+	m_SpriteNumberMove->setPositionX(width/4.0f - (iTotal-1)*15 - 15);
 }

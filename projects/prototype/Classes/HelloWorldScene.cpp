@@ -40,9 +40,9 @@ Scene* HelloWorld::createScene(int iLevel)
 	boardLayer->m_pStatusLayer->setScale(0.88f);
 	boardLayer->m_pStatusLayer->setCurrentScore(0);
 	boardLayer->m_pStatusLayer->setCurrentMove(0);
-	boardLayer->m_pStatusLayer->setPosition(420.f, 765.f);
 	boardLayer->m_pStatusLayer->setSpeedUpdateScore(120.f);
-	scene->addChild(boardLayer->m_pStatusLayer);
+	boardLayer->m_pStatusLayer->setPosition(Point(-8.0f, -35.0f));
+	scene->addChild(boardLayer->m_pStatusLayer, 50);
 
 	// init level
 	boardLayer->initLevel(iLevel);
@@ -55,12 +55,13 @@ Scene* HelloWorld::createScene(int iLevel)
                                            CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
     
 	closeItem->setAnchorPoint(ccp(0,0));
-	closeItem->setPosition(ccp(-12, -8));
+	closeItem->setPosition(ccp(500, -8));
 	//closeItem->setPosition(Point(origin.x + visibleSize.width - closeItem->getContentSize().width/2 ,
       //                          origin.y + closeItem->getContentSize().height/2));
 
     // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
+    //auto menu = Menu::create(closeItem, NULL);
+	auto menu = Menu::create(NULL);
     menu->setPosition(Point::ZERO);
     boardLayer->m_pHUDLayer->addChild(menu, 10);
 	//menuLayer->setTouchEnabled(true);
@@ -263,7 +264,7 @@ void HelloWorld::initLevel(int iLevel)
 	m_pStatusLayer->setCurrentMove(m_GameBoardManager.GetCurrentMove());
 	
 	const LevelConfig& levelConfig = m_GameBoardManager.GetLevelConfig();
-	m_pStatusLayer->setScoreForStar( levelConfig.m_ScoreOfStars[0], levelConfig.m_ScoreOfStars[1], levelConfig.m_ScoreOfStars[2], levelConfig.m_ScoreOfStars[2]* 1.1f);
+	m_pStatusLayer->setScoreForStar( levelConfig.m_ScoreOfStars[0], levelConfig.m_ScoreOfStars[1], levelConfig.m_ScoreOfStars[2]);
 	//m_pStatusLayer->update(0);
 
 	// init word-collect board
