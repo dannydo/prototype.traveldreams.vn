@@ -136,6 +136,8 @@ protected:
 	void VerticalMoveUlti(float fDeltaY);
 	
 
+	void PlayCombo4HelperEffect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime, float fRotation);
+
 	void PlayCombo4Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
 	void PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
 	void PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime);	

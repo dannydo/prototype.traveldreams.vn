@@ -1196,7 +1196,7 @@ void HelloWorld::CheckBoardStateAfterMove()
 
 void HelloWorld::ExecuteBonusWinGameEffect()
 {
-	m_ComputeMoveResult.Reset(true);
+	m_ComputeMoveResult.Reset(true);	
 
 	//if (m_GameBoardManager.GetCurrentMove() > 0)
 	if (m_GameBoardManager.ExecuteEndGameBonus(m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells, 
@@ -1587,11 +1587,10 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	//if (bIsBonusEndGamePhase)
 		//fDelayTime = 0;
 
-	float fTotalDestroyCellTime = fDelayTime+ _TME_BASIC_DESTROY_CELL_TIME_;
-	//CCLOG("Begin effect");
+	float fTotalDestroyCellTime = fDelayTime+ _TME_BASIC_DESTROY_CELL_TIME_;	
 
 	if (bIsBonusEndGamePhase)
-	{
+	{		
 		// play effect convert normal cells to combo cells
 		if (convertedToComboCells.size() > 0) // && convertedToComboCells[0].m_eGemComboType != _GCT_BONUS_END_GAME_CRAZY_PET_) //temporary disable transform of crasy pet
 		{
@@ -1686,6 +1685,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	// increase score by basic matching
 	m_GameBoardManager.IncreaseScoreForDestroyCells( iTotalDestroyCell, _CET_BASIC_MATCHING_);
 
+	CCLOG("Before combo chain");
+
 	// play combo chain	
 	float fCurrentDelayComboChain;
 	for(auto pComboEffect : comboChainList)
@@ -1747,7 +1748,9 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		}
 		else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_BONUS_END_GAME__SPECIAL_GEM_EFFECT_)
 		{
+			CCLOG("Before play end game effect combo");
 			PlayComboEndGameBonusEffect(pComboEffect, fCurrentDelayComboChain, _TME_BASIC_COMBO_EXECUTE_TIME_);
+			CCLOG("After play end game effect combo");
 		}
 		else  if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType >= _CET_BIRD_EXPLOSION_EFFECT_ && pComboEffect->m_ComboEffectDescription.m_eComboEffectType <= _CET_HAMSTER_RUN_RIGHT_DOWN_EFFECT_)
 		{
@@ -1796,7 +1799,9 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 		// clean data
 		delete pComboEffect;
-	}
+	}	
+
+	CCLOG("Before check bonus quest");
 
 	// check logic on bonus quest
 	if (!m_bIsEndGamePhase)
@@ -1920,7 +1925,9 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			if (levelBossInfo.m_iRemainLettersCount == 0)
 				m_GameBoardManager.KillBoss();
 		}
-	}
+	}	
+
+	CCLOG("Before create combo cells");
 
 	// create new combo cells, this is right after basic matching cells are destroyed
 	for(auto cell: newComboCells)
@@ -1964,7 +1971,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 					
 			//m_pBoardBatchNode->addChild(pSprite);						
 		}		
-	}
+	}	
 	
 	// move cells
 	int iUpdatedZOrder;
@@ -2002,7 +2009,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		if (m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite != NULL)
 			m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setZOrder(iUpdatedZOrder);
 	}	
-
+	
 
 	// generate new cells
 	// play sound
@@ -2674,7 +2681,7 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 		pCharacterSprite = Sprite::createWithSpriteFrameName("Gem_QuestionMask.png");
 		
 	Size parentSpriteSize = m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->getContentSize();
-	pCharacterSprite->setScale(0.8f);
+	pCharacterSprite->setScale(0.85f);
 	pCharacterSprite->setPosition(Point(parentSpriteSize.width/2.f, parentSpriteSize.height/2.f));  //( 42.f, 42.f));
 
 	switch(iGemID)
@@ -2851,8 +2858,37 @@ void HelloWorld::ShowLevelCompleteEffect()
 
 void HelloWorld::PlayCombo4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
 {
+	Point position(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
+				m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height);
 
+	auto pFlareSprite = Sprite::createWithSpriteFrameName("Combo4_Flare.png");	
+	pFlareSprite->setScale( 0.2f);
+	pFlareSprite->setPosition(position);
+	m_pComboEffectBatchNode->addChild(pFlareSprite);
+	pFlareSprite->runAction(
+		Sequence::create(
+			DelayTime::create(fDelayTime),
+			ScaleTo::create(0.133f, 1.5f, 1.5f),
+			Spawn::createWithTwoActions(
+				ScaleTo::create( 0.134f, 0.5f, 0.5f),
+				Sequence::createWithTwoActions(
+					DelayTime::create( 0.067f),
+					FadeOut::create( 0.067f))
+			),
+			RemoveSelf::create(),
+			NULL));
 
+	if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_DESTROY_ROW_)
+	{
+		PlayCombo4HelperEffect(pComboEffect, fDelayTime, fDisplayTime, 0);
+		PlayCombo4HelperEffect(pComboEffect, fDelayTime, fDisplayTime, 180.f);
+	}
+	else
+	{
+		PlayCombo4HelperEffect(pComboEffect, fDelayTime, fDisplayTime, 90.f);
+		PlayCombo4HelperEffect(pComboEffect, fDelayTime, fDisplayTime, 270.f);
+	}
+	/*
 
 	auto pComboEffectSprite = Sprite::createWithSpriteFrameName("SimpleEffect.png");
 	pComboEffectSprite->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
@@ -2880,9 +2916,60 @@ void HelloWorld::PlayCombo4Effect(ComboEffectBundle* pComboEffect, float fDelayT
 				FadeIn::create(0.02f),
 				FadeOut::create(fDisplayTime + 0.05f),
 				RemoveSelf::create(),
-				NULL));
-
+				NULL));*/
+				
 	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
+}
+
+void HelloWorld::PlayCombo4HelperEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, float fRotation)
+{
+	Point position(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
+				m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height);	
+
+	auto pLight1Sprite = Sprite::createWithSpriteFrameName("Combo4_light1.png"); // "Com4_Ex_00002.png"); //
+	pLight1Sprite->setRotation(fRotation);
+	pLight1Sprite->setAnchorPoint( Point( 0, 0.5f));
+	pLight1Sprite->setPosition( position);
+	pLight1Sprite->setScaleX(0.001f);
+	pLight1Sprite->setScaleY(1.75f);
+	m_pComboEffectBatchNode->addChild(pLight1Sprite);
+	pLight1Sprite->runAction(		
+		Sequence::create(
+			DelayTime::create(fDelayTime + 0.033f),						
+			Spawn::createWithTwoActions(
+				//ScaleTo::create( 0.467f,  3.f, 1.75f),
+				EaseOut::create( ScaleTo::create( 0.467f,  3.f, 1.75f), 1.f),
+				Sequence::createWithTwoActions(
+					DelayTime::create( 0.4f),
+					FadeTo::create( 0.067f, 0.5f))),
+			RemoveSelf::create(),
+			NULL));
+
+
+	auto pLight2Sprite = Sprite::createWithSpriteFrameName("Combo4_light2.png"); 
+	pLight2Sprite->setRotation(fRotation);
+	pLight2Sprite->setAnchorPoint( Point( 0, 0.5f));
+	pLight2Sprite->setPosition( position);
+	pLight2Sprite->setScaleX(0);
+	pLight2Sprite->setScaleY(1.75f);
+	m_pComboEffectBatchNode->addChild(pLight2Sprite);
+
+	Point translate(120.f, 0);
+	translate.rotateByAngle( Point(0,0), fRotation);
+	pLight2Sprite->runAction(
+		Sequence::create(
+			DelayTime::create(fDelayTime + 0.066f),
+			Spawn::create(
+				ScaleTo::create( 0.201f, 1.f, 1.75f),
+				Sequence::createWithTwoActions(
+					DelayTime::create( 0.067f),
+					MoveBy::create( 0.4f,  translate)), //Point(120.f, 0))),
+				Sequence::createWithTwoActions(
+					DelayTime::create( 0.367f),
+					FadeTo::create( 0.1f, 128)),
+				NULL),
+			RemoveSelf::create(),
+			NULL));	
 }
 
 void HelloWorld::PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
@@ -2892,7 +2979,7 @@ void HelloWorld::PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, fl
 	pComboEffectSprite->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
 				m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height));
 	pComboEffectSprite->setOpacity(0);
-	m_pComboEffectBatchNode->addChild(pComboEffectSprite);
+	m_pComboEffectBatchNode->addChild(pComboEffectSprite);	
 
 	pComboEffectSprite->runAction(
 		Sequence::create(
@@ -2902,9 +2989,10 @@ void HelloWorld::PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, fl
 				MoveBy::create( fDisplayTime, Point( 0, 300.f)),
 				Sequence::create(									
 					FadeIn::create(0.02f),
-					FadeOut::create(fDisplayTime + 0.05f),
-					RemoveSelf::create(),
-					NULL)),
+					FadeOut::create(fDisplayTime + 0.05f),					
+					NULL),
+				NULL),
+			RemoveSelf::create(),
 			NULL));						
 
 	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
@@ -2990,7 +3078,12 @@ void HelloWorld::PlayCrazyPetEndGameBonusEffect(ComboEffectBundle* pComboEffect,
 
 void HelloWorld::PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
 {
-	auto pComboEffectSprite1 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
+	PlayCombo4Effect( pComboEffect, fDelayTime, fDisplayTime);
+
+	PlayCombo4HelperEffect(pComboEffect, fDelayTime, fDisplayTime, 0);
+	PlayCombo4HelperEffect(pComboEffect, fDelayTime, fDisplayTime, 180.f);
+
+	/*auto pComboEffectSprite1 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
 	auto pComboEffectSprite2 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
 
 	pComboEffectSprite1->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
@@ -3025,14 +3118,21 @@ void HelloWorld::PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDela
 				FadeIn::create(0.02f),
 				FadeOut::create(fDisplayTime + 0.05f),
 				RemoveSelf::create(),
-				NULL));
+				NULL));*/
 
 	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
 }
 
 void HelloWorld::PlayCombo4_4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
 {
-	auto pComboEffectSprite1 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
+	PlayCombo4_4Effect( pComboEffect, fDelayTime, fDisplayTime);
+
+	PlayCombo4HelperEffect(pComboEffect, fDelayTime, fDisplayTime, 45.f);	
+	PlayCombo4HelperEffect(pComboEffect, fDelayTime, fDisplayTime, 135.f);	
+	PlayCombo4HelperEffect(pComboEffect, fDelayTime, fDisplayTime, 225.f);
+	PlayCombo4HelperEffect(pComboEffect, fDelayTime, fDisplayTime, 315.f);
+
+	/*auto pComboEffectSprite1 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
 	auto pComboEffectSprite2 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
 	auto pComboEffectSprite3 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
 	auto pComboEffectSprite4 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
@@ -3107,7 +3207,7 @@ void HelloWorld::PlayCombo4_4_4Effect(ComboEffectBundle* pComboEffect, float fDe
 				FadeOut::create(fDisplayTime + 0.05f),
 				RemoveSelf::create(),
 				NULL));
-
+				*/
 	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
 }
 

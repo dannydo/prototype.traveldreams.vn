@@ -2287,7 +2287,7 @@ int NewGameBoardManager::IncreaseScoreForDestroyCells(const int& iGemCount, cons
 	int iIncrementScore = (m_GameConfig.m_iScoreOfGem * iRatio * iGemCount/100 + iActivationBonusScore * iActivateComboRatio/100) * m_iPhaseMoveInComboChain;	
 	m_iCurrentScore += iIncrementScore;
 
-	CCLOG("Increase score gem count: %d, combo effect: %d, score incr: %d", iGemCount, (int)eComboEffectType, iIncrementScore);
+	//CCLOG("Increase score gem count: %d, combo effect: %d, score incr: %d", iGemCount, (int)eComboEffectType, iIncrementScore);
 
 	return iIncrementScore;
 }
