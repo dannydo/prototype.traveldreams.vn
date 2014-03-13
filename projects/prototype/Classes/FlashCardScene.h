@@ -6,6 +6,7 @@
 #include "Database\ChapterTable.h"
 #include "SettingMenuNode.h"
 #include "Database\LevelTable.h"
+#include "FooterNode.h"
 
 class FlashCardLayer : public cocos2d::LayerColor
 {
@@ -20,7 +21,6 @@ private:
 	void onTouchMoved(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 	void onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 
-	void openStringMenu();
 	void createNodeSlideShow();
 	void showSlideShowFlashCard();
 
@@ -53,9 +53,8 @@ private:
 	int m_iMoveLeftOrRight;
 	int m_iTotalFlashCard;
 	int m_iIndexFlashCard;
-
-	SettingMenuNode* m_pSettingNode	;
-	bool m_isShowSetting;
+  
+	FooterNode* m_pFooterNode;
 };
 
 class FlashCardScene : public cocos2d::CCScene

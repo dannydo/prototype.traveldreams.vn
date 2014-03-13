@@ -47,18 +47,15 @@ Scene* HelloWorld::createScene(int iLevel)
 	// init level
 	boardLayer->initLevel(iLevel);
 
+	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
+	ButtonNode* pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
+	pButtonSettingNode->setPosition(Point(590.0f, 50.0f));
 
-	// menu layer with close item	
-	auto closeItem = MenuItemImage::create(
-                                           "Setting.png", //"CloseNormal.png",
-                                           "Setting.png",//"CloseSelected.png",
-                                           CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
-    
-	closeItem->setAnchorPoint(ccp(0,0));
-	closeItem->setPosition(ccp(500, -8));
-	//closeItem->setPosition(Point(origin.x + visibleSize.width - closeItem->getContentSize().width/2 ,
-      //                          origin.y + closeItem->getContentSize().height/2));
+	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
+	pButtonManagerNode->addButtonNode(pButtonSettingNode);
+	boardLayer->m_pHUDLayer->addChild(pButtonManagerNode);
 
+	
     // create menu, it's an autorelease object
     //auto menu = Menu::create(closeItem, NULL);
 	auto menu = Menu::create(NULL);
@@ -176,7 +173,6 @@ bool HelloWorld::init()
 	this->scheduleUpdate();
 
 	m_pSettingNode = NULL;
-	m_isShowSetting = false;
 
     return true;
 }
@@ -494,21 +490,17 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 	if(m_pSettingNode == NULL)
 	{
 		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-500.0f, 0));
+		m_pSettingNode->setPosition(Point(640.0f, 0));
 		this->getParent()->addChild(m_pSettingNode, 100);
 	}
 
-	if (m_isShowSetting == false)
+	if (m_pSettingNode->getShowSetting() == false)
 	{
-		m_isShowSetting = true;
 		m_pSettingNode->show();
-		this->setTouchEnabled(false);
 	}
 	else
 	{
-		m_isShowSetting = false;
 		m_pSettingNode->hide();
-		this->setTouchEnabled(true);
 	}
 
     //Director::getInstance()->end();
@@ -685,6 +677,11 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 
 bool HelloWorld::onTouchBegan(Touch *pTouch, Event *pEvent)
 {
+	if (m_pSettingNode != NULL && m_pSettingNode->getShowSetting())
+	{
+		return false;
+	}
+
 	if (m_bIsEffectPlaying || m_bIsCellDragPlaying)
 		return true;
 

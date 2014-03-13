@@ -95,34 +95,8 @@ bool WorldMapLayer::init()
 		m_pointChapter.pop_back();
 	}
 
-	//create menu
-	Sprite* pBarBottom = Sprite::create("World-Map/bar-bottom.png");
-	pBarBottom->setAnchorPoint(Point(0.5f, 0.0f));
-	pBarBottom->setPosition(Point(winSize.width/2.0f, 0));
-	this->addChild(pBarBottom);
-
-	CCMenuItemImage* pIntroduction = CCMenuItemImage::create(
-		"World-Map/info_icon.png",
-		"World-Map/info_icon.png",
-		CC_CALLBACK_0(WorldMapLayer::menuOpenIntroductionCallBack, this));
-	pIntroduction->setPosition(ccp(150, 48));
-	pIntroduction->setScale(1.2f);
-
-	CCMenuItemImage* pFlashCard = CCMenuItemImage::create(
-		"World-Map/mask-button-flash-card.png",
-		"World-Map/mask-button-flash-card.png",
-		CC_CALLBACK_0(WorldMapLayer::menuOpenFlashCardCallBack, this));
-	pFlashCard->setPosition(ccp(365, 52));
-
-	CCMenuItemImage* pItemSetting = CCMenuItemImage::create(
-		"World-Map/mask-button-back.png",
-		"World-Map/mask-button-back.png",
-		CC_CALLBACK_0(WorldMapLayer::openSettingMenu, this));
-	pItemSetting->setPosition(ccp(56, 49));
-
-	CCMenu* pMenu = CCMenu::create(pItemSetting, pFlashCard, pIntroduction, NULL);
-	pMenu->setPosition(CCPointZero);
-	this->addChild(pMenu);
+	m_pFooterNode = FooterNode::create();
+	this->addChild(m_pFooterNode);
 
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kWorldMap);
@@ -130,9 +104,6 @@ bool WorldMapLayer::init()
 	LifeSystemNode* pLifeNode = LifeSystemNode::create();
 	pLifeNode->setPosition(Point(50.0f, 910.0f));
 	this->addChild(pLifeNode);
-
-	m_pSettingNode = NULL;
-	m_isShowSetting = false;
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
@@ -149,42 +120,6 @@ void WorldMapLayer::menuPlayChapterCallBack(Object* sender)
 	UserDefault::getInstance()->setIntegerForKey("ChapterPlayGame", iChapter);
 	LevelMapScene* pLevelMap =  LevelMapScene::create();
 	Director::getInstance()->replaceScene(pLevelMap);
-}
-
-void WorldMapLayer::menuOpenIntroductionCallBack()
-{
-	IntroductionScene* pIntroduction = IntroductionScene::create();
-	Director::getInstance()->replaceScene(pIntroduction);
-}
-
-void WorldMapLayer::menuOpenFlashCardCallBack()
-{
-	FlashCardCollectionScene* pFlashCardCollection = FlashCardCollectionScene::create();
-	pFlashCardCollection->getLayerColor()->setNameClassParent("WorldMap");
-	Director::getInstance()->replaceScene(pFlashCardCollection);
-}
-
-void WorldMapLayer::openSettingMenu()
-{
-	if(m_pSettingNode == NULL)
-	{
-		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-500.0f, 0));
-		this->addChild(m_pSettingNode);
-	}
-
-	if (m_isShowSetting == false)
-	{
-		m_isShowSetting = true;
-		m_pSettingNode->show();
-		this->setTouchEnabled(false);
-	}
-	else
-	{
-		m_isShowSetting = false;
-		m_pSettingNode->hide();
-		this->setTouchEnabled(true);
-	}
 }
 
 void WorldMapLayer::loadConfigWordMap()
@@ -214,6 +149,11 @@ void WorldMapLayer::loadConfigWordMap()
 
 bool WorldMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
+	if(m_pFooterNode->getSettingNode() != NULL && m_pFooterNode->getSettingNode()->getShowSetting())
+	{
+		return false;
+	}
+
 	Point touchPosition = pTouch->getLocation();
 	m_fBeginY = touchPosition.y;
 

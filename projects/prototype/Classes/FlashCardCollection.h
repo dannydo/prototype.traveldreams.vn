@@ -5,6 +5,7 @@
 #include "GameDataStructure.h"	 
 #include "Database\ChapterTable.h"
 #include "SettingMenuNode.h"
+#include "FooterNode.h"
 
 class FlashCardCollectionLayer : public cocos2d::LayerColor
 {
@@ -13,14 +14,12 @@ public:
 	virtual ~FlashCardCollectionLayer();
 	bool init();
 	CREATE_FUNC(FlashCardCollectionLayer);
-	void setNameClassParent(const char* sNameClassParent);
 
 private:
 	bool onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 	void onTouchMoved(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 	void onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 	
-	void openStringMenu();
 	void openFlashCard(const int& iIndexButton);
 
 	cocos2d::Node* m_pSlideShow;
@@ -39,9 +38,8 @@ private:
 	int m_iCurrentPage;
 	bool m_bIsSwipe;
 
-	SettingMenuNode* m_pSettingNode	;
-	bool m_isShowSetting;
 	const char* m_sNameClassParent;
+	FooterNode* m_pFooterNode;
 };
 
 class FlashCardCollectionScene : public cocos2d::CCScene

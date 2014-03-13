@@ -3,7 +3,8 @@
 
 #include "cocos2d.h"
 #include "SimpleAudioEngine.h" 
-#include "SettingMenuNode.h"
+#include "SettingMenuNode.h" 
+#include "FooterNode.h"
 
 class LevelMapLayer : public cocos2d::CCLayer
 {
@@ -29,9 +30,6 @@ private:
 
 	cocos2d::Node* m_pBackgroundNode;
 
-	SettingMenuNode* m_pSettingNode	;
-	bool m_isShowSetting;
-
 	int m_iTotalImageBG;
 	int m_iTotalLevel;
 	std::vector<cocos2d::Point> m_pointLevel;
@@ -40,6 +38,8 @@ private:
 	float m_fYMoved;
 	float m_maxHeight;
 	bool m_bMoveSlideShow;
+
+	FooterNode* m_pFooterNode;
 };
 
 class LevelMapScene : public cocos2d::CCScene

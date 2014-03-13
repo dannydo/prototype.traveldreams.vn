@@ -1,8 +1,8 @@
 #ifndef _WORLD_MAP_H_
 #define _WORLD_MAP_H_
 
-#include "cocos2d.h"  
-#include "SettingMenuNode.h"
+#include "cocos2d.h"  	  
+#include "FooterNode.h"
 
 class WorldMapLayer : public cocos2d::CCLayer
 {
@@ -21,13 +21,8 @@ private:
 	void updateScrollSlideShow();
 
 	void menuPlayChapterCallBack(cocos2d::Object* sender);
-	void menuOpenIntroductionCallBack();
-	void menuOpenFlashCardCallBack();
-	void openSettingMenu();
 
 	cocos2d::LayerColor* m_pBackgroundNode;
-	SettingMenuNode* m_pSettingNode	;
-	bool m_isShowSetting;
 
 	int m_iTotalChapter;
 	std::vector<cocos2d::Point> m_pointChapter;
@@ -36,6 +31,8 @@ private:
 	float m_fYMoved;
 	float m_maxHeight;
 	bool m_bMoveSlideShow;
+
+	FooterNode* m_pFooterNode;
 };
 
 class WorldMapScene : public cocos2d::CCScene

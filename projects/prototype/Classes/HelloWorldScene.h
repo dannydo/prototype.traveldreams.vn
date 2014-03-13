@@ -230,7 +230,6 @@ private:
 	cocos2d::LayerColor* m_pEndGameEffectLayer;
 
 	SettingMenuNode* m_pSettingNode	;
-	bool m_isShowSetting;
 };
 
 #endif // __HELLOWORLD_SCENE_H__
