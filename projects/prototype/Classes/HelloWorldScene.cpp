@@ -41,8 +41,8 @@ Scene* HelloWorld::createScene(int iLevel)
 	boardLayer->m_pStatusLayer->setCurrentScore(0);
 	boardLayer->m_pStatusLayer->setCurrentMove(0);
 	boardLayer->m_pStatusLayer->setSpeedUpdateScore(120.f);
-	boardLayer->m_pStatusLayer->setPosition(Point(-8.0f, -35.0f));
-	scene->addChild(boardLayer->m_pStatusLayer, 50);
+	boardLayer->m_pStatusLayer->setPosition(Point(-7.0f, -35.0f));
+	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pStatusLayer);
 
 	// init level
 	boardLayer->initLevel(iLevel);
