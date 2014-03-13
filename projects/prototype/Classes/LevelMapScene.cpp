@@ -91,7 +91,7 @@ bool LevelMapLayer::init()
 		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
 		pLevelLabel->setPosition(point);
 		
-		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel)
+		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel || 1 == 1)
 		{
 			Sprite* pButtonLevelSprite = Sprite::create("World-Map/Level_lock.png");
 			pButtonLevelSprite->setTag(levelInfo.iLevel);
@@ -128,26 +128,8 @@ bool LevelMapLayer::init()
 		m_pBackgroundNode->setPositionY(-(m_maxHeight-960));
 	}
 
-	Sprite* pBarBottom = Sprite::create("World-Map/bar-bottom.png");
-	pBarBottom->setAnchorPoint(Point(0.5f, 0.0f));
-	pBarBottom->setPosition(Point(winSize.width/2.0f, 0));
-	this->addChild(pBarBottom);
-
-	CCMenuItemImage* pFlashCard = CCMenuItemImage::create(
-		"World-Map/mask-button-flash-card.png",
-		"World-Map/mask-button-flash-card.png",
-		CC_CALLBACK_0(LevelMapLayer::menuOpenFlashCardCallBack, this));
-	pFlashCard->setPosition(ccp(365, 52));
-
-	CCMenuItemImage* pItemSetting = CCMenuItemImage::create(
-		"World-Map/mask-button-back.png",
-		"World-Map/mask-button-back.png",
-		CC_CALLBACK_0(LevelMapLayer::openSettingMenu, this));
-	pItemSetting->setPosition(ccp(56, 49));
-
-	CCMenu* pMenu = CCMenu::create(pItemSetting, pFlashCard, NULL);
-	pMenu->setPosition(CCPointZero);
-	this->addChild(pMenu);
+	m_pFooterNode = FooterNode::create();
+	this->addChild(m_pFooterNode);
 	
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kLevelMap);
@@ -155,9 +137,6 @@ bool LevelMapLayer::init()
 	LifeSystemNode* pLifeNode = LifeSystemNode::create();
 	pLifeNode->setPosition(Point(50.0f, 910.0f));
 	this->addChild(pLifeNode);
-
-	m_pSettingNode = NULL;
-	m_isShowSetting = false;
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
@@ -184,36 +163,6 @@ void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 	{
 		MessageBox("You have no life!", "Play Level");
 	}
-}
-
-void LevelMapLayer::openSettingMenu()
-{
-	if(m_pSettingNode == NULL)
-	{
-		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-500.0f, 0));
-		this->addChild(m_pSettingNode);
-	}
-
-	if (m_isShowSetting == false)
-	{
-		m_isShowSetting = true;
-		m_pSettingNode->show();
-		this->setTouchEnabled(false);
-	}
-	else
-	{
-		m_isShowSetting = false;
-		m_pSettingNode->hide();
-		this->setTouchEnabled(true);
-	}
-}
-
-void LevelMapLayer::menuOpenFlashCardCallBack()
-{
-	FlashCardCollectionScene* pFlashCardCollection = FlashCardCollectionScene::create();
-	pFlashCardCollection->getLayerColor()->setNameClassParent("LevelMap");
-	Director::getInstance()->replaceScene(pFlashCardCollection);
 }
 
 void LevelMapLayer::showPopupTargetGame(const int& iLevel)
@@ -256,6 +205,11 @@ void LevelMapLayer::loadConfigChapter(const int& iChapter)
 
 bool LevelMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
+	if(m_pFooterNode->getSettingNode() != NULL && m_pFooterNode->getSettingNode()->getShowSetting())
+	{
+		return false;
+	}
+
 	Point touchPosition = pTouch->getLocation();
 	m_fBeginY = touchPosition.y;
 

@@ -21,13 +21,13 @@ SettingMenuNode::~SettingMenuNode()
 
 bool SettingMenuNode::init()
 {
-	if (!Node::init())
+	if (!CustomNode::init())
 	{
 		return false;
 	}
 
-	LayerColor* pBackground = LayerColor::create(ccc4(216, 216, 216, 255), 500.0f, 960.0f);
-	this->addChild(pBackground);
+	m_Background = LayerColor::create(ccc4(216, 216, 216, 255), 500.0f, 960.0f);
+	this->addChild(m_Background);
 
 	m_pLabelMusic = LabelTTF::create("Music On", "Arial", 25);
 	m_pLabelMusic->setColor(ccc3(0.0f, 0.0f, 0.0f));
@@ -108,6 +108,9 @@ bool SettingMenuNode::init()
 	CCMenu* pMenu = CCMenu::create( m_pItemMusic, m_pItemEffect, m_pItemVoice, m_pItemTutorial, m_pItemBack, m_pItemLogoutFacebook,  NULL);
 	pMenu->setPosition(CCPointZero);
 	this->addChild(pMenu);
+
+	m_iShowSetting = false;
+	m_isClick = false;
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	FacebookManager::getInstance()->loadPlugin();
@@ -221,14 +224,52 @@ void SettingMenuNode::clickLogoutFacebook()
 
 void SettingMenuNode::show()
 {
-	MoveTo* actionParentMoveBy = MoveTo::create(0.25f, Point(500, 0));
+	MoveTo* actionParentMoveBy = MoveTo::create(0.25f, Point(-500.0f, 0.0f));
 	this->getParent()->runAction(actionParentMoveBy);
+	m_iShowSetting = true;
 }
 
 void SettingMenuNode::hide()
 {
-	MoveTo* actionParentMoveBy = MoveTo::create(0.25f, Point(0, 0));
+	MoveTo* actionParentMoveBy = MoveTo::create(0.25f, Point(0.0f, 0.0f));
 	this->getParent()->runAction(actionParentMoveBy);
+	m_iShowSetting = false;
+}
+
+bool SettingMenuNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
+{
+	Point touchPosition = pTouch->getLocation();
+
+	if (touchPosition.x < 140.0f)
+	{
+		m_isClick = true;
+	}
+
+	if (m_iShowSetting)
+		return true;
+
+	return false;
+}
+
+void SettingMenuNode::onTouchCustomNodeMoved(Touch* pTouch,  Event* pEvent)
+{
+
+}
+
+void SettingMenuNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
+{
+	if(m_isClick)
+	{
+		if (m_iShowSetting)
+		{
+			this->hide();
+		}
+		else
+		{
+			this->show();
+		}
+	}
+	m_isClick = false;
 }
 
 

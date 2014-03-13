@@ -13,7 +13,7 @@ public:
 	CREATE_FUNC(StatusLayer);
 
 	void setCurrentScore(const int& iCurrentScore);
-	void setScoreForStar(const float& iScore1Star, const float& iScore2Star, const float& iScore3Star, const float& iMaxScoreLevel);
+	void setScoreForStar(const float& iScore1Star, const float& iScore2Star, const float& iScore3Star);
 	void setCurrentMove(const int& iCurrentMove);
 	void setSpeedUpdateScore(const float& iSpeedUpdateScore);
 
@@ -22,12 +22,9 @@ private:
 	void clippingNodeCircle();
 	std::vector<int> generateArrayNumber(int iNumber);
 	void generateLayoutMove();
-	void generateLayoutScore(int iScore);
 	void updateScore();
 
-	cocos2d::SpriteBatchNode* m_pSpriteBatchNode;
-	cocos2d::Array* m_SpriteNumberMove;
-	cocos2d::Array* m_SpriteNumberScore;
+	cocos2d::Node* m_SpriteNumberMove;
 
 	cocos2d::Sprite* m_pStarYellow1;
 	cocos2d::Sprite* m_pStarYellow2;

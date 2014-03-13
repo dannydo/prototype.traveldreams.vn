@@ -3,6 +3,7 @@
 #include "LevelMapScene.h"
 #include "GameWordManager.h"
 #include "DictionaryNode.h"
+#include "FooterNode.h"
 
 USING_NS_CC;
 
@@ -84,20 +85,9 @@ bool FlashCardLayer::init()
 	m_pLabelIndex->setPosition(Point(320.0f, 870.0f));
 	this->addChild(m_pLabelIndex);
 
-	Sprite* pBarBottom = Sprite::create("FlashCard/bar-bottom.jpg");
-	pBarBottom->setAnchorPoint(Point(0.5f, 0.0f));
-	pBarBottom->setPosition(Point(winSize.width/2.0f, 0));
-	this->addChild(pBarBottom);
-
-	CCMenuItemImage* pItemSettingMenu = CCMenuItemImage::create(
-		"World-Map/mask-button-back.png",
-		"World-Map/mask-button-back.png",
-		CC_CALLBACK_0(FlashCardLayer::openStringMenu, this));
-	pItemSettingMenu->setPosition(ccp(56, 49));
-
-	CCMenu* pMenu = CCMenu::create(pItemSettingMenu, NULL);
-	pMenu->setPosition(CCPointZero);
-	this->addChild(pMenu);
+	m_pFooterNode = FooterNode::create();
+	m_pFooterNode->disableButtonIntroAndFlashCard();
+	this->addChild(m_pFooterNode);
 
 	m_levels = LevelTable::getInstance()->fetchLevelsForChapter(m_chapterInfo.iChapter);
 	m_iTotalFlashCard = m_levels.size();
@@ -115,8 +105,6 @@ bool FlashCardLayer::init()
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 
-	m_pSettingNode = NULL;
-	m_isShowSetting = false;
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kFlashCard);
    
 	m_pIconSoundSenetenceSprite = Sprite::create("FlashCard/icon_sound.png");
@@ -132,31 +120,13 @@ bool FlashCardLayer::init()
 	return true;
 }
 
-void FlashCardLayer::openStringMenu()
-{
-	if(m_pSettingNode == NULL)
-	{
-		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-500.0f, 0));
-		this->addChild(m_pSettingNode);
-	}
-
-	if (m_isShowSetting == false)
-	{
-		m_isShowSetting = true;
-		m_pSettingNode->show();
-		this->setTouchEnabled(false);
-	}
-	else
-	{
-		m_isShowSetting = false;
-		m_pSettingNode->hide();
-		this->setTouchEnabled(true);
-	}
-}
-
 bool FlashCardLayer::onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)
 {
+	if(m_pFooterNode->getSettingNode() != NULL && m_pFooterNode->getSettingNode()->getShowSetting())
+	{
+		return false;
+	}
+
 	m_fXMoved = 0;
 	Point touchPosition = pTouch->getLocation();
 	m_fBeginX = touchPosition.x;

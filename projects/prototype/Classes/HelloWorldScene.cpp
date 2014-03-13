@@ -40,27 +40,25 @@ Scene* HelloWorld::createScene(int iLevel)
 	boardLayer->m_pStatusLayer->setScale(0.88f);
 	boardLayer->m_pStatusLayer->setCurrentScore(0);
 	boardLayer->m_pStatusLayer->setCurrentMove(0);
-	boardLayer->m_pStatusLayer->setPosition(420.f, 765.f);
 	boardLayer->m_pStatusLayer->setSpeedUpdateScore(120.f);
-	scene->addChild(boardLayer->m_pStatusLayer);
+	boardLayer->m_pStatusLayer->setPosition(Point(-7.0f, -35.0f));
+	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pStatusLayer);
 
 	// init level
 	boardLayer->initLevel(iLevel);
 
+	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
+	ButtonNode* pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
+	pButtonSettingNode->setPosition(Point(590.0f, 50.0f));
 
-	// menu layer with close item	
-	auto closeItem = MenuItemImage::create(
-                                           "Setting.png", //"CloseNormal.png",
-                                           "Setting.png",//"CloseSelected.png",
-                                           CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
-    
-	closeItem->setAnchorPoint(ccp(0,0));
-	closeItem->setPosition(ccp(-12, -8));
-	//closeItem->setPosition(Point(origin.x + visibleSize.width - closeItem->getContentSize().width/2 ,
-      //                          origin.y + closeItem->getContentSize().height/2));
+	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
+	pButtonManagerNode->addButtonNode(pButtonSettingNode);
+	boardLayer->m_pHUDLayer->addChild(pButtonManagerNode);
 
+	
     // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
+    //auto menu = Menu::create(closeItem, NULL);
+	auto menu = Menu::create(NULL);
     menu->setPosition(Point::ZERO);
     boardLayer->m_pHUDLayer->addChild(menu, 10);
 	//menuLayer->setTouchEnabled(true);
@@ -175,7 +173,6 @@ bool HelloWorld::init()
 	this->scheduleUpdate();
 
 	m_pSettingNode = NULL;
-	m_isShowSetting = false;
 
     return true;
 }
@@ -263,7 +260,7 @@ void HelloWorld::initLevel(int iLevel)
 	m_pStatusLayer->setCurrentMove(m_GameBoardManager.GetCurrentMove());
 	
 	const LevelConfig& levelConfig = m_GameBoardManager.GetLevelConfig();
-	m_pStatusLayer->setScoreForStar( levelConfig.m_ScoreOfStars[0], levelConfig.m_ScoreOfStars[1], levelConfig.m_ScoreOfStars[2], levelConfig.m_ScoreOfStars[2]* 1.1f);
+	m_pStatusLayer->setScoreForStar( levelConfig.m_ScoreOfStars[0], levelConfig.m_ScoreOfStars[1], levelConfig.m_ScoreOfStars[2]);
 	//m_pStatusLayer->update(0);
 
 	// init word-collect board
@@ -493,21 +490,17 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 	if(m_pSettingNode == NULL)
 	{
 		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-500.0f, 0));
+		m_pSettingNode->setPosition(Point(640.0f, 0));
 		this->getParent()->addChild(m_pSettingNode, 100);
 	}
 
-	if (m_isShowSetting == false)
+	if (m_pSettingNode->getShowSetting() == false)
 	{
-		m_isShowSetting = true;
 		m_pSettingNode->show();
-		this->setTouchEnabled(false);
 	}
 	else
 	{
-		m_isShowSetting = false;
 		m_pSettingNode->hide();
-		this->setTouchEnabled(true);
 	}
 
     //Director::getInstance()->end();
@@ -684,6 +677,11 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 
 bool HelloWorld::onTouchBegan(Touch *pTouch, Event *pEvent)
 {
+	if (m_pSettingNode != NULL && m_pSettingNode->getShowSetting())
+	{
+		return false;
+	}
+
 	if (m_bIsEffectPlaying || m_bIsCellDragPlaying)
 		return true;
 

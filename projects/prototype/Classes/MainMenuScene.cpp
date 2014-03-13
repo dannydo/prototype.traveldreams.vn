@@ -3,7 +3,7 @@
 #include "WorldMapScene.h"
 #include "LifeSystemNode.h"	
 #include "ButtonNode.h"
-#include "ButtonManagerNode.h"
+#include "StatusLayer.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -62,12 +62,17 @@ bool MainMenuLayer::init()
 	buttonPlayNode->setPosition(Point(320.0f, 515.0f));
 
 	Sprite* pButtonLoginFacebookSprite = Sprite::create("LoadingAndMainMenu/FB_btn.png");
-	ButtonNode* buttonLoginNode = ButtonNode::createButtonSprite(pButtonLoginFacebookSprite, CC_CALLBACK_1(MainMenuLayer::loginFacebook, this));
-	buttonLoginNode->setPosition(Point(320.0f, 355.0f));
+	m_buttonLoginNode = ButtonNode::createButtonSprite(pButtonLoginFacebookSprite, CC_CALLBACK_1(MainMenuLayer::loginFacebook, this));
+	m_buttonLoginNode->setPosition(Point(320.0f, 355.0f));
+
+	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
+	ButtonNode* pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, CC_CALLBACK_1(MainMenuLayer::openSettingMenu, this));
+	pButtonSettingNode->setPosition(Point(590.0f, 50.0f));
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(buttonPlayNode);
-	pButtonManagerNode->addButtonNode(buttonLoginNode);
+	pButtonManagerNode->addButtonNode(m_buttonLoginNode);
+	pButtonManagerNode->addButtonNode(pButtonSettingNode);
 	this->addChild(pButtonManagerNode);
 
 	/*
@@ -114,22 +119,12 @@ bool MainMenuLayer::init()
 
 	this->scheduleUpdate();
 
-	// menu layer with close item	
-	auto closeItem = MenuItemImage::create("Setting.png",
-                                           "Setting.png",
-                                           CC_CALLBACK_0(MainMenuLayer::openSettingMenu, this));
-    
-	closeItem->setAnchorPoint(ccp(0,0));
-	closeItem->setPosition(ccp(-12, -8));
-
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Point::ZERO);
-	this->addChild(menu);
-
 	m_pSettingNode = NULL;
-	m_isShowSetting = false;
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
+
+	//UserService::getInstance()->addCallBackList(this);
+	//m_sFacebookToken = "CAAGQiytiRCoBAPqmEfvePLrbdMuzDylsNQZAZAud0CKLLTFZAfIm4pkdUcCoyYGEGDr3sgwKZCNLdTNbMgD2pd90UqfvFgf4JjsDR9rtBrUfO3D2nj3V8ZApvpeoJWDfYh3PwAnPJsZCHl9lFwZCGfjLKisBhnmgEaZCRZAHxYh3P9ZAxukpGupiX91XKyfjHVFbAfRpyqWxH6fbSCVxfiuxoimd05Y4Rc1fjKkVsTcDtlrwZDZD";
+	//UserService::getInstance()->registryUser(m_sFacebookToken);
 
 	return true;
 }
@@ -139,8 +134,9 @@ void MainMenuLayer::update(float dt)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	if(FacebookManager::getInstance()->isLogined())
 	{
+		m_sFacebookToken = FacebookManager::getInstance()->getAccessToken();
 		UserService::getInstance()->addCallBackList(this);
-		UserService::getInstance()->registryUser(FacebookManager::getInstance()->getAccessToken());
+		UserService::getInstance()->registryUser(m_sFacebookToken);
 		
 		this->unscheduleUpdate();
 	}
@@ -157,7 +153,10 @@ void MainMenuLayer::loginFacebook(Object* sender)
 {
 	CCLOG("login");
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    FacebookManager::getInstance()->loginByMode();
+	if(m_buttonLoginNode->isVisible() == true) 
+	{
+		FacebookManager::getInstance()->loginByMode();
+	}
 #else
 	MessageBox("Facebook not run with platform window", "Facebook");
 #endif
@@ -200,30 +199,35 @@ void MainMenuLayer::shareDialogFacebook()
 #endif
 }
 
-void MainMenuLayer::openSettingMenu()
+void MainMenuLayer::openSettingMenu(Object *sender)
 {
 	if(m_pSettingNode == NULL)
 	{
 		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-500.0f, 0));
+		m_pSettingNode->setPosition(Point(640.0f, 0.0f));
 		this->addChild(m_pSettingNode);
 	}
 
-	if (m_isShowSetting == false)
+	if (m_pSettingNode->getShowSetting() == false)
 	{
-		m_isShowSetting = true;
 		m_pSettingNode->show();
-		this->setTouchEnabled(false);
 	}
 	else
 	{
-		m_isShowSetting = false;
 		m_pSettingNode->hide();
-		this->setTouchEnabled(true);
 	}
 }
 
 void MainMenuLayer::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey)
 {
-	
+	try 
+	{
+		m_buttonLoginNode->setVisible(false);
+
+		UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
+		UserTable::getInstance()->updateUser(userInfo);
+	}
+	catch (exception e)
+	{
+	}
 }

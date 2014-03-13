@@ -4,7 +4,8 @@
 #include "cocos2d.h"
 #include "APIService\UserService.h"
 #include "SettingMenuNode.h"
-#include "APIService\UserService.h"
+#include "APIService\UserService.h"	 
+#include "ButtonManagerNode.h"
 
 class MainMenuLayer : public cocos2d::Layer, InterfaceService
 {
@@ -22,7 +23,7 @@ private:
 	void LogoutFacebook();
 	void shareLinkFacebook();
 	void shareDialogFacebook();
-	void openSettingMenu();
+	void openSettingMenu(cocos2d::Object* sender);
 
 	void resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey) override;
 
@@ -32,7 +33,9 @@ private:
 	cocos2d::MenuItemLabel* m_pItemShareDialog;
 
 	SettingMenuNode* m_pSettingNode	;
-	bool m_isShowSetting;
+
+	ButtonNode* m_buttonLoginNode;
+	std::string m_sFacebookToken;
 };
 
 class MainMenuScene : public cocos2d::Scene

@@ -3,6 +3,7 @@
 
 #include "cocos2d.h" 
 #include "Database\UserTable.h"
+#include "CustomNode.h"
 
 typedef enum {
 	kExitGame = 0,
@@ -14,7 +15,7 @@ typedef enum {
 	kPlayGame,
 } SceneMode;
 
-class SettingMenuNode : public cocos2d::Node
+class SettingMenuNode : public CustomNode
 {
 public:
 	SettingMenuNode();
@@ -24,8 +25,13 @@ public:
 
 	void show();
 	void hide();
+	inline bool getShowSetting() { return m_iShowSetting; };
 
 private:
+	bool onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
+	void onTouchCustomNodeMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override; 
+	void onTouchCustomNodeEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
+
 	void clickMusic();
 	void clickEffect();
 	void clickVoice();
@@ -36,6 +42,10 @@ private:
 	cocos2d::LabelTTF* m_plabelVoice;
 	cocos2d::LabelTTF* m_pLabelEffect;
 	cocos2d::LabelTTF* m_pLabelMusic;
+	cocos2d::LayerColor*m_Background;
+
+	bool m_iShowSetting;
+	bool m_isClick;
 };
 
 class Breadcrumb
