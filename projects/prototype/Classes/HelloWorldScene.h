@@ -108,6 +108,7 @@ public:
 	void visit() override;
 protected:
 	std::string GetImageFileFromGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
+	std::string GetImageFileFromSnapGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
 	int GetUnmoveCellsFromCurrentMovingRowOrColumn();
 
 	inline int GetZOrder(const int& iRow, const int& iColumn, const bool& bIsBush) { return (m_GameBoardManager.GetRowNumber()-1-iRow)*m_GameBoardManager.GetColumnNumber() + iColumn + bIsBush*100;}
@@ -122,7 +123,7 @@ protected:
 		std::vector<NewCellInfo>& newCells, bool bIsNewMove);
 		
 	Sprite* AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID, bool bPlayEffect = false);
-	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror=false);
+	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror=false, bool bIsBonus=false);
 	void AddNewComboCell(const ComboEffectCell& cell, const float& fDelayTime, const float& fEffectTime, bool bCreateMirror = true);
 
 	void OnEndDragEffect();
@@ -134,17 +135,19 @@ protected:
 
 	void HorizontalMoveUlti(float fDeltaX);
 	void VerticalMoveUlti(float fDeltaY);
+	void RemoveHint();
 	
 
-	void PlayCombo4HelperEffect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime, float fRotation);
+	void PlayCombo4HelperEffect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime, float fRotation, float fEffectScale = 1.f);
 
-	void PlayCombo4Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
+	void PlayCombo4Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime,  float fEffectScale = 1.f);
 	void PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
 	void PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime);	
 
-	void PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime);
+	void PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, float fEffectScale = 1.f);
 	void PlayCombo4_4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime);
 
+	void PlayActivateCommonDoubleAndTrippleComboEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, bool bRemoveTriggerComboCell = true, bool bExtraEffectOnTriggerComboCellWhenDestroy = false);
 	void PlayCombo4_5Effect(ComboEffectBundle* pComboEffect, float fDelayTime);
 	void PlayCombo5_5_5Effect(ComboEffectBundle* pComboEffect, float fDelayTime);
 	
@@ -161,6 +164,8 @@ protected:
 	void PlayChangeColorEffectOnSprite(Sprite* pSprite,const float& fDelayTime);
 	void PlaySplashLightDestroyEffectOnCell(const int& iRow, const int & iColumn,const float& fDelayTime, const float& fEffectDuration);
 
+
+	void PlayEarnScoreEffect(const int& iScore, const Cell& cell, const float& fDelay);
 
 	// unlock letter flow
 	void PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime);	
@@ -186,7 +191,7 @@ private:
 	float m_fMaskWidth, m_fMaskHeight;
 
 	cocos2d::CCSpriteBatchNode* m_pBoardBatchNode;
-	cocos2d::Sprite* m_pMoveHintNode;
+	//cocos2d::Sprite* m_pMoveHintNode;
 	cocos2d::CCSpriteBatchNode* m_pComboEffectBatchNode;
 	cocos2d::Sprite* m_pBossSprite;
 

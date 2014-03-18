@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>animations</key>
+	<dict>
+		<key>effectCombo5New</key>
+		<dict>
+			<key>delay</key>
+			<real>0.038</real>
+			<key>frames</key>
+			<array>
+				<string>Exp_00.png</string>
+				<string>Exp_01.png</string>
+				<string>Exp_02.png</string>
+				<string>Exp_03.png</string>
+				<string>Exp_04.png</string>
+				<string>Exp_05.png</string>
+				<string>Exp_06.png</string>
+				<string>Exp_07.png</string>
+				<string>Exp_08.png</string>
+			</array>
+		</dict>		
+	</dict>
+</dict>
+</plist>

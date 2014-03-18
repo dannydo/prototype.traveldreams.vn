@@ -171,7 +171,7 @@ public:
 		bool bIsNewMove);		
 
 	bool FastCheckBlocks( int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
-		std::vector<Cell>& basicMatchingDestroyedCells);		
+		std::vector<ComboEffectCell>& candidateDestroyedCells);		
 
 	int DecreaseMove() { return (m_iCurrentMove--);}
 
@@ -185,6 +185,7 @@ public:
 	int IncreaseScoreForCompleteBonusQuest();	
 
 	int IncreaseScoreForDestroyCells(const int& iGemCount, const ComboEffectType& eComboEffectType, int iActivateComboRatio = 100);
+	int GetScorePerGemDestroyByCombo(const ComboEffectType& eComboEffectType);
 	//int IncreaseScoreComboEffect(const int& iGemCount, const GemComboType_e& eComboType)
 	int IncreaseScoreForCreateCombo(const GemComboType_e& eComboType);
 

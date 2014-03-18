@@ -39,7 +39,23 @@ void GameBoardManager::GenerateGameBoard(int iLevel)
 			
 			m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = false;
 
-			m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % m_pLevelConfig->m_iNumberOfColor;			
+			switch (m_pLevelConfig->m_BoardMatrix[iRow][iColumn])
+			{
+				case 4:
+					m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_COMBO4_;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % m_pLevelConfig->m_iNumberOfColor;			
+					break;
+				case 5:
+					m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_COMBO5_;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % m_pLevelConfig->m_iNumberOfColor;			
+					break;
+				default:
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % m_pLevelConfig->m_iNumberOfColor;			
+					break;
+				case 6:
+					m_BoardValueMatrix[iRow][iColumn].m_eGemComboType = _GCT_COMBO6_;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = _SPECIAL_COMBO_GEM_ID;
+			}			
 			
 			while ( (iRow>1 && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow-1][iColumn].m_iGemID && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow-2][iColumn].m_iGemID) ||
 					(iColumn >1 && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow][iColumn-1].m_iGemID && m_BoardValueMatrix[iRow][iColumn].m_iGemID == m_BoardValueMatrix[iRow][iColumn-2].m_iGemID))
@@ -49,8 +65,8 @@ void GameBoardManager::GenerateGameBoard(int iLevel)
 		}
 
 	// for test
-	//m_BoardValueMatrix[1][0].m_iGemID = m_BoardValueMatrix[1][1].m_iGemID=m_BoardValueMatrix[0][2].m_iGemID=m_BoardValueMatrix[1][3].m_iGemID=	//m_BoardValueMatrix[1][4].m_iGemID = 0;
-		//m_BoardValueMatrix[4][2].m_iGemID=m_BoardValueMatrix[5][2].m_iGemID=0;
+	//m_BoardValueMatrix[1][0].m_iGemID = m_BoardValueMatrix[1][1].m_iGemID=m_BoardValueMatrix[0][2].m_iGemID=m_BoardValueMatrix[1][3].m_iGemID=	m_BoardValueMatrix[1][4].m_iGemID = 0;
+	//	m_BoardValueMatrix[4][2].m_iGemID=m_BoardValueMatrix[5][2].m_iGemID=0;
 	//m_BoardValueMatrix[1][2].m_iGemID=m_BoardValueMatrix[2][2].m_iGemID=1;
 
 	// generate obstacles

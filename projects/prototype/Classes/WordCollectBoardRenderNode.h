@@ -33,6 +33,7 @@ public:
 
 	std::string GetImageFileFromLetter(unsigned char iLetter);	
 	std::string GetImageInGemFileFromLetter(unsigned char iLetter);	
+	std::string GetImageInFileFromBonusLetter(unsigned char iLetter);	
 
 	//int GetNextCharacterID();
 
@@ -67,7 +68,7 @@ private:
 
 	SpriteBatchNode* m_pBatchNode;
 	//Sprite* m_pBackground;
-	DrawNode* m_pColorNode;
+	DrawNode* m_pColorNode;	
 
 	unsigned long m_iPreviousMainWordTapTime;
 	unsigned long m_iUnlockedLetterEffectEndTime;

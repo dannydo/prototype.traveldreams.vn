@@ -33,10 +33,12 @@
 #define _TME_DELAY_ACTIVE_COMBO_WHEN_BASIC_MATCHING_	0.1f
 #define _TME_BASIC_COMBO_EXECUTE_TIME_	0.35f ///basic: 4, 5, 4-4, 4-4-4
 #define _TME_COMBO_6_PHASE1_EXECUTE_TIME_		0.15f //
-#define _TME_COMBO_6_PHASE2_REMOVE_CELL_AT_TIME_	0.55f
+#define _TME_COMBO_6_PHASE2_REMOVE_CELL_AT_TIME_	0.7f
 #define _TME_COMBO_6_PHASE2_EXECUTE_TIME_		0.75f //
 #define _TME_COMBO_6_5_EXECUTE_TIME_			0.75f
-#define _TME_COMBO_4_5_PHASE2_DELAY_TIME_	0.2f //this delay used for 5-5-5 too, execution of each phase = basic combo execute time	
+#define _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_	0.42f
+#define _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_	0.15f
+#define _TME_COMBO_4_5_PHASE2_DELAY_TIME_	0.4f //this delay used for 5-5-5 too, execution of each phase = basic combo execute time	
 
 #define _TME_END_GAME_BONUS_PET_RUN_TIME_ 0.35f
 #define _TME_END_GAME_PET_EXPLOSION_PHASE_1_TIME_	0.06f

@@ -5,7 +5,7 @@
 ;number of color
 6
 ;score of stars
-4000	5000	6000
+8000	10000	12000
 ;map matrix
 0	0	1	1	1	1	0   0
 0	1	1	1	1	1	1   0
@@ -16,10 +16,10 @@
 0	1	1	0	0	1	1   0
 0	0	1	1	1	1	0   0
 ;main word
-TEACHER
+GLOBE
 0
 1
-5 2 5 3 5 4 5 5 5 6 5 7 5 8
+5 2 5 3 5 4 5 5 5 6 
 ;display of main word, 1: break line ( + number letter of first line, not this include "SPACE" used to break line)
 0
 ;end game bonus type

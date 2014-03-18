@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>animations</key>
+	<dict>
+		<key>effectCombo6_Light</key>
+		<dict>
+			<key>delay</key>
+			<real>0.051</real>
+			<key>frames</key>
+			<array>
+				<string>Combo6_000.png</string>
+				<string>Combo6_001.png</string>
+				<string>Combo6_002.png</string>
+				<string>Combo6_003.png</string>
+				<string>Combo6_004.png</string>
+				<string>Combo6_005.png</string>
+				<string>Combo6_006.png</string>
+				<string>Combo6_007.png</string>
+				<string>Combo6_008.png</string>
+				<string>Combo6_009.png</string>
+				<string>Combo6_010.png</string>
+				<string>Combo6_011.png</string>
+				<string>Combo6_012.png</string>
+				<string>Combo6_013.png</string>
+				<string>Combo6_014.png</string>
+			</array>
+		</dict>		
+		<key>effectCombo6_Flare</key>
+		<dict>
+			<key>delay</key>
+			<real>0.05</real>
+			<key>frames</key>
+			<array>
+				<string>Flare_00000_1.png</string>
+				<string>Flare_00000.png</string>
+				<string>Flare_00001.png</string>
+				<string>Flare_00002.png</string>
+				<string>Flare_00003.png</string>
+				<string>Flare_00004.png</string>
+				<string>Flare_00005.png</string>
+				<string>Flare_00006.png</string>
+				<string>Flare_00007.png</string>
+				<string>Flare_00008.png</string>
+				<string>Flare_00009.png</string>
+				<string>Flare_00010.png</string>
+				<string>Flare_00011.png</string>
+				<string>Flare_00012.png</string>
+				<string>Flare_00013.png</string>				
+			</array>
+		</dict>		
+	</dict>
+</dict>
+</plist>
