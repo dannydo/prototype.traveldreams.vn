@@ -4,6 +4,7 @@
 #include "GameWordManager.h"
 #include "DictionaryNode.h"
 #include "FooterNode.h"
+#include "SoundManager.h"
 
 USING_NS_CC;
 
@@ -238,13 +239,15 @@ void FlashCardLayer::playVoiceWord()
 {
 	if (m_currentLevelInfo.bIsUnlock) 
 	{
+		SoundManager::PlaySpellingOfWord(this, m_currentWordInfo);
+		/*
 		char sSoundFile[100];
 		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 			sprintf(sSoundFile, "EnglishSoundPC/Words/%s.wav", m_currentWordInfo.m_sSoundFile.c_str());
 		#else
 			sprintf(sSoundFile, "EnglishSound/Words/%s.ogg", m_currentWordInfo.m_sSoundFile.c_str());
 		#endif
-		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);*/
 	}
 }
 

@@ -56,7 +56,7 @@ bool LevelMapLayer::init()
 
 	m_pBackgroundNode = Node::create();
 	m_pBackgroundNode->setAnchorPoint(Point(0.5f, 0.0f));
-	m_pBackgroundNode->setPosition(Point(0.0f, 94.0f));
+	m_pBackgroundNode->setPosition(Point(0.0f, 0.0f));
 	this->addChild(m_pBackgroundNode);
 	m_maxHeight=0;
 
@@ -134,9 +134,18 @@ bool LevelMapLayer::init()
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kLevelMap);
 
+	
+	// temporary add background header to node
+	Sprite* pBarTop = Sprite::create("World-Map/Header.png");
+	pBarTop->setAnchorPoint(Point(0.0f, 1.f));	
+	pBarTop->setPosition( Point(0, winSize.height));
+	this->addChild(pBarTop);
+
 	LifeSystemNode* pLifeNode = LifeSystemNode::create();
 	pLifeNode->setPosition(Point(50.0f, 910.0f));
 	this->addChild(pLifeNode);
+
+
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
@@ -149,6 +158,9 @@ void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 {
 	if(UserTable::getInstance()->getUserInfo().iLife > 0)
 	{		
+		// play sound effect 					
+		SoundManager::PlaySoundEffect(_SET_LEVEL_SELECT_);
+
 		ButtonNode* pButtonNode = (ButtonNode*)pSender;
 		int iLevel = pButtonNode->getTag();
 
@@ -156,8 +168,7 @@ void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 		pGameWordManager->GenerateWordForNewLevel(iLevel);		
 
 		GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel);
-		this->addChild(pGameTargetNode, 10);
-		
+		this->addChild(pGameTargetNode, 10);		
 	}
 	else
 	{
@@ -223,8 +234,8 @@ void LevelMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 		Point touchPosition = pTouch->getLocation();
 		m_fYMoved = touchPosition.y - m_fBeginY;
 
-		if (m_fYMoved + m_pBackgroundNode->getPosition().y >= 94) {
-			m_fYMoved = -m_pBackgroundNode->getPosition().y + 94;
+		if (m_fYMoved + m_pBackgroundNode->getPosition().y >= 0) {
+			m_fYMoved = -m_pBackgroundNode->getPosition().y;
 		}
 		else if(m_fYMoved + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-960))
 		{

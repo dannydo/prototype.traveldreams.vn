@@ -16,7 +16,7 @@ bool FooterNode::init()
 		return false;
 	}
 
-	Sprite* pBarBottom = Sprite::create("Footer/bar-bottom.png");
+	Sprite* pBarBottom = Sprite::create("World-Map/Footer.png");
 	pBarBottom->setAnchorPoint(Point(0.0f, 0.0f));
 	pBarBottom->setPosition(Point(0.0f, 0.0f));
 	this->addChild(pBarBottom);

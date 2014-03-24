@@ -48,7 +48,11 @@ bool WorldMapLayer::init()
 	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 	this->loadConfigWordMap();
 
-	m_pBackgroundNode = LayerColor::create(ccc4(255, 255, 255, 255));
+	Sprite* pBackgroundSprite=  Sprite::create("World-Map/Worldmap_BG.png");
+	pBackgroundSprite->setAnchorPoint(Point(0,0));
+	this->addChild(pBackgroundSprite);
+
+	m_pBackgroundNode = LayerColor::create(ccc4(255, 255, 255, 0));
 	m_pBackgroundNode->setContentSize(CCSizeMake(640.0f, 960.0f));
 	m_pBackgroundNode->setAnchorPoint(Point(0.5f, 0.0f));
 	m_pBackgroundNode->setPosition(Point(0.0f, 94.0f));
@@ -101,9 +105,18 @@ bool WorldMapLayer::init()
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kWorldMap);
 
+	
+	// temporary add background header to node
+	Sprite* pBarTop = Sprite::create("World-Map/Header.png");
+	pBarTop->setAnchorPoint(Point(0.0f, 1.f));	
+	pBarTop->setPosition( Point(0, winSize.height));
+	this->addChild(pBarTop);
+
 	LifeSystemNode* pLifeNode = LifeSystemNode::create();
 	pLifeNode->setPosition(Point(50.0f, 910.0f));
 	this->addChild(pLifeNode);
+
+
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
@@ -114,6 +127,9 @@ bool WorldMapLayer::init()
 
 void WorldMapLayer::menuPlayChapterCallBack(Object* sender)
 {
+	// play sound effect 					
+	SoundManager::PlaySoundEffect(_SET_CHAPTER_SELECT_);
+
 	ButtonNode* pButtonNode = (ButtonNode*)sender;
 	int iChapter = pButtonNode->getTag();
 

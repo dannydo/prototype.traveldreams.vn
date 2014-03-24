@@ -61,7 +61,7 @@ int ObstacleProcessManager::AllocFreeBlock()
 	return -1;
 }
 
-bool ObstacleProcessManager::DestroyCellWithObstacle(const int& iBlockID)
+bool ObstacleProcessManager::DestroyCellWithObstacle(const int& iBlockID, const float& fDestroyTime )
 {
 	if (iBlockID < 0)
 		return true;
@@ -77,21 +77,25 @@ bool ObstacleProcessManager::DestroyCellWithObstacle(const int& iBlockID)
 		if (!pObstacleDescription->m_bIsDestroyable)
 			return false;
 
-		if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive)
-		{
-			if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty)
+		// need test: this has higher priority than m_bIsActive?
+		if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty)
 				return false;
 
+		if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive)
+		{			
 			// some obstacle should be removed instanly 1 time (with its gem) regard its level if m_bDecreaseLevelAfterDestroyed = false
 			// otherwise, only obstacle at level 0 has this effect
 			if (pObstacleDescription->m_bDecreaseLevelAfterDestroyed==false || m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel == 0)
 			{
-				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive = false;												
+				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive = false;									
+				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty = true;
+				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_fDirtyTime = fDestroyTime;
 			}
 			else
 			{
 				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel--;
-				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty = true;				
+				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty = true;
+				m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_fDirtyTime = fDestroyTime;
 
 				if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_iObstacleLevel == 0 && pObstacleDescription->m_LevelList[0].m_iLevelID != 0) // level 1 is lowest 
 				{
@@ -106,6 +110,28 @@ bool ObstacleProcessManager::DestroyCellWithObstacle(const int& iBlockID)
 	m_BlockWaitingClearList.push_back(iBlockID);
 
 	return true;		
+}
+
+void ObstacleProcessManager::CustomUpdateDirtyTime(const int& iBlockID, const float& fDirtyTime )
+{
+	if (iBlockID < 0)
+		return;
+
+	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
+	
+	for(int iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)
+	{
+		const ObstacleDescription* pObstacleDescription = GameConfigManager::getInstance()->GetObstacleDescription(iObstacleTypeID);
+		if (pObstacleDescription ==  NULL)
+			continue;
+		if (!pObstacleDescription->m_bIsDestroyable)
+			return;
+
+		if (m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsActive && m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_bIsDirty)
+		{
+			m_ObstacleBoardList[iBlockID].m_ObstacleList[iObstacleTypeID].m_fDirtyTime = fDirtyTime;
+		}
+	}
 }
 
 void ObstacleProcessManager::ForceDestroyObstacleBlock(const int& iBlockID)

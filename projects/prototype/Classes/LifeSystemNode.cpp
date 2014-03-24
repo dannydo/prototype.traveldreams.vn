@@ -17,7 +17,8 @@ bool LifeSystemNode::init()
 	if (!Node::init())
 	{
 		return false;
-	}
+	}	
+
 
 	UserTable::getInstance()->updateLife(0);
 	m_userInfo = UserTable::getInstance()->getUserInfo();

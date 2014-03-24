@@ -26,10 +26,27 @@ bool SettingMenuNode::init()
 		return false;
 	}
 
-	m_Background = LayerColor::create(ccc4(216, 216, 216, 255), 500.0f, 960.0f);
-	this->addChild(m_Background);
+	//m_Background = LayerColor::create(ccc4(216, 216, 216, 255), 500.0f, 960.0f);
+	m_pBackground =  Sprite::create("PanelSetting/panel-setting.png");
+	m_pBackground->setAnchorPoint(Point(0,0));
+	this->addChild(m_pBackground);
 
-	m_pLabelMusic = LabelTTF::create("Music On", "Arial", 25);
+	MenuItemImage* m_pMenuEffectOn = MenuItemImage::create("PanelSetting/Fx_on.PNG", "PanelSetting/Fx_on.PNG", CC_CALLBACK_0(SettingMenuNode::clickEffect, this));
+	MenuItemImage* m_pMenuEffectOff = MenuItemImage::create("PanelSetting/Fx_off.PNG", "PanelSetting/Fx_off.PNG", CC_CALLBACK_0(SettingMenuNode::clickEffect, this));
+	m_pMenuEffect = MenuItemToggle::createWithCallback( CC_CALLBACK_0(SettingMenuNode::clickEffect, this), m_pMenuEffectOff, m_pMenuEffectOn, NULL);	
+	m_pMenuEffect->setPosition(Point(410, 710));
+
+	MenuItemImage* m_pMenuMusicOn = MenuItemImage::create("PanelSetting/music_on.PNG", "PanelSetting/music_on.PNG", CC_CALLBACK_0(SettingMenuNode::clickMusic, this));
+	MenuItemImage* m_pMenuMusicOff = MenuItemImage::create("PanelSetting/music_off.PNG", "PanelSetting/music_off.PNG", CC_CALLBACK_0(SettingMenuNode::clickMusic, this));
+	m_pMenuMusic = MenuItemToggle::createWithCallback( CC_CALLBACK_0(SettingMenuNode::clickMusic, this), m_pMenuMusicOff, m_pMenuMusicOn, NULL);	
+	m_pMenuMusic->setPosition(Point(410, 620));
+
+	MenuItemImage* m_pMenuVoiceOn = MenuItemImage::create("PanelSetting/voice_on.PNG", "PanelSetting/voice_on.PNG", CC_CALLBACK_0(SettingMenuNode::clickVoice, this));
+	MenuItemImage* m_pMenuVoiceOff = MenuItemImage::create("PanelSetting/voice_off.PNG", "PanelSetting/voice_off.PNG", CC_CALLBACK_0(SettingMenuNode::clickVoice, this));
+	m_pMenuVoice = MenuItemToggle::createWithCallback( CC_CALLBACK_0(SettingMenuNode::clickVoice, this), m_pMenuVoiceOff, m_pMenuVoiceOn, NULL);	
+	m_pMenuVoice->setPosition(Point(410,530));
+
+	/*m_pLabelMusic = LabelTTF::create("Music On", "Arial", 25);
 	m_pLabelMusic->setColor(ccc3(0.0f, 0.0f, 0.0f));
     MenuItemLabel* m_pItemMusic = MenuItemLabel::create(m_pLabelMusic, CC_CALLBACK_0(SettingMenuNode::clickMusic, this));
     m_pItemMusic->setPosition(Point(100, 750));
@@ -42,12 +59,12 @@ bool SettingMenuNode::init()
 	m_plabelVoice = LabelTTF::create("Voice On", "Arial", 25);
 	m_plabelVoice->setColor(ccc3(0.0f, 0.0f, 0.0f));
     MenuItemLabel* m_pItemVoice = MenuItemLabel::create(m_plabelVoice, CC_CALLBACK_0(SettingMenuNode::clickVoice, this));
-    m_pItemVoice->setPosition(Point(400, 750));
+    m_pItemVoice->setPosition(Point(400, 750));*/
 
 	LabelTTF* pLabelTutorial = LabelTTF::create("TUTORIAL", "Arial", 25);
 	pLabelTutorial->setColor(ccc3(0.0f, 0.0f, 0.0f));
     MenuItemLabel* m_pItemTutorial = MenuItemLabel::create(pLabelTutorial, CC_CALLBACK_0(SettingMenuNode::clickTutorial, this));
-    m_pItemTutorial->setPosition(Point(250, 700));
+    m_pItemTutorial->setPosition(Point(250, 100));
 
 	LabelTTF* pLabelLogoutFacebook = LabelTTF::create("LOGOUT FACEBOOK", "Arial", 25);
 	pLabelLogoutFacebook->setColor(ccc3(0.0f, 0.0f, 0.0f));
@@ -57,18 +74,27 @@ bool SettingMenuNode::init()
 
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnMusic", 1) != 1)
 	{
-		m_pLabelMusic->setString("Music Off");
+		//m_pLabelMusic->setString("Music Off");
+		m_pMenuMusic->setSelectedIndex(0);
 	}
+	else 
+		m_pMenuMusic->setSelectedIndex(1);
 
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnEffect", 1) != 1)
 	{
-		m_pLabelEffect->setString("Effect Off");
+		//m_pLabelEffect->setString("Effect Off");
+		m_pMenuEffect->setSelectedIndex(0);
 	}
+	else 
+		m_pMenuEffect->setSelectedIndex(1);
 
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) != 1)
 	{
-		m_plabelVoice->setString("Voice Off");
+		//m_plabelVoice->setString("Voice Off");
+		m_pMenuVoice->setSelectedIndex(0);
 	}
+	else 
+		m_pMenuVoice->setSelectedIndex(1);
 
 	char *sTitleButtonBack;
 	int iSize = Breadcrumb::getInstance()->getSceneModes().size();
@@ -100,12 +126,20 @@ bool SettingMenuNode::init()
 		break;
 	}
 
-	LabelTTF* pLabelBack = LabelTTF::create(sTitleButtonBack, "Arial", 25);
+	/*LabelTTF* pLabelBack = LabelTTF::create(sTitleButtonBack, "Arial", 25);
 	pLabelBack->setColor(ccc3(0.0f, 0.0f, 0.0f));
     MenuItemLabel* m_pItemBack = MenuItemLabel::create(pLabelBack, CC_CALLBACK_0(SettingMenuNode::clickBack, this));
-	m_pItemBack->setPosition(Point(250, 650));
+	m_pItemBack->setPosition(Point(250, 650));*/
+	Sprite* pBackButtonSprite = Sprite::create("PanelSetting/back_btn.png");
+	ButtonNode* pBackButtonNode = ButtonNode::createButtonSprite(pBackButtonSprite, CC_CALLBACK_0(SettingMenuNode::clickBack, this));
+	pBackButtonNode->setPosition(Point(250, 252.0f));
 
-	CCMenu* pMenu = CCMenu::create( m_pItemMusic, m_pItemEffect, m_pItemVoice, m_pItemTutorial, m_pItemBack, m_pItemLogoutFacebook,  NULL);
+	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
+	pButtonManagerNode->addButtonNode(pBackButtonNode);
+	this->addChild(pButtonManagerNode);
+
+
+	CCMenu* pMenu = CCMenu::create( m_pMenuMusic, m_pMenuEffect, m_pMenuVoice, m_pItemTutorial, m_pItemLogoutFacebook,  NULL);
 	pMenu->setPosition(CCPointZero);
 	this->addChild(pMenu);
 
@@ -127,13 +161,15 @@ void SettingMenuNode::clickMusic()
 {
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnMusic", 1) != 1)
 	{
-		m_pLabelMusic->setString("Music On");
+		//m_pLabelMusic->setString("Music On");
+		m_pMenuMusic->setSelectedIndex(1);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnMusic", 1);
 		SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kNone);
 	}
 	else
 	{
-		m_pLabelMusic->setString("Music Off");
+		//m_pLabelMusic->setString("Music Off");
+		m_pMenuMusic->setSelectedIndex(0);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnMusic", 0);
 		SoundManager::StopBackgroundMusic();
 	}
@@ -143,12 +179,14 @@ void SettingMenuNode::clickEffect()
 {
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnEffect", 1) != 1)
 	{
-		m_pLabelEffect->setString("Effect On");
+		//m_pLabelEffect->setString("Effect On");
+		m_pMenuEffect->setSelectedIndex(1);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnEffect", 1);
 	}
 	else
 	{
-		m_pLabelEffect->setString("Effect Off");
+		//m_pLabelEffect->setString("Effect Off");
+		m_pMenuEffect->setSelectedIndex(0);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnEffect", 0);
 	}
 }
@@ -157,12 +195,14 @@ void SettingMenuNode::clickVoice()
 {
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) != 1)
 	{
-		m_plabelVoice->setString("Voice On");
+		//m_plabelVoice->setString("Voice On");
+		m_pMenuVoice->setSelectedIndex(1);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnVoice", 1);
 	}
 	else
 	{
-		m_plabelVoice->setString("Voice Off");
+		//m_plabelVoice->setString("Voice Off");
+		m_pMenuVoice->setSelectedIndex(0);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnVoice", 0);
 	}
 }

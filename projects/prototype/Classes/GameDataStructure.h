@@ -35,7 +35,8 @@
 #define _TME_COMBO_6_PHASE1_EXECUTE_TIME_		0.15f //
 #define _TME_COMBO_6_PHASE2_REMOVE_CELL_AT_TIME_	0.7f
 #define _TME_COMBO_6_PHASE2_EXECUTE_TIME_		0.75f //
-#define _TME_COMBO_6_5_EXECUTE_TIME_			0.75f
+#define _TME_COMBO_6_TRANSFORM_4_5_EXECUTE_TIME_	0.05f //
+//#define _TME_COMBO_6_5_EXECUTE_TIME_			0.75f
 #define _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_	0.42f
 #define _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_	0.15f
 #define _TME_COMBO_4_5_PHASE2_DELAY_TIME_	0.4f //this delay used for 5-5-5 too, execution of each phase = basic combo execute time	
@@ -335,6 +336,16 @@ public:
 		m_fDestroyAtTime = fDestroyAtTime;
 		m_bIsEarnScore = bIsEarnScore;
 	}	
+
+	DestroyedByComboCell (const int& iRow, const int& iColumn, const int& iDestroyPhaseIndex, const float& fDestroyAtTime, bool bIsEarnScore, bool bIsCompleteDestroyed) : Cell(iRow, iColumn)
+	{	
+		m_fDestroyAtTime = 0;
+		m_iDestroyPhaseIndex = iDestroyPhaseIndex;
+		m_iGroupIndex = 0;
+		m_bIsCompleteDestroyed = bIsCompleteDestroyed;
+		m_fDestroyAtTime = fDestroyAtTime;
+		m_bIsEarnScore = bIsEarnScore;
+	}	
 };
 
 struct NewCellInfo : public Cell
@@ -343,12 +354,14 @@ public:
 	int m_iGemLetterBlockID;
 	bool m_bIsUnlocked;
 	int m_iGemID;	
+	float m_fEffectiveTime;
 
 	NewCellInfo() : Cell()
 	{
 		m_iGemLetterBlockID = -1;
 		m_bIsUnlocked = false;
 		m_iGemID = -1;
+		m_fEffectiveTime = 0;
 	}
 
 	NewCellInfo(const int& iRow, const int& iColumn, const int& iGemID) : Cell(iRow, iColumn)
@@ -356,6 +369,7 @@ public:
 		m_iGemLetterBlockID = -1;
 		m_bIsUnlocked = false;
 		m_iGemID = iGemID;
+		m_fEffectiveTime = 0;
 	}
 
 	NewCellInfo(const int& iRow, const int& iColumn, const int& iGemLetterBlockID, const bool& bIsUnlocked, const int& iGemID) : Cell(iRow, iColumn)
@@ -363,6 +377,15 @@ public:
 		m_iGemLetterBlockID = iGemLetterBlockID;
 		m_bIsUnlocked = bIsUnlocked;
 		m_iGemID = iGemID;
+		m_fEffectiveTime = 0;
+	}
+
+	NewCellInfo(const int& iRow, const int& iColumn, const int& iGemLetterBlockID, const bool& bIsUnlocked, const int& iGemID, const float& fEffectiveTime) : Cell(iRow, iColumn)
+	{
+		m_iGemLetterBlockID = iGemLetterBlockID;
+		m_bIsUnlocked = bIsUnlocked;
+		m_iGemID = iGemID;
+		m_fEffectiveTime = fEffectiveTime;
 	}
 };
 /*
@@ -380,9 +403,10 @@ public:
 	int m_iWordLength;
 
 	std::string m_sMeaning;
-	std::string m_sSoundFile;
-	float m_fSoundLength;
-	//std::string m_sSoundVietnameseFile;
+	std::string m_sSoundEnglishFile;
+	float m_fSoundEnglishLength;
+	std::string m_sSoundVietnameseFile;
+	float m_fSoundVietnameseLength;
 	std::string m_sFlashCardImage;
 	std::string m_sPhonetic;
 	std::string m_sSentence;

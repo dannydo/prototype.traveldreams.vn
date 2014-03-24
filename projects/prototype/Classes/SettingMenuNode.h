@@ -39,10 +39,14 @@ private:
 	void clickLogoutFacebook();
 	void clickBack();
 
-	cocos2d::LabelTTF* m_plabelVoice;
-	cocos2d::LabelTTF* m_pLabelEffect;
-	cocos2d::LabelTTF* m_pLabelMusic;
-	cocos2d::LayerColor*m_Background;
+	//cocos2d::LabelTTF* m_plabelVoice;
+	cocos2d::MenuItemToggle* m_pMenuVoice;
+	//cocos2d::LabelTTF* m_pLabelEffect;
+	cocos2d::MenuItemToggle* m_pMenuEffect;
+	//cocos2d::LabelTTF* m_pLabelMusic;
+	cocos2d::MenuItemToggle* m_pMenuMusic;
+	//cocos2d::LayerColor*m_Background;
+	cocos2d::Sprite* m_pBackground;
 
 	bool m_iShowSetting;
 	bool m_isClick;

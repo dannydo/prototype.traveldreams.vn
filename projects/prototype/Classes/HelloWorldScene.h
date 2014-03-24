@@ -10,7 +10,7 @@
 #include "ComboCountRenderNode.h"
 #include "StatusLayer.h"
 //#include "BonusWordNode.h"
-#include "BonusWordNodeNew.h"	 
+//#include "BonusWordNodeNew.h"	 
 #include "SettingMenuNode.h"
 
 
@@ -122,8 +122,8 @@ protected:
 		std::vector<NewCellInfo>& unlockedLetterCells,
 		std::vector<NewCellInfo>& newCells, bool bIsNewMove);
 		
-	Sprite* AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID, bool bPlayEffect = false);
-	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror=false, bool bIsBonus=false);
+	Sprite* AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID, bool bPlayEffect = false, float fDelayTime=0);
+	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror=false, bool bIsBonus=false, float fDelayTime=0, bool bPlayEffect=false);
 	void AddNewComboCell(const ComboEffectCell& cell, const float& fDelayTime, const float& fEffectTime, bool bCreateMirror = true);
 
 	void OnEndDragEffect();

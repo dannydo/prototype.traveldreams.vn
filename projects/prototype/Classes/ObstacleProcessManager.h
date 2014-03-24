@@ -12,12 +12,14 @@ public:
 	bool m_bIsActive;
 	int m_iObstacleLevel;
 	bool m_bIsDirty;
+	float m_fDirtyTime;
 
 	ObstacleData()
 	{
 		m_bIsActive = false;
 		m_iObstacleLevel = 0;
 		m_bIsDirty = false;
+		m_fDirtyTime = 0;
 	}
 };
 
@@ -42,7 +44,8 @@ public:
 	ObstacleProcessManager(NewGameBoardManager* pGameBoardManager);
 	void InitLevel();
 
-	bool DestroyCellWithObstacle(const int& iBlockID);
+	bool DestroyCellWithObstacle(const int& iBlockID, const float& fDestroyTime );
+	void CustomUpdateDirtyTime(const int& iBlockID, const float& fDirtyTime );
 	void ForceDestroyObstacleBlock(const int& iBlockID); //clear block of obstacles, regard of its types (detach obstacle with cell is the job of GameBoardManager)
 	bool IsRowLocked(const int& iBlockID);
 	bool IsColumnLocked(const int& iBlockID);

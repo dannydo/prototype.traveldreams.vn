@@ -484,10 +484,16 @@ void HelloWorld::initLevel(int iLevel)
 	// play sound
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kGameMusic);
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kPlayGame);
+
+	// play sound effect 
+	SoundManager::PlaySoundEffect(_SET_DESTROY_LETTER_);
 }
 
 void HelloWorld::menuCloseCallback(Object* pSender)
 {
+	// play sound
+	SoundManager::PlaySoundEffect(_SET_BUTTON_PRESS_); 
+
 	if(m_pSettingNode == NULL)
 	{
 		m_pSettingNode = SettingMenuNode::create();
@@ -558,6 +564,7 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 			switch (eGemComboType)
 			{
 				case _GCT_NONE_:
+				default:
 					return "Orange_Cat.png"; //"Candy_Cam.png";
 				case _GCT_COMBO4_:
 					return "Orange_Combo_4.png";
@@ -678,6 +685,7 @@ std::string HelloWorld::GetImageFileFromSnapGemID(int iGemID, GemComboType_e eGe
 			switch (eGemComboType)
 			{
 				case _GCT_NONE_:
+				default:
 					return "Orange_Cat_Snap.png"; //"Candy_Cam.png";
 				case _GCT_COMBO4_:
 					return "Orange_Combo_4_Snap.png";
@@ -1107,7 +1115,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 		else
 		{			
 			// play sound
-			SoundManager::PlaySoundEffect(_SET_WRONG_MOVE_);
+			SoundManager::PlaySoundEffect(_SET_DRAG_FAIL_);
 
 			// return cells to their original positions
 			m_bIsCellDragPlaying = true;
@@ -1187,7 +1195,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 		else
 		{			
 			// play sound
-			SoundManager::PlaySoundEffect(_SET_WRONG_MOVE_);
+			SoundManager::PlaySoundEffect(_SET_DRAG_FAIL_);
 
 			// return cells to their original positions
 			m_bIsCellDragPlaying = true;
@@ -1204,7 +1212,10 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 	CCLOG("2");
 	// now play effect to destroy/move old cells, and generate new cells
 	if (bMoveIsValid)
-	{		
+	{				 
+		// play sound
+		SoundManager::PlaySoundEffect(_SET_DRAG_SUCCESS_);
+
 		// update obstacle manager right begin of move
 		m_GameBoardManager.GetObstacleProcessManager()->UpdateAfterMove();
 
@@ -1820,6 +1831,9 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 	if (bIsBonusEndGamePhase)
 	{		
+		fDelayTime = 0;
+		fTotalDestroyCellTime = _TME_BASIC_DESTROY_CELL_TIME_;
+
 		// play effect convert normal cells to combo cells
 		if (convertedToComboCells.size() > 0) // && convertedToComboCells[0].m_eGemComboType != _GCT_BONUS_END_GAME_CRAZY_PET_) //temporary disable transform of crasy pet
 		{
@@ -1885,14 +1899,14 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				iIndex++;
 			}
 
-			fDelayTime += _TME_BASIC_DESTROY_CELL_TIME_  + (iIndex+3) * fDelayPerConvertedCell;			
+			fDelayTime += _TME_BASIC_DESTROY_CELL_TIME_  + (iIndex+2) * fDelayPerConvertedCell;			
 		}
 	}
 
 
 	// play sound
 	if (basicMatchingDestroyedCells.size() > 0)
-		SoundManager::PlaySoundEffect(_SET_SIMPLE_MATCH_);
+		SoundManager::PlaySoundEffect(_SET_BASIC_MATCH_3_);
 
 	//CCLOG("Destroy cells");
 
@@ -2009,7 +2023,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		int iScorePerGem = m_GameBoardManager.GetScorePerGemDestroyByCombo(pComboEffect->m_ComboEffectDescription.m_eComboEffectType);
 		for(auto cell: pComboEffect->m_DestroyedCells)
 		{
-			if (cell.m_iDestroyPhaseIndex >=0 && (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_6_4_EFFECT_ || pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_6_5_EFFECT_ ))
+			if (cell.m_iDestroyPhaseIndex >=0 && (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_6_4_EFFECT_ || pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_6_5_EFFECT_ )
+				&& cell.m_bIsCompleteDestroyed)
 			{			
 				newComboCell.m_iRow = cell.m_iRow;
 				newComboCell.m_iColumn = cell.m_iColumn;
@@ -2108,7 +2123,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			if (levelBossInfo.m_bJustReleaseALetter)
 			{
 				// play sound effect 
-				SoundManager::PlaySoundEffect(_SET_GET_CHARACTER_);
+				SoundManager::PlaySoundEffect(_SET_DESTROY_LETTER_);
 
 				// remove current letter sprite
 				RemoveLetterFromBossSprite(fDelayEffectTime);
@@ -2200,12 +2215,27 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				// remove old question mark sprite
 				Sprite* pOldChildSprite = (Sprite*)pSprite->getChildren()->getLastObject();
 				if (pOldChildSprite != NULL)
-					pOldChildSprite->removeFromParentAndCleanup(true);
+					pOldChildSprite->runAction(						
+						Sequence::create(
+							DelayTime::create( fDelayTime + cell.m_fEffectiveTime),	
+							Spawn::createWithTwoActions(
+								ScaleTo::create( 0.133f, 2.f),
+								FadeOut::create( 0.133f)),
+							RemoveSelf::create(),
+							NULL));
+					//->removeFromParentAndCleanup(true);
 
 				if (cell.m_iGemLetterBlockID >= 0) //iLetter < 255)
 				{
 					data = m_GameBoardManager.GetGemLetterData(cell.m_iGemLetterBlockID);							
-					AddLetterToGem( cell, m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), data.m_iLetter, cell.m_iGemLetterBlockID);			
+					AddLetterToGem( cell, m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), data.m_iLetter, cell.m_iGemLetterBlockID,
+						i!=0, false, (i==0)?(fDelayTime + cell.m_fEffectiveTime):0, true);
+
+					if (i==0)
+					{
+						// play sound effect 					
+						SoundManager::PlaySoundEffect(_SET_COMPLETE_WORD_, fDelayTime + cell.m_fEffectiveTime);
+					}
 				}
 			}
 					
@@ -2252,8 +2282,10 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	
 
 	// generate new cells
+
+	// NOTE: drop sound effect not match to animation!!!
 	// play sound
-	SoundManager::PlaySoundEffect(_SET_DROP_GEM_, fTotalDestroyCellTime);
+	SoundManager::PlaySoundEffect(_SET_DROP_, fTotalDestroyCellTime + 0.027f * (m_GameBoardManager.GetRowNumber() - newCells[0].m_iRow));
 
 	//CCLOG("Create new gems");
 
@@ -2290,7 +2322,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 					m_fBoardBottomPosition + (cell.m_iRow + iNumberOfRow) * m_SymbolSize.height));
 				pSprite->runAction(
 					Sequence::create(
-						DelayTime::create(fTotalDestroyCellTime + 0.031f* (m_GameBoardManager.GetRowNumber() - cell.m_iRow)),
+						DelayTime::create(fTotalDestroyCellTime + 0.03f* (m_GameBoardManager.GetRowNumber() - cell.m_iRow)),
 						//MoveTo::create(_TME_MOVE_CELL_TIME_,	//0.027f
 							//ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, 
 								//	m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height)),
@@ -2405,7 +2437,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	if (bIsBonusEndGamePhase)
 	{
 		this->runAction( CCSequence::create(
-					CCDelayTime::create(fTotalDestroyCellTime+ _TME_MOVE_CELL_TIME_ *4),
+					CCDelayTime::create(fTotalDestroyCellTime+ _TME_MOVE_CELL_TIME_ + 0.1f ),
 					CCCallFunc::create( this, callfunc_selector( HelloWorld::ExecuteBonusWinGameEffect)),
 					NULL));		
 	}
@@ -2470,7 +2502,7 @@ void HelloWorld::AddNewLetterToBossSprite(const float& fDelayTime)
 	if (m_GameBoardManager.GetGameWordManager()->GenerateLetterFromMainWord(iLetter))
 	{
 		Sprite* pLetterSprite = Sprite::createWithSpriteFrameName(
-			m_pWordCollectBoardRenderNode->GetImageFileFromLetter(iLetter).c_str());
+			m_pWordCollectBoardRenderNode->GetImageInGemFileFromLetter(iLetter).c_str());
 		pLetterSprite->setPosition(Point( m_pBossSprite->getContentSize().width/2.f - pLetterSprite->getContentSize().width * 1.6f /4.f, 90.f));
 		pLetterSprite->setScale(1.6f);
 		m_pBossSprite->setTag(iLetter);
@@ -2670,9 +2702,11 @@ void HelloWorld::UpdateObstacleListAfterMove()
 					if (m_BoardObstaclesList[iBlockID][iObstacleTypeID] != NULL)
 					{	
 						m_BoardObstaclesList[iBlockID][iObstacleTypeID]->runAction(
-							Sequence::createWithTwoActions( 
+							Sequence::create(
+								DelayTime::create( obstacleData.m_fDirtyTime + 0.2f),
 								ScaleTo::create( 0.25f, 1.1f, 1.1f),
-								RemoveSelf::create()));
+								RemoveSelf::create(),
+								NULL));
 
 						Object* childNode = NULL;
 						CCARRAY_FOREACH( m_BoardObstaclesList[iBlockID][iObstacleTypeID]->getChildren(), childNode) 
@@ -2683,10 +2717,10 @@ void HelloWorld::UpdateObstacleListAfterMove()
 						//m_BoardObstaclesList[iBlockID][iObstacleTypeID]->removeFromParentAndCleanup(true);
 						m_BoardObstaclesList[iBlockID][iObstacleTypeID] = NULL;
 
-						AddObstacleToGem(m_BoardViewMatrix[iRow][iColumn].m_pSprite, iBlockID, iObstacleTypeID, true);
+						AddObstacleToGem(m_BoardViewMatrix[iRow][iColumn].m_pSprite, iBlockID, iObstacleTypeID, true, obstacleData.m_fDirtyTime  + 0.2f);
 					}											
 					else
-						AddObstacleToGem(m_BoardViewMatrix[iRow][iColumn].m_pSprite, iBlockID, iObstacleTypeID, false);
+						AddObstacleToGem(m_BoardViewMatrix[iRow][iColumn].m_pSprite, iBlockID, iObstacleTypeID, false, obstacleData.m_fDirtyTime  + 0.2f);
 					
 					obstacleData.m_bIsDirty = false;						
 				}
@@ -2775,7 +2809,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 				m_GameBoardManager.IncreaseScoreForUnlockMainWord();
 			
 			// play sound effect 
-			SoundManager::PlaySoundEffect(_SET_GET_CHARACTER_);
+			SoundManager::PlaySoundEffect(_SET_DESTROY_LETTER_, fDelay);
 		}							
 	}
 
@@ -2921,7 +2955,7 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 }
 */
 
-Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID, bool bPlayEffect)
+Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, const int& iObstacleTypeID, bool bPlayEffect, float fDelayTime)
 {	
 	ObstacleData& obstacleData = m_GameBoardManager.GetObstacleProcessManager()->GetObstacleData(iBlockID, iObstacleTypeID);
 	if (obstacleData.m_bIsActive)
@@ -2942,7 +2976,7 @@ Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, co
 			pMaskSprite->setVisible(false); //setOpacity(0);
 			pMaskSprite->runAction(
 				Sequence::create(
-					DelayTime::create(0.2f),
+					DelayTime::create(fDelayTime),
 					Show::create(), //FadeIn::create(0.01f),
 					ScaleTo::create(0.1f, 1.f, 1.f),
 					NULL));
@@ -2980,7 +3014,7 @@ Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, co
 						levelSpriteList[i]->setVisible(false); //setOpacity(0);
 						levelSpriteList[i]->runAction(
 							Sequence::create(
-								DelayTime::create(0.2f),
+								DelayTime::create(fDelayTime),
 								Show::create(), //FadeIn::create(0.01f),
 								ScaleTo::create(0.1f, 1.f, 1.f),
 								NULL));
@@ -2997,7 +3031,7 @@ Sprite* HelloWorld::AddObstacleToGem(Sprite* pGemSprite, const int& iBlockID, co
 	return NULL;
 }
 
-Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror, bool bIsBonus)
+Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror, bool bIsBonus, float fDelayTime, bool bPlayEffect)
 {
 	Sprite* pCharacterSprite;
 	if (iGemLetterBlockID >=0)
@@ -3045,6 +3079,80 @@ Sprite* HelloWorld::AddLetterToGem(const Cell& cell, const int& iGemID, const un
 	}
 	else
 		m_BoardViewMirrorMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite->addChild(pCharacterSprite);
+
+	if (bPlayEffect && !bIsMirror)
+	{
+		pCharacterSprite->setVisible(false);
+		pCharacterSprite->setScale(2.f);
+		pCharacterSprite->runAction(
+			Sequence::create(
+				DelayTime::create( fDelayTime + 0.33f),				
+				Show::create(),
+				ScaleTo::create( 0.12f, 1.f),
+				ScaleTo::create( 0.064f, 1.1f),
+				ScaleTo::create( 0.066f, 1.f),
+				NULL));
+
+		// extra effect
+		Sprite* pFlareSprite = Sprite::createWithSpriteFrameName("LetterAppear_Flare.png");
+		pFlareSprite->setVisible(false);
+		pFlareSprite->setRotation(-55.f);
+		pCharacterSprite->getParent()->addChild(pFlareSprite, 100);				
+		pFlareSprite->setPosition(pCharacterSprite->getPosition());
+		pFlareSprite->runAction(
+			Sequence::create(
+				DelayTime::create( fDelayTime + 0.033f),
+				Show::create(),
+				Spawn::create(
+					Sequence::createWithTwoActions(
+						ScaleTo::create( 0.133f, 1.93f),
+						ScaleTo::create( 0.417f, 1.6f)),
+					Sequence::createWithTwoActions(
+						RotateTo::create( 0.133f, -29.f),
+						RotateTo::create( 0.417f, 67)),
+					Sequence::createWithTwoActions(
+						DelayTime::create( 0.133f),
+						FadeTo::create( 0.417f, 128)),
+					NULL),
+				RemoveSelf::create(),
+				NULL));
+
+
+		Sprite* pRingSprite = Sprite::createWithSpriteFrameName("LetterAppear_Ring.png");
+		pRingSprite->setVisible(false);
+		pRingSprite->setScale( 0.8f);		
+		pCharacterSprite->getParent()->addChild(pRingSprite, 100);				
+		pRingSprite->setPosition(pCharacterSprite->getPosition());
+		pRingSprite->runAction(
+			Sequence::create(
+				DelayTime::create( fDelayTime + 0.033f),
+				Show::create(),
+				Spawn::createWithTwoActions(
+					ScaleTo::create( 0.467f, 1.35f),
+					FadeTo::create( 0.467f, 128)),
+				DelayTime::create( 0.083f),
+				RemoveSelf::create(),
+				NULL));
+
+
+		Sprite* pStarSprite = Sprite::createWithSpriteFrameName("LetterAppear_Star.png");
+		pStarSprite->setVisible(false);
+		pStarSprite->setScale( 0.6f);		
+		pCharacterSprite->getParent()->addChild(pStarSprite, 100);			
+		pStarSprite->setPosition(pCharacterSprite->getPosition());
+		pStarSprite->runAction(
+			Sequence::create(
+				DelayTime::create( fDelayTime + 0.033f),
+				Show::create(),
+				Spawn::createWithTwoActions(
+					ScaleTo::create( 0.467f, 1.3f),
+					Sequence::createWithTwoActions(
+						DelayTime::create( 0.35f),
+						FadeOut::create( 0.117f))),
+				RemoveSelf::create(),
+				NULL));		
+	}
+
 	return pCharacterSprite;
 }
 
@@ -3103,18 +3211,18 @@ void HelloWorld::ShowMainWordUnlockEffect()
 		fPositionXIncrement += letterSpriteList[i]->getContentSize().width * fScaleRatio + 2.f;
 	}
 
-	m_pWordCollectBoardRenderNode->PlaySpellingSound();
+	float fSpellingTime = m_pWordCollectBoardRenderNode->PlaySpellingSound();
 	
 	pSpriteBatchNode->runAction(
 		Sequence::create(
-			DelayTime::create( mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.f),
+			DelayTime::create( fSpellingTime), //mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.f),
 			FadeOut::create(0.5f),
 			RemoveSelf::create(),
 			NULL));
 
 	this->runAction(
 		Sequence::create(
-			DelayTime::create( mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.5f),
+			DelayTime::create( fSpellingTime), //mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.5f),
 			CallFunc::create( this,  callfunc_selector(HelloWorld::StartWinBonusPhase)),
 			NULL));
 
@@ -3264,12 +3372,14 @@ void HelloWorld::PlayCombo4HelperEffect(ComboEffectBundle* pComboEffect, float f
 	pLight1Sprite->setRotation(fRotation);
 	pLight1Sprite->setAnchorPoint( Point( 0, 0.5f));
 	pLight1Sprite->setPosition( position);
+	pLight1Sprite->setVisible(false);
 	pLight1Sprite->setScaleX(0.001f);
 	pLight1Sprite->setScaleY(1.75f * fEffectScale);
 	m_pComboEffectBatchNode->addChild(pLight1Sprite);
 	pLight1Sprite->runAction(		
 		Sequence::create(
 			DelayTime::create(fDelayTime + 0.033f),						
+			Show::create(),
 			Spawn::createWithTwoActions(
 				//ScaleTo::create( 0.467f,  3.f, 1.75f),
 				EaseOut::create( ScaleTo::create( 0.467f,  3.f, 1.75f * fEffectScale), 1.f),
@@ -3281,6 +3391,7 @@ void HelloWorld::PlayCombo4HelperEffect(ComboEffectBundle* pComboEffect, float f
 
 
 	auto pLight2Sprite = Sprite::createWithSpriteFrameName("Combo4_light2.png"); 
+	pLight2Sprite->setVisible(false);
 	pLight2Sprite->setRotation(fRotation);
 	pLight2Sprite->setAnchorPoint( Point( 0, 0.5f));
 	pLight2Sprite->setPosition( position);
@@ -3293,6 +3404,7 @@ void HelloWorld::PlayCombo4HelperEffect(ComboEffectBundle* pComboEffect, float f
 	pLight2Sprite->runAction(
 		Sequence::create(
 			DelayTime::create(fDelayTime + 0.066f),
+			Show::create(),
 			Spawn::create(
 				ScaleTo::create( 0.201f, 1.f, 1.75f * fEffectScale),
 				Sequence::createWithTwoActions(
@@ -3544,6 +3656,7 @@ void HelloWorld::PlayCombo4_4_4Effect(ComboEffectBundle* pComboEffect, float fDe
 				RemoveSelf::create(),
 				NULL));
 				*/
+	
 	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
 }
 
@@ -3931,7 +4044,7 @@ void HelloWorld::PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float f
 				NULL ));		
 	}
 	*/
-	SoundManager::PlaySoundEffect(_SET_COMBINE_DOUBLE_COMBO_, fDelayTime-0.15f);
+	SoundManager::PlaySoundEffect(_SET_DOUBLE_COMPLE_EFFECT_, fDelayTime-0.15f);
 }
 
 void HelloWorld::PlayCombo6_6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime)
@@ -3994,7 +4107,7 @@ void HelloWorld::PlayCombo6_6Effect(ComboEffectBundle* pComboEffectBundle, float
 				NULL ));		
 	} 
 
-	SoundManager::PlaySoundEffect(_SET_COMBINE_DOUBLE_COMBO_, fDelayTime-0.15f);
+	SoundManager::PlaySoundEffect(_SET_DOUBLE_COMPLE_EFFECT_, fDelayTime-0.15f);
 }
 
 // unlock letter flow
@@ -4066,7 +4179,7 @@ void HelloWorld::EndUnlockLetterAnimation()
 				m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
 			m_pHUDLayer->addChild( pEndGameNode, 100);
 
-			SoundManager::PlaySoundEffect(_SET_LOSE);
+			SoundManager::PlaySoundEffect(_SET_FAIL_);
 			UserTable::getInstance()->updateLife(1);
 
 			//Game Tracking Level

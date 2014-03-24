@@ -1,271 +1,331 @@
 30
 BLACKBOARD
 bảng đen
-Blackboard
+Blackboard_En_Male
+1.02
+Blackboard_Vi
+0.88
 Blackboard.jpg
-0
 /'blækbɔ:k/
 We are laughing because the teacher wrote the wrong answer on the blackboard.
-BlackboardSentence
-4
+Blackboard_FunnySentence_En_Male
+4.02
 CHALK
 phấn
-Chalk
+Chalk_En_Male
+0.91
+Chalk_Vi
+0.72
 Chalk.jpg
-0
 /tʃɔ:k/
 Chalk is all over teacher's face.
-ChalkSentence
-2
+Chalk_FunnySentence_En_Male
+2.46
 TIMETABLE
 thời khóa biểu
-Timetable
+Timetable_En_Male
+1.18
+Timetable_Vi
+0.95
 Timetable.jpg
-0
 /'taɪmteɪbl/
 He tattooed his timetable on his arm to remember it.
-TimetableSentence
-3
+Timetable_FunnySentence_En_Male
+3.83
 BOOKCASE
 tủ sách
-Bookcase
+Bookcase_En_Male
+1.07
+Bookcase_Vi
+0.63
 Bookcase.jpg
-1
 /ˈbʊkkeɪs/
 The heavy bookcase fell off on the fat librarian.
-BookcaseSentence
-3
+Bookcase_FunnySentence_En_Male
+3.25
 UNIFORM
 đồng phục
-Uniform
+Uniform_En_Male
+1.11
+Uniform_Vi
+0.58
 Uniform.jpg
-0
 /ˈjuːnɪfɔːm/
 My uniform makes me look like a prisoner.
-UniformSentence
-2
+Uniform_FunnySentence_En_Male
+2.02
 PEN
 cây viết
-Pen
+Pen_En_Male
+0.67
+Pen_Vi
+0.6
 Pen.jpg
-0
 /pen/
 He dropped his pen in the toilets.
-PenSentence
-2
+Pen_FunnySentence_En_Male
+1.88
 CRAYON
 bút chì màu
-Crayon
+Crayon_En_Male
+0.88
+Crayon_Vi
+1.14
 Crayon.jpg
-0
 /ˈkreɪən/
 My mum used my crayon for make-up.
-CrayonSentence
-2
+Crayon_FunnySentence_En_Male
+2.62
 SCISSORS
 cây kéo
-Scissors
+Scissors_En_Male
+0.86
+Scissors_Vi
+0.72
 Scissors.jpg
-0
 /ˈsɪzəz/
-Never carry scissors in your pocket. What's the next sentence?
-ScissorsSentence
-4
+Never carry scissors in your pocket, it will tickle you.
+Scissors_FunnySentence_En_Male
+3.18
 TEACHER
 giáo viên
-Teacher
+Teacher_En_Male
+0.7
+Teacher_Vi
+0.98
 Teacher.jpg
-0
 /ˈtiːtʃə(r)/
 The teacher did not know the answer.
-TeacherSentence
-2
+Teacher_FunnySentence_En_Male
+2.02
 CLASSMATE
 bạn cùng lớp
-Classmate
+Classmate_En_Male
+1.02
+Classmate_Vi
+0.88
 Classmate.jpg
-0
 /ˈklɑːsmeɪt/
 My classmate only copied my wrong answers and got a zero.
-ClassmateSentence
-4
+Classmate_FunnySentence_En_Male
+3.41
 STUDY
 học
-Study
+Study_En_Male
+0.44
+Study_Vi
+0.35
 Study.jpg
-0
 /ˈstʌdi/
 They only study hard to impress their beautiful teacher.
-StudySentence
-3
+Study_FunnySentence_En_Male
+2.67
 CLASSROOM
 lớp học
-Classroom
+Classroom_En_Male
+1.04
+Classroom_Vi
+0.77
 Classroom.jpg
-1
 /ˈklɑːsruːm/
 During the exam, somebody farted but we could not leave the classroom.
-ClassroomSentence
-4
+Classroom_FunnySentence_En_Male
+4.48
 PENCIL SHARPENER
 đồ chuốt viết chì
-PencilSharpener
+PencilSharpener_En_Male
+1.18
+PencilSharpener_Vi
+1.54
 PencilSharpener.jpg
-1
 /ˈpensl ˈʃɑːpnə(r)/
 My little finger got stuck in the pencil sharpener.
-PencilSharpenerSentence
-3
+PencilSharpener_FunnySentence_En_Male
+3.16
 PAPER
 giấy
-Paper
+Paper_En_Male
+0.67
+Paper_Vi
+0.49
 Paper.jpg
-0
 /ˈpeɪpə(r)/
 Ready, “1,2 ,3 “Rock. Scissors. Paper!” You have lost. I won”.
-PaperSentence
-6
+Paper_FunnySentence_En_Male
+6.79
 CHAIR
 cái ghế
-Chair
+Chair_En_Male
+0.65
+Chair_Vi
+0.79
 Chair.jpg
-0
 /tʃeə(r)/
 There is a ghost sitting on my chair.
-ChairSentence
-2
+Chair_FunnySentence_En_Male
+1.97
 TABLE
 cái bàn
-Table
+Table_En_Male
+0.67
+Table_Vi
+0.79
 Table.jpg
-0
 /ˈteɪbl/
 They were kissing under the table.
-TableSentence
-2
+Table_FunnySentence_En_Male
+1.88
 COMPUTER
 máy tính
-Computer
+Computer_En_Male
+0.84
+Computer_Vi
+0.77
 Computer.jpg
-1
 /kəmˈpjuːtə(r)/
 My computer never sleeps.
-ComputerSentence
-2
+Computer_FunnySentence_En_Male
+2.04
 RULER
 cây thước
-Ruler
+Ruler_En_Male
+0.88
+Ruler_Vi
+0.63
 Ruler.jpg
-0
 /ˈruːlə(r)/
 Stop poking me with your ruler.
-RulerSentence
-2
+Ruler_FunnySentence_En_Male
+1.63
 GLOBE
 quả địa cầu
-Globe
+Globe_En_Male
+0.74
+Globe_Vi
+1.09
 Globe.jpg
-0
 /ɡləʊb/
 Stop spinning the globe! I feel dizzy.
-GlobeSentence
-2
+Globe_FunnySentence_En_Male
+2.25
 ERASER
 cục tẩy
-Eraser
+Eraser_En_Male
+0.95
+Eraser_Vi
+0.74
 Eraser.jpg
-0
 /ɪˈreɪzə(r)/
 This eraser tastes like chewing-gum.
-EraserSentence
-2
+Eraser_FunnySentence_En_Male
+2.18
 LIVING ROOM
 phòng khách
-LivingRoom
+LivingRoom_En_Male
+0.98
+LivingRoom_Vi
+0.6
 LivingRoom.jpg
-1
 /ˈlɪvɪŋ ruːm/
 Hooray! I found 20 dollars under the sofa in the living room.
-LivingRoomSentence
-4
+LivingRoom_FunnySentence_En_Male
+3.41
 KITCHEN
 nhà bếp
-Kitchen
+Kitchen_En_Male
+0.88
+Kitchen_Vi
+0.65
 Kitchen.jpg
-0
 /ˈkɪtʃɪn/
 The kitchen is on fire.
-KitchenSentence
-1
+Kitchen_FunnySentence_En_Male
+1.65
 CURTAIN
 cái màn
-Curtain
+Curtain_En_Male
+0.84
+Curtain_Vi
+0.72
 Curtain.jpg
-0
 /ˈkɜːtn/
 She forgot to close the curtain when she was getting dressed.
-CurtainSentence
-3
+Curtain_FunnySentence_En_Male
+3.76
 WARDROBE
 tủ quần áo
-Wardrobe
+Wardrobe_En_Male
+0.93
+Wardrobe_Vi
+0.93
 Wardrobe.jpg
-1
 /ˈwɔːdrəʊb/
 My husband found the neighbor hidden in our wardrobe.
-WardrobeSentence
-3
+Wardrobe_FunnySentence_En_Male
+2.95
 MICROWAVE
 lò vi sóng
-Microwave
-Microwave.jpg
+Microwave_En_Male
 1
+Microwave_Vi
+0.95
+Microwave.jpg
 /ˈmaɪkrəweɪv/
 He has forgotten the cat in the microwave.
-MicrowaveSentence
-2
+Microwave_FunnySentence_En_Male
+2.35
 FRYING PAN
 cái chảo
-FryingPan
+FryingPan_En_Male
+1.11
+FryingPan_Vi
+0.74
 FryingPan.jpg
-1
 /fraɪɪŋ pæn/
 My mother hitted the thief with a frying pan.
-FryingPanSentence
-2
+FryingPan_FunnySentence_En_Male
+2.67
 CHOPSTICKS
 đôi đũa
-Chopsticks
-Chopsticks.jpg
+Chopsticks_En_Male
 1
+Chopsticks_Vi
+0.74
+Chopsticks.jpg
 /ˈtʃɒpstɪks/
 The tourist tried to eat his soup with chopsticks.
-ChopsticksSentence
-3
+Chopsticks_FunnySentence_En_Male
+3.02
 HAIRDRYER
 máy sấy
-Hairdryer
+Hairdryer_En_Male
+0.81
+Hairdryer_Vi
+0.67
 Hairdryer.jpg
-1
 /ˈheədraɪə(r)/
 Jack is trying to heat his coffee with a hair dryer.
-HairdryerSentence
-3
+Hairdryer_FunnySentence_En_Male
+2.65
 TOILET PAPER
 giấy vệ sinh
-ToiletPaper
+ToiletPaper_En_Male
+1.02
+ToiletPaper_Vi
+1.02
 ToiletPaper.jpg
-1
 /ˈtɔɪlət ˈpeɪpə(r)/
 Oh no, there is no more toilet paper! What can I use now?
-ToiletPaperSentence
-4
+ToiletPaper_FunnySentence_En_Male
+3.76
 BLOCK OF FLATS
 chung cư
-BlockOfFlats
+BlockOfFlats_En_Male
+1.32
+BlockOfFlats_Vi
+0.77
 BlockOfFlats.jpg
-1
 /blɒk əv flæts/
 There was a power cut in my block of flats and the delivery man had to walk 30 floors.
-BlockOfFlatsSentence
-5
+BlockOfFlats_FunnySentence_En_Male
+5.18

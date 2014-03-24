@@ -39,17 +39,15 @@ public:
 
 	bool onTouchBegan(Touch *pTouch, Event *pEvent) override;
 
-	void PlaySpellingSound();
+	float PlaySpellingSound();
 
 	void PlayUnlockLetterEffect(const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position);
-
+	
 private:
 	//void LoadWords();
 	//void GetWordIndex();
 
-	virtual bool init();		
-
-	//void PlayVietnameseSpelling();	
+	virtual bool init();			
 private:	
 	//std::vector<CCLabelTTF*> m_LabelList;	
 	/*int m_iWordCount;	

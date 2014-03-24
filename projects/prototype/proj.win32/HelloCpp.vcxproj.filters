@@ -66,13 +66,7 @@
     <ClCompile Include="..\Classes\GameTargetNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\BonusWordNode.cpp">
-      <Filter>Classes\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\IntroductionLayer.cpp">
-      <Filter>Classes\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\BonusWordNodeNew.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\WorldMapScene.cpp">
@@ -206,13 +200,7 @@
     <ClInclude Include="..\Classes\GameTargetNode.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\BonusWordNode.h">
-      <Filter>Classes\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\IntroductionLayer.h">
-      <Filter>Classes\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\BonusWordNodeNew.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\WorldMapScene.h">

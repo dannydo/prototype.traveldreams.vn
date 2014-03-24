@@ -19,7 +19,6 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/StatusLayer.cpp \
 				   ../../Classes/DictionaryNode.cpp \
 				   ../../Classes/GameWordManager.cpp \
-				   ../../Classes/BonusWordNodeNew.cpp \
 				   ../../Classes/IntroductionLayer.cpp \
 				   ../../Classes/FlashCardScene.cpp \
 				   ../../Classes/LevelMapScene.cpp \

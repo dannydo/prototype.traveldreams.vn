@@ -500,7 +500,7 @@ std::string WordCollectBoardRenderNode::GetImageInGemFileFromLetter(unsigned cha
 	char sFileName[18];
 	if (iLetter == ' ')		
 		sprintf(sFileName, "space.png");
-	if (iLetter != '?')
+	else if (iLetter != '?')
 		sprintf(sFileName, "Unlock_%c.png", ((unsigned char)iLetter));
 	else
 		sprintf(sFileName, "Questionmask.png");
@@ -590,8 +590,11 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 		return false;
 }
 
-void WordCollectBoardRenderNode::PlaySpellingSound()
+
+float WordCollectBoardRenderNode::PlaySpellingSound()
 {
+	return SoundManager::PlaySpellingOfWord(this, *m_pMainWord);
+	/*
 	char sSoundFile[100];
 
 	// check play voice on setting
@@ -606,20 +609,13 @@ void WordCollectBoardRenderNode::PlaySpellingSound()
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
 		//m_pMainWord->m_sSoundFile.c_str());
 
-		/*this->runAction(
+		this->runAction(
 		Sequence::create( 
 			DelayTime::create(3.5f),
 			CallFunc::create(this, callfunc_selector(WordCollectBoardRenderNode::PlayVietnameseSpelling)),
-			NULL));*/
-	}
+			NULL));
+	}*/
 }
-
-
-/*void WordCollectBoardRenderNode::PlayVietnameseSpelling()
-{
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(
-		m_pMainWord->m_sSoundVietnameseFile.c_str());
-}*/
 
 void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position)
 {

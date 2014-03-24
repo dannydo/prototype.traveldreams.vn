@@ -32,29 +32,5 @@ TABLE
 ;obstacle list: count, list
 0
 ;bonus quest
-2
-0 2 3
-1
-2	0	0	5	0	0
-3
-3	4
-PAPER
-MICROWAVE
-CRAYON
-
-
-2
-5	0	0
-
-COUNTDOWN	3
-3
-3 4 8 5 7 1
 0
-SHIELD 3
-3
-7 6 3 4 8 5
-0
-LOCK	0
-2
-1	2  3 7
-0
+
