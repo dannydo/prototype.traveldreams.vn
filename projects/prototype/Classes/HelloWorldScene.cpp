@@ -50,7 +50,7 @@ Scene* HelloWorld::createScene(int iLevel)
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
 	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
 	boardLayer->m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
-	boardLayer->m_pButtonSettingNode->setPosition(Point(41.0f, 41.0f));
+	boardLayer->m_pButtonSettingNode->setPosition(Point(50.0f, 48.0f));
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(boardLayer->m_pButtonSettingNode);

@@ -24,15 +24,15 @@ bool LifeSystemNode::init()
 	m_userInfo = UserTable::getInstance()->getUserInfo();
 	UserTable::getInstance()->updateUser(m_userInfo);
 
-	Sprite* pBackgroundClock = Sprite::create("Footer/life-time.png");
-	pBackgroundClock->setAnchorPoint(Point(0.0f, 0.5f));
-	pBackgroundClock->setPosition(Point(45.0f, 0.0f));
-	this->addChild(pBackgroundClock);
+	m_pBackgroundClock = Sprite::create("Footer/life-time.png");
+	m_pBackgroundClock->setAnchorPoint(Point(0.0f, 0.5f));
+	m_pBackgroundClock->setPosition(Point(45.0f, 0.0f));
+	this->addChild(m_pBackgroundClock);
 
 	Sprite* pAddLifeButton = Sprite::create("Footer/add-life-btn.png");
 	pAddLifeButton->setAnchorPoint(Point(0.0f, 0.5f));
 	pAddLifeButton->setPosition(Point(116.5f, 25.5f));
-	pBackgroundClock->addChild(pAddLifeButton);
+	m_pBackgroundClock->addChild(pAddLifeButton);
 
 	String clock = formatSecondsToDiaplay(m_userInfo.iLifeTimeRemaining);
 	m_pLabelSecondsRemaing = CCLabelTTF::create(clock.getCString(), "fonts/UTM Cookies.ttf", 24);
@@ -42,10 +42,10 @@ bool LifeSystemNode::init()
 
 	if (m_userInfo.iLifeTimeRemaining == 0)
 	{
-		m_pLabelSecondsRemaing->setVisible(false);
+		m_pBackgroundClock->setVisible(false);
 	}
 
-	pBackgroundClock->addChild(m_pLabelSecondsRemaing);
+	m_pBackgroundClock->addChild(m_pLabelSecondsRemaing);
 
 	Sprite* pBackgroundLife = Sprite::create("Footer/hearth.png");
 	pBackgroundLife->setAnchorPoint(Point(0.0f, 0.5f));
@@ -77,7 +77,7 @@ void LifeSystemNode::updateWhenTimeChange(float dt)
 		else
 		{
 			m_userInfo.iLife = _MAX_LIFE_;
-			m_pLabelSecondsRemaing->setVisible(false);
+			m_pBackgroundClock->setVisible(false);
 			this->unschedule(schedule_selector(LifeSystemNode::updateWhenTimeChange));
 		}
 

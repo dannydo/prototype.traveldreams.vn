@@ -67,7 +67,7 @@ bool MainMenuLayer::init()
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
 	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
 	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(MainMenuLayer::openSettingMenu, this));
-	m_pButtonSettingNode->setPosition(Point(41.0f, 41.0f));
+	m_pButtonSettingNode->setPosition(Point(50.0f, 50.0f));
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(buttonPlayNode);

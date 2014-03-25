@@ -20,6 +20,7 @@ private:
 
 	cocos2d::LabelTTF* m_pLabelSecondsRemaing;
 	cocos2d::LabelBMFont* m_pLabelLife;
+	cocos2d::Sprite* m_pBackgroundClock;
 
 	UserInfo m_userInfo;
 };
