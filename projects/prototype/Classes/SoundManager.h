@@ -18,14 +18,21 @@ enum SoundEffectType
 	_SET_FILL_LETTER_, // fill letter on main word header
 	_SET_COMPLETE_WORD_,
 
-	_SET_SIMPLE_COMBO_,
-	_SET_DOUBLE_COMPLE_EFFECT_,
+	_SET_CREATE_COMBO_4_,
+	_SET_ACTIVATE_COMBO_4_,
+	_SET_CREATE_COMBO_5_,
+	_SET_ACTIVATE_COMBO_5_,
+	_SET_CREATE_COMBO_6_,
+	_SET_ACTIVATE_COMBO_6_,
+	_SET_ACTIVATE_DOUBLE_COMBO_,
+	_SET_ACTIVATE_TRIPLE_COMBO_,
+
 
 	_SET_BUTTON_PRESS_,
 	_SET_POPUP_,
 	_SET_CHAPTER_SELECT_,
 	_SET_LEVEL_SELECT_,
-	//_SET_START_LEVEL_,
+	_SET_START_LEVEL_,
 	_SET_WIN_,
 	_SET_FAIL_
 
@@ -51,6 +58,7 @@ public:
 		kNone = 0,
     	kGameMusic,
     	kIntroMusic,
+		kEndGameBonus
     } StateBackGroundMusic;
 
 	static void PreloadSoundResource();

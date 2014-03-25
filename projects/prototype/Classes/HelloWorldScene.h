@@ -140,11 +140,11 @@ protected:
 
 	void PlayCombo4HelperEffect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime, float fRotation, float fEffectScale = 1.f);
 
-	void PlayCombo4Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime,  float fEffectScale = 1.f);
-	void PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime);
+	void PlayCombo4Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime,  float fEffectScale = 1.f, bool bPlaySoundEffect = true);
+	void PlayCombo5Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime, bool bPlaySoundEffect = true);
 	void PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime);	
 
-	void PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, float fEffectScale = 1.f);
+	void PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, float fEffectScale = 1.f, bool bPlaySoundEffect = true);
 	void PlayCombo4_4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime);
 
 	void PlayActivateCommonDoubleAndTrippleComboEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, bool bRemoveTriggerComboCell = true, bool bExtraEffectOnTriggerComboCellWhenDestroy = false);
@@ -168,7 +168,7 @@ protected:
 	void PlayEarnScoreEffect(const int& iScore, const Cell& cell, const float& fDelay);
 
 	// unlock letter flow
-	void PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime);	
+	//void PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime);	
 	void EndUnlockLetterAnimation();
 
 	// execute win game effect flow

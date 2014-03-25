@@ -994,14 +994,15 @@ void NewGameBoardManager::ExecuteComboChain(std::vector<ComboEffectBundle*>& com
 			}
 
 			int iActivationComboRatio = GetComboDestroyCellRatio(pComboInChain->m_ComboEffectDescription.m_eComboEffectType);
-
+			float fDelayFromDistance;
 			// trigger explostion effect: temporary implementation
 			for(int iRow = position.m_iRow+iRowDeltaD; iRow <= position.m_iRow+iRowDeltaA; iRow++)
 				for(int iColumn = position.m_iColumn+iColumnDeltaD; iColumn <= position.m_iColumn+iColumnDeltaA; iColumn++)
 			{			
 				if (iRow >= 0 && iRow < m_iRowNumber && iColumn >=0 && iColumn < m_iColumnNumber && IsCellDestroyable(iRow, iColumn))				
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, iColumn, pComboInChain, comboChainList, pComboInChain->m_fTriggerTime + _TME_DELAY_ACTIVE_COMBO_WHEN_BASIC_MATCHING_, pComboInChain->m_fTriggerTime + _TME_BASIC_COMBO_EXECUTE_TIME_);
+					fDelayFromDistance = pComboInChain->m_fTriggerTime + _TME_DELAY_ACTIVE_COMBO_WHEN_BASIC_MATCHING_ + abs(iRow + iColumn - position.m_iRow - position.m_iColumn) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, iColumn, pComboInChain, comboChainList, fDelayFromDistance, fDelayFromDistance + _TME_BASIC_COMBO_EXECUTE_TIME_);
 					
 					/*if (m_pObstacleProcessManager->DestroyCellWithObstacle(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))
 					{				
@@ -2873,18 +2874,21 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 		if (comboDescription.m_eComboEffectType == _CET_4_4_EFFECT_)
 		{
 			float fDelayAfterActivate = pTriggeredCombo->m_fTriggerTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_;
-			
+			float fDelayFromDistance;
+
 			// horizontal
 			for( iColumn=0; iColumn < m_iColumnNumber; iColumn++)
 				if ( !m_BoardValueMatrix[position.m_iRow][iColumn].m_bIsBlankCell && IsCellDestroyable(position.m_iRow, iColumn))
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow, iColumn, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate+_TME_BASIC_DESTROY_CELL_TIME_);
+					fDelayFromDistance = fDelayAfterActivate + abs(iColumn - position.m_iColumn) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow, iColumn, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance+_TME_BASIC_DESTROY_CELL_TIME_);
 				}
 			// vertical 
 			for( iRow=0; iRow < m_iRowNumber; iRow++)
 				if ( !m_BoardValueMatrix[iRow][position.m_iColumn].m_bIsBlankCell && IsCellDestroyable(iRow, position.m_iColumn))
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, position.m_iColumn, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate +_TME_BASIC_DESTROY_CELL_TIME_);
+					fDelayFromDistance = fDelayAfterActivate + abs(iRow - position.m_iRow) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, position.m_iColumn, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance +_TME_BASIC_DESTROY_CELL_TIME_);
 				}
 			
 			// add combo cells to destroy list
@@ -2895,18 +2899,21 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 		else if (comboDescription.m_eComboEffectType == _CET_4_4_4_EFFECT_)
 		{
 			float fDelayAfterActivate = pTriggeredCombo->m_fTriggerTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_;
+			float fDelayFromDistance;
 
 			// horizontal
 			for( iColumn=0; iColumn < m_iColumnNumber; iColumn++)
 				if ( !m_BoardValueMatrix[position.m_iRow][iColumn].m_bIsBlankCell && IsCellDestroyable(position.m_iRow, iColumn))
-				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow, iColumn, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate +_TME_BASIC_DESTROY_CELL_TIME_);
+				{		
+					fDelayFromDistance = fDelayAfterActivate + abs(iColumn - position.m_iColumn) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow, iColumn, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance +_TME_BASIC_DESTROY_CELL_TIME_);
 				}
 			// vertical 
 			for( iRow=0; iRow < m_iRowNumber; iRow++)
 				if ( !m_BoardValueMatrix[iRow][position.m_iColumn].m_bIsBlankCell && IsCellDestroyable(iRow, position.m_iColumn))
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, position.m_iColumn, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate+_TME_BASIC_DESTROY_CELL_TIME_);
+					fDelayFromDistance = fDelayAfterActivate + abs(iColumn - position.m_iColumn) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, position.m_iColumn, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance+_TME_BASIC_DESTROY_CELL_TIME_);
 				}
 			// cross line from bottom left to top right
 			int iMinD = _MIN_(position.m_iRow, position.m_iColumn);
@@ -2914,7 +2921,8 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 			for(int iDelta = -iMinD; iDelta <= iMinA; iDelta++)
 				if ( !m_BoardValueMatrix[position.m_iRow + iDelta][position.m_iColumn + iDelta].m_bIsBlankCell && IsCellDestroyable(position.m_iRow + iDelta, position.m_iColumn + iDelta))
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow + iDelta, position.m_iColumn + iDelta, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate+_TME_BASIC_DESTROY_CELL_TIME_);
+					fDelayFromDistance = fDelayAfterActivate + abs(iDelta) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow + iDelta, position.m_iColumn + iDelta, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance+_TME_BASIC_DESTROY_CELL_TIME_);
 				}			
 
 			// cross line from top left to bottom right
@@ -2923,7 +2931,8 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 			for(int iDelta = -iMinD; iDelta <= iMinA; iDelta++)
 				if ( !m_BoardValueMatrix[position.m_iRow + iDelta][position.m_iColumn - iDelta].m_bIsBlankCell && IsCellDestroyable(position.m_iRow + iDelta, position.m_iColumn - iDelta))
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow + iDelta, position.m_iColumn - iDelta, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate+_TME_BASIC_DESTROY_CELL_TIME_);
+					fDelayFromDistance = fDelayAfterActivate + abs(iDelta) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow + iDelta, position.m_iColumn - iDelta, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance+_TME_BASIC_DESTROY_CELL_TIME_);
 				}			
 
 			// add combo cells to destroy list
@@ -2937,13 +2946,14 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 		{
 			int iRow, iColumn;
 			float fDelayAfterActivate = pTriggeredCombo->m_fTriggerTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_;
+			float fDelayFromDistance;
 
 			// first explosion
 			for(iRow = position.m_iRow-1; iRow <= position.m_iRow+1; iRow++)
 				for(iColumn = position.m_iColumn-1; iColumn <= position.m_iColumn+1; iColumn++)
 			{			
 				if (iRow >= 0 && iRow < m_iRowNumber && iColumn >=0 && iColumn < m_iColumnNumber && !m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && IsCellDestroyable(iRow, iColumn))
-				{
+				{					
 					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, iColumn, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate +_TME_BASIC_DESTROY_CELL_TIME_);
 				}
 			}
@@ -2951,14 +2961,16 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 			// horizontal
 			for( iColumn=0; iColumn < m_iColumnNumber; iColumn++)
 				if ( !m_BoardValueMatrix[position.m_iRow][iColumn].m_bIsBlankCell && IsCellDestroyable(position.m_iRow, iColumn))
-				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow, iColumn, pTriggeredCombo, nextComboChainList, fDelayAfterActivate + _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_, fDelayAfterActivate+_TME_BASIC_DESTROY_CELL_TIME_ + _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_);
+				{			
+					fDelayFromDistance = fDelayAfterActivate + _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_ + abs(iColumn - position.m_iColumn) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow, iColumn, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance + _TME_BASIC_DESTROY_CELL_TIME_);
 				}
 			// vertical 
 			for( iRow=0; iRow < m_iRowNumber; iRow++)
 				if ( !m_BoardValueMatrix[iRow][position.m_iColumn].m_bIsBlankCell && IsCellDestroyable(iRow, position.m_iColumn))
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, position.m_iColumn, pTriggeredCombo, nextComboChainList, fDelayAfterActivate + _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_, fDelayAfterActivate + _TME_BASIC_DESTROY_CELL_TIME_ + _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_);
+					fDelayFromDistance = fDelayAfterActivate + _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_ + abs(iRow - position.m_iRow) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, position.m_iColumn, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance + _TME_BASIC_DESTROY_CELL_TIME_);
 				}
 
 			// explosion on top
@@ -3047,7 +3059,9 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 		// **************** implement combo 5-5	****************
 		else if (comboDescription.m_eComboEffectType == _CET_EXPLOSION_SECOND_ || comboDescription.m_eComboEffectType == _CET_5_5_EFFECT_ || comboDescription.m_eComboEffectType == _CET_5_5_SECOND_EFFECT_)
 		{
-			float fDelayAfterActivate = pTriggeredCombo->m_fTriggerTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_;
+			float fDelayAfterActivate = pTriggeredCombo->m_fTriggerTime;
+			if (comboDescription.m_eComboEffectType != _CET_EXPLOSION_SECOND_)
+				fDelayAfterActivate += _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_;
 
 			int iDelta = 2;
 			if (comboDescription.m_eComboEffectType == _CET_EXPLOSION_SECOND_)
@@ -3086,6 +3100,7 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 		else if (comboDescription.m_eComboEffectType == _CET_5_5_5_EFFECT_)
 		{
 			float fDelayAfterActivate = pTriggeredCombo->m_fTriggerTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_;
+			float fDelayFromDistance;
 
 			int iRow, iColumn;
 
@@ -3103,13 +3118,15 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 			for( iColumn=0; iColumn < m_iColumnNumber; iColumn++)
 				if ( !m_BoardValueMatrix[position.m_iRow][iColumn].m_bIsBlankCell && IsCellDestroyable(position.m_iRow, iColumn))
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow, iColumn, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate +_TME_BASIC_DESTROY_CELL_TIME_);
+					fDelayFromDistance = fDelayAfterActivate + _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_ + abs(iColumn - position.m_iColumn) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow, iColumn, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance +_TME_BASIC_DESTROY_CELL_TIME_);
 				}
 			// vertical 
 			for( iRow=0; iRow < m_iRowNumber; iRow++)
 				if ( !m_BoardValueMatrix[iRow][position.m_iColumn].m_bIsBlankCell && IsCellDestroyable(iRow, position.m_iColumn))
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, position.m_iColumn, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate +_TME_BASIC_DESTROY_CELL_TIME_);
+					fDelayFromDistance = fDelayAfterActivate + _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_ + abs(iRow - position.m_iRow) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, iRow, position.m_iColumn, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance +_TME_BASIC_DESTROY_CELL_TIME_);
 				}
 
 			// cross line from bottom left to top right
@@ -3118,7 +3135,8 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 			for(int iDelta = -iMinD1; iDelta <= iMinA1; iDelta++)
 				if ( !m_BoardValueMatrix[position.m_iRow + iDelta][position.m_iColumn + iDelta].m_bIsBlankCell && IsCellDestroyable(position.m_iRow + iDelta, position.m_iColumn + iDelta))
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow + iDelta, position.m_iColumn + iDelta, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate+_TME_BASIC_DESTROY_CELL_TIME_);
+					fDelayFromDistance = fDelayAfterActivate + _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_ + abs(iDelta) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow + iDelta, position.m_iColumn + iDelta, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance+_TME_BASIC_DESTROY_CELL_TIME_);
 				}			
 
 			// cross line from bot right to top left
@@ -3127,7 +3145,8 @@ void NewGameBoardManager::TriggerAdvanceComboList(const std::vector<ComboEffectD
 			for(int iDelta = -iMinD2; iDelta <= iMinA2; iDelta++)
 				if ( !m_BoardValueMatrix[position.m_iRow + iDelta][position.m_iColumn - iDelta].m_bIsBlankCell && IsCellDestroyable(position.m_iRow + iDelta, position.m_iColumn - iDelta))
 				{					
-					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow + iDelta, position.m_iColumn - iDelta, pTriggeredCombo, nextComboChainList, fDelayAfterActivate, fDelayAfterActivate +_TME_BASIC_DESTROY_CELL_TIME_);
+					fDelayFromDistance = fDelayAfterActivate + _TME_COMBO_4_5_PHASE1_LINE_DELAY_TIME_ + abs(iDelta) * _TME_COMBO4_DELAY_DISTANCE_;
+					DestroySingleCellByComboUtil(iActivationComboRatio, position.m_iRow + iDelta, position.m_iColumn - iDelta, pTriggeredCombo, nextComboChainList, fDelayFromDistance, fDelayFromDistance +_TME_BASIC_DESTROY_CELL_TIME_);
 				}			
 
 			// explosion on top

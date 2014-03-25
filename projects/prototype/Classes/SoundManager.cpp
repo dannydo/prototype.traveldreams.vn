@@ -10,9 +10,11 @@ void SoundManager::PreloadSoundResource()
 	//CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("SoundEffect/MusicTheme.ogg");
 	
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("SoundEffectPC/MusicTheme.wav");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("SoundEffectPC/OMW_BG_ingame.wav");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("SoundEffectPC/OMW_BG_Bonus_time.wav");
 #else
-	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("SoundEffect/MusicTheme.ogg");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("SoundEffect/OMW_BG_ingame.ogg");
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("SoundEffect/OMW_BG_Bonus_time.ogg");
 #endif	
 }
 
@@ -35,18 +37,27 @@ void SoundManager::PlayBackgroundMusic(StateBackGroundMusic stateBackGroundMusic
 		{
 			CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 			#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffectPC/MusicTheme.wav", true);
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffectPC/OMW_BG_ingame.wav", true);
 			#else
-				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/MusicTheme.ogg", true);
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/OMW_BG_ingame.ogg", true);
 			#endif
 		}
 		else if(stateBackGroundMusic == StateBackGroundMusic::kIntroMusic && isPlayMusic)
 		{
 			CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
 			#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffectPC/intro.wav", true);
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffectPC/OMW_Main_menu._Chapter_Level_screen.wav", true);
 			#else
-				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/intro.ogg", true);
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/OMW_Main_menu._Chapter_Level_screen.ogg", true);
+			#endif
+		}
+		else if (stateBackGroundMusic == StateBackGroundMusic::kEndGameBonus && isPlayMusic)
+		{
+			CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+			#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffectPC/OMW_BG_Bonus_time.wav", true);
+			#else
+				CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("SoundEffect/OMW_BG_Bonus_time.ogg", true);
 			#endif
 		}
 	}
@@ -75,7 +86,7 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 			sFileName = "SoundEffectPC/Drop_sfx.wav";
 			break;
 		case _SET_DRAG_FAIL_:
-			sFileName = "SoundEffectPC/Fail_sfx.wav";
+			sFileName = "SoundEffectPC/Drag_fail_sfx.wav";
 			break;
 		case _SET_DRAG_SUCCESS_:
 			sFileName = "SoundEffectPC/Drag_success_sfx.wav";
@@ -104,17 +115,45 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 		case _SET_LEVEL_SELECT_:
 			sFileName = "SoundEffectPC/Level_select_sfx.wav";
 			break;						
-		//_SET_START_LEVEL_,
+
+		case _SET_START_LEVEL_:
+			sFileName = "SoundEffectPC/Start_level_sfx.wav";
+			break;
+
 		case _SET_WIN_:
-			sFileName = "SoundEffectPC/Win_sfx_1.wav";
+			sFileName = "SoundEffectPC/Win_sfx.wav";
 			break;
 		case _SET_FAIL_:
 			sFileName = "SoundEffectPC/Fail_sfx.wav";
 			break;	
 		
-		case _SET_SIMPLE_COMBO_:
-		case _SET_DOUBLE_COMPLE_EFFECT_:
-			sFileName = "SoundEffectPC/combo_sfx.wav";
+		case _SET_CREATE_COMBO_4_:
+			sFileName = "SoundEffectPC/Create_combo_4_sfx.wav";
+			break;	
+		case _SET_ACTIVATE_COMBO_4_:
+			sFileName = "SoundEffectPC/Combo4_effect_sfx.wav";
+			break;	
+		case _SET_CREATE_COMBO_5_:
+			sFileName = "SoundEffectPC/Create_combo_5_sfx.wav";
+			break;	
+		case _SET_ACTIVATE_COMBO_5_:
+			sFileName = "SoundEffectPC/Combo5_effect_sfx.wav";
+			break;	
+		case _SET_CREATE_COMBO_6_:
+			sFileName = "SoundEffectPC/Create_combo_6_sfx.wav";
+			break;	
+		case _SET_ACTIVATE_COMBO_6_:
+			sFileName = "SoundEffectPC/Combo6_effect_sfx.wav";
+			break;	
+		case _SET_ACTIVATE_DOUBLE_COMBO_:
+			sFileName = "SoundEffectPC/Active_double_combo_sfx .wav";
+			break;	
+		case _SET_ACTIVATE_TRIPLE_COMBO_:
+			sFileName = "SoundEffectPC/Active_triple_combo_sfx.wav";
+			break;	
+
+		case _SET_POPUP_:
+			sFileName = "SoundEffectPC/Popup_sfx.wav";
 			break;	
 #else	
 		default:
@@ -122,7 +161,7 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 			sFileName = "SoundEffect/Drop_sfx.ogg";
 			break;
 		case _SET_DRAG_FAIL_:
-			sFileName = "SoundEffect/Fail_sfx.ogg";
+			sFileName = "SoundEffect/Drag_fail_sfx.wav";
 			break;
 		case _SET_DRAG_SUCCESS_:
 			sFileName = "SoundEffect/Drag_success_sfx.ogg";
@@ -151,17 +190,45 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 		case _SET_LEVEL_SELECT_:
 			sFileName = "SoundEffect/Level_select_sfx.ogg";
 			break;						
-		//_SET_START_LEVEL_,
+
+		case _SET_START_LEVEL_:
+			sFileName = "SoundEffect/Start_level_sfx.ogg";
+			break;
+
 		case _SET_WIN_:
-			sFileName = "SoundEffect/Win_sfx_1.ogg";
+			sFileName = "SoundEffect/Win_sfx.ogg";
 			break;
 		case _SET_FAIL_:
 			sFileName = "SoundEffect/Fail_sfx.ogg";
 			break;	
 
-		case _SET_SIMPLE_COMBO_:
-		case _SET_DOUBLE_COMPLE_EFFECT_:
-			sFileName = "SoundEffect/combo_sfx.ogg";
+		case _SET_CREATE_COMBO_4_:
+			sFileName = "SoundEffect/Create_combo_4_sfx.ogg";
+			break;	
+		case _SET_ACTIVATE_COMBO_4_:
+			sFileName = "SoundEffect/Combo4_effect_sfx.ogg";
+			break;	
+		case _SET_CREATE_COMBO_5_:
+			sFileName = "SoundEffect/Create_combo_5_sfx.ogg";
+			break;	
+		case _SET_ACTIVATE_COMBO_5_:
+			sFileName = "SoundEffect/Combo5_effect_sfx.ogg";
+			break;	
+		case _SET_CREATE_COMBO_6_:
+			sFileName = "SoundEffect/Create_combo_6_sfx.ogg";
+			break;	
+		case _SET_ACTIVATE_COMBO_6_:
+			sFileName = "SoundEffect/Combo6_effect_sfx.ogg";
+			break;	
+		case _SET_ACTIVATE_DOUBLE_COMBO_:
+			sFileName = "SoundEffect/Active_double_combo_sfx .ogg";
+			break;	
+		case _SET_ACTIVATE_TRIPLE_COMBO_:
+			sFileName = "SoundEffectPActive_triple_combo_sfx.ogg";
+			break;	
+
+		case _SET_POPUP_:
+			sFileName = "SoundEffect/Popup_sfx.ogg";
 			break;	
 #endif
 	};

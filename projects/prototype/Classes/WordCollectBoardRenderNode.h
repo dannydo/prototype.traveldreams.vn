@@ -28,8 +28,8 @@ public:
 	//void UpdateList();
 
 	//void UnlockCharacter(const float& fDelayTime, const int& iLetterIndex);
-	void UnlockLetter(const int& iLetterIndex);
-	float PlayUnlockLettersAnimation(float fDelayTime);
+	//void UnlockLetter(const int& iLetterIndex);
+	//float PlayUnlockLettersAnimation(float fDelayTime);
 
 	std::string GetImageFileFromLetter(unsigned char iLetter);	
 	std::string GetImageInGemFileFromLetter(unsigned char iLetter);	
@@ -41,7 +41,7 @@ public:
 
 	float PlaySpellingSound();
 
-	void PlayUnlockLetterEffect(const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position);
+	void PlayUnlockLetterEffect(const int& iLetterIndex, const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position);
 	
 private:
 	//void LoadWords();
@@ -69,11 +69,11 @@ private:
 	DrawNode* m_pColorNode;	
 
 	unsigned long m_iPreviousMainWordTapTime;
-	unsigned long m_iUnlockedLetterEffectEndTime;
+	//unsigned long m_iUnlockedLetterEffectEndTime;
 
 	//Armature* m_pCharacter;
 
-	bool m_NewUnlockedLetterFlags[_GDS_WORD_MAX_LENGTH_];
+	//bool m_NewUnlockedLetterFlags[_GDS_WORD_MAX_LENGTH_];
 
 	// position for bubble
 	Point m_CharacterFirstLinePositions[_WCBRN_MAX_FIRST_LINE_LETTERS_];

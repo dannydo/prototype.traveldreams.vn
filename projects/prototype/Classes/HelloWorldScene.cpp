@@ -288,6 +288,8 @@ void HelloWorld::initLevel(int iLevel)
 	animCache->addAnimationsWithFile("ComboEffect/combo6Animations.plist");
 	animCache->addAnimationsWithFile("ComboEffect/combo5AnimationsNew.plist");
 
+	animCache->addAnimationsWithFile("ComboEffect/DestroyShieldAnimations.plist"); 
+
 	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/AnimationDetach/Animation detach.ExportJson");
 	
 
@@ -486,7 +488,7 @@ void HelloWorld::initLevel(int iLevel)
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kPlayGame);
 
 	// play sound effect 
-	SoundManager::PlaySoundEffect(_SET_DESTROY_LETTER_);
+	SoundManager::PlaySoundEffect(_SET_START_LEVEL_);
 }
 
 void HelloWorld::menuCloseCallback(Object* pSender)
@@ -1247,6 +1249,8 @@ void HelloWorld::CheckBoardStateAfterMove()
 	}
 	else
 	{		
+		EndUnlockLetterAnimation();
+
 		/*//check end game
 		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked()) // complete objective ==> win		
 		//if (true)
@@ -1274,7 +1278,7 @@ void HelloWorld::CheckBoardStateAfterMove()
 		}
 		else //game is not end yet*/
 		{
-			PlayUnlockLettersOfMainWordAnimation(0.f);			
+			//PlayUnlockLettersOfMainWordAnimation(0.f);			
 		}				
 
 		// update obstacle manager after move
@@ -1306,7 +1310,7 @@ void HelloWorld::ExecuteBonusWinGameEffect()
 }
 
 void HelloWorld::ShowWinGamePopup()
-{
+{	
 	std::vector<Word> subWordList;	
 	EndGameNode* pEndGameNode = EndGameNode::createLayoutWin( m_GameBoardManager.GetCurrentScore(),
 		m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
@@ -1993,9 +1997,9 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		}
 		else if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_BONUS_END_GAME__SPECIAL_GEM_EFFECT_)
 		{
-			CCLOG("Before play end game effect combo");
+			//CCLOG("Before play end game effect combo");
 			PlayComboEndGameBonusEffect(pComboEffect, fCurrentDelayComboChain, _TME_BASIC_COMBO_EXECUTE_TIME_);
-			CCLOG("After play end game effect combo");
+			//CCLOG("After play end game effect combo");
 		}
 		else  if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType >= _CET_BIRD_EXPLOSION_EFFECT_ && pComboEffect->m_ComboEffectDescription.m_eComboEffectType <= _CET_HAMSTER_RUN_RIGHT_DOWN_EFFECT_)
 		{
@@ -2140,11 +2144,11 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 					{
 						const LevelBossConfig& bossLevelConfig = m_GameBoardManager.GetLevelConfig().m_BossConfig;
 
-						m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect(fDelayEffectTime, iLetter,  //m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
+						m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect( iUnlockedLetterOfMainWord, fDelayEffectTime, iLetter,  //m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
 							ccp(m_fBoardLeftPosition + (  bossLevelConfig.m_Position.m_iColumn + bossLevelConfig.m_iWidth/4.f)  * m_SymbolSize.width, 
 								m_fBoardBottomPosition + (  bossLevelConfig.m_Position.m_iRow + bossLevelConfig.m_iHeight/4.f) * m_SymbolSize.height));
 
-						m_pWordCollectBoardRenderNode->UnlockLetter(iUnlockedLetterOfMainWord);
+						//m_pWordCollectBoardRenderNode->UnlockLetter(iUnlockedLetterOfMainWord);
 
 						if (bIsMainWordJustUnlocked)
 							m_GameBoardManager.IncreaseScoreForLetterInMainWord();
@@ -2190,6 +2194,19 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		AddNewComboCell (cell, fDelayTime + 0.05f, _TME_BASIC_DESTROY_CELL_TIME_);			
 
 		PlayEarnScoreEffect( m_GameBoardManager.IncreaseScoreForCreateCombo(cell.m_eGemComboType), cell, fDelayTime+0.1f);
+
+		switch( cell.m_eGemComboType)
+		{
+			case _GCT_COMBO4_:
+				SoundManager::PlaySoundEffect(_SET_CREATE_COMBO_4_, fDelayTime);			
+				break;
+			case _GCT_COMBO5_:
+				SoundManager::PlaySoundEffect(_SET_CREATE_COMBO_5_, fDelayTime);
+				break;
+			case _GCT_COMBO6_:
+				SoundManager::PlaySoundEffect(_SET_CREATE_COMBO_6_, fDelayTime);
+				break;
+		}
 	}
 
 	// create gem with unlock letters ==> chua implement dung timing
@@ -2285,7 +2302,12 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 	// NOTE: drop sound effect not match to animation!!!
 	// play sound
-	SoundManager::PlaySoundEffect(_SET_DROP_, fTotalDestroyCellTime + 0.027f * (m_GameBoardManager.GetRowNumber() - newCells[0].m_iRow));
+	if (newCells.size() > 0)
+		SoundManager::PlaySoundEffect(_SET_DROP_, fTotalDestroyCellTime + 0.027f * (m_GameBoardManager.GetRowNumber() - newCells[0].m_iRow));
+	else
+	{
+		fDelayTime = fDelayTime;
+	}
 
 	//CCLOG("Create new gems");
 
@@ -2700,7 +2722,42 @@ void HelloWorld::UpdateObstacleListAfterMove()
 				if (obstacleData.m_bIsDirty)
 				{
 					if (m_BoardObstaclesList[iBlockID][iObstacleTypeID] != NULL)
-					{	
+					{							
+
+						// temporary hardcode effect of shield
+						if (iObstacleTypeID == 0)
+						{
+							auto pEffectSprite = Sprite::createWithSpriteFrameName("B_Smoke_01.png");
+							cocos2d::Animation* pAnim;
+
+							if (obstacleData.m_bIsActive) 
+							{
+								// descrease level
+								pAnim = AnimationCache::getInstance()->getAnimation("effectDecreaseShield");
+							}
+							else
+							{
+								// destroy
+								pAnim = AnimationCache::getInstance()->getAnimation("effectDestroyShield");
+							}
+
+							Point pos = m_BoardObstaclesList[iBlockID][iObstacleTypeID]->getParent()->getPosition();
+							pEffectSprite->setPosition(Point(pos.x, pos.y + 20.f) );
+							pEffectSprite->setScale(1.15f);
+							pEffectSprite->setVisible(false);
+							m_pBoardBatchNode->addChild(pEffectSprite, 200);
+
+							pEffectSprite->runAction( 
+								Sequence::create( 
+									DelayTime::create(obstacleData.m_fDirtyTime + 0.2f),
+									Show::create(),
+									Animate::create( pAnim),
+									RemoveSelf::create(),
+									NULL));
+						}
+
+
+
 						m_BoardObstaclesList[iBlockID][iObstacleTypeID]->runAction(
 							Sequence::create(
 								DelayTime::create( obstacleData.m_fDirtyTime + 0.2f),
@@ -2712,7 +2769,6 @@ void HelloWorld::UpdateObstacleListAfterMove()
 						CCARRAY_FOREACH( m_BoardObstaclesList[iBlockID][iObstacleTypeID]->getChildren(), childNode) 
 							((Node*)childNode)->runAction(
 								ScaleTo::create( 0.25f, 1.6f, 1.6f));
-
 
 						//m_BoardObstaclesList[iBlockID][iObstacleTypeID]->removeFromParentAndCleanup(true);
 						m_BoardObstaclesList[iBlockID][iObstacleTypeID] = NULL;
@@ -2777,12 +2833,7 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 	if (m_BoardViewMatrix[iRow][iColumn].m_iGemLetterBlockID >= 0)  //m_iLetter < 255)
 	{	
 		GemLetterData gemLetterData = m_GameBoardManager.FreeGemLetterBlock(m_BoardViewMatrix[iRow][iColumn].m_iGemLetterBlockID);
-
-
-		m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect(fDelay, gemLetterData.m_iLetter,  //m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
-			ccp(m_fBoardLeftPosition + iColumn  * m_SymbolSize.width, 
-					m_fBoardBottomPosition + iRow * m_SymbolSize.height));
-		
+				
 		//m_pWordCollectBoardRenderNode->PlayCharacterAnim(2, false);
 
 
@@ -2798,12 +2849,19 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 		else if (m_GameBoardManager.GetGameWordManager()->UnlockLetter( gemLetterData.m_iLetter, iUnlockedLetterIndexOfMainWord, bIsMainWordJustUnlocked))
 		{			
 			if (iUnlockedLetterIndexOfMainWord >=0)
-				m_pWordCollectBoardRenderNode->UnlockLetter(iUnlockedLetterIndexOfMainWord);
+			{
+				// increase score			
+				m_GameBoardManager.IncreaseScoreForLetterInMainWord();			
+
+				//m_pWordCollectBoardRenderNode->UnlockLetter(iUnlockedLetterIndexOfMainWord);
 				//m_pWordCollectBoardRenderNode->UnlockCharacter(fDelay, iUnlockedLetterIndexOfMainWord);
 
-			// increase score
-			if (iUnlockedLetterIndexOfMainWord >=0)
-				m_GameBoardManager.IncreaseScoreForLetterInMainWord();			
+				m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect( iUnlockedLetterIndexOfMainWord, fDelay, gemLetterData.m_iLetter,  //m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
+					ccp(m_fBoardLeftPosition + iColumn  * m_SymbolSize.width, 
+						m_fBoardBottomPosition + iRow * m_SymbolSize.height));
+			}
+
+			
 
 			if (bIsMainWordJustUnlocked)
 				m_GameBoardManager.IncreaseScoreForUnlockMainWord();
@@ -3296,7 +3354,7 @@ void HelloWorld::ShowLevelCompleteEffect()
 	SoundManager::PlaySoundEffect(_SET_WIN_);
 }
 
-void HelloWorld::PlayCombo4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, float fEffectScale)
+void HelloWorld::PlayCombo4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, float fEffectScale, bool bPlaySoundEffect)
 {
 	Point position(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
 				m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height);
@@ -3360,7 +3418,8 @@ void HelloWorld::PlayCombo4Effect(ComboEffectBundle* pComboEffect, float fDelayT
 				RemoveSelf::create(),
 				NULL));*/
 				
-	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
+	if (bPlaySoundEffect)
+		SoundManager::PlaySoundEffect(_SET_ACTIVATE_COMBO_4_, fDelayTime);
 }
 
 void HelloWorld::PlayCombo4HelperEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, float fRotation, float fEffectScale)
@@ -3439,9 +3498,7 @@ void HelloWorld::PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, fl
 					NULL),
 				NULL),
 			RemoveSelf::create(),
-			NULL));						
-
-	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
+			NULL));							
 }
 
 void HelloWorld::PlayCrazyPetEndGameBonusEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
@@ -3522,11 +3579,11 @@ void HelloWorld::PlayCrazyPetEndGameBonusEffect(ComboEffectBundle* pComboEffect,
 	}
 }
 
-void HelloWorld::PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, float fEffectScale)
+void HelloWorld::PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, float fEffectScale, bool bPlaySoundEffect)
 {
 	PlayActivateCommonDoubleAndTrippleComboEffect(pComboEffect, fDelayTime, _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_);
 
-	PlayCombo4Effect( pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, fDisplayTime, fEffectScale);
+	PlayCombo4Effect( pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, fDisplayTime, fEffectScale, false);
 
 	PlayCombo4HelperEffect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, fDisplayTime, 0, fEffectScale);
 	PlayCombo4HelperEffect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, fDisplayTime, 180.f, fEffectScale);
@@ -3566,98 +3623,22 @@ void HelloWorld::PlayCombo4_4Effect(ComboEffectBundle* pComboEffect, float fDela
 				FadeIn::create(0.02f),
 				FadeOut::create(fDisplayTime + 0.05f),
 				RemoveSelf::create(),
-				NULL));*/
+				NULL));*/	
 
-	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
+	if (bPlaySoundEffect)
+		SoundManager::PlaySoundEffect(_SET_ACTIVATE_DOUBLE_COMBO_, fDelayTime);
 }
 
 void HelloWorld::PlayCombo4_4_4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
 {
-	PlayCombo4_4Effect( pComboEffect, fDelayTime, fDisplayTime, 1.3f);
+	PlayCombo4_4Effect( pComboEffect, fDelayTime, fDisplayTime, 1.3f, false);
 
 	PlayCombo4HelperEffect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, fDisplayTime, 45.f, 1.3f);	
 	PlayCombo4HelperEffect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, fDisplayTime, 135.f, 1.3f);	
 	PlayCombo4HelperEffect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, fDisplayTime, 225.f, 1.3f);
-	PlayCombo4HelperEffect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, fDisplayTime, 315.f, 1.3f);
+	PlayCombo4HelperEffect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, fDisplayTime, 315.f, 1.3f);	
 
-	/*auto pComboEffectSprite1 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
-	auto pComboEffectSprite2 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
-	auto pComboEffectSprite3 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
-	auto pComboEffectSprite4 = Sprite::createWithSpriteFrameName("SimpleEffect.png");
-
-	pComboEffectSprite1->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
-				m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height));
-	pComboEffectSprite1->setOpacity(0);
-	m_pComboEffectBatchNode->addChild(pComboEffectSprite1);
-
-	pComboEffectSprite2->setPosition( pComboEffectSprite1->getPosition());
-	pComboEffectSprite2->setRotation(90.f);
-	pComboEffectSprite2->setOpacity(0);
-	m_pComboEffectBatchNode->addChild(pComboEffectSprite2);
-
-	pComboEffectSprite3->setPosition( pComboEffectSprite1->getPosition());
-	pComboEffectSprite3->setRotation(45.f);
-	pComboEffectSprite3->setOpacity(0);
-	m_pComboEffectBatchNode->addChild(pComboEffectSprite3);
-
-	pComboEffectSprite4->setPosition( pComboEffectSprite1->getPosition());
-	pComboEffectSprite4->setRotation(135.f);
-	pComboEffectSprite4->setOpacity(0);
-	m_pComboEffectBatchNode->addChild(pComboEffectSprite4);
-
-	pComboEffectSprite1->runAction(
-		Sequence::createWithTwoActions(
-		DelayTime::create(fDelayTime),
-		ScaleTo::create( fDisplayTime, 20.f, 1.f)));
-							
-	pComboEffectSprite2->runAction(
-		Sequence::createWithTwoActions(
-		DelayTime::create(fDelayTime),
-		ScaleTo::create( fDisplayTime, 20.f, 1.f)));
-
-	pComboEffectSprite3->runAction(
-		Sequence::createWithTwoActions(
-		DelayTime::create(fDelayTime),
-		ScaleTo::create( fDisplayTime, 20.f, 1.f)));
-
-	pComboEffectSprite4->runAction(
-		Sequence::createWithTwoActions(
-		DelayTime::create(fDelayTime),
-		ScaleTo::create( fDisplayTime, 20.f, 1.f)));
-
-	pComboEffectSprite1->runAction(
-			Sequence::create(				
-				DelayTime::create(fDelayTime),
-				FadeIn::create(0.02f),
-				FadeOut::create(fDisplayTime + 0.05f),
-				RemoveSelf::create(),
-				NULL));
-	pComboEffectSprite2->runAction(
-			Sequence::create(				
-				DelayTime::create(fDelayTime),
-				FadeIn::create(0.02f),
-				FadeOut::create(fDisplayTime + 0.05f),
-				RemoveSelf::create(),
-				NULL));
-
-	pComboEffectSprite3->runAction(
-			Sequence::create(				
-				DelayTime::create(fDelayTime),
-				FadeIn::create(0.02f),
-				FadeOut::create(fDisplayTime + 0.05f),
-				RemoveSelf::create(),
-				NULL));
-
-	pComboEffectSprite4->runAction(
-			Sequence::create(				
-				DelayTime::create(fDelayTime),
-				FadeIn::create(0.02f),
-				FadeOut::create(fDisplayTime + 0.05f),
-				RemoveSelf::create(),
-				NULL));
-				*/
-	
-	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
+	SoundManager::PlaySoundEffect(_SET_ACTIVATE_TRIPLE_COMBO_, fDelayTime);
 }
 
 void HelloWorld::PlayActivateCommonDoubleAndTrippleComboEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, bool bRemoveTriggerComboCell, bool bExtraEffectOnTriggerComboCellWhenDestroy)
@@ -3761,7 +3742,7 @@ void HelloWorld::PlayActivateCommonDoubleAndTrippleComboEffect(ComboEffectBundle
 
 void HelloWorld::PlayCombo4_5Effect(ComboEffectBundle* pComboEffect, float fDelayTime)
 {	
-	PlayCombo5Effect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, _TME_BASIC_COMBO_EXECUTE_TIME_);	
+	PlayCombo5Effect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, _TME_BASIC_COMBO_EXECUTE_TIME_, false);	
 	PlayCombo4_4Effect(pComboEffect, fDelayTime, _TME_BASIC_COMBO_EXECUTE_TIME_);
 
 	Cell backupPos = pComboEffect->m_ComboEffectDescription.m_Position;
@@ -3769,7 +3750,7 @@ void HelloWorld::PlayCombo4_5Effect(ComboEffectBundle* pComboEffect, float fDela
 		if (pComboEffect->m_ComboEffectDescription.m_Phase0CellList[i].m_iDestroyPhaseIndex >0)
 		{
 			pComboEffect->m_ComboEffectDescription.m_Position = pComboEffect->m_ComboEffectDescription.m_Phase0CellList[i];
-			PlayCombo5Effect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_ + _TME_COMBO_4_5_PHASE2_DELAY_TIME_ , _TME_BASIC_COMBO_EXECUTE_TIME_);
+			PlayCombo5Effect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_ + _TME_COMBO_4_5_PHASE2_DELAY_TIME_ , _TME_BASIC_COMBO_EXECUTE_TIME_, false);
 		}
 
 	pComboEffect->m_ComboEffectDescription.m_Position = backupPos;
@@ -3777,7 +3758,7 @@ void HelloWorld::PlayCombo4_5Effect(ComboEffectBundle* pComboEffect, float fDela
 
 void HelloWorld::PlayCombo5_5_5Effect(ComboEffectBundle* pComboEffect, float fDelayTime)
 {
-	PlayCombo5Effect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, _TME_BASIC_COMBO_EXECUTE_TIME_);
+	PlayCombo5Effect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, _TME_BASIC_COMBO_EXECUTE_TIME_, false);
 	PlayCombo4_4_4Effect(pComboEffect, fDelayTime, _TME_BASIC_COMBO_EXECUTE_TIME_);
 
 	Cell backupPos = pComboEffect->m_ComboEffectDescription.m_Position;
@@ -3785,13 +3766,13 @@ void HelloWorld::PlayCombo5_5_5Effect(ComboEffectBundle* pComboEffect, float fDe
 		if (pComboEffect->m_ComboEffectDescription.m_Phase0CellList[i].m_iDestroyPhaseIndex >0)
 		{
 			pComboEffect->m_ComboEffectDescription.m_Position = pComboEffect->m_ComboEffectDescription.m_Phase0CellList[i];
-			PlayCombo5Effect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_ + _TME_COMBO_4_5_PHASE2_DELAY_TIME_, _TME_BASIC_COMBO_EXECUTE_TIME_);
+			PlayCombo5Effect(pComboEffect, fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_ + _TME_COMBO_4_5_PHASE2_DELAY_TIME_, _TME_BASIC_COMBO_EXECUTE_TIME_, false);
 		}
 
 	pComboEffect->m_ComboEffectDescription.m_Position = backupPos;
 }
 
-void HelloWorld::PlayCombo5Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
+void HelloWorld::PlayCombo5Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, bool bPlaySoundEffect)
 {
 	auto pComboEffectSprite = Sprite::createWithSpriteFrameName("Exp_00.png");
 	auto pCombo4Anim = AnimationCache::getInstance()->getAnimation("effectCombo5New");
@@ -3807,17 +3788,52 @@ void HelloWorld::PlayCombo5Effect(ComboEffectBundle* pComboEffect, float fDelayT
 			RemoveSelf::create(),
 			NULL));
 
-	SoundManager::PlaySoundEffect(_SET_SIMPLE_COMBO_, fDelayTime);
+	if (bPlaySoundEffect)
+		SoundManager::PlaySoundEffect(_SET_ACTIVATE_COMBO_5_, fDelayTime);
 }
 
 void HelloWorld::PlayCombo5_5Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
 {
 	PlayActivateCommonDoubleAndTrippleComboEffect(pComboEffect, fDelayTime, _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_, pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_5_5_SECOND_EFFECT_);
 
-	Sprite* pComboEffectSprite;
+
+	auto pComboEffectSprite = Sprite::createWithSpriteFrameName("Exp_00.png");
+	pComboEffectSprite->setScale(1.6f);
+	pComboEffectSprite->setOpacity(180);
+	pComboEffectSprite->setColor(Color3B( 200, 100, 150));
+	auto pCombo5Anim = AnimationCache::getInstance()->getAnimation("effectCombo5New");
+
+	pComboEffectSprite->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
+				m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height));
+	m_pComboEffectBatchNode->addChild(pComboEffectSprite);
+
+	pComboEffectSprite->runAction( 
+		Sequence::create( 
+			DelayTime::create(fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_),
+			Animate::create( pCombo5Anim),
+			RemoveSelf::create(),
+			NULL));	
+
+	// test extra layer
+	auto pComboEffectSprite2 = Sprite::createWithSpriteFrameName("Exp_00.png");
+	pComboEffectSprite2->setOpacity(180);	
+	pComboEffectSprite2->setScaleX(1.6f);
+	pComboEffectSprite2->setScaleY(-1.6f);
+	pComboEffectSprite2->setColor(Color3B( 100, 255, 200));
+	pComboEffectSprite2->setPosition( pComboEffectSprite->getPosition());
+	m_pComboEffectBatchNode->addChild(pComboEffectSprite2);
+
+	pComboEffectSprite2->runAction( 
+		Sequence::create( 
+			DelayTime::create(fDelayTime + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_),
+			Animate::create( pCombo5Anim),
+			RemoveSelf::create(),
+			NULL));	
 
 	// play sound
-	SoundManager::PlaySoundEffect(_SET_DOUBLE_COMPLE_EFFECT_, fDelayTime);
+	SoundManager::PlaySoundEffect(_SET_ACTIVATE_DOUBLE_COMBO_, fDelayTime);
+	/*
+	Sprite* pComboEffectSprite;	
 
 	pComboEffectSprite = Sprite::createWithSpriteFrameName("Explosion2.png");		
 	pComboEffectSprite->setScale(2.17f);	
@@ -3833,7 +3849,7 @@ void HelloWorld::PlayCombo5_5Effect(ComboEffectBundle* pComboEffect, float fDela
 			CallFuncN::create( this, callfuncN_selector( HelloWorld::ActivateImageEffect)),
 			EaseOut::create( FadeOut::create( fDisplayTime), 2.f),				
 			RemoveSelf::create( true),				
-			NULL));		
+			NULL));		*/
 }
 	
 void HelloWorld::PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime)
@@ -4044,7 +4060,7 @@ void HelloWorld::PlayCombo6Effect(ComboEffectBundle* pComboEffectBundle, float f
 				NULL ));		
 	}
 	*/
-	SoundManager::PlaySoundEffect(_SET_DOUBLE_COMPLE_EFFECT_, fDelayTime-0.15f);
+	SoundManager::PlaySoundEffect(_SET_ACTIVATE_COMBO_6_, fDelayTime);
 }
 
 void HelloWorld::PlayCombo6_6Effect(ComboEffectBundle* pComboEffectBundle, float fDelayTime)
@@ -4107,11 +4123,11 @@ void HelloWorld::PlayCombo6_6Effect(ComboEffectBundle* pComboEffectBundle, float
 				NULL ));		
 	} 
 
-	SoundManager::PlaySoundEffect(_SET_DOUBLE_COMPLE_EFFECT_, fDelayTime-0.15f);
+	SoundManager::PlaySoundEffect(_SET_ACTIVATE_DOUBLE_COMBO_, fDelayTime);
 }
 
 // unlock letter flow
-void HelloWorld::PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime)
+/*void HelloWorld::PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime)
 {
 	float fDisplayTime = m_pWordCollectBoardRenderNode->PlayUnlockLettersAnimation(fDelayTime);
 	if (fDisplayTime > 0)
@@ -4129,7 +4145,7 @@ void HelloWorld::PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime)
 		//PlayUnlockLettersOfBonusWordsAnimation();
 		EndUnlockLetterAnimation();
 	}
-}
+}*/
 
 void HelloWorld::EndUnlockLetterAnimation()
 {
@@ -4161,6 +4177,8 @@ void HelloWorld::EndUnlockLetterAnimation()
 			{
 				// play sound effect 
 				SoundManager::PlaySoundEffect(_SET_COMPLETE_WORD_);
+
+				SoundManager::PlayBackgroundMusic(SoundManager::kEndGameBonus);
 
 				m_bIsEffectPlaying = true;//stop all interaction on board from now
 				m_bIsEndGamePhase = true; 

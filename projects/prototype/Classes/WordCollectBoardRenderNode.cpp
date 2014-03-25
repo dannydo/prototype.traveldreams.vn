@@ -124,10 +124,10 @@ bool WordCollectBoardRenderNode::init()
 	//m_pBatchNode->setPosition(10.f, 866.f);
 	this->addChild(m_pBatchNode, 10);
 
-	timeval now;
+	/*timeval now;
 	gettimeofday( &now, NULL);
 	m_iPreviousMainWordTapTime = now.tv_sec*1000 + now.tv_usec / 1000;
-	m_iUnlockedLetterEffectEndTime = m_iPreviousMainWordTapTime;
+	m_iUnlockedLetterEffectEndTime = m_iPreviousMainWordTapTime;*/
 
 	// preload character animation
 	/*ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/PigHero/PigHero.ExportJson");
@@ -328,7 +328,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 
 
 	// reset flags
-	memset( m_NewUnlockedLetterFlags, 0, sizeof(m_NewUnlockedLetterFlags));
+	//memset( m_NewUnlockedLetterFlags, 0, sizeof(m_NewUnlockedLetterFlags));
 }
 
 /*void WordCollectBoardRenderNode::UnlockCharacter(const float& fDelayTime, const int& iLetterIndex)
@@ -364,13 +364,13 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	PlayCharacterAnim(2, bAreAllCharacterUnlocked);
 }
 */
-void WordCollectBoardRenderNode::UnlockLetter(const int& iLetterIndex)
+/*void WordCollectBoardRenderNode::UnlockLetter(const int& iLetterIndex)
 {
 	if (iLetterIndex >= 0 && iLetterIndex < m_pMainWord->m_iWordLength)
 		m_NewUnlockedLetterFlags[iLetterIndex] = true;
-}
+}*/
 
-float WordCollectBoardRenderNode::PlayUnlockLettersAnimation(float fDelayTime)
+/*float WordCollectBoardRenderNode::PlayUnlockLettersAnimation(float fDelayTime)
 {
 	timeval now;
 	gettimeofday( &now, NULL);
@@ -617,28 +617,125 @@ float WordCollectBoardRenderNode::PlaySpellingSound()
 	}*/
 }
 
-void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position)
+void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex, const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position)
 {
-	Sprite* pSrite = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(iLetter).c_str());
-	//pSrite->setColor( ccc3(100, 100, 100));
-	pSrite->setScale(0.f);
-	//pSrite->setPosition( Point(position.x - 10.f, position.y-866.f) ); //_position.y));
-	pSrite->setPosition( position);
-	m_pBatchNode->addChild(pSrite);
-		
-	pSrite->runAction(
+	if (!(iLetterIndex >= 0 && iLetterIndex < m_pMainWord->m_iWordLength))		
+		return;
+
+	float fDelayTime = fDelayEffectTime + 0.1f;
+	Point destinationPosition = m_BubbleList[iLetterIndex]->getPosition();
+
+	// bubble
+	Sprite* pBubbleSprite = Sprite::createWithSpriteFrameName("bubble.png");
+	pBubbleSprite->setPosition(position);
+	pBubbleSprite->setScale(0.3f);
+	pBubbleSprite->setOpacity(76);///30%
+	pBubbleSprite->setVisible(false);
+	m_pBatchNode->addChild(pBubbleSprite,11);
+	pBubbleSprite->runAction(
+		Sequence::create(			
+			DelayTime::create(fDelayTime),
+			Show::create(),
+			Spawn::createWithTwoActions(
+				Sequence::createWithTwoActions(
+					ScaleTo::create( 0.1f, 2.5f),
+					ScaleTo::create( 0.23f, 0.65f)),
+				Sequence::createWithTwoActions(
+					DelayTime::create( 0.1f),
+					FadeTo::create( 0.23f, 255))),
+			MoveTo::create( 0.25f, destinationPosition),
+			DelayTime::create( 0.05f),
+			Spawn::createWithTwoActions(
+				ScaleTo::create( 0.3f, 3.f),
+				FadeOut::create( 0.3f)),
+			RemoveSelf::create(),
+			NULL));	
+
+	// letter
+	Sprite* pLetterSrite = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(iLetter).c_str());			
+	pLetterSrite->setPosition( position);
+	pLetterSrite->setVisible(false);
+	m_pBatchNode->addChild(pLetterSrite,1);		
+	pLetterSrite->runAction(
 		Sequence::create(
-			DelayTime::create(fDelayEffectTime),
-			ScaleTo::create(0.1f, 4.6f, 4.6f),
-			ScaleTo::create(0.2f, 1.f, 0.8f),
-			ScaleTo::create(0.14f, 1.f, 0.8f),
-			//EaseBackIn::create( 	ScaleTo::create(0.3f, 2.f, 2.f)),
-			MoveTo::create(	1.0f, Point(320.f, 820.f)),
+			DelayTime::create(fDelayTime),
+			Show::create(),
+			ScaleTo::create(0.1f, 4.f),
+			ScaleTo::create(0.23f, 1.),
+			MoveTo::create( 0.25f, destinationPosition),
 			RemoveSelf::create(),
 			NULL));
 
+	// flare
+	Sprite* pFlareSprite = Sprite::createWithSpriteFrameName("LetterAppear_Flare.png");
+	pFlareSprite->setPosition(position);
+	pFlareSprite->setRotation( -20.f);
+	pFlareSprite->setOpacity(128);///50%
+	pFlareSprite->setVisible(false);
+	m_pBatchNode->addChild(pFlareSprite);
+	pFlareSprite->runAction(
+		Sequence::create(			
+			DelayTime::create(fDelayTime),
+			Show::create(),
+			Spawn::create(
+				Sequence::createWithTwoActions(
+					ScaleTo::create( 0.1f, 5.f),
+					ScaleTo::create( 0.23f, 2.f)),
+				Sequence::createWithTwoActions(
+					RotateTo::create( 0.1f, 133.f),
+					RotateTo::create( 0.23f, 270.f)),
+				FadeTo::create( 0.1f, 1.f),
+				NULL),				
+			RemoveSelf::create(),
+			NULL));	
 
-	timeval now;
-	gettimeofday( &now, NULL);
-	m_iUnlockedLetterEffectEndTime = now.tv_sec*1000 + now.tv_usec / 1000 + (fDelayEffectTime + 0.22f + 0.17f + 1.f) * 1000;	
+
+	Point savePos = m_BubbleList[iLetterIndex]->getPosition();
+	//destroy old buble
+	m_BubbleList[iLetterIndex]->runAction(
+		Sequence::create(
+			DelayTime::create( fDelayTime + 0.58f),
+			ScaleTo::create( 0.017f, 1.3f),			
+			RemoveSelf::create(),
+			NULL));				
+
+	m_BubbleList[iLetterIndex] = Sprite::createWithSpriteFrameName("Main_Bubble_destroy.png");
+	m_BubbleList[iLetterIndex]->setPosition(savePos);
+	m_BubbleList[iLetterIndex]->setRotation( rand() % 360);
+	m_pBatchNode->addChild( m_BubbleList[iLetterIndex], -1);
+
+	m_BubbleList[iLetterIndex]->setVisible(false);
+	m_BubbleList[iLetterIndex]->runAction(
+		Sequence::create(
+			DelayTime::create(fDelayTime + 0.63f),
+			Show::create(),
+			DelayTime::create(0.0167f),
+			ScaleTo::create( 0.05f, 1.3f),
+			NULL));
+
+
+	// new letter
+	Point pos = m_LabelList[iLetterIndex]->getPosition();
+	Sprite* pOldSrite = m_LabelList[iLetterIndex];
+	pOldSrite->runAction( 
+		Sequence::createWithTwoActions(
+			DelayTime::create( fDelayTime + 0.58f),
+			RemoveSelf::create()));
+			
+
+	Sprite* pNewSrite = Sprite::createWithSpriteFrameName( GetImageInGemFileFromLetter(m_pMainWord->m_sWord[iLetterIndex]).c_str());						
+	pNewSrite->setVisible(false);
+	pNewSrite->setPosition( pos);	
+	m_pBatchNode->addChild(pNewSrite, 1);		
+	pNewSrite->runAction( 
+		Sequence::createWithTwoActions(
+			DelayTime::create( fDelayTime + 0.58f),			
+			Show::create()));
+			
+	m_LabelList[iLetterIndex] = pNewSrite;
+
+	// compute end time of effect to correct delay effect (still need this???)
+	//timeval now;
+	//gettimeofday( &now, NULL);
+	//m_iUnlockedLetterEffectEndTime = now.tv_sec*1000 + now.tv_usec / 1000 + (fDelayEffectTime + 0.22f + 0.17f + 1.f) * 1000;	
 }

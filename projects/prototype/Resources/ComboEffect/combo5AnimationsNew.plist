@@ -7,7 +7,7 @@
 		<key>effectCombo5New</key>
 		<dict>
 			<key>delay</key>
-			<real>0.041</real>
+			<real>0.032</real>
 			<key>frames</key>
 			<array>
 				<string>Exp_00.png</string>
@@ -19,6 +19,12 @@
 				<string>Exp_06.png</string>
 				<string>Exp_07.png</string>
 				<string>Exp_08.png</string>
+				<string>Exp_09.png</string>
+				<string>Exp_10.png</string>
+				<string>Exp_11.png</string>
+				<string>Exp_12.png</string>
+				<string>Exp_13.png</string>
+				<string>Exp_14.png</string>				
 			</array>
 		</dict>		
 	</dict>
