@@ -35,6 +35,7 @@ private:
 	SettingMenuNode* m_pSettingNode	;
 
 	ButtonNode* m_buttonLoginNode;
+	ButtonNode* m_pButtonSettingNode;
 	std::string m_sFacebookToken;
 };
 

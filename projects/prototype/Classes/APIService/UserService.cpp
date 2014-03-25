@@ -51,8 +51,6 @@ void UserService::registryUser(const std::string strAccessToken)
 	strURL.append("api/registry/");
 	strURL.append(strAccessToken);
 
-	CCLOG("registryUser: %s", strURL.getCString());
-
 	m_pRequest = new HttpRequest();
 	m_pRequest->setUrl(strURL.getCString());
 	m_pRequest->setRequestType(HttpRequest::Type::GET);
@@ -70,7 +68,6 @@ void UserService::getUserInfo()
 	String strURL = _CONSTANT_URL_;
 	strURL.append("api/getUserByFacebookToken/");
 	strURL.append(userInfo.sFacebookToken);
-	CCLOG("getUserInfo: %s", strURL.getCString());
 
 	m_pRequest = new HttpRequest();
 	m_pRequest->setUrl(strURL.getCString());
@@ -90,7 +87,6 @@ void UserService::getLeaderBoardLevel(const int& iLevel)
 	strURL.append("api/getLeaderBoardLevel/");
 	strURL.appendWithFormat("%d/", iLevel);
 	strURL.append(userInfo.sFacebookToken);
-	CCLOG("getLeaderBoardLevel: %s", strURL.getCString());
 
 	m_pRequest = new HttpRequest();
 	m_pRequest->setUrl(strURL.getCString());
@@ -108,6 +104,7 @@ void UserService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *respo
 	std::string sKey = "";
 	String strData = "";
 	sKey.append(response->getHttpRequest()->getTag());
+	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
 
 	if (response)
     {
@@ -120,18 +117,8 @@ void UserService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *respo
 			{
 				strData.appendWithFormat("%c", (*buffer)[i]);
 			}
-			CCLOG("%s", strData.getCString());
-		}
-		else
-		{
-			CCLOG("response failed");
-			CCLOG("error buffer: %s", response->getErrorBuffer());
 		}
     }
-	else
-	{
-		CCLOG("response null");
-	}
 
 	for(auto callBack : m_callBackList)
 	{

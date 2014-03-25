@@ -42,10 +42,8 @@ std::vector<LevelInfo> LevelTable::fetchLevelsForChapter(const int& iChapter)
 
 	String sql = "select * from Levels where Chapter=";
 	sql.appendWithFormat("%d", iChapter);
-	CCLOG("%s", sql.getCString());
 
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
-	CCLOG("row is %d,column is %d", nRow, nColumn);
 
 	for (int iRow=1; iRow<=nRow; iRow++)
 	{
@@ -58,6 +56,7 @@ std::vector<LevelInfo> LevelTable::fetchLevelsForChapter(const int& iChapter)
 		levelInfo.bIsUnlock = bool(strtod(re[iRow*nColumn+5], NULL));
 		levelInfo.bIsUpdate = bool(strtod(re[iRow*nColumn+6], NULL));
 		levelInfo.sWordKey = re[iRow*nColumn+7];
+		levelInfo.iTotalBonusQuest = int(strtod(re[iRow*nColumn+8], NULL));
 
 		levels.push_back(levelInfo);
 	}
@@ -74,10 +73,8 @@ LevelInfo LevelTable::fetchLevel(const int& iLevel)
 
 	String sql = "select * from Levels where Level=";
 	sql.appendWithFormat("%d", iLevel);
-	CCLOG("%s", sql.getCString());
 
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
-	CCLOG("row is %d,column is %d", nRow, nColumn);
 
 	LevelInfo levelInfo;
 	if (nRow > 0)
@@ -90,6 +87,7 @@ LevelInfo LevelTable::fetchLevel(const int& iLevel)
 		levelInfo.bIsUnlock = bool(strtod(re[nColumn+5], NULL));
 		levelInfo.bIsUpdate = bool(strtod(re[nColumn+6], NULL));
 		levelInfo.sWordKey = re[nColumn+7];
+		levelInfo.iTotalBonusQuest = int(strtod(re[nColumn+8], NULL));
 	}
 
 	sqlite3_free_table(re);
@@ -104,11 +102,11 @@ bool LevelTable::updateLevel(LevelInfo levelInfo)
 	sql.appendWithFormat(" Star=%d,", levelInfo.iStar);
 	sql.appendWithFormat(" Score=%d,", levelInfo.iScore);
 	sql.appendWithFormat(" BonusQuest=%d,", levelInfo.iBonusQuest);
+	sql.appendWithFormat(" TotalBonusQuest=%d,", levelInfo.iTotalBonusQuest);
 	sql.appendWithFormat(" IsUnlock=%d,", levelInfo.bIsUnlock);
 	sql.appendWithFormat(" IsUpdate=%d,", levelInfo.bIsUpdate);
 	sql.appendWithFormat(" WordKey='%s'", levelInfo.sWordKey.c_str());
 	sql.appendWithFormat(" where Level=%d", levelInfo.iLevel);
-	CCLOG("%s", sql.getCString());
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)

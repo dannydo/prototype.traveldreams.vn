@@ -1,4 +1,5 @@
-#include "ButtonManagerNode.h"
+#include "ButtonManagerNode.h" 
+#include "SoundManager.h"
 
 USING_NS_CC;
 
@@ -33,7 +34,12 @@ bool ButtonManagerNode::onTouchButtonBegan(Touch* pTouch,  Event* pEvent)
 
 	for (int iIndex=0; iIndex<m_buttonNodes.size(); iIndex++)
 	{
-		Sprite* pButtonSprite = m_buttonNodes[iIndex]->getButtonSprite();
+		Sprite* pButtonSprite;
+		if(m_buttonNodes[iIndex]->getStateActive())
+			pButtonSprite = m_buttonNodes[iIndex]->getButtonSpriteActive();
+		else
+			pButtonSprite = m_buttonNodes[iIndex]->getButtonSprite();
+
 		CCRect *pRectButton = new CCRect(pButtonSprite->getOffsetPosition().x, 
 			 pButtonSprite->getOffsetPosition().y, 
 			 pButtonSprite->getTextureRect().size.width, 
@@ -47,6 +53,9 @@ bool ButtonManagerNode::onTouchButtonBegan(Touch* pTouch,  Event* pEvent)
 			auto scaleAction = ScaleTo::create(0.1f, 1.150f, 0.85f);
 			pButtonSprite->runAction(scaleAction);
 			m_iIndexButtonActive = iIndex;
+
+			// play sound effect
+			SoundManager::PlaySoundEffect(_SET_BUTTON_PRESS_);
 
 			return true;
 			break;
@@ -68,7 +77,12 @@ void ButtonManagerNode::onTouchButtonEnded(Touch* pTouch,  Event* pEvent)
 
 	if (m_isClickButton)
 	{
-		Sprite* pButtonSprite = m_buttonNodes[m_iIndexButtonActive]->getButtonSprite();
+		Sprite* pButtonSprite;
+		if(m_buttonNodes[m_iIndexButtonActive]->getStateActive())
+			pButtonSprite = m_buttonNodes[m_iIndexButtonActive]->getButtonSpriteActive();
+		else
+			pButtonSprite = m_buttonNodes[m_iIndexButtonActive]->getButtonSprite();
+
 		CCRect *pRectButton = new CCRect(pButtonSprite->getOffsetPosition().x, 
 				 pButtonSprite->getOffsetPosition().y, 
 				 pButtonSprite->getTextureRect().size.width, 
@@ -99,6 +113,8 @@ void ButtonManagerNode::onTouchButtonEnded(Touch* pTouch,  Event* pEvent)
 void ButtonManagerNode::buttonCallBack()
 {
 	ButtonNode* pButtonSprite = m_buttonNodes[m_iIndexButtonActive];
+	pButtonSprite->setStateActive(!pButtonSprite->getStateActive());
+
 	if(pButtonSprite->getCallBack())
 	{
 		auto callBack = pButtonSprite->getCallBack();

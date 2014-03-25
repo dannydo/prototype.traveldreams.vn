@@ -102,7 +102,7 @@ void StatusLayer::updateScore()
 
 		if (m_iScoreOld < m_iMaxScoreLevel)
 		{
-			float angle = -bonus/m_iMaxScoreLevel*120;
+			float angle = bonus/m_iMaxScoreLevel*125;
 			auto actionRotate = RotateBy::create(0.0f, angle);
 			m_pMarkCircle->runAction(actionRotate);
 			m_iScoreOld = temp;
@@ -143,54 +143,39 @@ void StatusLayer::setScoreForStar(const float& iScore1Star, const float& iScore2
 	m_iScore1Star = iScore1Star;
 	m_iScore2Star = iScore2Star;
 	m_iScore3Star = iScore3Star;
-	m_iMaxScoreLevel = iScore3Star*118.0f/100.0f;
+	m_iMaxScoreLevel = iScore3Star*120.0f/100.0f;
 
 	Point point;
-	float angle = (iScore1Star*115/iScore3Star -15)/180.0f*_C_PI_;
+	float angle = _C_PI_-(iScore1Star*115/iScore3Star -15)/180.0f*_C_PI_;
 	point.x = m_fRadiusCircle*cos(angle);
 	point.y = m_fRadiusCircle*sin(angle);
 	m_pStarYellow1->setPosition(point);
 	m_pStarBlack1->setPosition(point);
 
-	float angleRotate = -(iScore1Star*115/iScore3Star -15.0f) + 90.0f;
+	float angleRotate = (iScore1Star*115/iScore3Star -15.0f) - 90.0f;
 	m_pStarBlack1->setRotation(angleRotate);
 	m_pStarYellow1 ->setRotation(angleRotate);
 
-	angle = (iScore2Star*115/iScore3Star -15)/180.0f*_C_PI_;
+	angle = _C_PI_-(iScore2Star*115/iScore3Star -15)/180.0f*_C_PI_;
 	point.x = m_fRadiusCircle*cos(angle);
 	point.y = m_fRadiusCircle*sin(angle);
 	m_pStarYellow2->setPosition(point);
 	m_pStarBlack2->setPosition(point);
 
-	angleRotate = -(iScore2Star*115/iScore3Star - 15.0f) + 90.0f;
+	angleRotate = (iScore2Star*115/iScore3Star - 15.0f) - 90.0f;
 	m_pStarBlack2->setRotation(angleRotate);
 	m_pStarYellow2 ->setRotation(angleRotate);
 
 
-	angle = 100.0f/180.0f*_C_PI_;
+	angle = _C_PI_-100.0f/180.0f*_C_PI_;
 	point.x = m_fRadiusCircle*cos(angle);
 	point.y = m_fRadiusCircle*sin(angle);
 	m_pStarYellow3->setPosition(point);
 	m_pStarBlack3->setPosition(point);
 
-	angleRotate = -100.0f + 90.0f;
+	angleRotate = 100.0f - 90.0f;
 	m_pStarBlack3->setRotation(angleRotate);
 	m_pStarYellow3 ->setRotation(angleRotate);
-}
-
-void StatusLayer::setPositionForStar(const float& iScoreStar, Sprite* pStar)
-{
-	Point point;
-	float angeFull = 110.0f/360.0f*_C_PI_;
-	float angle = iScoreStar/m_iMaxScoreLevel*angeFull;
-
-	point.x = m_centerCircle.x + m_fRadiusCircle*cos(angle);
-	point.y = m_centerCircle.y + m_fRadiusCircle*sin(angle);
-	if (angle == 0 || angle == _C_PI_ || point.y < m_centerCircle.y + pStar->getContentSize().height/4.0f)
-	{
-		//point.y = point.y + pStar->getContentSize().height/4.0f;
-	}
-	pStar->setPosition(point);
 }
 
 void StatusLayer::setCurrentMove(const int& iCurrentMove)
@@ -246,5 +231,5 @@ void StatusLayer::generateLayoutMove()
 		arrNumber.pop_back();
 	}
 
-	m_SpriteNumberMove->setPositionX(width/4.0f - (iTotal-1)*15 - 15);
+	m_SpriteNumberMove->setPositionX(width/4.0f - (iTotal-1)*15 - 32);
 }

@@ -69,14 +69,5 @@ void LoadingImagetNode::onHttpRequestCompleted(HttpClient *sender, HttpResponse 
 			}
 			
 		}
-		else
-		{
-			CCLOG("response failed");
-			CCLOG("error buffer: %s", response->getErrorBuffer());
-		}
     }
-	else
-	{
-		CCLOG("response null");
-	}
 }

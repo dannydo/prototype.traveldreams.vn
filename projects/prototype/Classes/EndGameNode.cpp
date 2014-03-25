@@ -108,6 +108,8 @@ bool EndGameNode::initWin()
 	if (m_levelInfo.bIsUnlock == false)
 	{
 		m_chapterInfo.iTotalLevelUnlock++;
+		m_chapterInfo.bIsUpdate = true;
+
 		userInfo.iCurrentChapter = m_levelInfo.iChapter;
 		userInfo.iCurrentLevel = m_levelInfo.iLevel + 1;
 
@@ -119,13 +121,16 @@ bool EndGameNode::initWin()
 		}
 		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 		UserTable::getInstance()->updateUser(userInfo);
-	}
 
-	m_levelInfo.bIsUnlock = true;
-	m_levelInfo.bIsUpdate = true;
-	m_levelInfo.sWordKey = m_mainWord.m_sWord;
+		m_levelInfo.sWordKey = m_mainWord.m_sWord;
+		m_levelInfo.bIsUnlock = true;
+		m_levelInfo.bIsUpdate = true;
+		m_levelInfo.iTotalBonusQuest = m_iTotalBonusQuest;
+	}
+	
 	if (m_levelInfo.iScore < m_iScore)
 	{
+		m_levelInfo.bIsUpdate = true;
 		m_levelInfo.iScore = m_iScore;
 	}
 
@@ -141,7 +146,7 @@ bool EndGameNode::init()
 		return false;
 	}
 	
-	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 229));
+	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 150));
 	pBackground->setContentSize(CCSizeMake(640, 960));
 	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
 	listener->setSwallowTouches(true);
@@ -241,7 +246,10 @@ void EndGameNode::addYellowStar(const int& iYellowStar)
 	if(m_levelInfo.iStar < iYellowStar)
 	{
 		m_chapterInfo.iTotalStar += iYellowStar - m_levelInfo.iStar;
+		m_chapterInfo.bIsUpdate = true;
+
 		m_levelInfo.iStar = iYellowStar;
+		m_levelInfo.bIsUpdate = true;
 		
 		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 		LevelTable::getInstance()->updateLevel(m_levelInfo);
@@ -254,21 +262,12 @@ void EndGameNode::sequenceUpdateStar()
 {
 	auto actionUpdateStar = CallFunc::create(this, callfunc_selector(EndGameNode::updateStar));
 	auto delay = DelayTime::create(0.5f);
-	auto actionLoopUpdateStar = CallFunc::create(this, callfunc_selector(EndGameNode::loopUpdateStar));
-	if (m_iCountYellowStar < m_iYellowStar-1) {
-		this->runAction(Sequence::create(delay->clone(), actionLoopUpdateStar, actionUpdateStar, NULL));
+	if (m_iCountYellowStar < m_iYellowStar) {
+		this->runAction(Sequence::create(delay->clone(), actionUpdateStar, NULL));
 	}
 	else
 	{
 		this->sequenceUpdateBonusQuest();
-	}
-}
-
-void EndGameNode::loopUpdateStar()
-{
-	if (m_iCountYellowStar < m_iYellowStar)
-	{
-		this->sequenceUpdateStar();
 	}
 }
 
@@ -279,6 +278,7 @@ void EndGameNode::updateStar()
 		pStarYellowImage->setPosition(Point(200.0f + m_iCountYellowStar*108.0f - m_iTotalBonusQuest*46, 823.0f + m_iCountYellowStar*5 - m_iTotalBonusQuest*5));
 		m_pSpriteBatchNode->addChild(pStarYellowImage);
 		m_iCountYellowStar++;
+		this->sequenceUpdateStar();
 	}
 }
 
@@ -286,6 +286,7 @@ void EndGameNode::addBonusQuestCompleted(const int& iBonusQuestCompleted)
 {
 	if(m_levelInfo.iBonusQuest < iBonusQuestCompleted)
 	{
+		m_levelInfo.bIsUpdate = true;
 		m_levelInfo.iBonusQuest = iBonusQuestCompleted;	 
 		LevelTable::getInstance()->updateLevel(m_levelInfo);
 	}
@@ -297,17 +298,8 @@ void EndGameNode::addBonusQuestCompleted(const int& iBonusQuestCompleted)
 void EndGameNode::sequenceUpdateBonusQuest()
 {
 	auto actionUpdateBonusQuest = CallFunc::create(this, callfunc_selector(EndGameNode::updateBonusQuest));
-	auto delay = DelayTime::create(0.7f);
-	auto actionLoopUpdateBonusQuest = CallFunc::create(this, callfunc_selector(EndGameNode::loopUpdateBonusQuest));
-	this->runAction(Sequence::create(delay->clone(), actionLoopUpdateBonusQuest, actionUpdateBonusQuest, NULL));
-}
-
-void EndGameNode::loopUpdateBonusQuest()
-{
-	if (m_iCountBonusQuest < m_iBonusQuestCompleted && m_iCountBonusQuest < m_iTotalBonusQuest)
-	{
-		this->sequenceUpdateBonusQuest();
-	}
+	auto delay = DelayTime::create(0.5f);
+	this->runAction(Sequence::create(delay->clone(), actionUpdateBonusQuest, NULL));
 }
 
 void EndGameNode::updateBonusQuest()
@@ -318,6 +310,7 @@ void EndGameNode::updateBonusQuest()
 		pMushRoom->setPosition(Point(529.0f + m_iCountBonusQuest*98.0f - m_iTotalBonusQuest*50, 835.0f + m_iCountBonusQuest*5 + 3));
 		m_pSpriteBatchNode->addChild(pMushRoom);
 		m_iCountBonusQuest++;
+		this->sequenceUpdateBonusQuest();
 	}
 }
 

@@ -27,6 +27,7 @@ private:
 
 	ButtonNode* m_pButtonIntroductionNode;
 	ButtonNode* m_pButtonFlashCardNode;
+	ButtonNode* m_pButtonSettingNode;
 
 };
 

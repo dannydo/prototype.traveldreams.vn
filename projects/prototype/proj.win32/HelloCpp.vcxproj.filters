@@ -156,6 +156,9 @@
     <ClCompile Include="..\Classes\FooterNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\HeaderNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -297,6 +300,9 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\FooterNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\HeaderNode.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

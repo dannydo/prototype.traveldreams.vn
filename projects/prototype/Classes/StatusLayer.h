@@ -18,7 +18,6 @@ public:
 	void setSpeedUpdateScore(const float& iSpeedUpdateScore);
 
 private:
-	void setPositionForStar(const float& iScoreStar, cocos2d::Sprite* pStar);
 	void clippingNodeCircle();
 	std::vector<int> generateArrayNumber(int iNumber);
 	void generateLayoutMove();

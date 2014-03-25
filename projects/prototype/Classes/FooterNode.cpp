@@ -16,29 +16,31 @@ bool FooterNode::init()
 		return false;
 	}
 
-	Sprite* pBarBottom = Sprite::create("World-Map/Footer.png");
+	Sprite* pBarBottom = Sprite::create("Footer/Footer.png");
 	pBarBottom->setAnchorPoint(Point(0.0f, 0.0f));
 	pBarBottom->setPosition(Point(0.0f, 0.0f));
 	this->addChild(pBarBottom);
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
-	ButtonNode* pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, CC_CALLBACK_1(FooterNode::openSettingMenu, this));
-	pButtonSettingNode->setPosition(Point(581.0f, 52.0f));
+	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
+	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(FooterNode::openSettingMenu, this));
+	m_pButtonSettingNode->setPosition(Point(41.0f, 41.0f));
 
 	Sprite* pFlashCardSprite = Sprite::create("Footer/btn_flashcard.png");
 	m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
-	m_pButtonFlashCardNode->setPosition(Point(448.0f, 52.0f));
+	m_pButtonFlashCardNode->setPosition(Point(140.0f, 41.0f));
 
 	Sprite* pIntroductionSprite = Sprite::create("Footer/info_icon.png");
 	m_pButtonIntroductionNode = ButtonNode::createButtonSprite(pIntroductionSprite, CC_CALLBACK_1(FooterNode::openIntroduction, this));
-	m_pButtonIntroductionNode->setPosition(Point(318.0f, 52.0f));
+	m_pButtonIntroductionNode->setPosition(Point(280.0f, 25.0f));
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
-	pButtonManagerNode->addButtonNode(pButtonSettingNode);
+	pButtonManagerNode->addButtonNode(m_pButtonSettingNode);
 	pButtonManagerNode->addButtonNode(m_pButtonFlashCardNode);
-	pButtonManagerNode->addButtonNode(m_pButtonIntroductionNode);
+	//pButtonManagerNode->addButtonNode(m_pButtonIntroductionNode);
 
 	this->addChild(pButtonManagerNode);
+	this->setZOrder(10);
 
 	m_pSettingNode = NULL;
 	
@@ -68,7 +70,8 @@ void FooterNode::openSettingMenu(Object* sender)
 	if(m_pSettingNode == NULL)
 	{
 		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(640.0f, 0.0f));
+		m_pSettingNode->setPosition(Point(-524.0f, 0.0f));
+		m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
 		this->getParent()->addChild(m_pSettingNode);
 	}
 

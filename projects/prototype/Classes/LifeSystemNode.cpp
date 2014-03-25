@@ -24,33 +24,42 @@ bool LifeSystemNode::init()
 	m_userInfo = UserTable::getInstance()->getUserInfo();
 	UserTable::getInstance()->updateUser(m_userInfo);
 
-	LabelTTF* labelLife = LabelTTF::create("Life: ", "Arial", 32);
-	labelLife->setAnchorPoint(Point(0.0f, 0.5f));
-	labelLife->setColor(ccc3(255, 0, 0));
-	this->addChild(labelLife);
+	Sprite* pBackgroundClock = Sprite::create("Footer/life-time.png");
+	pBackgroundClock->setAnchorPoint(Point(0.0f, 0.5f));
+	pBackgroundClock->setPosition(Point(45.0f, 0.0f));
+	this->addChild(pBackgroundClock);
 
-	String life = "";
-	life.appendWithFormat("%d", m_userInfo.iLife);
-	m_pLabelLife = LabelTTF::create(life.getCString(), "Arial", 32);
-	m_pLabelLife->setAnchorPoint(Point(0.0f, 0.5f));
-	m_pLabelLife->setPosition(Point(70.0f, 0.0f));
-	m_pLabelLife->setColor(ccc3(255, 0, 0));
-	this->addChild(m_pLabelLife);
+	Sprite* pAddLifeButton = Sprite::create("Footer/add-life-btn.png");
+	pAddLifeButton->setAnchorPoint(Point(0.0f, 0.5f));
+	pAddLifeButton->setPosition(Point(116.5f, 25.5f));
+	pBackgroundClock->addChild(pAddLifeButton);
 
 	String clock = formatSecondsToDiaplay(m_userInfo.iLifeTimeRemaining);
-	m_pLabelSecondsRemaing = LabelTTF::create(clock.getCString(), "Arial", 32);
+	m_pLabelSecondsRemaing = CCLabelTTF::create(clock.getCString(), "fonts/UTM Cookies.ttf", 24);
 	m_pLabelSecondsRemaing->setAnchorPoint(Point(0.0f, 0.5f));
-	m_pLabelSecondsRemaing->setPosition(Point(110.0f, 0.0f));
-	m_pLabelSecondsRemaing->setColor(ccc3(255, 0, 0));
+	m_pLabelSecondsRemaing->setPosition(Point(42.0f, 29.0f));
+	m_pLabelSecondsRemaing->setColor(ccc3(180, 115, 5));
 
 	if (m_userInfo.iLifeTimeRemaining == 0)
 	{
 		m_pLabelSecondsRemaing->setVisible(false);
 	}
 
-	this->addChild(m_pLabelSecondsRemaing);
+	pBackgroundClock->addChild(m_pLabelSecondsRemaing);
 
-	
+	Sprite* pBackgroundLife = Sprite::create("Footer/hearth.png");
+	pBackgroundLife->setAnchorPoint(Point(0.0f, 0.5f));
+	pBackgroundLife->setPosition(Point(0.0f, 0.0f));
+	this->addChild(pBackgroundLife);
+
+	char sLife[2];
+	sprintf(sLife, "%d", m_userInfo.iLife);
+	m_pLabelLife = LabelBMFont::create(sLife, "fonts/Flashcard-bitmap-font-game.fnt");
+	m_pLabelLife->setAnchorPoint(Point(0.0f, 0.5f));
+	m_pLabelLife->setPosition(Point(32.0f, 5.0f));
+	m_pLabelLife->setScale(1.2f);
+	this->addChild(m_pLabelLife);
+
 	this->schedule(schedule_selector(LifeSystemNode::updateWhenTimeChange), 1.0f);
 	return true;
 }
@@ -77,17 +86,23 @@ void LifeSystemNode::updateWhenTimeChange(float dt)
 	}
 
 	String clock = formatSecondsToDiaplay(m_userInfo.iLifeTimeRemaining);
-	String life = "";
-	life.appendWithFormat("%d", m_userInfo.iLife);
+	char sLife[2];
+	sprintf(sLife, "%d", m_userInfo.iLife);
 	m_pLabelSecondsRemaing->setString(clock.getCString());
-	m_pLabelLife->setString(life.getCString());
+	m_pLabelLife->setString(sLife);
 }
 
 String LifeSystemNode::formatSecondsToDiaplay(const int& iSeconds)
 {
 	String str = "";
+	if(iSeconds/60 < 10)
+		str.append("0");
 	str.appendWithFormat("%d", iSeconds/60);
+
 	str.appendWithFormat("%s", ":");
+
+	if(iSeconds%60 < 10)
+		str.append("0");	
 	str.appendWithFormat("%d", iSeconds%60);
 
 	return str;

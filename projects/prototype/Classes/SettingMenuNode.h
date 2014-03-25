@@ -3,7 +3,8 @@
 
 #include "cocos2d.h" 
 #include "Database\UserTable.h"
-#include "CustomNode.h"
+#include "CustomNode.h"	
+#include "ButtonManagerNode.h"
 
 typedef enum {
 	kExitGame = 0,
@@ -26,6 +27,7 @@ public:
 	void show();
 	void hide();
 	inline bool getShowSetting() { return m_iShowSetting; };
+	void addButtonSetting(ButtonNode* pSettingButton);
 
 private:
 	bool onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
@@ -35,18 +37,15 @@ private:
 	void clickMusic();
 	void clickEffect();
 	void clickVoice();
-	void clickTutorial();
-	void clickLogoutFacebook();
-	void clickBack();
+	void clickTutorial(cocos2d::Object* sender);
+	void clickFacebook(cocos2d::Object* sender);
+	void clickBack(cocos2d::Object* sender);
 
-	//cocos2d::LabelTTF* m_plabelVoice;
 	cocos2d::MenuItemToggle* m_pMenuVoice;
-	//cocos2d::LabelTTF* m_pLabelEffect;
 	cocos2d::MenuItemToggle* m_pMenuEffect;
-	//cocos2d::LabelTTF* m_pLabelMusic;
 	cocos2d::MenuItemToggle* m_pMenuMusic;
-	//cocos2d::LayerColor*m_Background;
 	cocos2d::Sprite* m_pBackground;
+	ButtonNode* m_pSettingButton;
 
 	bool m_iShowSetting;
 	bool m_isClick;

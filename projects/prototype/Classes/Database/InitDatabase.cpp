@@ -91,7 +91,7 @@ bool InitDatabase::createDatabase()
 	else 
 	{
 		std::string sql;
-		sql="insert into Users values('vandao', 0, '', '', '', '', 1, 1, 5, 0, 0)";
+		sql="insert into Users values('ohmyword', 0, '', '', '', '', 1, 1, 5, 0, 0)";
 		iResult = sqlite3_exec(m_DatabaseSqlite, sql.c_str(), NULL, NULL, NULL);
 		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
 			bCreateSuccess = false;
@@ -116,7 +116,7 @@ bool InitDatabase::createDatabase()
 			bCreateSuccess = false;
 	}
 
-	iResult = sqlite3_exec(m_DatabaseSqlite,"create table if not exists Levels(Level integer primary key, Chapter integer, Star integer, Score integer, BonusQuest integer, IsUnlock integer, IsUpdate integer, WordKey text)", NULL, NULL, NULL);
+	iResult = sqlite3_exec(m_DatabaseSqlite,"create table if not exists Levels(Level integer primary key, Chapter integer, Star integer, Score integer, BonusQuest integer, IsUnlock integer, IsUpdate integer, WordKey text, TotalBonusQuest integer)", NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
 	{
 		bCreateSuccess = false;
@@ -131,8 +131,7 @@ bool InitDatabase::createDatabase()
 			String sql = "insert into Levels values(";
 			sql.appendWithFormat("%d,", iLevel);
 			sql.appendWithFormat("%d,", iChapter);
-			sql.append("0,0,0,0,0,'')");
-			CCLOG("%s", sql.getCString());
+			sql.append("0,0,0,0,0,'',0)");
 
 			iResult = sqlite3_exec(m_DatabaseSqlite, sql.getCString(), NULL, NULL, NULL);
 			if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)

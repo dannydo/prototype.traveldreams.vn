@@ -41,7 +41,6 @@ void UserTable::fetchhUser()
 	int nRow, nColumn;
 		
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), "select * from Users limit 1", &re, &nRow, &nColumn,NULL);
-	CCLOG("row is %d,column is %d", nRow, nColumn);
 
 	if (nRow > 0)
 	{
@@ -75,7 +74,6 @@ bool UserTable::updateUser(const UserInfo& userInfo)
 	sql.appendWithFormat(" LifeTimeRemaining=%d,", userInfo.iLifeTimeRemaining);
 	sql.appendWithFormat(" LifeTimeBeginRemain=%u", userInfo.ulLifeTimeBeginRemain);
 	sql.appendWithFormat(" where UserIdentifier='%s'", m_userInfo.sUserIdentifier.c_str());
-	CCLOG("%s", sql.getCString());
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
@@ -100,7 +98,6 @@ bool UserTable::insertUser(const UserInfo& userInfo)
 	sql.appendWithFormat("%d,", userInfo.iLife);
 	sql.appendWithFormat("%d,", userInfo.iLifeTimeRemaining);
 	sql.appendWithFormat("%u)", userInfo.ulLifeTimeBeginRemain);
-	CCLOG("%s", sql.getCString());
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
@@ -169,7 +166,6 @@ bool UserTable::updateLife(const unsigned int& iLoseLife)
 	sql.appendWithFormat(" LifeTimeRemaining=%d,", m_userInfo.iLifeTimeRemaining);
 	sql.appendWithFormat(" LifeTimeBeginRemain=%u", m_userInfo.ulLifeTimeBeginRemain);
 	sql.appendWithFormat(" where UserIdentifier='%s'", m_userInfo.sUserIdentifier.c_str());
-	CCLOG("%s", sql.getCString());
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)

@@ -1,5 +1,4 @@
 #include "SettingMenuNode.h"
-#include "Social/FacebookManager.h"
 #include "MainMenuScene.h"
 #include "WorldMapScene.h"
 #include "LevelMapScene.h"
@@ -8,6 +7,11 @@
 #include "FlashCardCollection.h"
 
 USING_NS_CC;
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "Social\FacebookManager.h"
+using namespace cocos2d::plugin;
+#endif
 
 SettingMenuNode::SettingMenuNode()
 {
@@ -26,134 +30,108 @@ bool SettingMenuNode::init()
 		return false;
 	}
 
-	//m_Background = LayerColor::create(ccc4(216, 216, 216, 255), 500.0f, 960.0f);
 	m_pBackground =  Sprite::create("PanelSetting/panel-setting.png");
 	m_pBackground->setAnchorPoint(Point(0,0));
 	this->addChild(m_pBackground);
 
-	MenuItemImage* m_pMenuEffectOn = MenuItemImage::create("PanelSetting/Fx_on.PNG", "PanelSetting/Fx_on.PNG", CC_CALLBACK_0(SettingMenuNode::clickEffect, this));
-	MenuItemImage* m_pMenuEffectOff = MenuItemImage::create("PanelSetting/Fx_off.PNG", "PanelSetting/Fx_off.PNG", CC_CALLBACK_0(SettingMenuNode::clickEffect, this));
-	m_pMenuEffect = MenuItemToggle::createWithCallback( CC_CALLBACK_0(SettingMenuNode::clickEffect, this), m_pMenuEffectOff, m_pMenuEffectOn, NULL);	
-	m_pMenuEffect->setPosition(Point(410, 710));
+	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
+	this->addChild(pButtonManagerNode);
 
-	MenuItemImage* m_pMenuMusicOn = MenuItemImage::create("PanelSetting/music_on.PNG", "PanelSetting/music_on.PNG", CC_CALLBACK_0(SettingMenuNode::clickMusic, this));
-	MenuItemImage* m_pMenuMusicOff = MenuItemImage::create("PanelSetting/music_off.PNG", "PanelSetting/music_off.PNG", CC_CALLBACK_0(SettingMenuNode::clickMusic, this));
-	m_pMenuMusic = MenuItemToggle::createWithCallback( CC_CALLBACK_0(SettingMenuNode::clickMusic, this), m_pMenuMusicOff, m_pMenuMusicOn, NULL);	
-	m_pMenuMusic->setPosition(Point(410, 620));
+	Sprite* pEffectSprite = Sprite::create("PanelSetting/Fx_on.PNG");
+	Sprite* pEffectSpriteActive = Sprite::create("PanelSetting/Fx_off.PNG");
+	ButtonNode* pButtonEffectNode = ButtonNode::createButtonSprite(pEffectSprite, pEffectSpriteActive, CC_CALLBACK_0(SettingMenuNode::clickEffect, this));
+	pButtonEffectNode->setPosition(Point(410, 710));
+	pButtonManagerNode->addButtonNode(pButtonEffectNode);
 
-	MenuItemImage* m_pMenuVoiceOn = MenuItemImage::create("PanelSetting/voice_on.PNG", "PanelSetting/voice_on.PNG", CC_CALLBACK_0(SettingMenuNode::clickVoice, this));
-	MenuItemImage* m_pMenuVoiceOff = MenuItemImage::create("PanelSetting/voice_off.PNG", "PanelSetting/voice_off.PNG", CC_CALLBACK_0(SettingMenuNode::clickVoice, this));
-	m_pMenuVoice = MenuItemToggle::createWithCallback( CC_CALLBACK_0(SettingMenuNode::clickVoice, this), m_pMenuVoiceOff, m_pMenuVoiceOn, NULL);	
-	m_pMenuVoice->setPosition(Point(410,530));
+	Sprite* pMusicSprite = Sprite::create("PanelSetting/music_on.PNG");
+	Sprite* pMusicSpriteActive = Sprite::create("PanelSetting/music_off.PNG");
+	ButtonNode* pButtonMusicNode = ButtonNode::createButtonSprite(pMusicSprite, pMusicSpriteActive, CC_CALLBACK_0(SettingMenuNode::clickMusic, this));
+	pButtonMusicNode->setPosition(Point(410, 620));
+	pButtonManagerNode->addButtonNode(pButtonMusicNode);
 
-	/*m_pLabelMusic = LabelTTF::create("Music On", "Arial", 25);
-	m_pLabelMusic->setColor(ccc3(0.0f, 0.0f, 0.0f));
-    MenuItemLabel* m_pItemMusic = MenuItemLabel::create(m_pLabelMusic, CC_CALLBACK_0(SettingMenuNode::clickMusic, this));
-    m_pItemMusic->setPosition(Point(100, 750));
+	Sprite* pVoiceSprite = Sprite::create("PanelSetting/voice_on.PNG");
+	Sprite* pVoiceSpriteActive = Sprite::create("PanelSetting/voice_off.PNG");
+	ButtonNode* pButtonVoiceNode = ButtonNode::createButtonSprite(pVoiceSprite, pVoiceSpriteActive, CC_CALLBACK_0(SettingMenuNode::clickVoice, this));
+	pButtonVoiceNode->setPosition(Point(410, 530));
+	pButtonManagerNode->addButtonNode(pButtonVoiceNode);
 
-	m_pLabelEffect = LabelTTF::create("Effect On", "Arial", 25);
-	m_pLabelEffect->setColor(ccc3(0.0f, 0.0f, 0.0f));
-    MenuItemLabel* m_pItemEffect = MenuItemLabel::create(m_pLabelEffect, CC_CALLBACK_0(SettingMenuNode::clickEffect, this));
-    m_pItemEffect->setPosition(Point(250, 750));
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnEffect", 1) == 0)
+		pButtonEffectNode->setStateActive(true);
 
-	m_plabelVoice = LabelTTF::create("Voice On", "Arial", 25);
-	m_plabelVoice->setColor(ccc3(0.0f, 0.0f, 0.0f));
-    MenuItemLabel* m_pItemVoice = MenuItemLabel::create(m_plabelVoice, CC_CALLBACK_0(SettingMenuNode::clickVoice, this));
-    m_pItemVoice->setPosition(Point(400, 750));*/
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnMusic", 1) == 0)
+		pButtonMusicNode->setStateActive(true);
 
-	LabelTTF* pLabelTutorial = LabelTTF::create("TUTORIAL", "Arial", 25);
-	pLabelTutorial->setColor(ccc3(0.0f, 0.0f, 0.0f));
-    MenuItemLabel* m_pItemTutorial = MenuItemLabel::create(pLabelTutorial, CC_CALLBACK_0(SettingMenuNode::clickTutorial, this));
-    m_pItemTutorial->setPosition(Point(250, 100));
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) == 0)
+		pButtonVoiceNode->setStateActive(true);
 
-	LabelTTF* pLabelLogoutFacebook = LabelTTF::create("LOGOUT FACEBOOK", "Arial", 25);
-	pLabelLogoutFacebook->setColor(ccc3(0.0f, 0.0f, 0.0f));
-    MenuItemLabel* m_pItemLogoutFacebook = MenuItemLabel::create(pLabelLogoutFacebook, CC_CALLBACK_0(SettingMenuNode::clickLogoutFacebook, this));
-    m_pItemLogoutFacebook->setPosition(Point(250, 600));
-	m_pItemLogoutFacebook->setVisible(false);
 
-	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnMusic", 1) != 1)
-	{
-		//m_pLabelMusic->setString("Music Off");
-		m_pMenuMusic->setSelectedIndex(0);
-	}
-	else 
-		m_pMenuMusic->setSelectedIndex(1);
 
-	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnEffect", 1) != 1)
-	{
-		//m_pLabelEffect->setString("Effect Off");
-		m_pMenuEffect->setSelectedIndex(0);
-	}
-	else 
-		m_pMenuEffect->setSelectedIndex(1);
-
-	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) != 1)
-	{
-		//m_plabelVoice->setString("Voice Off");
-		m_pMenuVoice->setSelectedIndex(0);
-	}
-	else 
-		m_pMenuVoice->setSelectedIndex(1);
-
-	char *sTitleButtonBack;
 	int iSize = Breadcrumb::getInstance()->getSceneModes().size();
 	switch(Breadcrumb::getInstance()->getSceneMode(iSize - 2))
 	{
-	case SceneMode::kExitGame:
+		case SceneMode::kExitGame:
 		{
-			sTitleButtonBack = "EXIT GAME";
-			m_pItemLogoutFacebook->setVisible(true);
+			Sprite* pFacebookLoginSprite = Sprite::create("PanelSetting/loginFB.PNG");
+			#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+				FacebookManager::getInstance()->loadPlugin();
+				if(!FacebookManager::getInstance()->isLogined())
+					pFacebookLoginSprite = Sprite::create("PanelSetting/logoutFB.png");
+				else
+					pFacebookLoginSprite = Sprite::create("PanelSetting/loginFB.PNG");
+			#endif
+			
+			ButtonNode* pButtonFacebook = ButtonNode::createButtonSprite(pFacebookLoginSprite, CC_CALLBACK_1(SettingMenuNode::clickFacebook, this));
+			pButtonFacebook->setPosition(Point(261, 200.0f));
+			pButtonManagerNode->addButtonNode(pButtonFacebook);
 			break;
 		}
-	case SceneMode::kMainMenu :
-		sTitleButtonBack = "MAIN MENU";
-		break;
-
-	case SceneMode::kWorldMap :
-		sTitleButtonBack = "BACK TO WORLD MAP";
-		break;
-
-	case SceneMode::kLevelMap :
+		case SceneMode::kMainMenu :
 		{
-			sTitleButtonBack = "BACK TO LEVEL MAP";
+			Sprite* pBackSprite = Sprite::create("PanelSetting/menu-btn.png");
+			ButtonNode* pButtonBack = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
+			pButtonBack->setPosition(Point(261, 200.0f));
+			pButtonManagerNode->addButtonNode(pButtonBack);
+			break;
+		}
+		case SceneMode::kWorldMap :
+		{
+			Sprite* pBackSprite = Sprite::create("PanelSetting/worldmap-btn.png");
+			ButtonNode* pButtonBack = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
+			pButtonBack->setPosition(Point(261, 200.0f));
+			pButtonManagerNode->addButtonNode(pButtonBack);
+			break;
+		}
+		case SceneMode::kLevelMap :
+		{
+			Sprite* pBackSprite;
 			if (Breadcrumb::getInstance()->getSceneMode(iSize - 1) == SceneMode::kPlayGame)
-				sTitleButtonBack = "END GAME";
+				pBackSprite = Sprite::create("PanelSetting/exit-level-btn.png");
+			else
+				pBackSprite = Sprite::create("PanelSetting/level-map-btn.png");
+			ButtonNode* pBackButtonNode = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
+			pBackButtonNode->setPosition(Point(261, 200.0f));
+			pButtonManagerNode->addButtonNode(pBackButtonNode);
 			break;
 		}
-	case SceneMode::kFlashCardCollection :
-		sTitleButtonBack = "BACK TO FLASHCARD COLLECTION";
-		break;
+		case SceneMode::kFlashCardCollection :
+		{
+			Sprite* pBackSprite = Sprite::create("PanelSetting/flashcard.PNG");
+			ButtonNode* pButtonBack = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
+			pButtonBack->setPosition(Point(261, 200.0f));
+			pButtonManagerNode->addButtonNode(pButtonBack);
+			break;
+		}
 	}
 
-	/*LabelTTF* pLabelBack = LabelTTF::create(sTitleButtonBack, "Arial", 25);
-	pLabelBack->setColor(ccc3(0.0f, 0.0f, 0.0f));
-    MenuItemLabel* m_pItemBack = MenuItemLabel::create(pLabelBack, CC_CALLBACK_0(SettingMenuNode::clickBack, this));
-	m_pItemBack->setPosition(Point(250, 650));*/
-	Sprite* pBackButtonSprite = Sprite::create("PanelSetting/back_btn.png");
-	ButtonNode* pBackButtonNode = ButtonNode::createButtonSprite(pBackButtonSprite, CC_CALLBACK_0(SettingMenuNode::clickBack, this));
-	pBackButtonNode->setPosition(Point(250, 252.0f));
-
-	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
+	Sprite* pBackButtonSprite = Sprite::create("PanelSetting/tutorial-btn.png");
+	ButtonNode* pBackButtonNode = ButtonNode::createButtonSprite(pBackButtonSprite, CC_CALLBACK_1(SettingMenuNode::clickTutorial, this));
+	pBackButtonNode->setPosition(Point(261, 350.0f));
 	pButtonManagerNode->addButtonNode(pBackButtonNode);
-	this->addChild(pButtonManagerNode);
 
-
-	CCMenu* pMenu = CCMenu::create( m_pMenuMusic, m_pMenuEffect, m_pMenuVoice, m_pItemTutorial, m_pItemLogoutFacebook,  NULL);
-	pMenu->setPosition(CCPointZero);
-	this->addChild(pMenu);
 
 	m_iShowSetting = false;
 	m_isClick = false;
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	FacebookManager::getInstance()->loadPlugin();
-	if(!FacebookManager::getInstance()->isLogined())
-	{
-		m_pItemLogoutFacebook->setVisible(false);
-	}
-#endif
-	
 	return true;
 }
 
@@ -161,15 +139,11 @@ void SettingMenuNode::clickMusic()
 {
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnMusic", 1) != 1)
 	{
-		//m_pLabelMusic->setString("Music On");
-		m_pMenuMusic->setSelectedIndex(1);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnMusic", 1);
 		SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kNone);
 	}
 	else
 	{
-		//m_pLabelMusic->setString("Music Off");
-		m_pMenuMusic->setSelectedIndex(0);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnMusic", 0);
 		SoundManager::StopBackgroundMusic();
 	}
@@ -179,14 +153,10 @@ void SettingMenuNode::clickEffect()
 {
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnEffect", 1) != 1)
 	{
-		//m_pLabelEffect->setString("Effect On");
-		m_pMenuEffect->setSelectedIndex(1);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnEffect", 1);
 	}
 	else
 	{
-		//m_pLabelEffect->setString("Effect Off");
-		m_pMenuEffect->setSelectedIndex(0);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnEffect", 0);
 	}
 }
@@ -195,23 +165,19 @@ void SettingMenuNode::clickVoice()
 {
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) != 1)
 	{
-		//m_plabelVoice->setString("Voice On");
-		m_pMenuVoice->setSelectedIndex(1);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnVoice", 1);
 	}
 	else
 	{
-		//m_plabelVoice->setString("Voice Off");
-		m_pMenuVoice->setSelectedIndex(0);
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnVoice", 0);
 	}
 }
 
-void SettingMenuNode::clickTutorial()
+void SettingMenuNode::clickTutorial(Object* sender)
 {
 }
 
-void SettingMenuNode::clickBack()
+void SettingMenuNode::clickBack(Object* sender)
 {
 	switch(Breadcrumb::getInstance()->getSceneModePopBack())
 	{
@@ -253,10 +219,13 @@ void SettingMenuNode::clickBack()
 	}
 }
 
-void SettingMenuNode::clickLogoutFacebook()
+void SettingMenuNode::clickFacebook(Object* sender)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    FacebookManager::getInstance()->logoutByMode();
+	if(!FacebookManager::getInstance()->isLogined())
+		FacebookManager::getInstance()->logoutByMode();
+	else
+		FacebookManager::getInstance()->loginByMode();
 #else
 	MessageBox("Facebook not run with platform window", "Facebook");
 #endif
@@ -264,15 +233,21 @@ void SettingMenuNode::clickLogoutFacebook()
 
 void SettingMenuNode::show()
 {
-	MoveTo* actionParentMoveBy = MoveTo::create(0.25f, Point(-500.0f, 0.0f));
-	this->getParent()->runAction(actionParentMoveBy);
+	// play sound effect
+	SoundManager::PlaySoundEffect(_SET_GAME_MENU_);
+
+	MoveTo* actionParentMoveTo = MoveTo::create(0.15f, Point(524.0f, 0.0f));
+	this->getParent()->runAction(actionParentMoveTo);
 	m_iShowSetting = true;
 }
 
 void SettingMenuNode::hide()
 {
-	MoveTo* actionParentMoveBy = MoveTo::create(0.25f, Point(0.0f, 0.0f));
-	this->getParent()->runAction(actionParentMoveBy);
+	// play sound effect
+	SoundManager::PlaySoundEffect(_SET_GAME_MENU_);
+
+	MoveTo* actionParentMoveTo = MoveTo::create(0.15f, Point(0.0f, 0.0f));
+	this->getParent()->runAction(actionParentMoveTo);
 	m_iShowSetting = false;
 }
 
@@ -280,7 +255,7 @@ bool SettingMenuNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
 {
 	Point touchPosition = pTouch->getLocation();
 
-	if (touchPosition.x < 140.0f)
+	if (touchPosition.x > 524.0f)
 	{
 		m_isClick = true;
 	}
@@ -300,16 +275,18 @@ void SettingMenuNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
 {
 	if(m_isClick)
 	{
+		m_pSettingButton->setStateActive(!m_pSettingButton->getStateActive());
 		if (m_iShowSetting)
-		{
 			this->hide();
-		}
 		else
-		{
 			this->show();
-		}
 	}
 	m_isClick = false;
+}
+
+void SettingMenuNode::addButtonSetting(ButtonNode* pSettingButton)
+{
+	m_pSettingButton = pSettingButton;
 }
 
 

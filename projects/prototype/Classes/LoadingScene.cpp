@@ -7,6 +7,11 @@
 
 using namespace cocos2d;
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "Social\FacebookManager.h"
+using namespace cocos2d::plugin;
+#endif
+
 bool LoadingScene::init()
 {
 	if(CCScene::init())
@@ -96,12 +101,16 @@ void LoadingLayer::initData()
 	}
 
 	InitDatabase::getInstance();
-	UserTable::getInstance();
-	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
-	userInfo.sFacebookId = "100000135318088";
-	userInfo.sFacebookToken = "CAAGQiytiRCoBAPqmEfvePLrbdMuzDylsNQZAZAud0CKLLTFZAfIm4pkdUcCoyYGEGDr3sgwKZCNLdTNbMgD2pd90UqfvFgf4JjsDR9rtBrUfO3D2nj3V8ZApvpeoJWDfYh3PwAnPJsZCHl9lFwZCGfjLKisBhnmgEaZCRZAHxYh3P9ZAxukpGupiX91XKyfjHVFbAfRpyqWxH6fbSCVxfiuxoimd05Y4Rc1fjKkVsTcDtlrwZDZD";
-	UserTable::getInstance()->updateUser(userInfo);
 	DictionaryDatabase::getInstance();
+
+	UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
+	if(userInfo.sFacebookId != "")
+	{
+		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+			FacebookManager::getInstance()->loadPlugin();
+			FacebookManager::getInstance()->loginByMode();
+		#endif
+	}
 }
 
 void LoadingLayer::finishLoading()

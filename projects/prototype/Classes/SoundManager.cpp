@@ -116,6 +116,9 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 		case _SET_DOUBLE_COMPLE_EFFECT_:
 			sFileName = "SoundEffectPC/combo_sfx.wav";
 			break;	
+		case _SET_GAME_MENU_:
+			sFileName = "SoundEffectPC/IGM_sfx.wav";
+			break;	
 #else	
 		default:
 		case _SET_DROP_:
@@ -162,7 +165,10 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 		case _SET_SIMPLE_COMBO_:
 		case _SET_DOUBLE_COMPLE_EFFECT_:
 			sFileName = "SoundEffect/combo_sfx.ogg";
-			break;	
+			break;
+		case _SET_GAME_MENU_:
+			sFileName = "SoundEffect/IGM_sfx.ogg";
+			break;
 #endif
 	};
 
