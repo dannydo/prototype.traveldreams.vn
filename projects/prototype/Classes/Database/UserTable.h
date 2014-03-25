@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 
-#define _SECONDS_FOR_NEW_LIFE_ 1800
+#define _SECONDS_FOR_NEW_LIFE_ 60
 #define _MAX_LIFE_ 5
 
 struct UserInfo
