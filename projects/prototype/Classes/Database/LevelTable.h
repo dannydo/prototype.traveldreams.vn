@@ -10,6 +10,7 @@ struct LevelInfo
 	int iStar;
 	int iScore;
 	int iBonusQuest;
+	int iTotalBonusQuest;
 	bool bIsUnlock;
 	bool bIsUpdate;
 	std::string sWordKey;

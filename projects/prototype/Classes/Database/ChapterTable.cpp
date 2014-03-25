@@ -41,7 +41,6 @@ void ChapterTable::fetchAllChapter()
 	int nRow, nColumn;
 		
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), "select * from Chapters", &re, &nRow, &nColumn,NULL);
-	CCLOG("row is %d,column is %d", nRow, nColumn);
 
 	for (int iRow=1; iRow<=nRow; iRow++)
 	{
@@ -74,7 +73,6 @@ bool ChapterTable::updateChapter(ChapterInfo chapterInfo)
 	sql.appendWithFormat(" IsUnlock=%d,", chapterInfo.bIsUnlock);
 	sql.appendWithFormat(" IsUpdate=%d", chapterInfo.bIsUpdate);
 	sql.appendWithFormat(" where Chapter=%d", chapterInfo.iChapter);
-	CCLOG("%s", sql.getCString());
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)

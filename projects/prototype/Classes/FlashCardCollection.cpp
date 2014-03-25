@@ -220,7 +220,6 @@ void FlashCardCollectionLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Eve
 		Point touchButton = m_pButton1->convertToNodeSpace(touchPosition);
 		if(pRectButton->containsPoint(touchButton))
 		{
-			CCLOG("button1");
 			openFlashCard(1);
 		}
 
@@ -231,7 +230,6 @@ void FlashCardCollectionLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Eve
 		touchButton = m_pButton2->convertToNodeSpace(touchPosition);
 		if(pRectButton->containsPoint(touchButton))
 		{
-			CCLOG("button2");
 			openFlashCard(2);
 		}
 
@@ -242,7 +240,6 @@ void FlashCardCollectionLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Eve
 		touchButton = m_pButton3->convertToNodeSpace(touchPosition);
 		if(pRectButton->containsPoint(touchButton))
 		{
-			CCLOG("button3");
 			openFlashCard(3);
 		}
 
@@ -253,7 +250,6 @@ void FlashCardCollectionLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Eve
 		touchButton = m_pButton4->convertToNodeSpace(touchPosition);
 		if(pRectButton->containsPoint(touchButton))
 		{
-			CCLOG("button4");
 			openFlashCard(4);
 		}
 	}

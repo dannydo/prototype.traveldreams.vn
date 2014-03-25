@@ -21,7 +21,7 @@
 		<key>effectDestroyShield</key>
 		<dict>
 			<key>delay</key>
-			<real>0.65</real>
+			<real>0.065</real>
 			<key>frames</key>
 			<array>
 				<string>B_Smoke_01.png</string>

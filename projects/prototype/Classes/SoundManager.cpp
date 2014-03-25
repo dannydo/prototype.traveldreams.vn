@@ -130,6 +130,10 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 		case _SET_CREATE_COMBO_4_:
 			sFileName = "SoundEffectPC/Create_combo_4_sfx.wav";
 			break;	
+		case _SET_GAME_MENU_:
+			sFileName = "SoundEffectPC/IGM_sfx.wav";
+			break;	
+			
 		case _SET_ACTIVATE_COMBO_4_:
 			sFileName = "SoundEffectPC/Combo4_effect_sfx.wav";
 			break;	
@@ -204,7 +208,10 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 
 		case _SET_CREATE_COMBO_4_:
 			sFileName = "SoundEffect/Create_combo_4_sfx.ogg";
-			break;	
+			break;
+		case _SET_GAME_MENU_:
+			sFileName = "SoundEffect/IGM_sfx.ogg";
+			break;
 		case _SET_ACTIVATE_COMBO_4_:
 			sFileName = "SoundEffect/Combo4_effect_sfx.ogg";
 			break;	

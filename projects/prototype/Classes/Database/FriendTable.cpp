@@ -42,7 +42,6 @@ void FriendTable::fetchAllFriend()
 	int nRow, nColumn;
 		
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), "select * from Friends", &re, &nRow, &nColumn,NULL);
-	CCLOG("row is %d,column is %d", nRow, nColumn);
 
 	for (int iRow=1; iRow<=nRow; iRow++)
 	{

@@ -56,7 +56,6 @@ bool DictionaryDatabase::init()
 		FILE *fp = fopen(sPath.c_str(), "wb");
 		if (!fp)
 		{
-			CCLOG("can not create file %s", sPath.c_str());
 			return false;
 		}
 
@@ -93,10 +92,8 @@ WordDictionaryInfo DictionaryDatabase::fectMeanWord(const char* sWord)
 
 	String sql = "select * from Words where Word=";
 	sql.appendWithFormat("'%s'", sLovercase.c_str());
-	CCLOG("%s", sql.getCString());
 
 	sqlite3_get_table(m_DatabaseSqlite, sql.getCString(), &re, &nRow, &nColumn,NULL);
-	CCLOG("row is %d,column is %d", nRow, nColumn);
 
 	WordDictionaryInfo wordDictInfo;
 	if (nRow > 0)

@@ -17,7 +17,6 @@ void GameTracking::saveFileTrackingLevel(const int& ilevel, const int& iMove, co
 	FILE *fp = fopen(sPath.c_str(), "a+");
 	if (!fp)
 	{
-		CCLOG("can not create file %s", sPath.c_str());
 		return;
 	}
 	

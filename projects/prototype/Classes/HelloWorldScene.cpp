@@ -41,18 +41,19 @@ Scene* HelloWorld::createScene(int iLevel)
 	boardLayer->m_pStatusLayer->setCurrentScore(0);
 	boardLayer->m_pStatusLayer->setCurrentMove(0);
 	boardLayer->m_pStatusLayer->setSpeedUpdateScore(120.f);
-	boardLayer->m_pStatusLayer->setPosition(Point(-7.0f, -35.0f));
+	boardLayer->m_pStatusLayer->setPosition(Point(567.0f, -38.0f));
 	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pStatusLayer);
 
 	// init level
 	boardLayer->initLevel(iLevel);
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
-	ButtonNode* pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
-	pButtonSettingNode->setPosition(Point(590.0f, 50.0f));
+	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
+	boardLayer->m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
+	boardLayer->m_pButtonSettingNode->setPosition(Point(41.0f, 41.0f));
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
-	pButtonManagerNode->addButtonNode(pButtonSettingNode);
+	pButtonManagerNode->addButtonNode(boardLayer->m_pButtonSettingNode);
 	boardLayer->m_pHUDLayer->addChild(pButtonManagerNode);
 
 	
@@ -62,7 +63,8 @@ Scene* HelloWorld::createScene(int iLevel)
     menu->setPosition(Point::ZERO);
     boardLayer->m_pHUDLayer->addChild(menu, 10);
 	//menuLayer->setTouchEnabled(true);
-	scene->addChild(boardLayer->m_pHUDLayer);
+	//scene->addChild(boardLayer->m_pHUDLayer);
+	boardLayer->addChild(boardLayer->m_pHUDLayer, 99);
 
 
 	// combo count render node
@@ -499,8 +501,9 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 	if(m_pSettingNode == NULL)
 	{
 		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(640.0f, 0));
-		this->getParent()->addChild(m_pSettingNode, 100);
+		m_pSettingNode->setPosition(Point(-524.0f, 0));
+		m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
+		this->addChild(m_pSettingNode, 98);
 	}
 
 	if (m_pSettingNode->getShowSetting() == false)

@@ -3,11 +3,11 @@
 #include "IntroductionLayer.h"
 #include "FlashCardCollection.h"
 #include "MainMenuScene.h"
-#include "LifeSystemNode.h"
 #include "SoundManager.h"
 #include "GameBoardManager.h"
 #include "Database\ChapterTable.h"
 #include "ButtonManagerNode.h"
+#include "HeaderNode.h"
 
 USING_NS_CC;
 
@@ -102,21 +102,11 @@ bool WorldMapLayer::init()
 	m_pFooterNode = FooterNode::create();
 	this->addChild(m_pFooterNode);
 
+	HeaderNode* pHeaderNode = HeaderNode::create();
+	this->addChild(pHeaderNode);
+
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kWorldMap);
-
-	
-	// temporary add background header to node
-	Sprite* pBarTop = Sprite::create("World-Map/Header.png");
-	pBarTop->setAnchorPoint(Point(0.0f, 1.f));	
-	pBarTop->setPosition( Point(0, winSize.height));
-	this->addChild(pBarTop);
-
-	LifeSystemNode* pLifeNode = LifeSystemNode::create();
-	pLifeNode->setPosition(Point(50.0f, 910.0f));
-	this->addChild(pLifeNode);
-
-
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
@@ -127,7 +117,7 @@ bool WorldMapLayer::init()
 
 void WorldMapLayer::menuPlayChapterCallBack(Object* sender)
 {
-	// play sound effect 					
+	// play sound effect
 	SoundManager::PlaySoundEffect(_SET_CHAPTER_SELECT_);
 
 	ButtonNode* pButtonNode = (ButtonNode*)sender;

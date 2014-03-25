@@ -49,6 +49,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/ActionExtension.cpp \
 				   ../../Classes/FooterNode.cpp \
 				   ../../Classes/ButtonManagerNode.cpp \
+				   ../../Classes/HeaderNode.cpp \
 				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \

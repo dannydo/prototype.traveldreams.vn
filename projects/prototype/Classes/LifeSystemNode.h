@@ -19,7 +19,7 @@ private:
 	cocos2d::String formatSecondsToDiaplay(const int& iSeconds);
 
 	cocos2d::LabelTTF* m_pLabelSecondsRemaing;
-	cocos2d::LabelTTF* m_pLabelLife;
+	cocos2d::LabelBMFont* m_pLabelLife;
 
 	UserInfo m_userInfo;
 };

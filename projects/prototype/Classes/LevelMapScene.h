@@ -28,6 +28,8 @@ private:
 	void loadConfigChapter(const int& iChapter);
 	void updateScrollSlideShow();
 
+	cocos2d::Node* generateLayoutStarAndBonusQuest(const int& iStarCompleted, const int& iBonusQuestCompleted, const int& iTotalBonusQuest);
+
 	cocos2d::Node* m_pBackgroundNode;
 
 	int m_iTotalImageBG;

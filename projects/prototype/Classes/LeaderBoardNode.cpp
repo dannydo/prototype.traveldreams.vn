@@ -68,8 +68,12 @@ bool LeaderBoardtNode::init()
 		m_arrIndex[iIndex] = -1;
 	}
 
-	UserService::getInstance()->addCallBackList(this);
-	UserService::getInstance()->getLeaderBoardLevel(m_iLevel);
+	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
+	if (userInfo.sFacebookId != "")
+	{
+		UserService::getInstance()->addCallBackList(this);
+		UserService::getInstance()->getLeaderBoardLevel(m_iLevel);
+	}
 	m_isClick = false;
 
 	return true;

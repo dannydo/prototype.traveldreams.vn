@@ -1,7 +1,6 @@
 #include "MainMenuScene.h"
 #include "SoundManager.h"
 #include "WorldMapScene.h"
-#include "LifeSystemNode.h"	
 #include "ButtonNode.h"
 #include "StatusLayer.h"
 
@@ -66,65 +65,28 @@ bool MainMenuLayer::init()
 	m_buttonLoginNode->setPosition(Point(320.0f, 355.0f));
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
-	ButtonNode* pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, CC_CALLBACK_1(MainMenuLayer::openSettingMenu, this));
-	pButtonSettingNode->setPosition(Point(590.0f, 50.0f));
+	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
+	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(MainMenuLayer::openSettingMenu, this));
+	m_pButtonSettingNode->setPosition(Point(41.0f, 41.0f));
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(buttonPlayNode);
 	pButtonManagerNode->addButtonNode(m_buttonLoginNode);
-	pButtonManagerNode->addButtonNode(pButtonSettingNode);
-	this->addChild(pButtonManagerNode);
-
-	/*
-	CCMenuItemImage* pPlayGame = CCMenuItemImage::create(
-		"LoadingAndMainMenu/btn_play.png",
-		"LoadingAndMainMenu/btn_play.png",
-		CC_CALLBACK_0(MainMenuLayer::playGame, this));
-	pPlayGame->setPosition(Point(320.0f, 254.0f));
-
-	CCMenuItemImage* m_pLoginfacebook = CCMenuItemImage::create(
-		"LoadingAndMainMenu/FB_btn.png",
-		"LoadingAndMainMenu/FB_btn.png",
-		CC_CALLBACK_0(MainMenuLayer::loginFacebook, this));
-	m_pLoginfacebook->setPosition(Point(320.0f, 94.0f));
-
-	CCMenu* pMenu = CCMenu::create( pPlayGame, m_pLoginfacebook,  NULL);
-	pMenu->setPosition(CCPointZero);
-
-	this->addChild(pMenu, 1);
-	
-    LabelTTF* label2 = LabelTTF::create("Logout", "Arial", 32);
-    MenuItemLabel* m_pItemLogout = MenuItemLabel::create(label2, CC_CALLBACK_0(MainMenuLayer::LogoutFacebook, this));
-    m_pItemLogout->setPosition(Point(winSize.width /2.f - 40, winSize.height/2.f - 350));
-	pMenu->addChild(m_pItemLogout);
-
-	LabelTTF* label3 = LabelTTF::create("Share", "Arial", 32);
-    MenuItemLabel* m_pItemShareLink = MenuItemLabel::create(label3, CC_CALLBACK_0(MainMenuLayer::shareLinkFacebook, this));
-    m_pItemShareLink->setPosition(Point(winSize.width /2.f - 190, winSize.height/2.f - 350));
-	pMenu->addChild(m_pItemShareLink);
-
-	LabelTTF* label4 = LabelTTF::create("Share Dialog", "Arial", 32);
-    MenuItemLabel* m_pItemShareDialog = MenuItemLabel::create(label4, CC_CALLBACK_0(MainMenuLayer::shareDialogFacebook, this));
-    m_pItemShareDialog->setPosition(Point(winSize.width /2.f + 150, winSize.height/2.f - 350));
-	pMenu->addChild(m_pItemShareDialog);
-	*/
+	pButtonManagerNode->addButtonNode(m_pButtonSettingNode);
+	this->addChild(pButtonManagerNode, 10);
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	FacebookManager::getInstance()->loadPlugin();
+	if(FacebookManager::getInstance()->isLogined())
+	{
+		m_buttonLoginNode->setVisible(false);
+	}
 #endif
-	
-	LifeSystemNode* pLifeNode = LifeSystemNode::create();
-	pLifeNode->setPosition(Point(50.0f, 910.0f));
-	this->addChild(pLifeNode);
 
 	this->scheduleUpdate();
 
 	m_pSettingNode = NULL;
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
-
-	//UserService::getInstance()->addCallBackList(this);
-	//m_sFacebookToken = "CAAGQiytiRCoBAPqmEfvePLrbdMuzDylsNQZAZAud0CKLLTFZAfIm4pkdUcCoyYGEGDr3sgwKZCNLdTNbMgD2pd90UqfvFgf4JjsDR9rtBrUfO3D2nj3V8ZApvpeoJWDfYh3PwAnPJsZCHl9lFwZCGfjLKisBhnmgEaZCRZAHxYh3P9ZAxukpGupiX91XKyfjHVFbAfRpyqWxH6fbSCVxfiuxoimd05Y4Rc1fjKkVsTcDtlrwZDZD";
-	//UserService::getInstance()->registryUser(m_sFacebookToken);
 
 	return true;
 }
@@ -151,7 +113,6 @@ void MainMenuLayer::playGame(Object* sender)
 
 void MainMenuLayer::loginFacebook(Object* sender)
 {
-	CCLOG("login");
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	if(m_buttonLoginNode->isVisible() == true) 
 	{
@@ -164,7 +125,6 @@ void MainMenuLayer::loginFacebook(Object* sender)
 
 void MainMenuLayer::LogoutFacebook()
 {
-	CCLOG("logout");
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
     FacebookManager::getInstance()->logoutByMode();
 #else
@@ -174,7 +134,6 @@ void MainMenuLayer::LogoutFacebook()
 
 void MainMenuLayer::shareLinkFacebook()
 {
-	CCLOG("Share facebook link");
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
     FacebookManager::getInstance()->shareLink("Facebook SDK for Android", "Build great social apps and get more installs.",
 		"The Facebook SDK for Android makes it easier and faster to develop Facebook integrated Android apps.",
@@ -183,12 +142,11 @@ void MainMenuLayer::shareLinkFacebook()
 #else
 	MessageBox("Facebook not run with platform window", "Facebook");
 #endif
-	
+
 }
 
 void MainMenuLayer::shareDialogFacebook()
 {
-	CCLOG("Share facebook dialog");
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
     FacebookManager::getInstance()->shareDialog("Facebook SDK for Android", "Build great social apps and get more installs.",
 		"The Facebook SDK for Android makes it easier and faster to develop Facebook integrated Android apps.",
@@ -204,7 +162,8 @@ void MainMenuLayer::openSettingMenu(Object *sender)
 	if(m_pSettingNode == NULL)
 	{
 		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(640.0f, 0.0f));
+		m_pSettingNode->setPosition(Point(-524.0f, 0.0f));
+		m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
 		this->addChild(m_pSettingNode);
 	}
 
@@ -222,10 +181,17 @@ void MainMenuLayer::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, st
 {
 	try 
 	{
-		m_buttonLoginNode->setVisible(false);
-
-		UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
-		UserTable::getInstance()->updateUser(userInfo);
+		cs::JsonDictionary* jsonData = pJsonDict->getSubDictionary("data");
+		bool bResult = jsonData->getItemBoolvalue("result", false);
+		if (bResult)
+		{
+			UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
+			userInfo.sFacebookId = jsonData->getItemStringValue("facebook_id");
+			userInfo.sFacebookToken = m_sFacebookToken;
+			UserTable::getInstance()->updateUser(userInfo);
+			
+			m_buttonLoginNode->setVisible(false);
+		}
 	}
 	catch (exception e)
 	{

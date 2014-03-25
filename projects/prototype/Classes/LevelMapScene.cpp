@@ -6,10 +6,11 @@
 #include "WorldMapScene.h"
 #include "FlashCardCollection.h"
 #include "Database\UserTable.h"
-#include "LifeSystemNode.h"
+#include "HeaderNode.h"
 #include "Database\LevelTable.h"
 #include "ButtonManagerNode.h"
-#include "Database\UserTable.h"
+#include "Database\UserTable.h"	 
+#include "Config.h"
 
 using namespace cocos2d;
 
@@ -87,31 +88,40 @@ bool LevelMapLayer::init()
 
 		char sLevel[5];
 		sprintf(sLevel, "%d", levelInfo.iLevel);
-		LabelTTF* pLevelLabel = LabelTTF::create(sLevel, "Arial", 32);
+		LabelTTF* pLevelLabel = LabelTTF::create(sLevel, "fonts/UTM Cookies.ttf", 32);
 		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
-		pLevelLabel->setPosition(point);
+		pLevelLabel->setPosition(Point(point.x-2, point.y+17));
 		
-		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel || 1 == 1)
+		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel)
 		{
-			Sprite* pButtonLevelSprite = Sprite::create("World-Map/Level_lock.png");
+			Sprite* pButtonLevelSprite;
+			
+			
+			if(levelInfo.iLevel == userInfo.iCurrentLevel)
+			{
+				pointScroll = point;
+				pButtonLevelSprite = Sprite::create("World-Map/new-level.png");
+			}
+			else
+			{
+				pButtonLevelSprite = Sprite::create("World-Map/pass-level.png");
+			}
+
 			pButtonLevelSprite->setTag(levelInfo.iLevel);
 			ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonLevelSprite, CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
 			buttonPlayNode->setPosition(point);
 			buttonPlayNode->setTag(levelInfo.iLevel);
 			pButtonManagerNode->addButtonNode(buttonPlayNode);
 
-			if(levelInfo.iLevel == userInfo.iCurrentLevel)
-			{
-				pointScroll = point;
-				pLevelLabel->setColor(ccc3(0, 255, 0));
-			}
+			Node* pStarAndBonusQuestNode = this->generateLayoutStarAndBonusQuest(levelInfo.iStar, levelInfo.iBonusQuest, levelInfo.iTotalBonusQuest);
+			pStarAndBonusQuestNode->setPosition(Point(point.x-2, point.y));
+			m_pBackgroundNode->addChild(pStarAndBonusQuestNode);
 		}
 		else
 		{
 			Sprite* pButtonLevelSprite = Sprite::create("World-Map/Level_lock.png");
 			pButtonLevelSprite->setPosition(point);
 			m_pBackgroundNode->addChild(pButtonLevelSprite);
-			pLevelLabel->setColor(ccc3(255, 0, 0));
 		}
 
 		m_pBackgroundNode->addChild(pLevelLabel);
@@ -134,18 +144,8 @@ bool LevelMapLayer::init()
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kLevelMap);
 
-	
-	// temporary add background header to node
-	Sprite* pBarTop = Sprite::create("World-Map/Header.png");
-	pBarTop->setAnchorPoint(Point(0.0f, 1.f));	
-	pBarTop->setPosition( Point(0, winSize.height));
-	this->addChild(pBarTop);
-
-	LifeSystemNode* pLifeNode = LifeSystemNode::create();
-	pLifeNode->setPosition(Point(50.0f, 910.0f));
-	this->addChild(pLifeNode);
-
-
+	HeaderNode* pHeaderNode = HeaderNode::create();
+	this->addChild(pHeaderNode);
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
@@ -258,4 +258,53 @@ void LevelMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 void LevelMapLayer::updateScrollSlideShow()
 {
 	m_bMoveSlideShow = false;
+}
+
+Node* LevelMapLayer::generateLayoutStarAndBonusQuest(const int& iStarCompleted, const int& iBonusQuestCompleted, const int& iTotalBonusQuest)
+{
+	Node* pNode = Node::create();
+	int fRadiusCircle = 60;
+	Point point;
+
+	for(int iCountStar=0; iCountStar<3; iCountStar++)
+	{
+		Sprite* pStarSprite;
+		if(iCountStar < iStarCompleted)
+		{
+			pStarSprite = Sprite::create("World-Map/start-y.png");
+		}
+		else
+		{
+			pStarSprite = Sprite::create("World-Map/star-p.png");
+		}
+
+		float angle = _C_PI_-(58 - 20*iTotalBonusQuest + 37*iCountStar)/180.0f*_C_PI_;
+		point.x = fRadiusCircle*cos(angle);
+		point.y = fRadiusCircle*sin(angle);
+
+		pStarSprite->setPosition(point);
+		pNode->addChild(pStarSprite);
+	}
+
+	for(int iCountBonusQuest=0; iCountBonusQuest<iTotalBonusQuest; iCountBonusQuest++)
+	{
+		Sprite* pBonusQuestSprite;
+		if(iCountBonusQuest<iBonusQuestCompleted)
+		{
+			pBonusQuestSprite = Sprite::create("World-Map/bonus-y.png");
+		}
+		else
+		{
+			pBonusQuestSprite = Sprite::create("World-Map/bonus-p.png");
+		}
+
+		float angle = _C_PI_-(58 - 20*iTotalBonusQuest + 37*(iCountBonusQuest+3))/180.0f*_C_PI_;
+		point.x = fRadiusCircle*cos(angle);
+		point.y = fRadiusCircle*sin(angle);
+
+		pBonusQuestSprite->setPosition(point);
+		pNode->addChild(pBonusQuestSprite);
+	}
+
+	return pNode;
 }

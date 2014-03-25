@@ -193,7 +193,7 @@ void FacebookActionResult::onActionResult(ProtocolUser* pPlugin, UserActionResul
     default:
         break;
     }
-    MessageBox(msg, userStatus);
+    //MessageBox(msg, userStatus);
 
     // get session ID
     std::string sessionID = pPlugin->getSessionID();

@@ -34,7 +34,8 @@ enum SoundEffectType
 	_SET_LEVEL_SELECT_,
 	_SET_START_LEVEL_,
 	_SET_WIN_,
-	_SET_FAIL_
+	_SET_FAIL_,
+	_SET_GAME_MENU_
 
 	/*
 	_SET_WRONG_MOVE_,

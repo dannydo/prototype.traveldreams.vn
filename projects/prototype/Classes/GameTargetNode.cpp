@@ -29,9 +29,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 		return false;
 	}
 
-	CCLOG("test 1");
-
-	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 229));
+	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 150));
 	pBackground->setContentSize(CCSizeMake(640, 960));
 	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
 	listener->setSwallowTouches(true);
@@ -39,8 +37,6 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, pBackground);
 	this->addChild(pBackground);
 	this->setContentSize(pBackground->getContentSize());
-
-	CCLOG("test 2");
 
 	m_pSpriteBatchNode = SpriteBatchNode::create("Target-End-Game/TargetEndgame.pvr.ccz");
 	SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("Target-End-Game/TargetEndgame.plist");
@@ -60,8 +56,6 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pBoostersImage->setPosition(Point(216.0f, 531.0f));
 	m_pSpriteBatchNode->addChild(pBoostersImage);
 
-	CCLOG("test 3");
-
 	Sprite* pIconBoosterImage = Sprite::createWithSpriteFrameName("icon-boosters.PNG");
 	pIconBoosterImage->setPosition(Point(320.0f, 465.0f));
 	m_pSpriteBatchNode->addChild(pIconBoosterImage);
@@ -78,8 +72,6 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pTargetImage->setPosition(Point(320.0f, 755.0f));
 	pTargetImage->setRotation(-3.5);
 	m_pSpriteBatchNode->addChild(pTargetImage);
-
-	CCLOG("test 4");
 
 	std::string sPath = "FlashCard/flashcardimage/";
 	sPath.append(pMainWord.m_sFlashCardImage);
@@ -111,8 +103,6 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	ButtonNode* buttonCloseNode = ButtonNode::createButtonSprite(pButtonCloseSprite, CC_CALLBACK_1(GameTargetNode::menuCloseCallBack, this));
 	buttonCloseNode->setPosition(Point(582.0f, 914.0f));
 
-	CCLOG("test 5");
-
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(buttonPlayNode);
 	pButtonManagerNode->addButtonNode(buttonCloseNode);
@@ -121,8 +111,6 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel);
 	pLeaderBoard->setPosition(Point(320, 114));
 	this->addChild(pLeaderBoard);
-
-	CCLOG("test 6");
 
 	return true;
 }		
