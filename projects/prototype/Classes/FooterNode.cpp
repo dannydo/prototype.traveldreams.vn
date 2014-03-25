@@ -24,11 +24,11 @@ bool FooterNode::init()
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
 	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
 	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(FooterNode::openSettingMenu, this));
-	m_pButtonSettingNode->setPosition(Point(41.0f, 41.0f));
+	m_pButtonSettingNode->setPosition(Point(50.0f, 50.0f));
 
 	Sprite* pFlashCardSprite = Sprite::create("Footer/btn_flashcard.png");
 	m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
-	m_pButtonFlashCardNode->setPosition(Point(140.0f, 41.0f));
+	m_pButtonFlashCardNode->setPosition(Point(220.0f, 50.0f));
 
 	Sprite* pIntroductionSprite = Sprite::create("Footer/info_icon.png");
 	m_pButtonIntroductionNode = ButtonNode::createButtonSprite(pIntroductionSprite, CC_CALLBACK_1(FooterNode::openIntroduction, this));
