@@ -152,7 +152,6 @@ bool LevelMapLayer::init()
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
-	m_bMoveSlideShow = false;
 
 	m_pScrollManager = new ScrollManager();
 
@@ -264,7 +263,6 @@ void LevelMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 
 void LevelMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
-
 	DataTouch dataTouch = m_pScrollManager->getDistanceScrollY();
 	float distanceY = dataTouch.point.y;
 	float deltaTime = dataTouch.fDeltaTime;
@@ -285,11 +283,6 @@ void LevelMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 	auto actionEaseOut = EaseOut::create(actionMove, 2.5f);
 	m_pBackgroundNode->stopAllActions();
 	m_pBackgroundNode->runAction(Sequence::create(actionEaseOut, NULL));
-}
-
-void LevelMapLayer::updateScrollSlideShow()
-{
-	m_bMoveSlideShow = false;
 }
 
 Node* LevelMapLayer::generateLayoutStarAndBonusQuest(const int& iStarCompleted, const int& iBonusQuestCompleted, const int& iTotalBonusQuest)

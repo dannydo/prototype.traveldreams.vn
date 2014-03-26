@@ -11,6 +11,12 @@ struct DataTouch
 	cocos2d::Point point;
 	unsigned long lTime;
 	float fDeltaTime;
+
+	DataTouch()
+	{
+		lTime = 0;
+		fDeltaTime = 0;
+	}
 };
 
 class ScrollManager
@@ -19,6 +25,7 @@ public:
 	ScrollManager();
 	void addDataToQueue(DataTouch dataTouch);
 	DataTouch getDistanceScrollY();
+	DataTouch getDistanceScrollX();
 
 private:
 	unsigned long getTimeLocalCurrent();
