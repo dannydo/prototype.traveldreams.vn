@@ -27,7 +27,7 @@ COMPUTER
 ; config columns appear, 1: all columns, 0: specific columns + column count + columns list
 1
 ;end game bonus type
-2
+1
 ;boss
 0
 ;obstacle list: count, list

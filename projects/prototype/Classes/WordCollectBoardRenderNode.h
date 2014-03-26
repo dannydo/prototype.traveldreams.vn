@@ -44,7 +44,7 @@ public:
 	float PlaySpellingSound();
 
 	void PlayUnlockLetterEffect(const int& iLetterIndex, const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position);
-	
+	void PlayUnlockWordEffect(const float& fMoveTime, const float& fDisplayTime);
 private:
 	//void LoadWords();
 	//void GetWordIndex();
@@ -71,6 +71,7 @@ private:
 	SpriteBatchNode* m_pBatchNode;
 	//Sprite* m_pBackground;
 	DrawNode* m_pColorNode;	
+	//Sprite* m_pLetterPanel;
 
 	unsigned long m_iPreviousMainWordTapTime;
 	//unsigned long m_iUnlockedLetterEffectEndTime;

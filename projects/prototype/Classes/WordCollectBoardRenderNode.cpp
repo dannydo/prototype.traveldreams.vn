@@ -171,7 +171,8 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	pTip->setPosition(Point( 310.f, 790.f));
 	m_pColorNode->addChild(pTip);
 
-
+	//m_pLetterPanel = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(' ').c_str());
+	//m_pBatchNode->addChild(m_pLetterPanel, 2);
 
 	// create labels
 	int iWordLength = strlen(m_pMainWord->m_sWord);	
@@ -728,7 +729,7 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex,
 	Sprite* pNewSrite = Sprite::createWithSpriteFrameName( GetImageInGemFileFromLetter(m_pMainWord->m_sWord[iLetterIndex]).c_str());						
 	pNewSrite->setVisible(false);
 	pNewSrite->setPosition( pos);	
-	m_pBatchNode->addChild(pNewSrite, 1);		
+	m_pBatchNode->addChild(pNewSrite, 2);
 	pNewSrite->runAction( 
 		Sequence::createWithTwoActions(
 			DelayTime::create( fDelayTime + 0.58f),			
@@ -740,4 +741,27 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex,
 	//timeval now;
 	//gettimeofday( &now, NULL);
 	//m_iUnlockedLetterEffectEndTime = now.tv_sec*1000 + now.tv_usec / 1000 + (fDelayEffectTime + 0.22f + 0.17f + 1.f) * 1000;	
+}
+
+void WordCollectBoardRenderNode::PlayUnlockWordEffect(const float& fMoveTime, const float& fDisplayTime)
+{
+	/*m_pLetterPanel->runAction(
+			Sequence::create(
+			//Spawn::createWithTwoActions(
+					MoveBy::create( fMoveTime, Point( 0, -250.f)),
+					//ScaleTo::create(fMoveTime, 1.6f)),
+				DelayTime::create(fDisplayTime),
+				FadeOut::create(0.5f),
+				NULL));
+				*/
+	for(int i=0; i< m_pMainWord->m_iWordLength; i++)
+	{
+		m_LabelList[i]->runAction(
+			Sequence::create(
+				MoveTo::create( fMoveTime, Point( 0, -400.f)),
+				DelayTime::create(fDisplayTime),
+				FadeOut::create(0.5f),
+				NULL));
+
+	}
 }

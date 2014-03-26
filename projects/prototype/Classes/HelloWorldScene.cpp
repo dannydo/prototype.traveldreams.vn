@@ -3337,7 +3337,10 @@ void HelloWorld::ShowMainWordUnlockEffect()
 
 	
 	m_pEndGameEffectLayer = LayerColor::create(ccc4( 0,0,0, 100));
-	this->getParent()->addChild(m_pEndGameEffectLayer);	
+	this->getParent()->addChild(m_pEndGameEffectLayer, this->getZOrder());	
+
+
+	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
 
 	
 	SpriteBatchNode* pSpriteBatchNode = SpriteBatchNode::create("ResourceDemo.pvr.ccz");
@@ -3347,8 +3350,7 @@ void HelloWorld::ShowMainWordUnlockEffect()
 	float fScaleRatio = 1.75f;
 	float fDisplayEffectTime = 0.25f;
 	float fDelayPerLetter = 0.06f;
-
-	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+	
 	
 
 	float fWordGraphicLength = 0;
@@ -3356,11 +3358,11 @@ void HelloWorld::ShowMainWordUnlockEffect()
 
 	for(int i=0; i< mainWord.m_iWordLength; i++)
 	{
-		letterSpriteList[i] = Sprite::createWithSpriteFrameName(  m_pWordCollectBoardRenderNode->GetImageFileFromLetter(mainWord.m_sWord[i]).c_str());
+		letterSpriteList[i] = Sprite::createWithSpriteFrameName(  m_pWordCollectBoardRenderNode->GetImageInGemFileFromLetter(mainWord.m_sWord[i]).c_str());
 		letterSpriteList[i]->setAnchorPoint(Point(0,0));
 		letterSpriteList[i]->setScale(fScaleRatio);
 
-		fWordGraphicLength += letterSpriteList[i]->getContentSize().width * fScaleRatio + 2.f;
+		fWordGraphicLength += letterSpriteList[i]->getContentSize().width * fScaleRatio - 10.f;
 	}
 
 	Size winSize = Director::getInstance()->getWinSize();
@@ -3383,17 +3385,19 @@ void HelloWorld::ShowMainWordUnlockEffect()
 					EaseOut::create( ScaleTo::create( fDisplayEffectTime, fScaleRatio, fScaleRatio), 2.f)),
 				NULL));		
 
-		fPositionXIncrement += letterSpriteList[i]->getContentSize().width * fScaleRatio + 2.f;
-	}
+		fPositionXIncrement += letterSpriteList[i]->getContentSize().width * fScaleRatio - 10.f;
+	}	
 
-	float fSpellingTime = m_pWordCollectBoardRenderNode->PlaySpellingSound();
+	float fSpellingTime = m_pWordCollectBoardRenderNode->PlaySpellingSound() + 0.9f;
 	
 	pSpriteBatchNode->runAction(
 		Sequence::create(
 			DelayTime::create( fSpellingTime), //mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.f),
 			FadeOut::create(0.5f),
 			RemoveSelf::create(),
-			NULL));
+			NULL));	
+	
+	//m_pWordCollectBoardRenderNode->PlayUnlockWordEffect( 0.35f, fSpellingTime - 0.2f);
 
 	this->runAction(
 		Sequence::create(

@@ -24,7 +24,7 @@ CLASSMATE
 ;display of main word, 1: break line ( + number letter of first line, not this include "SPACE" used to break line)
 0
 ;end game bonus type
-2
+1
 ;boss
 0
 ;obstacle list: count, list
