@@ -72,6 +72,8 @@ bool LeaderBoardtNode::init()
 		UserService::getInstance()->getLeaderBoardLevel(m_iLevel);
 	}
 
+	m_bIsSwipe = false;
+
 	return true;
 }
 
@@ -125,6 +127,12 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 
 bool LeaderBoardtNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
 {
+	if(m_bIsSwipe)
+	{
+		return false;
+	}
+	m_bIsSwipe = true;
+
 	if (m_iLeaderBoardCount > 5)
 	{
 		Point touchPosition = pTouch->getLocation();
@@ -181,22 +189,26 @@ void LeaderBoardtNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
 	float distanceX = dataTouch.point.x;
 	float deltaTime = dataTouch.fDeltaTime;
 	
-
-	float fTime = 0.2f;
-	distanceX = distanceX * fTime / deltaTime / 10; 
-
-	if (distanceX + m_pSlideShow->getPositionX() >= 0.0f) {
-		distanceX = -m_pSlideShow->getPositionX();
-	}
-	else if(distanceX + m_pSlideShow->getPositionX() <= m_fMinPositionLeft)
+	if(distanceX!=0 && deltaTime!=0)
 	{
-		distanceX = m_fMinPositionLeft - m_pSlideShow->getPositionX();
+		float fTime = 0.2f;
+		distanceX = distanceX * fTime / deltaTime / 10; 
+
+		if (distanceX + m_pSlideShow->getPositionX() >= 0.0f) {
+			distanceX = -m_pSlideShow->getPositionX();
+		}
+		else if(distanceX + m_pSlideShow->getPositionX() <= m_fMinPositionLeft)
+		{
+			distanceX = m_fMinPositionLeft - m_pSlideShow->getPositionX();
+		}
+
+		auto actionMove = MoveBy::create(fTime, Point(distanceX, 0.0f));
+		auto actionEaseOut = EaseOut::create(actionMove, 2.5f);
+		m_pSlideShow->stopAllActions();
+		m_pSlideShow->runAction(Sequence::create(actionEaseOut, NULL));
 	}
 
-	auto actionMove = MoveBy::create(fTime, Point(distanceX, 0.0f));
-	auto actionEaseOut = EaseOut::create(actionMove, 2.5f);
-	m_pSlideShow->stopAllActions();
-	m_pSlideShow->runAction(Sequence::create(actionEaseOut, NULL));
+	m_bIsSwipe = false;
 }
 
 void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey)

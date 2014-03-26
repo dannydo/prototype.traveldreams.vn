@@ -45,6 +45,7 @@ private:
 	int m_arrIndex[6];
 	
 	ScrollManager* m_pScrollManager;
+	bool m_bIsSwipe;
 };
 
 #endif;

@@ -39,6 +39,7 @@ private:
 	float m_fBeginY;
 	float m_fYMoved;
 	float m_maxHeight;
+	bool m_bIsSwipe;
 
 	FooterNode* m_pFooterNode;
 	ScrollManager* m_pScrollManager;

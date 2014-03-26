@@ -154,6 +154,7 @@ bool LevelMapLayer::init()
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 
 	m_pScrollManager = new ScrollManager();
+	m_bIsSwipe = false;
 
 	return true;
 }
@@ -220,6 +221,12 @@ void LevelMapLayer::loadConfigChapter(const int& iChapter)
 
 bool LevelMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
+	if(m_bIsSwipe)
+	{
+		return false;
+	}
+	m_bIsSwipe = true;
+
 	if(m_pFooterNode->getSettingNode() != NULL && m_pFooterNode->getSettingNode()->getShowSetting())
 	{
 		return false;
@@ -251,7 +258,7 @@ void LevelMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 	}
 	
 	Point point = m_pBackgroundNode->getPosition();
-	m_pBackgroundNode->setPosition(Point(point.x, point.y + m_fYMoved));
+	m_pBackgroundNode->setPositionY(point.y + m_fYMoved);
 	m_fBeginY = touchPosition.y;
 
 	DataTouch dataTouch;
@@ -267,22 +274,26 @@ void LevelMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 	float distanceY = dataTouch.point.y;
 	float deltaTime = dataTouch.fDeltaTime;
 	
-
-	float fTime = 0.2f;
-	distanceY = distanceY * fTime / deltaTime / 10; 
-
-	if (distanceY + m_pBackgroundNode->getPosition().y >= 0) {
-		distanceY = -m_pBackgroundNode->getPosition().y;
-	}
-	else if(distanceY + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-960))
+	if(distanceY!=0 && deltaTime!=0)
 	{
-		distanceY = -(m_maxHeight-960) - m_pBackgroundNode->getPosition().y;
+		float fTime = 0.2f;
+		distanceY = distanceY * fTime / deltaTime / 10; 
+
+		if (distanceY + m_pBackgroundNode->getPosition().y >= 0) {
+			distanceY = -m_pBackgroundNode->getPosition().y;
+		}
+		else if(distanceY + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-960))
+		{
+			distanceY = -(m_maxHeight-960) - m_pBackgroundNode->getPosition().y;
+		}
+
+		auto actionMove = MoveBy::create(fTime, Point(0.0f, distanceY));
+		auto actionEaseOut = EaseOut::create(actionMove, 2.5f);
+		m_pBackgroundNode->stopAllActions();
+		m_pBackgroundNode->runAction(Sequence::create(actionEaseOut, NULL));
 	}
 
-	auto actionMove = MoveBy::create(fTime, Point(0.0f, distanceY));
-	auto actionEaseOut = EaseOut::create(actionMove, 2.5f);
-	m_pBackgroundNode->stopAllActions();
-	m_pBackgroundNode->runAction(Sequence::create(actionEaseOut, NULL));
+	m_bIsSwipe = false;
 }
 
 Node* LevelMapLayer::generateLayoutStarAndBonusQuest(const int& iStarCompleted, const int& iBonusQuestCompleted, const int& iTotalBonusQuest)

@@ -28,32 +28,35 @@ void ScrollManager::addDataToQueue(DataTouch dataTouch)
 
 DataTouch ScrollManager::getDistanceScrollY()
 {
-	DataTouch last = m_Datatouchs[m_iTotalDataTouch-1];
-	for(int iIndex=m_iTotalDataTouch-2; iIndex>=0; iIndex--)
+	if(m_iTotalDataTouch > 1)
 	{
-		DataTouch dataTouch = m_Datatouchs[iIndex];
-		float distanceY = last.point.y - dataTouch.point.y;
-		float deltaTime = (last.lTime - dataTouch.lTime)/1000.0f; 
-
-		if (fabsf(distanceY) > _MAX_DISTANCE_)
+		DataTouch last = m_Datatouchs[m_iTotalDataTouch-1];
+		for(int iIndex=m_iTotalDataTouch-2; iIndex>=0; iIndex--)
 		{
-			m_iTotalDataTouch=0;
-			distanceY = distanceY + distanceY/deltaTime*_ACCELERATION_*1.0f;
+			DataTouch dataTouch = m_Datatouchs[iIndex];
+			float distanceY = last.point.y - dataTouch.point.y;
+			float deltaTime = (last.lTime - dataTouch.lTime)/1000.0f; 
 
-			DataTouch dataTouch;
-			dataTouch.fDeltaTime = deltaTime;
-			dataTouch.point = Point(0.0f, distanceY);
-			return dataTouch;
-		}
-		else if (iIndex == 0)
-		{
-			m_iTotalDataTouch=0;
-			distanceY = distanceY + distanceY/deltaTime*_ACCELERATION_*1.0f;
+			if (fabsf(distanceY) > _MAX_DISTANCE_)
+			{
+				m_iTotalDataTouch=0;
+				distanceY = distanceY + distanceY/deltaTime*_ACCELERATION_*1.0f;
 
-			DataTouch dataTouch;
-			dataTouch.fDeltaTime = deltaTime;
-			dataTouch.point = Point(0.0f, distanceY);
-			return dataTouch;
+				DataTouch dataTouch;
+				dataTouch.fDeltaTime = deltaTime;
+				dataTouch.point = Point(0.0f, distanceY);
+				return dataTouch;
+			}
+			else if (iIndex == 0)
+			{
+				m_iTotalDataTouch=0;
+				distanceY = distanceY + distanceY/deltaTime*_ACCELERATION_*1.0f;
+
+				DataTouch dataTouch;
+				dataTouch.fDeltaTime = deltaTime;
+				dataTouch.point = Point(0.0f, distanceY);
+				return dataTouch;
+			}
 		}
 	}
 
@@ -62,32 +65,35 @@ DataTouch ScrollManager::getDistanceScrollY()
 
 DataTouch ScrollManager::getDistanceScrollX()
 {
-	DataTouch last = m_Datatouchs[m_iTotalDataTouch-1];
-	for(int iIndex=m_iTotalDataTouch-2; iIndex>=0; iIndex--)
+	if(m_iTotalDataTouch > 1)
 	{
-		DataTouch dataTouch = m_Datatouchs[iIndex];
-		float distanceX = last.point.x - dataTouch.point.x;
-		float deltaTime = (last.lTime - dataTouch.lTime)/1000.0f; 
-
-		if (fabsf(distanceX) > _MAX_DISTANCE_)
+		DataTouch last = m_Datatouchs[m_iTotalDataTouch-1];
+		for(int iIndex=m_iTotalDataTouch-2; iIndex>=0; iIndex--)
 		{
-			m_iTotalDataTouch=0;
-			distanceX = distanceX + distanceX/deltaTime*_ACCELERATION_*1.0f;
+			DataTouch dataTouch = m_Datatouchs[iIndex];
+			float distanceX = last.point.x - dataTouch.point.x;
+			float deltaTime = (last.lTime - dataTouch.lTime)/1000.0f; 
 
-			DataTouch dataTouch;
-			dataTouch.fDeltaTime = deltaTime;
-			dataTouch.point = Point(distanceX, 0.0f);
-			return dataTouch;
-		}
-		else if (iIndex == 0)
-		{
-			m_iTotalDataTouch=0;
-			distanceX = distanceX + distanceX/deltaTime*_ACCELERATION_*1.0f;
+			if (fabsf(distanceX) > _MAX_DISTANCE_)
+			{
+				m_iTotalDataTouch=0;
+				distanceX = distanceX + distanceX/deltaTime*_ACCELERATION_*1.0f;
 
-			DataTouch dataTouch;
-			dataTouch.fDeltaTime = deltaTime;
-			dataTouch.point = Point(distanceX, 0.0f);
-			return dataTouch;
+				DataTouch dataTouch;
+				dataTouch.fDeltaTime = deltaTime;
+				dataTouch.point = Point(distanceX, 0.0f);
+				return dataTouch;
+			}
+			else if (iIndex == 0)
+			{
+				m_iTotalDataTouch=0;
+				distanceX = distanceX + distanceX/deltaTime*_ACCELERATION_*1.0f;
+
+				DataTouch dataTouch;
+				dataTouch.fDeltaTime = deltaTime;
+				dataTouch.point = Point(distanceX, 0.0f);
+				return dataTouch;
+			}
 		}
 	}
 
