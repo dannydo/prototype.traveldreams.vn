@@ -4353,7 +4353,17 @@ void HelloWorld::EndUnlockLetterAnimation()
 				m_bIsEffectPlaying = true;//stop all interaction on board from now
 				m_bIsEndGamePhase = true; 
 
-				ShowMainWordUnlockEffect();
+				float fExtraDelay = 0.1f;
+				if (m_GameBoardManager.GetPhaseMoveOfComboChain() == 2)
+					fExtraDelay += 1.f;
+
+				m_pTempSpriteForAction->runAction( 					
+					Sequence::create(
+						DelayTime::create(fExtraDelay),
+						CCCallFunc::create( this, callfunc_selector( HelloWorld::ShowMainWordUnlockEffect)),
+						NULL));			
+
+				//ShowMainWordUnlockEffect();
 				//ExecuteBonusWinGameEffect();
 
 				UserTable::getInstance()->updateLife(0);

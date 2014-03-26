@@ -56,6 +56,8 @@ DataTouch ScrollManager::getDistanceScrollY()
 			return dataTouch;
 		}
 	}
+
+	return DataTouch();
 }
 
 unsigned long ScrollManager::getTimeLocalCurrent()

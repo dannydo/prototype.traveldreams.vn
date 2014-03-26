@@ -170,6 +170,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	pTip->setScale(1.2f);
 	pTip->setPosition(Point( 310.f, 790.f));
 	m_pColorNode->addChild(pTip);
+	
 
 	//m_pLetterPanel = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(' ').c_str());
 	//m_pBatchNode->addChild(m_pLetterPanel, 2);
@@ -207,7 +208,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	int iLetterCountOfFirstLine;
 
 	const LevelConfig* pLevelConfig = GameWordManager::getInstance()->GetLevelConfig();
-	if (pLevelConfig->m_bBreakLineWhenDisplayMainWord)
+	if (pLevelConfig->m_bBreakLineWhenDisplayMainWord) 
 		iLetterCountOfFirstLine = pLevelConfig->m_iLetterCountOfFirstLine-1; //skip "SPACE"; 
 	else
 		iLetterCountOfFirstLine = m_pMainWord->m_iWordLength;
@@ -330,6 +331,17 @@ void WordCollectBoardRenderNode::GenerateLabels()
 
 	// reset flags
 	//memset( m_NewUnlockedLetterFlags, 0, sizeof(m_NewUnlockedLetterFlags));
+
+
+	// extra tutorial
+	if (strcmp( m_pMainWord->m_sWord, "PEN") == 0)
+	{
+		Sprite* pTutorialSprite = Sprite::create("tutorial.png");
+		pTutorialSprite->setScale(1.2f);
+		m_pColorNode->addChild(pTutorialSprite);
+		pTutorialSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+	}
+
 }
 
 /*void WordCollectBoardRenderNode::UnlockCharacter(const float& fDelayTime, const int& iLetterIndex)
