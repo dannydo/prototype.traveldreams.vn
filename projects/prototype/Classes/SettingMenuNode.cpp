@@ -179,6 +179,15 @@ void SettingMenuNode::clickTutorial(Object* sender)
 
 void SettingMenuNode::clickBack(Object* sender)
 {
+	this->actionBack();
+	//auto actionHide = CallFunc::create(this, callfunc_selector(SettingMenuNode::hide));
+	//auto actionBackTo = CallFunc::create(this, callfunc_selector(SettingMenuNode::actionBack));
+	//this->runAction(Sequence::create(actionHide, DelayTime::create(0.15f)->clone(), actionBackTo, NULL));
+}
+
+void SettingMenuNode::actionBack()
+{
+	m_pSettingButton->setStateActive(!m_pSettingButton->getStateActive());
 	switch(Breadcrumb::getInstance()->getSceneModePopBack())
 	{
 	case SceneMode::kExitGame:

@@ -28,7 +28,7 @@ bool FooterNode::init()
 
 	Sprite* pFlashCardSprite = Sprite::create("Footer/btn_flashcard.png");
 	m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
-	m_pButtonFlashCardNode->setPosition(Point(220.0f, 50.0f));
+	m_pButtonFlashCardNode->setPosition(Point(585.0f, 50.0f));
 
 	Sprite* pIntroductionSprite = Sprite::create("Footer/info_icon.png");
 	m_pButtonIntroductionNode = ButtonNode::createButtonSprite(pIntroductionSprite, CC_CALLBACK_1(FooterNode::openIntroduction, this));

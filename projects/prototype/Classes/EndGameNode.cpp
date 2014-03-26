@@ -54,8 +54,12 @@ bool EndGameNode::initLose()
 	pSenetnceFailImage3->setPosition(Point(320.0f, 535.0f));
 	m_pSpriteBatchNode->addChild(pSenetnceFailImage3);
 
-	Sprite* pPetImage = Sprite::createWithSpriteFrameName("pet-fail.png");
-	pPetImage->setPosition(Point(135.0f, 378.0f));
+	Sprite* pMonsterImage = Sprite::createWithSpriteFrameName("pet-fail-r.PNG");
+	pMonsterImage->setPosition(Point(548.0f, 378.0f));
+	m_pSpriteBatchNode->addChild(pMonsterImage);
+
+	Sprite* pPetImage = Sprite::createWithSpriteFrameName("pet-fail-l.png");
+	pPetImage->setPosition(Point(102.0f, 378.0f));
 	m_pSpriteBatchNode->addChild(pPetImage);
 
 	Sprite* pButtonReplayGameSprite = Sprite::create("Target-End-Game/btn_replay.png");
@@ -80,7 +84,11 @@ bool EndGameNode::initWin()
 	this->generateLayoutStartAndBonusQuest();
 
 	
-	Sprite* pPetImage = Sprite::createWithSpriteFrameName("pet.png");
+	Sprite* pMonsterImage = Sprite::createWithSpriteFrameName("pet-r.png");
+	pMonsterImage->setPosition(Point(548.0f, 378.0f));
+	m_pSpriteBatchNode->addChild(pMonsterImage);
+
+	Sprite* pPetImage = Sprite::createWithSpriteFrameName("pet-l.png");
 	pPetImage->setPosition(Point(102.0f, 378.0f));
 	m_pSpriteBatchNode->addChild(pPetImage);
 
