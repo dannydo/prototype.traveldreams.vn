@@ -40,6 +40,7 @@ private:
 	void clickTutorial(cocos2d::Object* sender);
 	void clickFacebook(cocos2d::Object* sender);
 	void clickBack(cocos2d::Object* sender);
+	void actionBack();
 
 	cocos2d::MenuItemToggle* m_pMenuVoice;
 	cocos2d::MenuItemToggle* m_pMenuEffect;

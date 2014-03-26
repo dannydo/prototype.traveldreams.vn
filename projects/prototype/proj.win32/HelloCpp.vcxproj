@@ -169,6 +169,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\MainMenuScene.cpp" />
     <ClCompile Include="..\Classes\NewGameBoardManager.cpp" />
     <ClCompile Include="..\Classes\ObstacleProcessManager.cpp" />
+    <ClCompile Include="..\Classes\ScrollManager.cpp" />
     <ClCompile Include="..\Classes\SettingMenuNode.cpp" />
     <ClCompile Include="..\Classes\Social\FacebookManager.cpp" />
     <ClCompile Include="..\Classes\SoundManager.cpp" />
@@ -218,13 +219,13 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\MainMenuScene.h" />
     <ClInclude Include="..\Classes\NewGameBoardManager.h" />
     <ClInclude Include="..\Classes\ObstacleProcessManager.h" />
+    <ClInclude Include="..\Classes\ScrollManager.h" />
     <ClInclude Include="..\Classes\SettingMenuNode.h" />
     <ClInclude Include="..\Classes\Social\FacebookManager.h" />
     <ClInclude Include="..\Classes\SoundManager.h" />
     <ClInclude Include="..\Classes\StatusLayer.h" />
     <ClInclude Include="..\Classes\WordCollectBoardRenderNode.h" />
     <ClInclude Include="..\Classes\WorldMapScene.h" />
-    <ClInclude Include="AccelerometerManager.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>

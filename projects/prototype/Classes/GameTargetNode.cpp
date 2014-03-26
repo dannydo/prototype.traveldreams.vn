@@ -60,13 +60,13 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pIconBoosterImage->setPosition(Point(320.0f, 465.0f));
 	m_pSpriteBatchNode->addChild(pIconBoosterImage);
 	
-	Sprite* pMonsterImage = Sprite::createWithSpriteFrameName("monster.png");
+	Sprite* pMonsterImage = Sprite::createWithSpriteFrameName("pet-r.png");
 	pMonsterImage->setPosition(Point(548.0f, 378.0f));
 	m_pSpriteBatchNode->addChild(pMonsterImage);
 
-	Sprite* pPetImage = Sprite::createWithSpriteFrameName("pet.png");
+	Sprite* pPetImage = Sprite::createWithSpriteFrameName("pet-l.png");
 	pPetImage->setPosition(Point(102.0f, 378.0f));
-	m_pSpriteBatchNode->addChild(pPetImage);	
+	m_pSpriteBatchNode->addChild(pPetImage);
 
 	Sprite* pTargetImage = Sprite::createWithSpriteFrameName("target.png");
 	pTargetImage->setPosition(Point(320.0f, 755.0f));

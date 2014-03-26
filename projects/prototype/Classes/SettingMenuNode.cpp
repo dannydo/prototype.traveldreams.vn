@@ -74,7 +74,7 @@ bool SettingMenuNode::init()
 			Sprite* pFacebookLoginSprite = Sprite::create("PanelSetting/loginFB.PNG");
 			#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 				FacebookManager::getInstance()->loadPlugin();
-				if(!FacebookManager::getInstance()->isLogined())
+				if(FacebookManager::getInstance()->isLogined())
 					pFacebookLoginSprite = Sprite::create("PanelSetting/logoutFB.png");
 				else
 					pFacebookLoginSprite = Sprite::create("PanelSetting/loginFB.PNG");
@@ -179,6 +179,15 @@ void SettingMenuNode::clickTutorial(Object* sender)
 
 void SettingMenuNode::clickBack(Object* sender)
 {
+	this->actionBack();
+	//auto actionHide = CallFunc::create(this, callfunc_selector(SettingMenuNode::hide));
+	//auto actionBackTo = CallFunc::create(this, callfunc_selector(SettingMenuNode::actionBack));
+	//this->runAction(Sequence::create(actionHide, DelayTime::create(0.15f)->clone(), actionBackTo, NULL));
+}
+
+void SettingMenuNode::actionBack()
+{
+	m_pSettingButton->setStateActive(!m_pSettingButton->getStateActive());
 	switch(Breadcrumb::getInstance()->getSceneModePopBack())
 	{
 	case SceneMode::kExitGame:
@@ -222,10 +231,11 @@ void SettingMenuNode::clickBack(Object* sender)
 void SettingMenuNode::clickFacebook(Object* sender)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	if(!FacebookManager::getInstance()->isLogined())
-		FacebookManager::getInstance()->logoutByMode();
-	else
-		FacebookManager::getInstance()->loginByMode();
+	//if(FacebookManager::getInstance()->isLogined())
+		//FacebookManager::getInstance()->logoutByMode();
+	//else
+		//FacebookManager::getInstance()->loginByMode();
+	MessageBox("To be implemented", "Facebook");
 #else
 	MessageBox("Facebook not run with platform window", "Facebook");
 #endif
