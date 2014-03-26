@@ -92,7 +92,7 @@ bool LevelMapLayer::init()
 		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
 		pLevelLabel->setPosition(Point(point.x-2, point.y+17));
 		
-		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel)
+		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel || levelInfo.iLevel < 31)
 		{
 			Sprite* pButtonLevelSprite;
 			
@@ -113,9 +113,12 @@ bool LevelMapLayer::init()
 			buttonPlayNode->setTag(levelInfo.iLevel);
 			pButtonManagerNode->addButtonNode(buttonPlayNode);
 
-			Node* pStarAndBonusQuestNode = this->generateLayoutStarAndBonusQuest(levelInfo.iStar, levelInfo.iBonusQuest, levelInfo.iTotalBonusQuest);
-			pStarAndBonusQuestNode->setPosition(Point(point.x-2, point.y));
-			m_pBackgroundNode->addChild(pStarAndBonusQuestNode);
+			if (levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel)
+			{
+				Node* pStarAndBonusQuestNode = this->generateLayoutStarAndBonusQuest(levelInfo.iStar, levelInfo.iBonusQuest, levelInfo.iTotalBonusQuest);
+				pStarAndBonusQuestNode->setPosition(Point(point.x-2, point.y));
+				m_pBackgroundNode->addChild(pStarAndBonusQuestNode);
+			}
 		}
 		else
 		{
@@ -150,6 +153,8 @@ bool LevelMapLayer::init()
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 	m_bMoveSlideShow = false;
+
+	m_pScrollManager = new ScrollManager();
 
 	return true;
 }
@@ -224,35 +229,62 @@ bool LevelMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 	Point touchPosition = pTouch->getLocation();
 	m_fBeginY = touchPosition.y;
 
+	DataTouch dataTouch;
+	dataTouch.point = touchPosition;
+	dataTouch.lTime = 0;
+	dataTouch.fDeltaTime = 0;
+	m_pScrollManager->addDataToQueue(dataTouch);
+
 	return true;
 }
 
 void LevelMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {	 
-	if(m_bMoveSlideShow == false)
-	{
-		Point touchPosition = pTouch->getLocation();
-		m_fYMoved = touchPosition.y - m_fBeginY;
+	Point touchPosition = pTouch->getLocation();
+	m_fYMoved = touchPosition.y - m_fBeginY;
 
-		if (m_fYMoved + m_pBackgroundNode->getPosition().y >= 0) {
-			m_fYMoved = -m_pBackgroundNode->getPosition().y;
-		}
-		else if(m_fYMoved + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-960))
-		{
-			m_fYMoved = -(m_maxHeight-960) - m_pBackgroundNode->getPosition().y;
-		}
-	
-		m_bMoveSlideShow = true;
-		auto actionMove = MoveBy::create(0.0f, Point(0.0f, m_fYMoved));
-		auto actionUpdate = CallFunc::create(this, callfunc_selector(LevelMapLayer::updateScrollSlideShow));
-		m_pBackgroundNode->runAction(Sequence::create(actionMove, actionUpdate, NULL));
-		m_fBeginY = touchPosition.y;
+	if (m_fYMoved + m_pBackgroundNode->getPosition().y >= 0) {
+		m_fYMoved = -m_pBackgroundNode->getPosition().y;
 	}
+	else if(m_fYMoved + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-960))
+	{
+		m_fYMoved = -(m_maxHeight-960) - m_pBackgroundNode->getPosition().y;
+	}
+	
+	Point point = m_pBackgroundNode->getPosition();
+	m_pBackgroundNode->setPosition(Point(point.x, point.y + m_fYMoved));
+	m_fBeginY = touchPosition.y;
+
+	DataTouch dataTouch;
+	dataTouch.point = touchPosition;
+	dataTouch.lTime = 0;
+	dataTouch.fDeltaTime = 0;
+	m_pScrollManager->addDataToQueue(dataTouch);
 }
 
 void LevelMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
 
+	DataTouch dataTouch = m_pScrollManager->getDistanceScrollY();
+	float distanceY = dataTouch.point.y;
+	float deltaTime = dataTouch.fDeltaTime;
+	
+
+	float fTime = 0.2f;
+	distanceY = distanceY * fTime / deltaTime / 10; 
+
+	if (distanceY + m_pBackgroundNode->getPosition().y >= 0) {
+		distanceY = -m_pBackgroundNode->getPosition().y;
+	}
+	else if(distanceY + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-960))
+	{
+		distanceY = -(m_maxHeight-960) - m_pBackgroundNode->getPosition().y;
+	}
+
+	auto actionMove = MoveBy::create(fTime, Point(0.0f, distanceY));
+	auto actionEaseOut = EaseOut::create(actionMove, 2.5f);
+	m_pBackgroundNode->stopAllActions();
+	m_pBackgroundNode->runAction(Sequence::create(actionEaseOut, NULL));
 }
 
 void LevelMapLayer::updateScrollSlideShow()

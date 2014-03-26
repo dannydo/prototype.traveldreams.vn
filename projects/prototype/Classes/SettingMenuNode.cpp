@@ -74,7 +74,7 @@ bool SettingMenuNode::init()
 			Sprite* pFacebookLoginSprite = Sprite::create("PanelSetting/loginFB.PNG");
 			#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 				FacebookManager::getInstance()->loadPlugin();
-				if(!FacebookManager::getInstance()->isLogined())
+				if(FacebookManager::getInstance()->isLogined())
 					pFacebookLoginSprite = Sprite::create("PanelSetting/logoutFB.png");
 				else
 					pFacebookLoginSprite = Sprite::create("PanelSetting/loginFB.PNG");
@@ -222,10 +222,11 @@ void SettingMenuNode::clickBack(Object* sender)
 void SettingMenuNode::clickFacebook(Object* sender)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	if(!FacebookManager::getInstance()->isLogined())
-		FacebookManager::getInstance()->logoutByMode();
-	else
-		FacebookManager::getInstance()->loginByMode();
+	//if(FacebookManager::getInstance()->isLogined())
+		//FacebookManager::getInstance()->logoutByMode();
+	//else
+		//FacebookManager::getInstance()->loginByMode();
+	MessageBox("To be implemented", "Facebook");
 #else
 	MessageBox("Facebook not run with platform window", "Facebook");
 #endif

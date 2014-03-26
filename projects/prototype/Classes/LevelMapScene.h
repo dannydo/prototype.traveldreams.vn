@@ -4,7 +4,8 @@
 #include "cocos2d.h"
 #include "SimpleAudioEngine.h" 
 #include "SettingMenuNode.h" 
-#include "FooterNode.h"
+#include "FooterNode.h"	   
+#include "ScrollManager.h"
 
 class LevelMapLayer : public cocos2d::CCLayer
 {
@@ -42,6 +43,7 @@ private:
 	bool m_bMoveSlideShow;
 
 	FooterNode* m_pFooterNode;
+	ScrollManager* m_pScrollManager;
 };
 
 class LevelMapScene : public cocos2d::CCScene

@@ -116,7 +116,8 @@ void MainMenuLayer::loginFacebook(Object* sender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	if(m_buttonLoginNode->isVisible() == true) 
 	{
-		FacebookManager::getInstance()->loginByMode();
+		//FacebookManager::getInstance()->loginByMode();
+		MessageBox("To be implemented", "Facebook");
 	}
 #else
 	MessageBox("Facebook not run with platform window", "Facebook");

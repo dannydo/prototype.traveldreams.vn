@@ -316,6 +316,7 @@ void EndGameNode::updateBonusQuest()
 
 void EndGameNode::menuNextLevelCallBack(Object* sender)
 {
+	Breadcrumb::getInstance()->getSceneModePopBack();
 	if ( m_iCurrentLevel >= _MAX_GAME_LEVEL_)
 		m_iCurrentLevel = 0;
 

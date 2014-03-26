@@ -104,11 +104,17 @@ void LoadingLayer::initData()
 	DictionaryDatabase::getInstance();
 
 	UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
+	userInfo.sFacebookToken = "CAAGQiytiRCoBAB5OUzRDO7OEejvNl8lheuOzZCeRG3ZBLSBPNsV7IAI8AVwVKshZCBQfo6QpLE1NZBv1OUZCpXfSeFwGyzito0hhEP3GLBIK5wCfSInTnv8u3sa1yzZBmB1FGmHPQXEJOADnOnPwETRTo81JSLXxcFNI5Q3T6PICutMERTEUdvtM1jejNfWz4lVZA1ZBZAYGVJOeXmO8Wg6j9FjqTWErOfNRrvBHfhcVw9QZDZD";
+	userInfo.sFacebookId = "100000135318088";
+	userInfo.sFirstName	 = "Van";
+	userInfo.sLastName = "Dao";
+	UserTable::getInstance()->updateUser(userInfo);
+
 	if(userInfo.sFacebookId != "")
 	{
 		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-			FacebookManager::getInstance()->loadPlugin();
-			FacebookManager::getInstance()->loginByMode();
+			//FacebookManager::getInstance()->loadPlugin();
+			//FacebookManager::getInstance()->loginByMode();
 		#endif
 	}
 }
