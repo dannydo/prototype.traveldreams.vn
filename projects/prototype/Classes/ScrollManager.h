@@ -25,6 +25,7 @@ public:
 	ScrollManager();
 	void addDataToQueue(DataTouch dataTouch);
 	DataTouch getDistanceScrollY();
+	DataTouch getDistanceScrollX();
 
 private:
 	unsigned long getTimeLocalCurrent();

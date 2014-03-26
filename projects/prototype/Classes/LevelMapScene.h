@@ -27,7 +27,6 @@ private:
 	void menuOpenFlashCardCallBack();
 
 	void loadConfigChapter(const int& iChapter);
-	void updateScrollSlideShow();
 
 	cocos2d::Node* generateLayoutStarAndBonusQuest(const int& iStarCompleted, const int& iBonusQuestCompleted, const int& iTotalBonusQuest);
 
@@ -40,7 +39,6 @@ private:
 	float m_fBeginY;
 	float m_fYMoved;
 	float m_maxHeight;
-	bool m_bMoveSlideShow;
 
 	FooterNode* m_pFooterNode;
 	ScrollManager* m_pScrollManager;
