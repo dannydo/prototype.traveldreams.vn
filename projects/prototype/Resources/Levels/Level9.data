@@ -1,11 +1,11 @@
 ;size map
 8	8
 ;number of move
-30
+28
 ;number of color
 6
 ;score of stars
-8000	15000	30000
+8000	12000	18000
 ;map matrix
 0	0	1	1	1	1	0	0
 0	0	1	1	1	1	0	0
@@ -31,6 +31,14 @@ BOOKCASE
 ;boss
 0
 ;obstacle list: count, list
+2
+SHIELD	2
+3
+2 2 2 4 2 7
+0
+LOCK 0
+1
+5 5
 0
 ;bonus quest
 0

@@ -126,6 +126,9 @@ protected:
 	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror=false, bool bIsBonus=false, float fDelayTime=0, bool bPlayEffect=false);
 	void AddNewComboCell(const ComboEffectCell& cell, const float& fDelayTime, const float& fEffectTime, bool bCreateMirror = true);
 
+	void OnStartGame();
+	void OnCompleteComboChain();
+
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();
 	void UpdateObstacleListAfterMove();
@@ -178,7 +181,9 @@ protected:
 	void ExecuteBonusWinGameEffect();	
 	
 	void ShowLevelCompleteEffect();
+	void ShowLevelFailEffect();
 	void ShowWinGamePopup();
+	void ShowFailGamePopup();
 
 	// utility functions on boss sprite	
 	void AddNewLetterToBossSprite(const float& fDelayTime);
@@ -192,7 +197,8 @@ private:
 
 	cocos2d::CCSpriteBatchNode* m_pBoardBatchNode;
 	//cocos2d::Sprite* m_pMoveHintNode;
-	cocos2d::CCSpriteBatchNode* m_pComboEffectBatchNode;
+	cocos2d::CCSpriteBatchNode* m_pComboEffectBatchNode; 
+	cocos2d::CCSpriteBatchNode* m_pTextEffectBatchNode; 
 	cocos2d::Sprite* m_pBossSprite;
 
 

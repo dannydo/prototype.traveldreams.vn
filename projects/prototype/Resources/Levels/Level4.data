@@ -11,9 +11,9 @@
 1	1	1	0	0	1	1   1
 1	1	0	0	0	0	1   1
 1	1	1	0	0	1	1   1
-1	1	1	1	1	1	1   5
+1	1	1	1	1	1	1   1
 1	1	1	1	1	5	1   1
-1	1	1	4	1	1	1   1
+1	1	1	6	1	1	1   1
 1	1	1	1	1	1	1   1
 ;main word
 CRAYON
@@ -26,10 +26,14 @@ CRAYON
 ; config columns appear, 1: all columns, 0: specific columns + column count + columns list
 1
 ;end game bonus type
-2
+1
 ;boss
 0
 ;obstacle list: count, list
+1
+SHIELD 1
+1 
+5 3
 0
 ;bonus quest
 0

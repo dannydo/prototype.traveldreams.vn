@@ -159,6 +159,23 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 		case _SET_POPUP_:
 			sFileName = "SoundEffectPC/Popup_sfx.wav";
 			break;	
+
+		case_SET_ENCOURAGE_NICE_:
+			sFileName = "SoundEffectPC/Encouragement/Nice.wav";
+			break;		
+		case _SET_ENCOURAGE_LOVELY_:
+			sFileName = "SoundEffectPC/Encouragement/Lovely.wav";
+			break;	
+		case _SET_ENCOURAGE_BEAUTIFUL_:
+			sFileName = "SoundEffectPC/Encouragement/Beautiful.wav";
+			break;			
+		case _SET_ENCOURAGE_BRILLIANT_:
+			sFileName = "SoundEffectPC/Encouragement/Brilliant.wav";
+			break;	
+		case _SET_ENCOURAGE_ARTISTIC_:
+			sFileName = "SoundEffectPC/Encouragement/Artistic.wav";
+			break;
+	
 #else	
 		default:
 		case _SET_DROP_:
@@ -237,6 +254,23 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 		case _SET_POPUP_:
 			sFileName = "SoundEffect/Popup_sfx.ogg";
 			break;	
+
+		
+		case_SET_ENCOURAGE_NICE_:
+			sFileName = "SoundEffect/Encouragement/Nice.ogg";
+			break;		
+		case _SET_ENCOURAGE_LOVELY_:
+			sFileName = "SoundEffect/Encouragement/Lovely.ogg";
+			break;	
+		case _SET_ENCOURAGE_BEAUTIFUL_:
+			sFileName = "SoundEffect/Encouragement/Beautiful.ogg";
+			break;			
+		case _SET_ENCOURAGE_BRILLIANT_:
+			sFileName = "SoundEffect/Encouragement/Brilliant.ogg";
+			break;	
+		case _SET_ENCOURAGE_ARTISTIC_:
+			sFileName = "SoundEffect/Encouragement/Artistic.ogg";
+			break;
 #endif
 	};
 

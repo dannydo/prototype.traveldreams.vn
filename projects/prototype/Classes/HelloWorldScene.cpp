@@ -34,6 +34,7 @@ Scene* HelloWorld::createScene(int iLevel)
 
 	//
 	boardLayer->m_pWordCollectBoardRenderNode = WordCollectBoardRenderNode::create();		
+	boardLayer->m_pWordCollectBoardRenderNode->SetStartGameCallback(std::bind( &HelloWorld::OnStartGame, boardLayer));
 
 	// extra layer for score/stars...	
 	boardLayer->m_pStatusLayer = StatusLayer::create();
@@ -273,6 +274,11 @@ void HelloWorld::initLevel(int iLevel)
 	m_pBoardBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
 	//m_pBoardBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);
 	this->addChild(m_pBoardBatchNode);
+
+	// init batchNode for text effect
+	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("TestEffect.plist");
+	m_pTextEffectBatchNode = CCSpriteBatchNode::create("TestEffect.pvr.ccz");
+	this->addChild(m_pTextEffectBatchNode);
 	
 	// move hint
 	//m_pMoveHintNode = Sprite::createWithSpriteFrameName("Gem_A.png");
@@ -487,10 +493,7 @@ void HelloWorld::initLevel(int iLevel)
 
 	// play sound
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kGameMusic);
-	Breadcrumb::getInstance()->addSceneMode(SceneMode::kPlayGame);
-
-	// play sound effect 
-	SoundManager::PlaySoundEffect(_SET_START_LEVEL_);
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kPlayGame);	
 }
 
 void HelloWorld::menuCloseCallback(Object* pSender)
@@ -1229,6 +1232,88 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 	}
 }
 
+void HelloWorld::OnStartGame()
+{
+	Sprite* pTextSprite = Sprite::createWithSpriteFrameName("Level_Start.png");
+	Size textSize = pTextSprite->getContentSize();
+	Size winSize = Director::getInstance()->getWinSize();
+
+	pTextSprite->setPosition(Point( -textSize.width/2.f, winSize.height/2.f + 100.f));	
+	m_pTextEffectBatchNode->addChild(pTextSprite);
+
+	pTextSprite->runAction(
+		Sequence::create(
+			MoveTo::create( 0.6f, Point( winSize.width/2.f - 40.f, winSize.height/2.f + 100.f)),
+			//MoveTo::create( 0.033f, Point( winSize.width/2.f - 40.f, winSize.height/2.f + 100.f)),
+			DelayTime::create(0.9f),
+			//MoveTo::create( 0.033f, Point( winSize.width/2.f - 70.f, winSize.height/2.f + 100.f)),
+			Spawn::createWithTwoActions(
+				EaseBackOut::create( MoveTo::create( 0.5f, Point( winSize.width + textSize.width/2.f, winSize.height/2.f + 100.f))),
+				FadeOut::create( 1.f)),
+			RemoveSelf::create(),
+			NULL));
+
+	// play sound effect 
+	SoundManager::PlaySoundEffect(_SET_START_LEVEL_);
+}
+
+void HelloWorld::OnCompleteComboChain()
+{
+	m_bIsEffectPlaying = false;
+
+
+	if (m_GameBoardManager.GetPhaseMoveOfComboChain() >3)
+	{
+		Sprite* pTextSprite;
+
+		switch( m_GameBoardManager.GetPhaseMoveOfComboChain()-1)
+		{
+			case 3:				
+				pTextSprite = Sprite::createWithSpriteFrameName("3_Nice.png");
+				SoundManager::PlaySoundEffect(_SET_ENCOURAGE_NICE_);
+				break;
+			case 4:
+				pTextSprite = Sprite::createWithSpriteFrameName("4_Lovely.png");
+				SoundManager::PlaySoundEffect(_SET_ENCOURAGE_LOVELY_);
+				break;
+			case 5:
+				pTextSprite = Sprite::createWithSpriteFrameName("5_Beautiful.png");
+				SoundManager::PlaySoundEffect(_SET_ENCOURAGE_BEAUTIFUL_);
+				break;
+			case 6:
+				pTextSprite = Sprite::createWithSpriteFrameName("6_Briliant.png");
+				SoundManager::PlaySoundEffect(_SET_ENCOURAGE_BRILLIANT_);
+				break;
+			case 7:
+			default:
+				pTextSprite = Sprite::createWithSpriteFrameName("7_Artistic.png");
+				SoundManager::PlaySoundEffect(_SET_ENCOURAGE_ARTISTIC_);
+				break;			
+		}
+
+		Size winSize = Director::getInstance()->getWinSize();
+
+		pTextSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+		pTextSprite->setOpacity(0);
+		pTextSprite->setScale(1.1f);
+		m_pTextEffectBatchNode->addChild(pTextSprite);
+		pTextSprite->runAction( 
+			Sequence::create(
+				Spawn::createWithTwoActions(
+					FadeIn::create( 0.3f),
+					MoveBy::create( 0.3f, Point( 0, 35.f))),
+				DelayTime::create(0.7f),
+				Spawn::createWithTwoActions(
+					FadeOut::create( 0.3f),
+					ScaleTo::create(0.3f, 1.25f)),
+				CCCallFunc::create( this, callfunc_selector( HelloWorld::EndUnlockLetterAnimation)),
+				RemoveSelf::create(),
+				NULL));
+	}
+	else
+		EndUnlockLetterAnimation();
+}
+
 void HelloWorld::OnEndDragEffect()
 {
 	update(0);	
@@ -1252,7 +1337,8 @@ void HelloWorld::CheckBoardStateAfterMove()
 	}
 	else
 	{		
-		EndUnlockLetterAnimation();
+		//EndUnlockLetterAnimation();
+		OnCompleteComboChain();
 
 		/*//check end game
 		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked()) // complete objective ==> win		
@@ -1308,7 +1394,8 @@ void HelloWorld::ExecuteBonusWinGameEffect()
 	else
 	{
 		//PlayUnlockLettersOfBonusWordsAnimation();
-		EndUnlockLetterAnimation();		
+		//EndUnlockLetterAnimation();		
+		OnCompleteComboChain();
 	}
 }
 
@@ -1319,6 +1406,20 @@ void HelloWorld::ShowWinGamePopup()
 		m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStars());
 	m_pHUDLayer->addChild( pEndGameNode, 100);
+}
+
+void HelloWorld::ShowFailGamePopup()
+{
+	EndGameNode* pEndGameNode = EndGameNode::createLayoutLose( m_GameBoardManager.GetCurrentScore(), 
+				m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
+	m_pHUDLayer->addChild( pEndGameNode, 100);
+
+	//SoundManager::PlaySoundEffect(_SET_FAIL_);
+	UserTable::getInstance()->updateLife(1);
+
+	//Game Tracking Level
+	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+	GameTracking::saveFileTrackingLevel(m_GameBoardManager.GetCurrentLevel(), 0, mainWord.m_iWordLength-mainWord.m_iRemainInactivatedCharacterCount, "Lose");
 }
 
 
@@ -2057,8 +2158,10 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		// increase score by combo		
 		int iActivationScore = m_GameBoardManager.IncreaseScoreForDestroyCells( iTotalDestroyCell, pComboEffect->m_ComboEffectDescription.m_eComboEffectType, pComboEffect->m_ComboEffectDescription.m_iActivationScoreRatio)
 			- iTotalDestroyCell * iScorePerGem;
-		PlayEarnScoreEffect( iActivationScore, pComboEffect->m_ComboEffectDescription.m_Position, fCurrentDelayComboChain);
-
+		if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType <= _GCT_COMBO6_)
+			PlayEarnScoreEffect( iActivationScore, pComboEffect->m_ComboEffectDescription.m_Position, fCurrentDelayComboChain);
+		else
+			PlayEarnScoreEffect( iActivationScore, pComboEffect->m_ComboEffectDescription.m_Position, fCurrentDelayComboChain + _TME_DOUBLE_TRIPLE_COMMONE_ACTIVATE_DELAY_TIME_);
 		// clean data
 		delete pComboEffect;
 	}	
@@ -2499,13 +2602,24 @@ void HelloWorld::PlayEarnScoreEffect(const int& iScore,  const Cell& cell, const
 	int iLength = strlen(sBuffer);
 	char sSpriteName[16] = "ScoreNum_0.png";
 	Sprite* pScoreNumberSprite;
+
+	float fScale = 1.2f;
+	if (iScore < 50)
+		fScale = 1.1f;
+	else if (iScore < 100)
+		fScale = 1.3f;
+	else if (iScore < 200)
+		fScale = 1.5f;
+	else
+		fScale = 1.7f;
+
 	for(int i=0; i < iLength; i++)
 	{
 		//sprintf( sSpriteName, "ScoreNum_%c.png", sBuffer[i]);
 		sSpriteName[9] = sBuffer[i];
 		pScoreNumberSprite = Sprite::createWithSpriteFrameName( sSpriteName);
-		pScoreNumberSprite->setScale(1.2f);
-		pScoreNumberSprite->setPosition( Point(position.x - pScoreNumberSprite->getContentSize().width*1.2f * ((iLength-1)/2.f-i), position.y));
+		pScoreNumberSprite->setScale(fScale);
+		pScoreNumberSprite->setPosition( Point(position.x - pScoreNumberSprite->getContentSize().width*fScale * ((iLength-1)/2.f-i), position.y));
 		pScoreNumberSprite->setVisible(false);
 		m_pBoardBatchNode->addChild(pScoreNumberSprite, 100);
 
@@ -3328,8 +3442,26 @@ void HelloWorld::StartWinBonusPhase()
 
 void HelloWorld::ShowLevelCompleteEffect()
 {
+	Sprite* pTextSprite = Sprite::createWithSpriteFrameName("Level_Completed.png");
+	Size textSize = pTextSprite->getContentSize();
+	Size winSize = Director::getInstance()->getWinSize();
+
+	pTextSprite->setPosition(Point( -textSize.width/2.f, winSize.height/2.f + 100.f));
+	m_pTextEffectBatchNode->addChild(pTextSprite);
+
+	pTextSprite->runAction(
+		Sequence::create(
+			MoveTo::create( 0.4f, Point( winSize.width/2.f - 40.f, winSize.height/2.f  + 100.f)),
+			DelayTime::create(1.2f),
+			Spawn::createWithTwoActions(
+				EaseBackOut::create(MoveTo::create( 0.5f, Point( winSize.width + textSize.width/2.f, winSize.height/2.f  + 100.f))),
+				FadeOut::create( 0.9f)),
+			RemoveSelf::create(),
+			NULL));
+
+
 	//! Load data synchorinize (should replace load async in the future
-    ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/WordClear/WordClear.ExportJson");
+    /*ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/WordClear/WordClear.ExportJson");
 	
 	//play
 	Armature* pAmarture = Armature::create("WordClear");
@@ -3347,14 +3479,42 @@ void HelloWorld::ShowLevelCompleteEffect()
 			DelayTime::create( fAnimDuration + 0.02f),
 			RemoveSelf::create(),
 			NULL));
+			*/
+	this->runAction(
+		Sequence::create(
+			DelayTime::create(2.1f),  //fAnimDuration),
+			CallFunc::create( this,  callfunc_selector(HelloWorld::ShowWinGamePopup)),
+			NULL));
+			
+	SoundManager::PlaySoundEffect(_SET_WIN_);
+}
+
+void HelloWorld::ShowLevelFailEffect()
+{
+	Sprite* pTextSprite = Sprite::createWithSpriteFrameName("Level_Fail.png");
+	Size textSize = pTextSprite->getContentSize();
+	Size winSize = Director::getInstance()->getWinSize();
+
+	pTextSprite->setPosition(Point( -textSize.width/2.f, winSize.height/2.f + 100.f));
+	m_pTextEffectBatchNode->addChild(pTextSprite);
+
+	pTextSprite->runAction(
+		Sequence::create(
+			MoveTo::create( 0.4f, Point( winSize.width/2.f  - 40.f, winSize.height/2.f + 100.f)),
+			DelayTime::create(1.2f),
+			Spawn::createWithTwoActions(
+				EaseBackOut::create(MoveTo::create( 0.5f, Point( winSize.width + textSize.width/2.f, winSize.height/2.f  + 100.f))),
+				FadeOut::create( 1.f)),
+			RemoveSelf::create(),
+			NULL));
 
 	this->runAction(
 		Sequence::create(
-			DelayTime::create( fAnimDuration),
-			CallFunc::create( this,  callfunc_selector(HelloWorld::ShowWinGamePopup)),
+			DelayTime::create(2.1f),  //fAnimDuration),
+			CallFunc::create( this,  callfunc_selector(HelloWorld::ShowFailGamePopup)),
 			NULL));
-
-	SoundManager::PlaySoundEffect(_SET_WIN_);
+			
+	SoundManager::PlaySoundEffect(_SET_FAIL_);
 }
 
 void HelloWorld::PlayCombo4Effect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime, float fEffectScale, bool bPlaySoundEffect)
@@ -3501,7 +3661,10 @@ void HelloWorld::PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, fl
 					NULL),
 				NULL),
 			RemoveSelf::create(),
-			NULL));							
+			NULL));		
+
+	// sound effect
+	SoundManager::PlaySoundEffect(_SET_ACTIVATE_COMBO_4_, fDelayTime);
 }
 
 void HelloWorld::PlayCrazyPetEndGameBonusEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
@@ -4152,7 +4315,7 @@ void HelloWorld::PlayCombo6_6Effect(ComboEffectBundle* pComboEffectBundle, float
 
 void HelloWorld::EndUnlockLetterAnimation()
 {
-	m_bIsEffectPlaying = false;
+	//m_bIsEffectPlaying = false;
 
 	if (m_bIsEndGamePhase)
 	{
@@ -4195,17 +4358,7 @@ void HelloWorld::EndUnlockLetterAnimation()
 		else  if (m_GameBoardManager.GetCurrentMove() == 0) // out of move ==> lose
 		{
 			m_bIsEndGamePhase = true; 
-
-			EndGameNode* pEndGameNode = EndGameNode::createLayoutLose( m_GameBoardManager.GetCurrentScore(), 
-				m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
-			m_pHUDLayer->addChild( pEndGameNode, 100);
-
-			SoundManager::PlaySoundEffect(_SET_FAIL_);
-			UserTable::getInstance()->updateLife(1);
-
-			//Game Tracking Level
-			const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
-			GameTracking::saveFileTrackingLevel(m_GameBoardManager.GetCurrentLevel(), 0, mainWord.m_iWordLength-mainWord.m_iRemainInactivatedCharacterCount, "Lose");
+			ShowLevelFailEffect();			
 		}
 	}
 }

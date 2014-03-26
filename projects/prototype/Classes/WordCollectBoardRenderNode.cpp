@@ -557,6 +557,8 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 	{
 		m_pColorNode->runAction(RemoveSelf::create());
 		m_pColorNode = NULL;
+
+		m_StartGameCallback();
 	}
 
 	Point touchPosition;

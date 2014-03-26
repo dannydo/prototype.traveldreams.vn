@@ -35,6 +35,8 @@ public:
 	std::string GetImageInGemFileFromLetter(unsigned char iLetter);	
 	std::string GetImageInFileFromBonusLetter(unsigned char iLetter);	
 
+	inline void SetStartGameCallback( std::function<void()> startGameCallback) { m_StartGameCallback = startGameCallback;}
+
 	//int GetNextCharacterID();
 
 	bool onTouchBegan(Touch *pTouch, Event *pEvent) override;
@@ -49,6 +51,8 @@ private:
 
 	virtual bool init();			
 private:	
+	std::function<void()> m_StartGameCallback;
+
 	//std::vector<CCLabelTTF*> m_LabelList;	
 	/*int m_iWordCount;	
 	Word m_WordList[_GDS_WORD_MAX_COUNT_];
@@ -57,7 +61,7 @@ private:
 	int m_iNextCharacterID;
 	
 	bool m_ActivedCharacterFlags[_GDS_WORD_MAX_LENGTH_];*/
-	const Word* m_pMainWord;
+	const Word* m_pMainWord;	
 
 	Sprite* m_LabelList[_GDS_WORD_MAX_LENGTH_];
 	Sprite* m_BubbleList[_GDS_WORD_MAX_LENGTH_];

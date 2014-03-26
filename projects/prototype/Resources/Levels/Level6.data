@@ -1,18 +1,18 @@
 ;size map
 8	8
 ;number of move
-10
+15
 ;number of color
 6
 ;score of stars
-8000	14000	19000
+8000	12000	16000
 ;map matrix
 0	0	1	1	1	1	0   0
-0	1	5	1	1	1	1   0
+0	1	1	1	1	1	1   0
 1	1	1	1	1	1	1   1
 1	1	1	1	1	1	1   1
-1	1	1	1	1	1	1   1
-1	1	1	4	1	1   1	1
+1	5	1	1	1	1	1   1
+1	1	4	1	1	1   1	1
 0	1	1	1	1	1	1   0
 0	0	1	1	1	1	0   0
 ;main word
@@ -27,6 +27,10 @@ PAPER
 ;boss
 0
 ;obstacle list: count, list
+1
+SHIELD 1
+6
+4 1 5 1 8 4 8 5 4 8 5 8
 0
 ;bonus quest
 0

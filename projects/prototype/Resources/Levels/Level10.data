@@ -5,7 +5,7 @@
 ;number of color
 6
 ;score of stars
-8000	16000	30000
+8000	12000	16000
 ;map matrix
 1	1	1	1	1	1	1	1
 1	1	1	1	1	1	1	1
@@ -31,6 +31,10 @@ BLACKBOARD
 ;boss
 0
 ;obstacle list: count, list
+1
+COUNTDOWN	5
+1
+6 4
 0
 ;bonus quest
 0

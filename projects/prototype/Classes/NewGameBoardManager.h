@@ -157,6 +157,8 @@ public:
 	bool IsRowLocked(const int& iRow);
 	bool IsColumnLocked(const int& iColumn);
 
+	inline const int& GetPhaseMoveOfComboChain() { return m_iPhaseMoveInComboChain;}
+
 	void GenerateGameBoard(int iLevel);
 
 	inline std::vector<DestroyedByComboCell>& GetDestroyBonusQuestGemList() { return m_DestroyBonusQuestGemList;}
