@@ -75,60 +75,120 @@ void GameWordManager::LoadWordGenerateConfig()
 	delete[] orginalData;
 }
 
-void GameWordManager::LoadWords()
+void GameWordManager::LoadWorldListConfig()
 {
 	unsigned long iDataSize;
-	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData("WordList.txt", "r", &iDataSize);
+	std::string fullPath = CCFileUtils::getInstance()->fullPathForFilename("GameData/Words/WordListConfig.data");
+	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData(fullPath.c_str(), "r", &iDataSize);
 	char* data = new char[iDataSize];
 	memcpy(data, orginalData, iDataSize);
 	membuf dataBuf(data, data + iDataSize);
 	std::istream inputStream(&dataBuf);
 
-	inputStream >> m_iWordCount;
+	int iPackageCount;
+	inputStream >> iPackageCount;
+	
+	for(int i=0; i< iPackageCount; i++)
+	{		
+		WorldListPackgeDescription package;
+		inputStream >> package.m_sPackgageID;
+		inputStream >> package.m_sPackagePath;
+		
+		m_MapPackgeNameToIndex[package.m_sPackgageID] = i;
+		m_WorldPackageList.push_back(package);
+	}
+}
+
+void GameWordManager::ClearCache()
+{
+	m_WordList.clear();
+	m_MapWordIDToLoadedIndex.clear();
+}
+
+void GameWordManager::PreLoadPackageForWord(std::string sWordID)
+{	
+	// parse packageID from wordID
+	auto iIndexOfSpecalLetter = sWordID.find_first_of('-');
+	auto sPackageID = sWordID.substr(0, iIndexOfSpecalLetter);
+	int iPackageIndex = m_MapPackgeNameToIndex[sPackageID];		
+	LoadWords( iPackageIndex);
+}
+
+void GameWordManager::LoadWords(const int& iPackageIndex)
+{
+	std::string sPackagePath = m_WorldPackageList[iPackageIndex].m_sPackagePath;
+	sPackagePath.append("/WordList.txt");
+
+	unsigned long iDataSize;	
+	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData(sPackagePath.c_str(), "r", &iDataSize);
+	char* data = new char[iDataSize];
+	memcpy(data, orginalData, iDataSize);
+	membuf dataBuf(data, data + iDataSize);
+	std::istream inputStream(&dataBuf);
+
+	char sWordID[40];
+	
+
+	int iWordCount;
+	inputStream >> iWordCount;
 	std::string sTemp;
-	for(int iWordIndex = 0; iWordIndex < m_iWordCount; iWordIndex++)
+	for(int iWordIndex = 0; iWordIndex < iWordCount; iWordIndex++)
 	{
+		Word newWord;
 		std::getline(inputStream, sTemp);
 		std::getline(inputStream, sTemp);
-		strcpy( m_WordList[iWordIndex].m_sWord, sTemp.data());		
-		m_WordList[iWordIndex].m_iWordLength = sTemp.size()-1;
-		m_WordList[iWordIndex].m_sWord[m_WordList[iWordIndex].m_iWordLength] = 0;
+		strcpy( newWord.m_sWord, sTemp.data());		
+		newWord.m_iWordLength = sTemp.size()-1;
+		newWord.m_sWord[newWord.m_iWordLength] = 0;
+
+		sprintf( sWordID, "%s-%s", m_WorldPackageList[iPackageIndex].m_sPackgageID.c_str(), newWord.m_sWord);
+		m_MapWordIDToLoadedIndex[sWordID] = iWordIndex;
 
 		//inputStream >> m_WordList[iWordIndex].m_sWord;		
 		//m_WordList[iWordIndex].m_iWordLength = strlen( m_WordList[iWordIndex].m_sWord);
 
 		// read \r to temp
 		//std::getline(inputStream, sTemp);		
-		std::getline(inputStream, m_WordList[iWordIndex].m_sMeaning);
+		std::getline(inputStream, newWord.m_sMeaning);
 		//strcpy( m_WordList[iWordIndex].m_sMeaning, sTemp.c_str());
 
-		inputStream >> m_WordList[iWordIndex].m_sSoundEnglishFile;		
-		inputStream >> m_WordList[iWordIndex].m_fSoundEnglishLength;
+		inputStream >> newWord.m_sSoundEnglishFile;		
+		inputStream >> newWord.m_fSoundEnglishLength;
 
-		inputStream >> m_WordList[iWordIndex].m_sSoundVietnameseFile;
-		inputStream >> m_WordList[iWordIndex].m_fSoundVietnameseLength;
+		inputStream >> newWord.m_sSoundVietnameseFile;
+		inputStream >> newWord.m_fSoundVietnameseLength;
 
 		//inputStream >> m_WordList[iWordIndex].m_sSoundVietnameseFile;		
 		//std::getline(inputStream, m_WordList[iWordIndex].m_sSoundFile);
 		//std::getline(inputStream, m_WordList[iWordIndex].m_sSoundVietnameseFile);
 		
-		inputStream >> m_WordList[iWordIndex].m_sFlashCardImage;
+		inputStream >> newWord.m_sFlashCardImage;
 		
 
 		std::getline(inputStream, sTemp);
-		std::getline(inputStream, m_WordList[iWordIndex].m_sPhonetic);
-		std::getline(inputStream, m_WordList[iWordIndex].m_sSentence);
-		inputStream >> m_WordList[iWordIndex].m_sSentenceSoundFile;
-		inputStream >> m_WordList[iWordIndex].m_fSentenceSoundLength;
+		std::getline(inputStream, newWord.m_sPhonetic);
+		std::getline(inputStream, newWord.m_sSentence);
+		inputStream >> newWord.m_sSentenceSoundFile;
+		inputStream >> newWord.m_fSentenceSoundLength;
+
+		m_WordList.push_back(newWord);
 	}
 
 	delete[] data;
 	delete[] orginalData;
 }
 
-int GameWordManager::GetWordIndexFromContent(const std::string& sWord)
+int GameWordManager::GetLoadedWordIndexFromID(const std::string& sWordID)
 {
-	for(int iWordIndex=0; iWordIndex < m_iWordCount; iWordIndex++)
+	if ( m_MapWordIDToLoadedIndex.find(sWordID) == m_MapWordIDToLoadedIndex.end()) //this word not loaded yet
+	{
+		PreLoadPackageForWord(sWordID);
+	}
+
+	return m_MapWordIDToLoadedIndex[sWordID];
+
+	/*int iWordCount = m_WordList.size();
+	for(int iWordIndex=0; iWordIndex < iWordCount; iWordIndex++)
 	{
 		if (m_WordList[iWordIndex].m_sWord == sWord)
 			return iWordIndex;
@@ -136,13 +196,14 @@ int GameWordManager::GetWordIndexFromContent(const std::string& sWord)
 	// error, word not found
 	assert(0);
 
-	return 0;
+	return 0;*/
 }
 
 void GameWordManager::GenerateWordForNewLevel(int iLevel)
 {
 	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(iLevel);
-	m_iMainWordIndex = m_pLevelConfig->m_iMainWordID;
+	m_iMainWordIndex = GetLoadedWordIndexFromID(m_pLevelConfig->m_sMainWordID);
+		//m_pLevelConfig->m_iMainWordID;
 	
 
 	if (!m_pLevelConfig->m_bIsMainWordExistedOnBoard)		

@@ -7,6 +7,13 @@
 
 bool SuccessWithPercentRatio(const int& iPercentRatio);
 
+struct WorldListPackgeDescription
+{
+public:
+	std::string m_sPackgageID;
+	std::string m_sPackagePath;
+};
+
 class GameWordManager
 {
 public:	
@@ -15,7 +22,7 @@ public:
 		if (m_pInstance == NULL)
 		{
 			m_pInstance = new GameWordManager();
-			m_pInstance->LoadWords();
+			//m_pInstance->LoadWords();
 		}
 		return m_pInstance;
 	}
@@ -36,9 +43,14 @@ private:
 	static GameWordManager* m_pInstance;
 public:	
 	void LoadWordGenerateConfig();
-	void LoadWords();
+	void LoadWorldListConfig();
+	void LoadWords(const int& iPackageIndex);
+
+	void ClearCache();
+
 	void GenerateWordForNewLevel(int iLevel);
 	void RetryCurrentLevel();
+
 
 	inline const Word& GetMainWord() { return m_WordList[m_iMainWordIndex];}	
 	bool IsMainWordUnlocked() { return (m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount == 0);}
@@ -46,9 +58,9 @@ public:
 	inline const LevelConfig* GetLevelConfig() { return m_pLevelConfig;}
 
 	int GetLengthOfMainWord();
-	int GetLengthOfSubWord();
+	//int GetLengthOfSubWord();
 
-	int GetWordIndexFromContent(const std::string& sWord);
+	int GetLoadedWordIndexFromID(const std::string& sWordID);
 	inline const Word& GetWord(const int& iWordIndex) { return m_WordList[iWordIndex];}
 
 	void EnableVersusBossMode();
@@ -66,6 +78,8 @@ public:
 		bool& bIsMainWordJustUnlocked);
 		//bool& bIsMainWordFullUnlocked);	
 private:
+	void PreLoadPackageForWord(std::string sWordID);
+
 	void ResetDataForNewPlay();
 		
 	bool GenerateLetterFromTrashCollection(unsigned char& sLetter);
@@ -75,10 +89,19 @@ private:
 	// word generate config
 	WordGenerateConfig m_WordGenerateConfig;
 
+	// cache current level config
 	const LevelConfig* m_pLevelConfig;
 
-	int m_iWordCount;	
-	Word m_WordList[_GDS_WORD_MAX_COUNT_];
+	// new feature: support world package
+	std::map<std::string,int> m_MapPackgeNameToIndex;
+	std::vector<WorldListPackgeDescription> m_WorldPackageList;
+
+	std::map<std::string,int> m_MapWordIDToLoadedIndex;
+
+
+	//int m_iWordCount;	
+	//Word m_WordList[_GDS_WORD_MAX_COUNT_];
+	std::vector<Word> m_WordList;
 
 	int m_iMainWordIndex;
 	int m_iTotalCollectibleLettersOfMainWord;

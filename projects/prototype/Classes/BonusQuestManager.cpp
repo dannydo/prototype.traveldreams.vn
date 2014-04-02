@@ -40,7 +40,9 @@ void BonusQuestManager::InitLevel()
 					m_CollectBonusWordParam.m_iRemainLettersCount = m_CollectBonusWordObjective.m_iRequiredLetterCount;
 					
 					//random bonus word
-					m_CollectBonusWordObjective.m_iSelectedBonusWordID = m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[rand() % m_CollectBonusWordObjective.m_iBonusWordCount];
+					m_CollectBonusWordObjective.m_iSelectedBonusWordID =
+						GameWordManager::getInstance()->GetLoadedWordIndexFromID( m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[rand() % m_CollectBonusWordObjective.m_iBonusWordCount]);
+						//m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[rand() % m_CollectBonusWordObjective.m_iBonusWordCount];
 					break;
 				}
 			}

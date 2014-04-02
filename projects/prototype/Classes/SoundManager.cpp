@@ -182,7 +182,7 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 			sFileName = "SoundEffect/Drop_sfx.ogg";
 			break;
 		case _SET_DRAG_FAIL_:
-			sFileName = "SoundEffect/Drag_fail_sfx.wav";
+			sFileName = "SoundEffect/Drag_fail_sfx.ogg";
 			break;
 		case _SET_DRAG_SUCCESS_:
 			sFileName = "SoundEffect/Drag_success_sfx.ogg";

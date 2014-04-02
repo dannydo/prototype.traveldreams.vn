@@ -8,7 +8,7 @@
 USING_NS_CC;
 
 #define _MAX_OBSTACLE_TYPE_COUNT_	5
-#define _MAXIMUM_BONUS_WORD_LENGTH_	10
+#define _MAXIMUM_BONUS_WORD_COUNT_	10
 
 struct Level_ObstacleConfig
 {
@@ -71,7 +71,8 @@ public:
 struct BonusQuestCollectBonusWordDescription
 {
 public:
-	int m_BonusWordIDList[_MAXIMUM_BONUS_WORD_LENGTH_];
+	//int m_BonusWordIDList[_MAXIMUM_BONUS_WORD_LENGTH_];
+	std::string m_BonusWordIDList[_MAXIMUM_BONUS_WORD_COUNT_];
 	int m_iBonusWordCount;
 	int m_iRequiredLetterCount;
 };
@@ -118,7 +119,8 @@ public:
 	// map matrix
 	int m_BoardMatrix[_BOARD_MAX_ROW_NUMBER_][_BOARD_MAX_COLUMN_NUMBER_];
 	// main word
-	int m_iMainWordID;
+	//int m_iMainWordID;
+	std::string m_sMainWordID;
 	bool m_MainWordUnlockedFlagList[_GDS_WORD_MAX_LENGTH_];
 	bool m_bIsMainWordExistedOnBoard;
 	Cell m_MainWordLetterPosition[_GDS_WORD_MAX_LENGTH_];

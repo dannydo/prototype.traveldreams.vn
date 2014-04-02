@@ -55,7 +55,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     director->setAnimationInterval(1.0 / 60);
 
 	// load word list
-	GameWordManager::getInstance()->LoadWords();
+	GameWordManager::getInstance()->LoadWorldListConfig();
 	GameWordManager::getInstance()->LoadWordGenerateConfig();
 
 	// load level config

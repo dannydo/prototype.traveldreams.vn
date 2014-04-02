@@ -1259,7 +1259,8 @@ void HelloWorld::OnStartGame()
 
 void HelloWorld::OnCompleteComboChain()
 {
-	m_bIsEffectPlaying = false;
+	if (!m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked() && m_GameBoardManager.GetCurrentMove()!=0)
+		m_bIsEffectPlaying = false;
 
 
 	if (m_GameBoardManager.GetPhaseMoveOfComboChain() >3)
@@ -1297,6 +1298,15 @@ void HelloWorld::OnCompleteComboChain()
 		pTextSprite->setOpacity(0);
 		pTextSprite->setScale(1.1f);
 		m_pTextEffectBatchNode->addChild(pTextSprite);
+		
+		FiniteTimeAction* pFinalStep;
+		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked() || m_GameBoardManager.GetCurrentMove()==0)
+			pFinalStep = Sequence::createWithTwoActions(
+							CCCallFunc::create( this, callfunc_selector( HelloWorld::EndUnlockLetterAnimation)),
+							RemoveSelf::create());
+		else
+			pFinalStep = RemoveSelf::create();
+
 		pTextSprite->runAction( 
 			Sequence::create(
 				Spawn::createWithTwoActions(
@@ -1306,8 +1316,7 @@ void HelloWorld::OnCompleteComboChain()
 				Spawn::createWithTwoActions(
 					FadeOut::create( 0.3f),
 					ScaleTo::create(0.3f, 1.25f)),
-				CCCallFunc::create( this, callfunc_selector( HelloWorld::EndUnlockLetterAnimation)),
-				RemoveSelf::create(),
+				pFinalStep,
 				NULL));
 	}
 	else
@@ -2123,6 +2132,9 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		ComboEffectCell newComboCell;
 		if (pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_6_4_EFFECT_ || pComboEffect->m_ComboEffectDescription.m_eComboEffectType == _CET_6_5_EFFECT_ ) 
 		{
+			// temporary hardcode for sound effect of combo 6-4, 6-5 here
+			SoundManager::PlaySoundEffect(_SET_ACTIVATE_DOUBLE_COMBO_, fCurrentDelayComboChain);
+
 			newComboCell.m_eGemComboType = (pComboEffect->m_ComboEffectDescription.m_eComboEffectType==_CET_6_4_EFFECT_)?_GCT_COMBO4_:_GCT_COMBO5_;
 			newComboCell.m_iGemID = pComboEffect->m_ComboEffectDescription.m_iGemID;
 		}
@@ -2368,17 +2380,30 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	
 	// move cells
 	int iUpdatedZOrder;
-	auto afterMoveEffectAction = Sequence::create(					
+	/*auto afterMoveEffectAction = Sequence::create(					
 					SetAnchorAction::Create( Point( 0.5f, -0.5f)),
 					ScaleTo::create( 0.015f, 1.06f, 0.92f),
 					ScaleTo::create( 0.106f, 0.95f, 1.05f),
 					ScaleTo::create( 0.05f, 1.03f, 0.96f),
 					ScaleTo::create( 0.05f, 1.f, 1.f),
 					ResetAnchorToCenterAction::Create(),
-					NULL);
+					NULL);*/
+
+	float fPercentChange;
+			/*Sequence::create(					
+					SetAnchorAction::Create( Point( 0.5f, -0.5f)),
+					ScaleTo::create( 0.015f, 1.f + 0.06f * fPercentChange , 1- 0.08f * fPercentChange),
+					ScaleTo::create( 0.106f, 1.f - 0.05f*fPercentChange, 1.f + 0.05f * fPercentChange),
+					ScaleTo::create( 0.05f, 1.f + 0.03f * fPercentChange, 1.f - 0.04* fPercentChange),
+					ScaleTo::create( 0.05f, 1.f, 1.f),
+					ResetAnchorToCenterAction::Create(),
+					NULL);*/
 
 	for (int i=0; i < originalMovedCells.size(); i++)
 	{		
+
+		fPercentChange = (originalMovedCells[i].m_iRow - targetMovedCells[i].m_iRow + 1.f) * 1.f / iNumberOfRow;
+
 		//if ( m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite == NULL)
 		//	CCLOG("3- Effect NULL, %d, %d", originalMovedCells[i].m_iRow, originalMovedCells[i].m_iColumn);
 		m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->runAction(
@@ -2387,7 +2412,14 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 				EaseOut::create( MoveTo::create( _TME_MOVE_CELL_TIME_,
 					ccp(m_fBoardLeftPosition + targetMovedCells[i].m_iColumn * m_SymbolSize.width, 
 					m_fBoardBottomPosition + targetMovedCells[i].m_iRow * m_SymbolSize.height)),			1.f),
-				afterMoveEffectAction->clone(),
+				//afterMoveEffectAction->clone(),
+				SetAnchorAction::Create( Point( 0.5f, -0.5f)),
+				ScaleTo::create( 0.015f, 1.f + 0.06f * fPercentChange , 1- 0.08f * fPercentChange),
+				ScaleTo::create( 0.106f, 1.f - 0.05f*fPercentChange, 1.f + 0.05f * fPercentChange),
+				ScaleTo::create( 0.05f, 1.f + 0.03f * fPercentChange, 1.f - 0.04* fPercentChange),
+				ScaleTo::create( 0.05f, 1.f, 1.f),
+				ResetAnchorToCenterAction::Create(),
+
 				NULL));
 
 
@@ -2428,6 +2460,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		//iLetter = (unsigned char)outputLettersForGems[iGemIndex];
 		cell = newCells[iGemIndex];
 
+		fPercentChange = ( iNumberOfRow - cell.m_iRow) * 1.f / iNumberOfRow;
+
 		for(int i=0; i< 2; i++)
 		{					
 			Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID( cell.m_iGemID,  //m_GameBoardManager.GetCellValue(cell.m_iRow, cell.m_iColumn), //_GCT_NONE_).c_str());
@@ -2457,7 +2491,15 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 						EaseOut::create( MoveTo::create(_TME_MOVE_CELL_TIME_,
 								ccp(m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, 
 								m_fBoardBottomPosition + cell.m_iRow  * m_SymbolSize.height)), 2.f),
-						afterMoveEffectAction->clone(),
+					
+						//afterMoveEffectAction->clone(),
+						SetAnchorAction::Create( Point( 0.5f, -0.5f)),
+						ScaleTo::create( 0.015f, 1.f + 0.06f * fPercentChange , 1- 0.08f * fPercentChange),
+						ScaleTo::create( 0.106f, 1.f - 0.05f*fPercentChange, 1.f + 0.05f * fPercentChange),
+						ScaleTo::create( 0.05f, 1.f + 0.03f * fPercentChange, 1.f - 0.04* fPercentChange),
+						ScaleTo::create( 0.05f, 1.f, 1.f),
+						ResetAnchorToCenterAction::Create(),
+
 						NULL));
 
 				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
@@ -2483,7 +2525,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			m_pBoardBatchNode->addChild(pSprite, GetZOrder( cell.m_iRow, cell.m_iColumn, false));
 		}		
 	}
-	delete afterMoveEffectAction;
+	//delete afterMoveEffectAction;
 
 
 	// last check: activation of collect word bonus quest
@@ -3347,7 +3389,7 @@ void HelloWorld::ShowMainWordUnlockEffect()
 	m_pEndGameEffectLayer->addChild(pSpriteBatchNode);
 
 	// play unlock main word effect
-	float fScaleRatio = 1.75f;
+	float fScaleRatio = 1.55f;
 	float fDisplayEffectTime = 0.25f;
 	float fDelayPerLetter = 0.06f;
 	
@@ -3362,7 +3404,7 @@ void HelloWorld::ShowMainWordUnlockEffect()
 		letterSpriteList[i]->setAnchorPoint(Point(0,0));
 		letterSpriteList[i]->setScale(fScaleRatio);
 
-		fWordGraphicLength += letterSpriteList[i]->getContentSize().width * fScaleRatio - 10.f;
+		fWordGraphicLength += letterSpriteList[i]->getContentSize().width * fScaleRatio - 12.f;
 	}
 
 	Size winSize = Director::getInstance()->getWinSize();
@@ -3385,7 +3427,7 @@ void HelloWorld::ShowMainWordUnlockEffect()
 					EaseOut::create( ScaleTo::create( fDisplayEffectTime, fScaleRatio, fScaleRatio), 2.f)),
 				NULL));		
 
-		fPositionXIncrement += letterSpriteList[i]->getContentSize().width * fScaleRatio - 10.f;
+		fPositionXIncrement += letterSpriteList[i]->getContentSize().width * fScaleRatio - 12.f;
 	}	
 
 	float fSpellingTime = m_pWordCollectBoardRenderNode->PlaySpellingSound() + 0.9f;

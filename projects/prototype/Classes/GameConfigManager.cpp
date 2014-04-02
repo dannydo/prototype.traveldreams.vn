@@ -99,7 +99,8 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 	std::getline(inputStream, sTemp);
 	std::getline(inputStream, sTemp);
 	sTemp.erase( sTemp.size()-1, 1);  // remove \r at the end of line
-	levelConfig.m_iMainWordID = GameWordManager::getInstance()->GetWordIndexFromContent(sTemp);		
+	//levelConfig.m_iMainWordID = GameWordManager::getInstance()->GetWordIndexFromContent(sTemp);		
+	levelConfig.m_sMainWordID = sTemp;
 	
 	memset( levelConfig.m_MainWordUnlockedFlagList, 0, sizeof(levelConfig.m_MainWordUnlockedFlagList));
 	int iAlreadyUnlockedLetterCount, iTemp;
@@ -115,7 +116,8 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 	levelConfig.m_bIsMainWordExistedOnBoard = (iTemp > 0);
 	if (levelConfig.m_bIsMainWordExistedOnBoard)
 	{
-		const Word& word = GameWordManager::getInstance()->GetWord(levelConfig.m_iMainWordID);
+		int iMainWordIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(levelConfig.m_sMainWordID);
+		const Word& word = GameWordManager::getInstance()->GetWord(iMainWordIndex);
 		for(int i=0; i< word.m_iWordLength; i++)
 		{
 			inputStream >> levelConfig.m_MainWordLetterPosition[i].m_iRow;
@@ -303,7 +305,8 @@ void GameConfigManager::LoadConfigOfLevel(int iLevel)
 						std::getline(inputStream, sTemp);
 						while (sTemp[sTemp.length()-1] == '\r' || sTemp[sTemp.length()-1] == ' ')
 							sTemp.erase( sTemp.size()-1, 1);  // remove \r at the end of line
-						levelConfig.m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[j] = GameWordManager::getInstance()->GetWordIndexFromContent(sTemp);
+						levelConfig.m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[j] = sTemp;
+							//GameWordManager::getInstance()->GetWordIndexFromContent(sTemp);
 					}
 					break;
 				}

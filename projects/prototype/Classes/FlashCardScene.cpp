@@ -325,7 +325,7 @@ void FlashCardLayer::createNodeSlideShow()
 
 	if(m_currentLevelInfo.sWordKey != "")
 	{
-		int iIndex = GameWordManager::getInstance()->GetWordIndexFromContent(m_currentLevelInfo.sWordKey);
+		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(m_currentLevelInfo.sWordKey); //GetWordIndexFromContent(m_currentLevelInfo.sWordKey);
 		m_currentWordInfo = GameWordManager::getInstance()->GetWord(iIndex);
 	}
 }
@@ -346,7 +346,7 @@ Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
 	LevelInfo levelInfo = m_levels[iIndexFlashCard-1];
 	if(levelInfo.bIsUnlock)
 	{	
-		int iIndex = GameWordManager::getInstance()->GetWordIndexFromContent(levelInfo.sWordKey);
+		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(levelInfo.sWordKey);
 		Word wordInfo = GameWordManager::getInstance()->GetWord(iIndex);
 
 		Sprite* pBackgroundFlashCardBorder = Sprite::create("FlashCard/flashcardbackgroundborder.png");

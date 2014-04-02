@@ -164,7 +164,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	m_pColorNode = DrawNode::create();
 	CCPoint vertex[] = { ccp(0,0), ccp(1000,0), ccp(1000,1000), ccp(0,1000) };
 	m_pColorNode->drawPolygon(vertex, 4, ccc4f(0, 0, 0, 0.5f), 0, ccc4f(0, 0, 0, 0.5f) );
-	this->addChild(m_pColorNode, 9);
+	this->addChild(m_pColorNode, 19);
 
 	Sprite* pTip = Sprite::create("tip-msg.png");
 	pTip->setScale(1.2f);

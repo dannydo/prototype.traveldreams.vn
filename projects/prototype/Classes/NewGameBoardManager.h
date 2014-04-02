@@ -271,6 +271,9 @@ protected:
 private:
 	// utility methods to find hint on temporary matrix
 	bool haveCellMatch3(const Cell& cell);
+	bool canActivatedAsSpecialComboHorizontal(const Cell& cell); //can be activate as combo 6 or double/tripple combo	
+	bool canActivatedAsSpecialComboVertical(const Cell& cell);
+
 	int haveMatch3WHenMoveRow(const int& iRow);
 	int haveMatch3WHenMoveColumn(const int& iColumn);
 public:
