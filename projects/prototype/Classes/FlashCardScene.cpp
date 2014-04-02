@@ -74,10 +74,12 @@ bool FlashCardLayer::init()
 
 	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 
+	/*
 	LabelTTF* pLabelTitle = LabelTTF::create(m_chapterInfo.sName.c_str(), "Arial", 40);
 	pLabelTitle->setColor(ccc3(0.0f, 0.0f, 0.0f));
 	pLabelTitle->setPosition(Point(320.0f, 905.0f));
 	this->addChild(pLabelTitle);
+	*/
 
 	char sTotalLevel[10];
 	sprintf(sTotalLevel, "%d/%d", 1, 20);
@@ -90,7 +92,7 @@ bool FlashCardLayer::init()
 	m_pFooterNode->disableButtonIntroAndFlashCard();
 	this->addChild(m_pFooterNode);
 
-	m_levels = LevelTable::getInstance()->fetchLevelsForChapter(m_chapterInfo.iChapter);
+	m_levels = LevelTable::getInstance()->getAllLevelsForChapter(m_chapterInfo.sChapterId);
 	m_iTotalFlashCard = m_levels.size();
 	m_iIndexFlashCard = 1;
 
@@ -316,6 +318,7 @@ void FlashCardLayer::createNodeSlideShow()
 		m_pSlideShow->addChild(pLastCardRight);
 	}
 
+	/*
 	m_currentLevelInfo = m_levels[m_iIndexFlashCard-1];
 	m_pLabelWord = LabelTTF::create(m_currentLevelInfo.sWordKey.c_str(), "Arial", 32.0f);
 	m_pLabelWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
@@ -328,6 +331,7 @@ void FlashCardLayer::createNodeSlideShow()
 		int iIndex = GameWordManager::getInstance()->GetWordIndexFromContent(m_currentLevelInfo.sWordKey);
 		m_currentWordInfo = GameWordManager::getInstance()->GetWord(iIndex);
 	}
+	*/
 }
 
 Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
@@ -346,6 +350,7 @@ Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
 	LevelInfo levelInfo = m_levels[iIndexFlashCard-1];
 	if(levelInfo.bIsUnlock)
 	{	
+		/*
 		int iIndex = GameWordManager::getInstance()->GetWordIndexFromContent(levelInfo.sWordKey);
 		Word wordInfo = GameWordManager::getInstance()->GetWord(iIndex);
 
@@ -379,6 +384,7 @@ Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
 		pLabelWordSentence->setAnchorPoint(Point(0.5, 1.0f));
 		pLabelWordSentence->setPosition(Point(320.0f, 235.0f));
 		pNode->addChild(pLabelWordSentence);
+		*/
 
 		Sprite* pIconSoundSenetenceSprite = Sprite::create("FlashCard/icon_sound.png");
 		pIconSoundSenetenceSprite->setPosition(Point(500.0f, 636.0f));

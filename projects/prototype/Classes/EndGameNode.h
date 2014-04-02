@@ -11,8 +11,8 @@
 class EndGameNode : public cocos2d::Node
 {
 public:
-	static EndGameNode* createLayoutWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel);
-	static EndGameNode* createLayoutLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel);
+	static EndGameNode* createLayoutWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId);
+	static EndGameNode* createLayoutLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel,  const std::string sChapterId);
 
 	bool init() override;
 	bool initWin();
@@ -44,6 +44,7 @@ private:
 	ChapterInfo m_chapterInfo;
 	Word m_mainWord;
 
+	std::string m_sChapterId;
 	int m_iScore;
 	int m_iYellowStar;
 	int m_iCountYellowStar;

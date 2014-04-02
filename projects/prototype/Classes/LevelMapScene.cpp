@@ -11,6 +11,7 @@
 #include "ButtonManagerNode.h"
 #include "Database\UserTable.h"	 
 #include "Config.h"
+#include "GameConfigManager.h"
 
 using namespace cocos2d;
 
@@ -50,10 +51,11 @@ bool LevelMapLayer::init()
 		return false;
 	}
 
-	int iChapter = UserDefault::getInstance()->getIntegerForKey("ChapterPlayGame", 1);
+	m_sChapterId = UserDefault::getInstance()->getStringForKey("ChapterPlayGame");
 	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 
-	this->loadConfigChapter(iChapter);
+	ChapterConfig chapterConfig = GameConfigManager::getInstance()->GetChapterConfig(m_sChapterId);
+	WordlMapConfig::WordMapChapterConfig wordMapChapterConfig =  GameConfigManager::getInstance()->GetWordMapChapterConfig(m_sChapterId);
 
 	m_pBackgroundNode = Node::create();
 	m_pBackgroundNode->setAnchorPoint(Point(0.5f, 0.0f));
@@ -61,11 +63,16 @@ bool LevelMapLayer::init()
 	this->addChild(m_pBackgroundNode);
 	m_maxHeight=0;
 
-	for(int iIndex=1; iIndex<=m_iTotalImageBG; iIndex++)
+	std::string sPathFile;
+	for(int iIndex=1; iIndex<=chapterConfig.m_iTotalBackgroundImage; iIndex++)
 	{
-		char sBGChapter[50];
-		sprintf(sBGChapter, "World-Map/%d/bg%d.png", iChapter, iIndex);
-		Sprite* pBGImage = Sprite::create(sBGChapter);
+		char sBGChapter[10];
+		sprintf(sBGChapter, "/bg%d.png", iIndex);
+
+		sPathFile = wordMapChapterConfig.m_sPathData;
+		sPathFile.append(sBGChapter);
+
+		Sprite* pBGImage = Sprite::create(sPathFile.c_str());
 		pBGImage->setAnchorPoint(Point(0.5f, 0.0f));
 		pBGImage->setPosition(Point(320.0f, m_maxHeight));
 
@@ -77,14 +84,13 @@ bool LevelMapLayer::init()
 	m_pBackgroundNode->addChild(pButtonManagerNode);
 
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
-	std::vector<LevelInfo> levels = LevelTable::getInstance()->fetchLevelsForChapter(iChapter);
-
 	Point pointScroll;
-
-	while(!levels.empty())
+	std::vector<LevelInfo> levels = LevelTable::getInstance()->getAllLevelsForChapter(m_sChapterId);
+	
+	for(int iIndex=0; iIndex<chapterConfig.m_iTotalevel; iIndex++)
 	{
-		LevelInfo levelInfo = levels.back();
-		Point point = m_pointLevel.back();
+		LevelInfo levelInfo = levels[iIndex];
+		Point point = chapterConfig.m_positionLevel[iIndex];
 
 		char sLevel[5];
 		sprintf(sLevel, "%d", levelInfo.iLevel);
@@ -92,7 +98,7 @@ bool LevelMapLayer::init()
 		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
 		pLevelLabel->setPosition(Point(point.x-2, point.y+17));
 		
-		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel || levelInfo.iLevel < 31)
+		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel)
 		{
 			Sprite* pButtonLevelSprite;
 			
@@ -128,9 +134,6 @@ bool LevelMapLayer::init()
 		}
 
 		m_pBackgroundNode->addChild(pLevelLabel);
-
-		levels.pop_back();
-		m_pointLevel.pop_back();
 	}
 
 	if (pointScroll.y > 960-94-200 && pointScroll.y < m_maxHeight-960) {
@@ -163,7 +166,7 @@ void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 {
 	if(UserTable::getInstance()->getUserInfo().iLife > 0)
 	{		
-		// play sound effect 					
+		// play sound effect
 		SoundManager::PlaySoundEffect(_SET_LEVEL_SELECT_);
 
 		ButtonNode* pButtonNode = (ButtonNode*)pSender;
@@ -172,7 +175,7 @@ void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 		GameWordManager* pGameWordManager = GameWordManager::getInstance();
 		pGameWordManager->GenerateWordForNewLevel(iLevel);		
 
-		GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel);
+		GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel, m_sChapterId);
 		this->addChild(pGameTargetNode, 10);		
 	}
 	else
@@ -186,37 +189,9 @@ void LevelMapLayer::showPopupTargetGame(const int& iLevel)
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
 	pGameWordManager->GenerateWordForNewLevel(iLevel);
 
-	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel);
+	
+	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel, m_sChapterId);
 	this->addChild(pGameTargetNode, 10);
-}
-
-void LevelMapLayer::loadConfigChapter(const int& iChapter)
-{
-	char sFilename[50];
-	sprintf(sFilename, "World-Map/%d/config.txt", iChapter);
-
-	unsigned long iDataSize;
-	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData(sFilename, "r", &iDataSize);
-	char* data = new char[iDataSize];
-	memcpy(data, orginalData, iDataSize);
-	membuf dataBuf(data, data + iDataSize);
-	std::istream inputStream(&dataBuf);
-
-	inputStream >> m_iTotalImageBG;
-	inputStream >> m_iTotalLevel;
-
-	std::string sTemp;
-	for(int iIndex = 0; iIndex < m_iTotalLevel; iIndex++)
-	{
-		float fX, fY;
-		inputStream >> fX;
-		inputStream >> fY;
-		Point point = Point(fX, fY);
-		m_pointLevel.push_back(point);
-	}
-
-	delete[] data;
-	delete[] orginalData;
 }
 
 bool LevelMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)

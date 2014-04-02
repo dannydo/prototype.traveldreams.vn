@@ -21,7 +21,7 @@ public:
 	LeaderBoardtNode() {};
 	virtual ~LeaderBoardtNode();
 	bool init() override;
-	static LeaderBoardtNode* createLayout(const int& iLevel);
+	static LeaderBoardtNode* createLayout(const int& iLevel, const std::string sChapterId);
 
 	bool onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
 	void onTouchCustomNodeMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override; 
@@ -43,6 +43,8 @@ private:
 	int m_iLevel;
 	int m_iLeaderBoardCount;
 	int m_arrIndex[6];
+
+	std::string m_sChapterId;
 	
 	ScrollManager* m_pScrollManager;
 	bool m_bIsSwipe;

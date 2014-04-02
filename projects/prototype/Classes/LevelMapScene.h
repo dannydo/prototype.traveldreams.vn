@@ -26,20 +26,16 @@ private:
 	void openSettingMenu();
 	void menuOpenFlashCardCallBack();
 
-	void loadConfigChapter(const int& iChapter);
-
 	cocos2d::Node* generateLayoutStarAndBonusQuest(const int& iStarCompleted, const int& iBonusQuestCompleted, const int& iTotalBonusQuest);
 
 	cocos2d::Node* m_pBackgroundNode;
-
-	int m_iTotalImageBG;
-	int m_iTotalLevel;
-	std::vector<cocos2d::Point> m_pointLevel;
 
 	float m_fBeginY;
 	float m_fYMoved;
 	float m_maxHeight;
 	bool m_bIsSwipe;
+
+	std::string m_sChapterId;
 
 	FooterNode* m_pFooterNode;
 	ScrollManager* m_pScrollManager;
@@ -53,7 +49,7 @@ public:
 	bool init();
 	CREATE_FUNC(LevelMapScene);
 
-	CC_SYNTHESIZE_READONLY(LevelMapLayer*, _layer, Layer);	
+	CC_SYNTHESIZE_READONLY(LevelMapLayer*, _layer, Layer);
 };
 
 #endif

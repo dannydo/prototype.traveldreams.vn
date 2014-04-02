@@ -141,7 +141,7 @@ int GameWordManager::GetWordIndexFromContent(const std::string& sWord)
 
 void GameWordManager::GenerateWordForNewLevel(int iLevel)
 {
-	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(iLevel);
+	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig("Chapter1", iLevel);
 	m_iMainWordIndex = m_pLevelConfig->m_iMainWordID;
 	
 

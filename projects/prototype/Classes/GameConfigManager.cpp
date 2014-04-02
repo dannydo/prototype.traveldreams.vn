@@ -15,23 +15,27 @@ GameConfigManager::GameConfigManager()
 
 GameConfigManager::~GameConfigManager()
 {
-	for(int i=1; i<=_MAX_GAME_LEVEL_; i++)
+	/*for(int i=1; i<=_MAX_GAME_LEVEL_; i++)
 		for(auto pObstacle: m_LevelConfigList[i].m_ObstacleConfigList)
-			delete pObstacle;
-
+			delete pObstacle;*/
+	m_LevelConfig.Clear();
+ 
 	for(auto pObstacleDescription : m_ObstacleDescriptionArray)
 		delete pObstacleDescription;
 }
-	
-void GameConfigManager::LoadLevelsConfig()
-{
-	for(int i=1; i<=_MAX_GAME_LEVEL_; i++)
-		LoadConfigOfLevel(i);
-}
 
-LevelConfig& GameConfigManager::GetLevelConfig(int iLevel)
+LevelConfig& GameConfigManager::GetLevelConfig(const std::string& sChapterID, const int& iLevelId)
 {
-	return m_LevelConfigList[iLevel];	
+	if (iLevelId != m_iCurrentLevelID || sChapterID != m_sCurrentChapterID)
+	{
+		this->LoadConfigOfLevel(sChapterID, iLevelId);
+		this->GetChapterConfig(sChapterID);
+
+		m_sCurrentChapterID = sChapterID;
+		m_iCurrentLevelID = iLevelId;
+	}
+
+	return m_LevelConfig;
 }
 
 const ObstacleLevelDescription& GameConfigManager::GetObstacleLevelDescription(const int& iObstacleTypeID, const int& iLevel)
@@ -44,17 +48,20 @@ const ObstacleLevelDescription& GameConfigManager::GetObstacleLevelDescription(c
 	//for(int i=0; i < pObstacleDescription->m_LevelList.size(); i++)
 }
 
-void GameConfigManager::LoadConfigOfLevel(int iLevel)
+void GameConfigManager::LoadConfigOfLevel(const std::string& sChapterID, const int& iLevelId)
 {
-	LevelConfig& levelConfig = m_LevelConfigList[iLevel];
+	WordlMapConfig::WordMapChapterConfig wordMapChapterConfig = this->GetWordMapChapterConfig(sChapterID);
 
-	//if (iLevel == 5)
-	//	iLevel = 5;
+	std::string sPathFileData = wordMapChapterConfig.m_sPathData;
 	char sFileName[25];
-	sprintf(sFileName, "Levels/Level%d.data", iLevel);	
+	sprintf(sFileName, "/Level%d.data", iLevelId);
+	sPathFileData.append(sFileName);
+
+	m_LevelConfig.Clear();
+	LevelConfig& levelConfig = m_LevelConfig;
 
 	unsigned long iDataSize;
-	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData(sFileName, "r", &iDataSize);
+	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData(sPathFileData.c_str(), "r", &iDataSize);
 	char* data = new char[iDataSize];
 	memcpy(data, orginalData, iDataSize);
 	membuf dataBuf(data, data + iDataSize);
@@ -543,4 +550,94 @@ void GameConfigManager::LoadObstacleConfig()
 	
 	CC_SAFE_DELETE(pJsonDict);
     CC_SAFE_DELETE_ARRAY(des);
+}
+
+void GameConfigManager::LoadWordMapConfig()
+{
+	unsigned long iDataSize;
+	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData("GameData/WorldMapConfig.data", "r", &iDataSize);
+	char* data = new char[iDataSize];
+	memcpy(data, orginalData, iDataSize);
+	membuf dataBuf(data, data + iDataSize);
+	std::istream inputStream(&dataBuf);
+
+	inputStream >> m_WordlMapConfig.m_sFileNameBackgound;
+	inputStream >> m_WordlMapConfig.m_iTotalChapter;	
+
+	std::string sTemp;
+	for(int iIndex = 0; iIndex < m_WordlMapConfig.m_iTotalChapter; iIndex++)
+	{
+		WordlMapConfig::WordMapChapterConfig wordMapChapterConfig;
+		inputStream >> wordMapChapterConfig.m_sChapterId;
+		inputStream >> wordMapChapterConfig.m_sPathData;
+
+		float fX, fY;
+		inputStream >> fX;
+		inputStream >> fY;
+		wordMapChapterConfig.m_position = Point(fX, fY);
+
+		inputStream >> wordMapChapterConfig.m_iTotalevel;
+		inputStream >> wordMapChapterConfig.m_hasUnlock;
+		wordMapChapterConfig.m_iRequest = 0;
+
+		if(wordMapChapterConfig.m_hasUnlock == 1)
+		{
+			inputStream >> wordMapChapterConfig.m_iRequest;
+		}
+		
+		
+		m_WordlMapConfig.m_WorlMapChapterConfigMap[wordMapChapterConfig.m_sChapterId] = iIndex;
+		m_WordlMapConfig.m_WorlMapChapterConfigs.push_back(wordMapChapterConfig);
+	}
+
+	delete[] data;
+	delete[] orginalData;
+}
+
+ChapterConfig& GameConfigManager::GetChapterConfig(const std::string& sChapterID)
+{
+	if (sChapterID != m_sCurrentChapterID)
+	{
+		m_sCurrentChapterID = sChapterID;
+		this->LoadConfigOfChapter(sChapterID);
+	}
+
+	return m_ChapterConfig;
+}
+
+void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID)
+{
+	WordlMapConfig::WordMapChapterConfig wordMapChapterConfig = this->GetWordMapChapterConfig(sChapterID);
+	ChapterConfig& chapterConfig = m_ChapterConfig;
+
+	std::string sPathFileData = wordMapChapterConfig.m_sPathData;
+	sPathFileData.append("/ChapterConfig.data");
+
+	unsigned long iDataSize;
+	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData(sPathFileData.c_str(), "r", &iDataSize);
+	char* data = new char[iDataSize];
+	memcpy(data, orginalData, iDataSize);
+	membuf dataBuf(data, data + iDataSize);
+	std::istream inputStream(&dataBuf);
+
+	inputStream >> chapterConfig.m_iTotalBackgroundImage;
+	chapterConfig.m_iTotalevel = wordMapChapterConfig.m_iTotalevel;
+
+	std::string sTemp;
+	for(int iIndex = 0; iIndex < chapterConfig.m_iTotalevel; iIndex++)
+	{
+		float fX, fY;
+		inputStream >> fX;
+		inputStream >> fY;
+		chapterConfig.m_positionLevel[iIndex] = Point(fX, fY);
+	}
+
+	delete[] data;
+	delete[] orginalData;
+}
+
+WordlMapConfig::WordMapChapterConfig& GameConfigManager::GetWordMapChapterConfig(const std::string& sChapterID)
+{
+	int iIndex = m_WordlMapConfig.m_WorlMapChapterConfigMap[sChapterID];
+	return m_WordlMapConfig.m_WorlMapChapterConfigs[iIndex];
 }

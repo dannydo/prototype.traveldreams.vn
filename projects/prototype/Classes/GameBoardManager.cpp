@@ -9,7 +9,7 @@ GameBoardManager::GameBoardManager(): m_GameConfig(GameConfigManager::getInstanc
 
 void GameBoardManager::GenerateGameBoard(int iLevel)
 {	
-	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(iLevel);
+	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig("Chapter1", iLevel);
 
 	// Load game config
 	//LoadGameConfig();

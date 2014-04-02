@@ -4,7 +4,6 @@
 #include "FlashCardCollection.h"
 #include "MainMenuScene.h"
 #include "SoundManager.h"
-#include "GameBoardManager.h"
 #include "Database\ChapterTable.h"
 #include "ButtonManagerNode.h"
 #include "HeaderNode.h"
@@ -45,10 +44,11 @@ bool WorldMapLayer::init()
 		return false;
 	}
 
-	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
-	this->loadConfigWordMap();
+	m_wordMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
+	std::string sPathFile = "GameData/";
+	sPathFile.append(m_wordMapConfig.m_sFileNameBackgound);
 
-	Sprite* pBackgroundSprite=  Sprite::create("World-Map/Worldmap_BG.png");
+	Sprite* pBackgroundSprite=  Sprite::create(sPathFile.c_str());
 	pBackgroundSprite->setAnchorPoint(Point(0,0));
 	this->addChild(pBackgroundSprite);
 
@@ -66,37 +66,38 @@ bool WorldMapLayer::init()
 
 	m_maxHeight=960.0f;
 
-	while(!chapters.empty())
+	WordlMapConfig::WordMapChapterConfig wordMapChapterConfig;
+	for(int iIndex=0; iIndex<m_wordMapConfig.m_WorlMapChapterConfigs.size(); iIndex++)
 	{
-		ChapterInfo chapterInfo = chapters.back();
-		Point point = m_pointChapter.back();
+		wordMapChapterConfig = m_wordMapConfig.m_WorlMapChapterConfigs[iIndex];
+		sPathFile = wordMapChapterConfig.m_sPathData;
+		sPathFile.append("/Chapter-icon.png");
 
-		char sFilename[50];
-		sprintf(sFilename, "World-Map/%d.png", chapterInfo.iChapter); 
-
-		if(chapterInfo.bIsUnlock || chapterInfo.iChapter == userInfo.iCurrentChapter || 1 == 1)
+		if (iIndex < chapters.size())
 		{
-			Sprite* pButtonLevelSprite = Sprite::create(sFilename);
-			pButtonLevelSprite->setTag(chapterInfo.iChapter);
-			ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonLevelSprite, CC_CALLBACK_1(WorldMapLayer::menuPlayChapterCallBack, this));
-			buttonPlayNode->setPosition(point);
-			buttonPlayNode->setTag(chapterInfo.iChapter);
-			pButtonManagerNode->addButtonNode(buttonPlayNode);
-
-			if(chapterInfo.iChapter == userInfo.iCurrentLevel)
+			ChapterInfo chapterInfo = chapters[iIndex];
+			if(chapterInfo.bIsUnlock)
 			{
-				
+				Sprite* pButtonLevelSprite = Sprite::create(sPathFile.c_str());
+				pButtonLevelSprite->setTag(iIndex);
+				ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonLevelSprite, CC_CALLBACK_1(WorldMapLayer::menuPlayChapterCallBack, this));
+				buttonPlayNode->setPosition(wordMapChapterConfig.m_position);
+				buttonPlayNode->setTag(iIndex);
+				pButtonManagerNode->addButtonNode(buttonPlayNode);
 			}
+			else
+			{
+				Sprite* pButtonLevelSprite = Sprite::create(sPathFile.c_str());
+				pButtonLevelSprite->setPosition(wordMapChapterConfig.m_position);
+				m_pBackgroundNode->addChild(pButtonLevelSprite);
+			} 
 		}
 		else
 		{
-			Sprite* pButtonLevelSprite = Sprite::create(sFilename);
-			pButtonLevelSprite->setPosition(point);
+			Sprite* pButtonLevelSprite = Sprite::create(sPathFile.c_str());
+			pButtonLevelSprite->setPosition(wordMapChapterConfig.m_position);
 			m_pBackgroundNode->addChild(pButtonLevelSprite);
 		}
-
-		chapters.pop_back();
-		m_pointChapter.pop_back();
 	}
 
 	m_pFooterNode = FooterNode::create();
@@ -121,36 +122,12 @@ void WorldMapLayer::menuPlayChapterCallBack(Object* sender)
 	SoundManager::PlaySoundEffect(_SET_CHAPTER_SELECT_);
 
 	ButtonNode* pButtonNode = (ButtonNode*)sender;
-	int iChapter = pButtonNode->getTag();
+	int iIndex = pButtonNode->getTag();
+	std::string sChapterId = m_wordMapConfig.m_WorlMapChapterConfigs[iIndex].m_sChapterId;
 
-	UserDefault::getInstance()->setIntegerForKey("ChapterPlayGame", iChapter);
+	UserDefault::getInstance()->setStringForKey("ChapterPlayGame", sChapterId);
 	LevelMapScene* pLevelMap =  LevelMapScene::create();
 	Director::getInstance()->replaceScene(pLevelMap);
-}
-
-void WorldMapLayer::loadConfigWordMap()
-{
-	unsigned long iDataSize;
-	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData("World-Map/config.txt", "r", &iDataSize);
-	char* data = new char[iDataSize];
-	memcpy(data, orginalData, iDataSize);
-	membuf dataBuf(data, data + iDataSize);
-	std::istream inputStream(&dataBuf);
-
-	inputStream >> m_iTotalChapter;
-
-	std::string sTemp;
-	for(int iIndex = 0; iIndex < m_iTotalChapter; iIndex++)
-	{
-		float fX, fY;
-		inputStream >> fX;
-		inputStream >> fY;
-		Point point = Point(fX, fY);
-		m_pointChapter.push_back(point);
-	}
-
-	delete[] data;
-	delete[] orginalData;
 }
 
 bool WorldMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)

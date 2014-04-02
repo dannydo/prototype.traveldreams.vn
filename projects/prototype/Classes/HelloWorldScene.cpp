@@ -1403,7 +1403,7 @@ void HelloWorld::ShowWinGamePopup()
 {	
 	std::vector<Word> subWordList;	
 	EndGameNode* pEndGameNode = EndGameNode::createLayoutWin( m_GameBoardManager.GetCurrentScore(),
-		m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
+		m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel(), "Chapter1");
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStars());
 	m_pHUDLayer->addChild( pEndGameNode, 100);
 }
@@ -1411,7 +1411,7 @@ void HelloWorld::ShowWinGamePopup()
 void HelloWorld::ShowFailGamePopup()
 {
 	EndGameNode* pEndGameNode = EndGameNode::createLayoutLose( m_GameBoardManager.GetCurrentScore(), 
-				m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
+				m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel(), "Chapter1");
 	m_pHUDLayer->addChild( pEndGameNode, 100);
 
 	//SoundManager::PlaySoundEffect(_SET_FAIL_);

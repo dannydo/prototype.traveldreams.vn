@@ -4,15 +4,20 @@
 #include "Database\UserTable.h"
 #include "SettingMenuNode.h"
 #include "Database\UserTable.h"
+#include "Database\VersionTable.h"
+#include "GameConfigManager.h"
+#include "Database\InitDatabase.h"
 
 USING_NS_CC;
 
-EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel)
+EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId)
 {
 	EndGameNode* pEndGameNode = new EndGameNode();
 	pEndGameNode->m_iCurrentLevel = iCurrentLevel;
 	pEndGameNode->m_mainWord = mainWord;
 	pEndGameNode->m_iScore = iScore;
+	pEndGameNode->m_sChapterId = sChapterId;
+
 	if(pEndGameNode->initLose())
 	{
 		pEndGameNode->autorelease();
@@ -23,12 +28,14 @@ EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& mainWo
 	return NULL;
 }
 
-EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel)
+EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId)
 {
 	EndGameNode* pEndGameNode = new EndGameNode();	  
 	pEndGameNode->m_iCurrentLevel = iCurrentLevel;
 	pEndGameNode->m_mainWord = mainWord;
 	pEndGameNode->m_iScore = iScore;
+	pEndGameNode->m_sChapterId = sChapterId;
+
 	if(pEndGameNode->initWin())
 	{			
 		pEndGameNode->autorelease();
@@ -78,7 +85,7 @@ bool EndGameNode::initWin()
 		return false;
 	}
 
-	LevelConfig* pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(m_iCurrentLevel);
+	LevelConfig* pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(m_sChapterId, m_iCurrentLevel);
 	m_iTotalBonusQuest = pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount;
 
 	this->generateLayoutStartAndBonusQuest();
@@ -108,37 +115,42 @@ bool EndGameNode::initWin()
 	m_pButtonManagerNode->addButtonNode(buttonReplayNode);
 	
 	//Update level data, hackcode chapter
-	m_levelInfo = LevelTable::getInstance()->fetchLevel(m_iCurrentLevel);
-	std::vector<ChapterInfo> chapters = ChapterTable::getInstance()->getChaptersInfo();
-	m_chapterInfo = chapters[m_levelInfo.iChapter-1];
+	m_levelInfo = LevelTable::getInstance()->getLevel(m_sChapterId, m_iCurrentLevel);
+	m_chapterInfo = ChapterTable::getInstance()->getChapterInfo(m_sChapterId);
+
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
 
 	if (m_levelInfo.bIsUnlock == false)
 	{
 		m_chapterInfo.iTotalLevelUnlock++;
-		m_chapterInfo.bIsUpdate = true;
 
-		userInfo.iCurrentChapter = m_levelInfo.iChapter;
+		userInfo.sCurrentChapterId = m_levelInfo.sChapterId;
 		userInfo.iCurrentLevel = m_levelInfo.iLevel + 1;
 
-		if (m_levelInfo.iLevel == m_levelInfo.iChapter*20)
+		// Unlock chapter
+		WordlMapConfig wordMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
+		int iIndexCurrentChapter = wordMapConfig.m_WorlMapChapterConfigMap[m_levelInfo.sChapterId];
+		WordlMapConfig::WordMapChapterConfig worMapChapterConfig = wordMapConfig.m_WorlMapChapterConfigs[iIndexCurrentChapter];
+
+		if (m_iCurrentLevel == worMapChapterConfig.m_iTotalevel)
 		{
-			m_chapterInfo.bIsUnlock = true;
-			userInfo.iCurrentChapter = (int)m_levelInfo.iLevel/20 + 1;
-			UserDefault::getInstance()->setIntegerForKey("ChapterPlayGame", userInfo.iCurrentChapter);
+			worMapChapterConfig = wordMapConfig.m_WorlMapChapterConfigs[iIndexCurrentChapter+1];
+			InitDatabase::getInstance()->createDataChapterAndLevel(worMapChapterConfig.m_sChapterId, worMapChapterConfig.m_iTotalevel);
+
+			userInfo.sCurrentChapterId = worMapChapterConfig.m_sChapterId;
+			userInfo.iCurrentLevel = 1;
+			UserDefault::getInstance()->setStringForKey("ChapterPlayGame", userInfo.sCurrentChapterId);
 		}
 		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 		UserTable::getInstance()->updateUser(userInfo);
 
-		m_levelInfo.sWordKey = m_mainWord.m_sWord;
+		// van dao m_levelInfo.sWordKey = m_mainWord.m_sWord;
 		m_levelInfo.bIsUnlock = true;
-		m_levelInfo.bIsUpdate = true;
 		m_levelInfo.iTotalBonusQuest = m_iTotalBonusQuest;
 	}
 	
 	if (m_levelInfo.iScore < m_iScore)
 	{
-		m_levelInfo.bIsUpdate = true;
 		m_levelInfo.iScore = m_iScore;
 	}
 
@@ -222,7 +234,7 @@ bool EndGameNode::init()
 	m_pButtonManagerNode->addButtonNode(buttonCloseNode);
 	this->addChild(m_pButtonManagerNode);
 
-	m_pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel);
+	m_pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel, m_sChapterId);
 	m_pLeaderBoard->setPosition(Point(320, 114));
 	this->addChild(m_pLeaderBoard);
 
@@ -254,10 +266,8 @@ void EndGameNode::addYellowStar(const int& iYellowStar)
 	if(m_levelInfo.iStar < iYellowStar)
 	{
 		m_chapterInfo.iTotalStar += iYellowStar - m_levelInfo.iStar;
-		m_chapterInfo.bIsUpdate = true;
 
 		m_levelInfo.iStar = iYellowStar;
-		m_levelInfo.bIsUpdate = true;
 		
 		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 		LevelTable::getInstance()->updateLevel(m_levelInfo);
@@ -294,7 +304,6 @@ void EndGameNode::addBonusQuestCompleted(const int& iBonusQuestCompleted)
 {
 	if(m_levelInfo.iBonusQuest < iBonusQuestCompleted)
 	{
-		m_levelInfo.bIsUpdate = true;
 		m_levelInfo.iBonusQuest = iBonusQuestCompleted;	 
 		LevelTable::getInstance()->updateLevel(m_levelInfo);
 	}
