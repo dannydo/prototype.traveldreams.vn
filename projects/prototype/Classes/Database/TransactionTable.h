@@ -11,6 +11,7 @@ struct TransactionInfo
 	int iTotalAmount;
 	unsigned long uDateTime;
 	int iVersion;
+	std::string sType;
 };
 
 class TransactionTable

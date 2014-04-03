@@ -130,7 +130,10 @@ void LoadingLayer::initData()
 			userInfo.sCurrentChapterId = wordMapChapterConfig.m_sChapterId;
 			UserTable::getInstance()->updateUser(userInfo);
 
-			if(InitDatabase::getInstance()->createDataChapterAndLevel(wordMapChapterConfig.m_sChapterId, wordMapChapterConfig.m_iTotalevel))
+			// Create data for one chapter
+			std::vector<std::string> wordList;
+			std::vector<int> mapLevels;
+			if(InitDatabase::getInstance()->createDataChapterAndLevel(wordMapChapterConfig.m_sChapterId, wordList, mapLevels))
 			{
 				UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
 			}

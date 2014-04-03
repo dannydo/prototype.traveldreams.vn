@@ -171,6 +171,9 @@
     <ClCompile Include="..\Classes\Database\TransactionTable.cpp">
       <Filter>Database</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Database\WordTable.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -324,6 +327,9 @@
       <Filter>Database</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Database\TransactionTable.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\WordTable.h">
       <Filter>Database</Filter>
     </ClInclude>
   </ItemGroup>
