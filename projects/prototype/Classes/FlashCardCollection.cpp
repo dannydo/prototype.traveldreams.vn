@@ -60,10 +60,13 @@ bool FlashCardCollectionLayer::init()
 		Node* pNodeChapter = Node::create();
 		ChapterInfo chapterInfo = m_chapters[iIndex];
 
+		/*
+		van dao
 		char sFilename[40];
 		sprintf(sFilename, "FlashCard/chapter/%d.png", chapterInfo.iChapter%2+1);
 		Sprite* pChapterImageSprite = Sprite::create(sFilename);
 		pNodeChapter->addChild(pChapterImageSprite);
+		
 
 		char sTotalLevel[5];
 		sprintf(sTotalLevel, "%d/%d", chapterInfo.iTotalLevelUnlock, 20);
@@ -71,7 +74,7 @@ bool FlashCardCollectionLayer::init()
 		pLabelTotalLevel->setColor(ccc3(0.0f, 0.0f, 0.0f));
 		pLabelTotalLevel->setPositionY(-pChapterImageSprite->getContentSize().height/2.0f-12);
 		pNodeChapter->addChild(pLabelTotalLevel);
-
+		*/
 		pNodeChapter->setAnchorPoint(Point(0.0f, 0.0f));
 		switch(iIndex%4)
 		{

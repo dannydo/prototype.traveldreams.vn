@@ -3,7 +3,10 @@
 #include "Database\InitDatabase.h"
 #include "Database\UserTable.h"
 #include "SettingMenuNode.h"
-#include "Database\DictionaryDatabase.h"
+#include "Database\DictionaryDatabase.h"	 
+#include "GameConfigManager.h"
+#include "GameWordManager.h"
+#include "Database/VersionTable.h"
 
 using namespace cocos2d;
 
@@ -85,6 +88,15 @@ void LoadingLayer::loadData()
 
 void LoadingLayer::initData()
 {
+	// load word list
+	GameWordManager::getInstance()->LoadWorldListConfig();
+	GameWordManager::getInstance()->LoadWordGenerateConfig();
+
+	// load level config
+	GameConfigManager::getInstance()->LoadGameConfig();
+	GameConfigManager::getInstance()->LoadObstacleConfig();
+	GameConfigManager::getInstance()->LoadWordMapConfig();
+
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnMusic", -1) == -1)
 	{
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnMusic", 1);
@@ -103,19 +115,34 @@ void LoadingLayer::initData()
 	InitDatabase::getInstance();
 	DictionaryDatabase::getInstance();
 
-	UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
-	userInfo.sFacebookToken = "CAAGQiytiRCoBAB5OUzRDO7OEejvNl8lheuOzZCeRG3ZBLSBPNsV7IAI8AVwVKshZCBQfo6QpLE1NZBv1OUZCpXfSeFwGyzito0hhEP3GLBIK5wCfSInTnv8u3sa1yzZBmB1FGmHPQXEJOADnOnPwETRTo81JSLXxcFNI5Q3T6PICutMERTEUdvtM1jejNfWz4lVZA1ZBZAYGVJOeXmO8Wg6j9FjqTWErOfNRrvBHfhcVw9QZDZD";
-	userInfo.sFacebookId = "100000135318088";
-	userInfo.sFirstName	 = "Van";
-	userInfo.sLastName = "Dao";
-	UserTable::getInstance()->updateUser(userInfo);
-
-	if(userInfo.sFacebookId != "")
+	if(InitDatabase::getInstance()->getDatabseSqlite() != NULL)
 	{
-		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-			//FacebookManager::getInstance()->loadPlugin();
-			//FacebookManager::getInstance()->loginByMode();
-		#endif
+		if (UserDefault::getInstance()->getIntegerForKey("InitDatabase", 0) == 0)
+		{
+			WordlMapConfig wordMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
+			WordlMapConfig::WordMapChapterConfig wordMapChapterConfig = wordMapConfig.m_WorlMapChapterConfigs[0];
+	
+			UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
+			userInfo.sFacebookToken = "CAAGQiytiRCoBAB5OUzRDO7OEejvNl8lheuOzZCeRG3ZBLSBPNsV7IAI8AVwVKshZCBQfo6QpLE1NZBv1OUZCpXfSeFwGyzito0hhEP3GLBIK5wCfSInTnv8u3sa1yzZBmB1FGmHPQXEJOADnOnPwETRTo81JSLXxcFNI5Q3T6PICutMERTEUdvtM1jejNfWz4lVZA1ZBZAYGVJOeXmO8Wg6j9FjqTWErOfNRrvBHfhcVw9QZDZD";
+			userInfo.sFacebookId = "100000135318088";
+			userInfo.sFirstName	 = "Van";
+			userInfo.sLastName = "Dao";
+			userInfo.sCurrentChapterId = wordMapChapterConfig.m_sChapterId;
+			UserTable::getInstance()->updateUser(userInfo);
+
+			if(InitDatabase::getInstance()->createDataChapterAndLevel(wordMapChapterConfig.m_sChapterId, wordMapChapterConfig.m_iTotalevel))
+			{
+				UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
+			}
+
+			if(userInfo.sFacebookId != "")
+			{
+				#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+					//FacebookManager::getInstance()->loadPlugin();
+					//FacebookManager::getInstance()->loginByMode();
+				#endif
+			}
+		}
 	}
 }
 

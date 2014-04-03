@@ -12,6 +12,8 @@ public:
 	bool init();
 	static void releaseInstance();
 
+	bool createDataChapterAndLevel(const std::string& sChapterId, const int& iTotalLevel);
+
 	inline sqlite3* getDatabseSqlite() { return m_DatabaseSqlite; };
 
 private:

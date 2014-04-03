@@ -1,5 +1,6 @@
 #include "LevelTable.h"
 #include "InitDatabase.h"
+#include "VersionTable.h"
 
 USING_NS_CC; 
 
@@ -34,79 +35,75 @@ bool LevelTable::init()
 	return true;
 }
 
-std::vector<LevelInfo> LevelTable::fetchLevelsForChapter(const int& iChapter)
+void LevelTable::fetchLevelsForChapter(const std::string& sChapterId)
 {
-	std::vector<LevelInfo> levels;
+	while(!m_ChapterLevels.empty())
+	{
+		m_ChapterLevels.pop_back();
+	}
+
 	char **re;
 	int nRow, nColumn;
 
-	String sql = "select * from Levels where Chapter=";
-	sql.appendWithFormat("%d", iChapter);
+	String sql = "select * from Levels where ChapterId=";
+	sql.appendWithFormat("'%s'", sChapterId.c_str());
 
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
 
 	for (int iRow=1; iRow<=nRow; iRow++)
 	{
 		LevelInfo levelInfo;
-		levelInfo.iLevel = int(strtod(re[iRow*nColumn+0], NULL));
-		levelInfo.iChapter = int(strtod(re[iRow*nColumn+1], NULL));
-		levelInfo.iStar = int(strtod(re[iRow*nColumn+2], NULL));
-		levelInfo.iScore = int(strtod(re[iRow*nColumn+3], NULL));
-		levelInfo.iBonusQuest = int(strtod(re[iRow*nColumn+4], NULL));
-		levelInfo.bIsUnlock = bool(strtod(re[iRow*nColumn+5], NULL));
-		levelInfo.bIsUpdate = bool(strtod(re[iRow*nColumn+6], NULL));
-		levelInfo.sWordKey = re[iRow*nColumn+7];
-		levelInfo.iTotalBonusQuest = int(strtod(re[iRow*nColumn+8], NULL));
+		levelInfo.iLevelId = int(strtod(re[iRow*nColumn+0], NULL));
+		levelInfo.sChapterId = re[iRow*nColumn+1];
+		levelInfo.iLevel = int(strtod(re[iRow*nColumn+2], NULL));
+		levelInfo.sWordId = re[iRow*nColumn+3];
+		levelInfo.iStar = int(strtod(re[iRow*nColumn+4], NULL));
+		levelInfo.iScore = int(strtod(re[iRow*nColumn+5], NULL));
+		levelInfo.iBonusQuest = int(strtod(re[iRow*nColumn+6], NULL));
+		levelInfo.iTotalBonusQuest = int(strtod(re[iRow*nColumn+7], NULL));
+		levelInfo.bIsUnlock = bool(strtod(re[iRow*nColumn+8], NULL));
+		levelInfo.iVersion = int(strtod(re[iRow*nColumn+9], NULL));
 
-		levels.push_back(levelInfo);
+		m_ChapterLevels.push_back(levelInfo);
 	}
 
 	sqlite3_free_table(re);
-
-	return levels;
 }
 
-LevelInfo LevelTable::fetchLevel(const int& iLevel)
-{	
-	char **re;
-	int nRow, nColumn;
-
-	String sql = "select * from Levels where Level=";
-	sql.appendWithFormat("%d", iLevel);
-
-	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
-
-	LevelInfo levelInfo;
-	if (nRow > 0)
+std::vector<LevelInfo> LevelTable::getAllLevelsForChapter(std::string& sChapterId)
+{
+	if(m_sCurrentChapterId != sChapterId)
 	{
-		levelInfo.iLevel = int(strtod(re[nColumn+0], NULL));
-		levelInfo.iChapter = int(strtod(re[nColumn+1], NULL));
-		levelInfo.iStar = int(strtod(re[nColumn+2], NULL));
-		levelInfo.iScore = int(strtod(re[nColumn+3], NULL));
-		levelInfo.iBonusQuest = int(strtod(re[nColumn+4], NULL));
-		levelInfo.bIsUnlock = bool(strtod(re[nColumn+5], NULL));
-		levelInfo.bIsUpdate = bool(strtod(re[nColumn+6], NULL));
-		levelInfo.sWordKey = re[nColumn+7];
-		levelInfo.iTotalBonusQuest = int(strtod(re[nColumn+8], NULL));
+		this->fetchLevelsForChapter(sChapterId);
 	}
 
-	sqlite3_free_table(re);
+	return m_ChapterLevels;
+}
 
-	return levelInfo;
+LevelInfo LevelTable::getLevel(const std::string& sChapterId, const int& iLevel)
+{	
+	if(m_sCurrentChapterId != sChapterId)
+	{
+		this->fetchLevelsForChapter(sChapterId);
+		m_sCurrentChapterId = sChapterId;
+	}
+
+	return m_ChapterLevels[iLevel];
 }
 
 bool LevelTable::updateLevel(LevelInfo levelInfo)
 {
 	String sql = "update Levels Set";
-	sql.appendWithFormat(" Chapter=%d,", levelInfo.iChapter);
+	sql.appendWithFormat(" ChapterId='%s',", levelInfo.sChapterId.c_str());
+	sql.appendWithFormat(" Level=%d,", levelInfo.iLevel);
+	sql.appendWithFormat(" WordId='%s',", levelInfo.sWordId.c_str());
 	sql.appendWithFormat(" Star=%d,", levelInfo.iStar);
 	sql.appendWithFormat(" Score=%d,", levelInfo.iScore);
 	sql.appendWithFormat(" BonusQuest=%d,", levelInfo.iBonusQuest);
 	sql.appendWithFormat(" TotalBonusQuest=%d,", levelInfo.iTotalBonusQuest);
 	sql.appendWithFormat(" IsUnlock=%d,", levelInfo.bIsUnlock);
-	sql.appendWithFormat(" IsUpdate=%d,", levelInfo.bIsUpdate);
-	sql.appendWithFormat(" WordKey='%s'", levelInfo.sWordKey.c_str());
-	sql.appendWithFormat(" where Level=%d", levelInfo.iLevel);
+	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
+	sql.appendWithFormat(" where LevelId=%d", levelInfo.iLevelId);
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)

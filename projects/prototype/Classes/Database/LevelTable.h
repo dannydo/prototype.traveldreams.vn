@@ -5,15 +5,16 @@
 
 struct LevelInfo
 {
+	int iLevelId;
+	std::string sChapterId;
 	int iLevel;
-	int iChapter;
+	std::string sWordId;
 	int iStar;
 	int iScore;
 	int iBonusQuest;
 	int iTotalBonusQuest;
 	bool bIsUnlock;
-	bool bIsUpdate;
-	std::string sWordKey;
+	int iVersion;
 };
 
 class LevelTable
@@ -24,11 +25,15 @@ public:
 	LevelTable();
 	static void releaseInstance();
 
-	std::vector<LevelInfo> fetchLevelsForChapter(const int& iChapter);
-	LevelInfo fetchLevel(const int& iLevel);
+	std::vector<LevelInfo> getAllLevelsForChapter(std::string& sChapterId);
+	LevelInfo getLevel(const std::string& sChapterId, const int& iLevel);
 	bool updateLevel(LevelInfo levelInfo);
 
 private:
+	void fetchLevelsForChapter(const std::string& sChapterId);
+
 	static LevelTable* m_LevelTable;
+	std::vector<LevelInfo> m_ChapterLevels;
+	std::string m_sCurrentChapterId;
 };
 #endif

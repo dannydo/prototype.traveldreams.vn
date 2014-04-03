@@ -10,7 +10,7 @@ class GameBoardManager
 {
 public:
 	GameBoardManager();
-	void GenerateGameBoard(int iLevel);
+	void GenerateGameBoard();
 
 	inline const LevelConfig* GetLevelConfig() { return m_pLevelConfig;}
 	inline int GetRowNumber() { return m_iRowNumber;}

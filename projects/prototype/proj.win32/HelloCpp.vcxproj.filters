@@ -120,9 +120,6 @@
     <ClCompile Include="..\Classes\Database\LevelTable.cpp">
       <Filter>Database</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Database\FriendTable.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\SettingMenuNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
@@ -161,6 +158,18 @@
     </ClCompile>
     <ClCompile Include="..\Classes\ScrollManager.cpp">
       <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\PowerUpTable.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\VersionTable.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\UnlockChapterTable.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\TransactionTable.cpp">
+      <Filter>Database</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -263,9 +272,6 @@
     <ClInclude Include="..\Classes\Database\LevelTable.h">
       <Filter>Database</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Database\FriendTable.h">
-      <Filter>Database</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\SettingMenuNode.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
@@ -307,6 +313,18 @@
     </ClInclude>
     <ClInclude Include="..\Classes\ScrollManager.h">
       <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\PowerUpTable.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\VersionTable.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\UnlockChapterTable.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\TransactionTable.h">
+      <Filter>Database</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

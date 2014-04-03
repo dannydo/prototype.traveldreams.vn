@@ -48,7 +48,7 @@ public:
 
 	void ClearCache();
 
-	void GenerateWordForNewLevel(int iLevel);
+	void GenerateWordForNewLevel(std::string sChapterID, int iLevel);
 	void RetryCurrentLevel();
 
 

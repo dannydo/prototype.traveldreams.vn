@@ -7,9 +7,11 @@ GameBoardManager::GameBoardManager(): m_GameConfig(GameConfigManager::getInstanc
 	m_ComboCountList[0] = m_ComboCountList[1] = m_ComboCountList[2] = 0;
 }
 
-void GameBoardManager::GenerateGameBoard(int iLevel)
+void GameBoardManager::GenerateGameBoard()
 {	
-	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(iLevel);
+	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
+	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
+	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig( sCurrentChapterID, iCurrentLevel);
 
 	// Load game config
 	//LoadGameConfig();

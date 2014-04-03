@@ -5,15 +5,20 @@
 
 struct ChapterInfo
 {
-	int iChapter;
-	std::string sName;
-	int iMinLevel;
-	int iMaxLevel;
+	std::string sChapterId;
 	int iTotalLevelUnlock;
 	int iTotalStar;
-	int iTotalScore;
 	bool bIsUnlock;
-	bool bIsUpdate;
+	int iVersion;
+
+	ChapterInfo()
+	{
+		sChapterId = "";
+		iTotalLevelUnlock = 0;
+		iTotalStar = 0;
+		bIsUnlock = false;
+		iVersion = 0;
+	}
 };
 
 class ChapterTable
@@ -25,10 +30,12 @@ public:
 	bool init();
 
 	inline std::vector<ChapterInfo> getChaptersInfo() { return m_Chapters; };
-	void fetchAllChapter();
+	ChapterInfo getChapterInfo(const std::string sChapterId);
 	bool updateChapter(ChapterInfo chapterInfo);
 
 private:
+	void fetchAllChapter();
+
 	static ChapterTable* m_ChapterTable;
 	std::vector<ChapterInfo> m_Chapters;
 };

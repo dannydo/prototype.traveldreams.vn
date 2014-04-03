@@ -8,7 +8,9 @@
 USING_NS_CC;
 
 #define _MAX_OBSTACLE_TYPE_COUNT_	5
+
 #define _MAXIMUM_BONUS_WORD_COUNT_	10
+#define _MAXIMUM_LEVEL_ON_CHAPTER_ 30
 
 struct Level_ObstacleConfig
 {
@@ -148,10 +150,43 @@ public:
 
 	~LevelConfig()
 	{		
+		Clear();
+	}
+
+	void Clear()
+	{
 		m_bEnableBoss = false;
+		
+		for(auto pObstacle : m_ObstacleConfigList)
+			delete pObstacle;
+		m_ObstacleConfigList.clear();
 	}
 };
 
+struct ChapterConfig  {
+public:
+	int m_iTotalBackgroundImage;
+	int m_iTotalevel;
+	Point m_positionLevel[_MAXIMUM_LEVEL_ON_CHAPTER_];
+};
+
+struct WordlMapConfig {
+public:
+	struct WordMapChapterConfig  {
+	public:
+		std::string m_sChapterId;
+		std::string m_sPathData;
+		Point m_position;
+		int m_iTotalevel;
+		bool m_hasUnlock;
+		int m_iRequest;
+	};
+
+	std::string m_sFileNameBackgound;
+	int m_iTotalChapter;
+	std::map<std::string, int> m_WorlMapChapterConfigMap;
+	std::vector<WordMapChapterConfig> m_WorlMapChapterConfigs;
+};
 
 struct ObstacleLevelDescription
 {
@@ -227,13 +262,20 @@ private:
 public:
 	~GameConfigManager();
 	
-	void LoadLevelsConfig();
 	void LoadGameConfig();
 	void LoadObstacleConfig();
+	void LoadWordMapConfig();
 
-	LevelConfig& GetLevelConfig(int iLevel);
+	LevelConfig& GetLevelConfig(const std::string& sChapterID, const int& iLevelId);
+	ChapterConfig& GetChapterConfig(const std::string& sChapterID);
+	WordlMapConfig::WordMapChapterConfig& GetWordMapChapterConfig(const std::string& sChapterID);
+
 	inline const GameConfig& GetGameConfig() { return m_GameConfig;}	
 	inline int GetObstacleTypeCount() { return m_ObstacleDescriptionArray.size();}
+
+	inline const std::string& GetCurrentChapterID() { return m_sCurrentChapterID; };
+	inline const int& GetCurrentLevelId() { return m_iCurrentLevelID; };
+	inline const WordlMapConfig& GetWordlMapConfig() { return m_WordlMapConfig; };
 
 	inline const ObstacleDescription* GetObstacleDescription(const int& iObstacleTypeID) {
 		if (iObstacleTypeID < m_ObstacleDescriptionArray.size())
@@ -244,9 +286,17 @@ public:
 
 	const ObstacleLevelDescription& GetObstacleLevelDescription(const int& iObstacleTypeID, const int& iLevel);
 private:
-	void LoadConfigOfLevel(int iLevel);		
+	void LoadConfigOfLevel(const std::string& sChapterID, const int& iLevelId);
+	void LoadConfigOfChapter(const std::string& sChapterID);
 private:
-	LevelConfig m_LevelConfigList[_MAX_GAME_LEVEL_+1];
+	LevelConfig m_LevelConfig;
+	int m_iCurrentLevelID;
+
+	ChapterConfig m_ChapterConfig;
+	std::string m_sCurrentChapterID;
+
+	WordlMapConfig m_WordlMapConfig;
+
 	GameConfig m_GameConfig;	
 
 	std::vector<ObstacleDescription*> m_ObstacleDescriptionArray;

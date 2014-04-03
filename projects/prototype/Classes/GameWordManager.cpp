@@ -199,11 +199,13 @@ int GameWordManager::GetLoadedWordIndexFromID(const std::string& sWordID)
 	return 0;*/
 }
 
-void GameWordManager::GenerateWordForNewLevel(int iLevel)
+void GameWordManager::GenerateWordForNewLevel(std::string sChapterID, int iLevel)
 {
-	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(iLevel);
+//	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
+//	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
+
+	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(sChapterID, iLevel);
 	m_iMainWordIndex = GetLoadedWordIndexFromID(m_pLevelConfig->m_sMainWordID);
-		//m_pLevelConfig->m_iMainWordID;
 	
 
 	if (!m_pLevelConfig->m_bIsMainWordExistedOnBoard)		

@@ -7,7 +7,7 @@
 class GameTargetNode : public cocos2d::Node
 {
 public:
-	static GameTargetNode* createLayout(const Word& pMainWord, const int& iCurrentLevel);
+	static GameTargetNode* createLayout(const Word& pMainWord, const int& iCurrentLevel, const std::string sChapterId);
 	bool initLayout(const Word& pMainWord);
 
 private:
@@ -21,6 +21,7 @@ private:
 
 	cocos2d::SpriteBatchNode* m_pSpriteBatchNode;
 	int m_iCurrentLevel;
+	std::string m_sChapterId;
 };
 
 #endif;

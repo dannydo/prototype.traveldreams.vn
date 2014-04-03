@@ -16,10 +16,9 @@ NewGameBoardManager::~NewGameBoardManager()
 	delete m_pObstacleProcessManager;
 }
 
-void NewGameBoardManager::GenerateGameBoard(int iLevel)
-{
-	m_iCurrentLevel = iLevel;
-	GameBoardManager::GenerateGameBoard(iLevel);
+void NewGameBoardManager::GenerateGameBoard()
+{	
+	GameBoardManager::GenerateGameBoard();
 	
 	m_pGameWordManager = GameWordManager::getInstance();	
 	m_iCurrentMove = m_pLevelConfig->m_iNumberOfMove;

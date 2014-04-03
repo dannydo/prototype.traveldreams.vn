@@ -9,10 +9,13 @@
 
 #include "Database\InitDatabase.h"
 #include "Database\ChapterTable.h"
-#include "Database\FriendTable.h"
 #include "Database\LevelTable.h"
 #include "Database\UserTable.h"
 #include "Database\DictionaryDatabase.h"
+#include "Database\VersionTable.h"
+#include "Database\UnlockChapterTable.h"
+#include "Database\TransactionTable.h"
+#include "Database\PowerUpTable.h"
 
 USING_NS_CC;
 
@@ -28,11 +31,14 @@ AppDelegate::~AppDelegate()
 	UserService::releaseInstance();
 
 	ChapterTable::releaseInstance();
-	FriendTable::releaseInstance();
 	LevelTable::releaseInstance();
 	UserTable::releaseInstance();
 	InitDatabase::releaseInstance();
 	DictionaryDatabase::releaseInstance();
+	VersionTable::releaseInstance();
+	UnlockChapterTable::releaseInstance();
+	TransactionTable::releaseInstance();
+	PowerUpTable::releaseInstance();
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	//FacebookManager::getInstance()->unloadPlugin();
@@ -53,16 +59,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
-
-	// load word list
-	GameWordManager::getInstance()->LoadWorldListConfig();
-	GameWordManager::getInstance()->LoadWordGenerateConfig();
-
-	// load level config
-	GameConfigManager::getInstance()->LoadGameConfig();
-	GameConfigManager::getInstance()->LoadObstacleConfig();
-	GameConfigManager::getInstance()->LoadLevelsConfig();
-
 
     // create a scene. it's an autorelease object
 	auto scene =  LoadingScene::create(); //MainMenuScene::create(); //HelloWorld::createScene();		

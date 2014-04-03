@@ -15,10 +15,12 @@ LeaderBoardtNode::~LeaderBoardtNode()
 	UserService::getInstance()->removeCallBackList(this);
 }
 
-LeaderBoardtNode* LeaderBoardtNode::createLayout(const int& iLevel)
+LeaderBoardtNode* LeaderBoardtNode::createLayout(const int& iLevel, const std::string sChapterId)
 {
 	LeaderBoardtNode* pLeaderBoardNode = new LeaderBoardtNode();
 	pLeaderBoardNode->m_iLevel = iLevel;
+	pLeaderBoardNode->m_sChapterId = sChapterId;
+
 	if(pLeaderBoardNode->init())
 	{
 		pLeaderBoardNode->autorelease();
@@ -213,7 +215,7 @@ void LeaderBoardtNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
 
 void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey)
 {
-	LevelInfo levelInfo =  LevelTable::getInstance()->fetchLevel(m_iLevel);
+	LevelInfo levelInfo =  LevelTable::getInstance()->getLevel(m_sChapterId, m_iLevel);
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
 
 	if (sKey == "LeaderBoardLevel")

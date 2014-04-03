@@ -9,16 +9,17 @@
 struct UserInfo
 {
 	std::string sUserIdentifier;
-	int iUserId;
 	std::string sFacebookId;
 	std::string sFacebookToken;
 	std::string sFirstName;
 	std::string sLastName;
-	int iCurrentChapter;
+	std::string sCurrentChapterId;
 	int iCurrentLevel;
 	int iLife;
 	int iLifeTimeRemaining;
 	unsigned long ulLifeTimeBeginRemain;
+	int iMonney;
+	int iVersion;
 };
 
 class UserTable
@@ -30,12 +31,12 @@ public:
 	static void releaseInstance();
 
 	inline UserInfo getUserInfo() { return m_userInfo; };
-	void fetchhUser();
+	
 	bool updateUser(const UserInfo& userInfo);
-	bool insertUser(const UserInfo& userInfo);
 	bool updateLife(const unsigned int& iLoseLife);
 
 private:
+	void fetchhUser();
 	unsigned long getTimeLocalCurrent();
 
 	static UserTable* m_UserTable;

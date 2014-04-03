@@ -8,10 +8,12 @@
 
 USING_NS_CC;
 
-GameTargetNode* GameTargetNode::createLayout(const Word& pMainWord, const int& iCurrentLevel)
+GameTargetNode* GameTargetNode::createLayout(const Word& pMainWord, const int& iCurrentLevel, const std::string sChapterId)
 {
 	GameTargetNode* pGameTargetNode = new GameTargetNode();
 	pGameTargetNode->m_iCurrentLevel = iCurrentLevel;
+	pGameTargetNode->m_sChapterId = sChapterId;
+
 	if(pGameTargetNode->initLayout(pMainWord))
 	{
 		pGameTargetNode->autorelease();
@@ -108,7 +110,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pButtonManagerNode->addButtonNode(buttonCloseNode);
 	this->addChild(pButtonManagerNode);
 
-	LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel);
+	LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel, m_sChapterId);
 	pLeaderBoard->setPosition(Point(320, 114));
 	this->addChild(pLeaderBoard);
 
@@ -116,8 +118,8 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 }		
 
 void GameTargetNode::menuPlayLevelCallBack(Object* sender)
-{
-	CCScene *pGameScene = HelloWorld::createScene(m_iCurrentLevel);
+{	
+	CCScene *pGameScene = HelloWorld::createScene();
 	CCDirector::getInstance()->replaceScene(pGameScene);
 }
 
@@ -128,10 +130,10 @@ void GameTargetNode::menuCloseCallBack(Object* sender)
 
 void GameTargetNode::generateLayoutStartAndBonusQuest()
 {
-	LevelConfig* pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(m_iCurrentLevel);
+	LevelConfig* pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(m_sChapterId, m_iCurrentLevel);
 	int iTotalBonusQuest = pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount;
 
-	LevelInfo levelInfo = LevelTable::getInstance()->fetchLevel(m_iCurrentLevel);
+	LevelInfo levelInfo = LevelTable::getInstance()->getLevel(m_sChapterId, m_iCurrentLevel);
 
 	for(int iIndex=0; iIndex<3; iIndex++) 
 	{

@@ -8,7 +8,7 @@
 
 USING_NS_CC;
 
-Scene* HelloWorld::createScene(int iLevel)
+Scene* HelloWorld::createScene()
 {		
     // 'scene' is an autorelease object
     auto scene = Scene::create();
@@ -46,7 +46,7 @@ Scene* HelloWorld::createScene(int iLevel)
 	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pStatusLayer);
 
 	// init level
-	boardLayer->initLevel(iLevel);
+	boardLayer->initLevel();
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
 	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
@@ -180,7 +180,7 @@ bool HelloWorld::init()
     return true;
 }
 
-void HelloWorld::initLevel(int iLevel)
+void HelloWorld::initLevel()
 {		
 	/*switch( iLevel)
 	{
@@ -201,7 +201,11 @@ void HelloWorld::initLevel(int iLevel)
 			iNumberOfColumn = 9;
 			break;
 	};*/
-	m_GameBoardManager.GenerateGameBoard(iLevel);
+
+	string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
+	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
+
+	m_GameBoardManager.GenerateGameBoard();
 	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
 	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
 
@@ -1410,17 +1414,23 @@ void HelloWorld::ExecuteBonusWinGameEffect()
 
 void HelloWorld::ShowWinGamePopup()
 {	
+	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
+	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
+
 	std::vector<Word> subWordList;	
 	EndGameNode* pEndGameNode = EndGameNode::createLayoutWin( m_GameBoardManager.GetCurrentScore(),
-		m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
+		m_GameBoardManager.GetGameWordManager()->GetMainWord(), iCurrentLevel, sCurrentChapterID);
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStars());
 	m_pHUDLayer->addChild( pEndGameNode, 100);
 }
 
 void HelloWorld::ShowFailGamePopup()
 {
+	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
+	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
+
 	EndGameNode* pEndGameNode = EndGameNode::createLayoutLose( m_GameBoardManager.GetCurrentScore(), 
-				m_GameBoardManager.GetGameWordManager()->GetMainWord(), m_GameBoardManager.GetCurrentLevel());
+				m_GameBoardManager.GetGameWordManager()->GetMainWord(), iCurrentLevel, sCurrentChapterID);
 	m_pHUDLayer->addChild( pEndGameNode, 100);
 
 	//SoundManager::PlaySoundEffect(_SET_FAIL_);
@@ -1428,7 +1438,8 @@ void HelloWorld::ShowFailGamePopup()
 
 	//Game Tracking Level
 	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
-	GameTracking::saveFileTrackingLevel(m_GameBoardManager.GetCurrentLevel(), 0, mainWord.m_iWordLength-mainWord.m_iRemainInactivatedCharacterCount, "Lose");
+	
+	GameTracking::saveFileTrackingLevel(iCurrentLevel, 0, mainWord.m_iWordLength-mainWord.m_iRemainInactivatedCharacterCount, "Lose");
 }
 
 
@@ -3448,7 +3459,10 @@ void HelloWorld::ShowMainWordUnlockEffect()
 			NULL));
 
 	//Game Tracking Level
-	GameTracking::saveFileTrackingLevel(m_GameBoardManager.GetCurrentLevel(), m_GameBoardManager.GetCurrentMove(), mainWord.m_iWordLength, "Win");
+	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
+	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
+
+	GameTracking::saveFileTrackingLevel(iCurrentLevel, m_GameBoardManager.GetCurrentMove(), mainWord.m_iWordLength, "Win");
 }
 
 using namespace cocos2d::extension::armature;
