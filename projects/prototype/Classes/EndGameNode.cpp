@@ -134,8 +134,11 @@ bool EndGameNode::initWin()
 
 		if (m_iCurrentLevel == worMapChapterConfig.m_iTotalevel)
 		{
+			// Create data for one chapter
+			std::vector<std::string> wordList;
+			std::vector<int> mapLevels;
 			worMapChapterConfig = wordMapConfig.m_WorlMapChapterConfigs[iIndexCurrentChapter+1];
-			InitDatabase::getInstance()->createDataChapterAndLevel(worMapChapterConfig.m_sChapterId, worMapChapterConfig.m_iTotalevel);
+			InitDatabase::getInstance()->createDataChapterAndLevel(worMapChapterConfig.m_sChapterId, wordList, mapLevels);
 
 			userInfo.sCurrentChapterId = worMapChapterConfig.m_sChapterId;
 			userInfo.iCurrentLevel = 1;

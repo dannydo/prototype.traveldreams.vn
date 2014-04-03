@@ -12,7 +12,7 @@ public:
 	bool init();
 	static void releaseInstance();
 
-	bool createDataChapterAndLevel(const std::string& sChapterId, const int& iTotalLevel);
+	bool createDataChapterAndLevel(const std::string& sChapterId, std::vector<std::string>& wordList, std::vector<int>& mapLevels);
 
 	inline sqlite3* getDatabseSqlite() { return m_DatabaseSqlite; };
 

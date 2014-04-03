@@ -43,7 +43,8 @@ bool TransactionTable::insertTransaction(const TransactionInfo& transactionInfo)
 	sql.appendWithFormat(" %d,", transactionInfo.iQuantity);
 	sql.appendWithFormat(" %d,", transactionInfo.iTotalAmount);
 	sql.appendWithFormat(" %u,", this->getTimeLocalCurrent());
-	sql.appendWithFormat(" %d)", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
+	sql.appendWithFormat(" %d,)", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
+	sql.appendWithFormat(" '%s'", transactionInfo.sType.c_str());
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
