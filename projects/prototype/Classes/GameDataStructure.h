@@ -404,7 +404,7 @@ struct Word
 {
 public:	
 	char m_sWord[_GDS_WORD_MAX_LENGTH_];		
-	int m_iWordLength;
+	int m_iWordLength;	
 
 	std::string m_sMeaning;
 	std::string m_sSoundEnglishFile;
@@ -417,6 +417,7 @@ public:
 	std::string m_sSentenceSoundFile;
 	float m_fSentenceSoundLength;
 
+	// following attributes only used when generate/collect letter in-game.
 	bool m_ActivatedCharacterFlags[_GDS_WORD_MAX_LENGTH_];
 	int m_iRemainInactivatedCharacterCount;
 	bool m_AppearedCharacterFlags[_GDS_WORD_MAX_LENGTH_];	

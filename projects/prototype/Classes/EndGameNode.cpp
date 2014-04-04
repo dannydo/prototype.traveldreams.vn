@@ -128,21 +128,31 @@ bool EndGameNode::initWin()
 		userInfo.iCurrentLevel = m_levelInfo.iLevel + 1;
 
 		// Unlock chapter
-		WordlMapConfig wordMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
-		int iIndexCurrentChapter = wordMapConfig.m_WorlMapChapterConfigMap[m_levelInfo.sChapterId];
-		WordlMapConfig::WordMapChapterConfig worMapChapterConfig = wordMapConfig.m_WorlMapChapterConfigs[iIndexCurrentChapter];
+		WordlMapConfig worldMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
+		int iIndexCurrentChapter = worldMapConfig.m_WorlMapChapterConfigMap[m_levelInfo.sChapterId];
+		WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[iIndexCurrentChapter];
 
-		if (m_iCurrentLevel == worMapChapterConfig.m_iTotalevel)
+		if (m_iCurrentLevel == worldMapChapterConfig.m_iTotalevel)
 		{
 			// Create data for one chapter
 			std::vector<std::string> wordList;
 			std::vector<int> mapLevels;
-			worMapChapterConfig = wordMapConfig.m_WorlMapChapterConfigs[iIndexCurrentChapter+1];
-			InitDatabase::getInstance()->createDataChapterAndLevel(worMapChapterConfig.m_sChapterId, wordList, mapLevels);
 
-			userInfo.sCurrentChapterId = worMapChapterConfig.m_sChapterId;
-			userInfo.iCurrentLevel = 1;
-			UserDefault::getInstance()->setStringForKey("ChapterPlayGame", userInfo.sCurrentChapterId);
+			std::string sNextChapterID;
+			if ( GameConfigManager::getInstance()->GetNextChapterID(worldMapChapterConfig.m_sChapterId, sNextChapterID))
+			{
+				GameConfigManager::getInstance()->GenerateWordsForLevels( sNextChapterID, wordList, mapLevels);
+						
+				InitDatabase::getInstance()->createDataChapterAndLevel( sNextChapterID, wordList, mapLevels);
+
+				userInfo.sCurrentChapterId = sNextChapterID;
+				userInfo.iCurrentLevel = 1;
+				UserDefault::getInstance()->setStringForKey("ChapterPlayGame", userInfo.sCurrentChapterId);
+			}
+			else // the last chapter is finished so game is end now!!!!
+			{
+				return true;
+			}
 		}
 		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 		UserTable::getInstance()->updateUser(userInfo);
@@ -344,11 +354,17 @@ void EndGameNode::menuNextLevelCallBack(Object* sender)
 	ChapterConfig& currentChapter = GameConfigManager::getInstance()->GetChapterConfig(m_sChapterId);
 	if (currentChapter.m_iTotalevel <= m_iCurrentLevel)
 	{
-		//ChapterConfig* pNextChapter = GameConfigManager::getInstance()->GetNextChapterConfig(m_sChapterId);
-		//if (pNextChapter == NULL)
-		//	return;
-
-		m_iCurrentLevel = 1;		
+		std::string sNextChapterID;
+		if ( GameConfigManager::getInstance()->GetNextChapterID( m_sChapterId, sNextChapterID))
+		{
+			ChapterConfig& nextChapter = GameConfigManager::getInstance()->GetChapterConfig(sNextChapterID);						
+			m_sChapterId = sNextChapterID;
+			m_iCurrentLevel = 1;		
+		}
+		else // all level/chapter is finished
+		{
+			return;
+		}
 	}
 	else
 		m_iCurrentLevel++;
@@ -381,8 +397,12 @@ void EndGameNode::menuRetryLevelLoseCallBack(Object* sender)
 
 void EndGameNode::menuRetryLevelWinCallBack(Object* sender)
 {
+	// make sure we already cache correct current chapter/level 
+	GameConfigManager::getInstance()->GetLevelConfig( m_sChapterId, m_iCurrentLevel);
+	
+
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
-	pGameWordManager->RetryCurrentLevel();
+	pGameWordManager->GenerateWordForNewLevel( m_sChapterId, m_iCurrentLevel);		
 
 	CCScene *pGameScene = HelloWorld::createScene();
 	CCDirector::getInstance()->replaceScene(pGameScene);

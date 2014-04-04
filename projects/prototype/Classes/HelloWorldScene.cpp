@@ -453,14 +453,17 @@ void HelloWorld::initLevel()
 		int iGemLetterBlockID;
 		unsigned char iLetter;
 
+		int iPositionIndex = 0;
 		for(int i=0; i< mainWord.m_iWordLength; i++)
 		{			
 			if (!mainWord.m_ActivatedCharacterFlags[i])
 			{
 				iLetter = mainWord.m_sWord[i];
 				iGemLetterBlockID = m_GameBoardManager.AllocFreeGemLetterBlock( iLetter, true);
-				AddLetterToGem( levelConfig.m_MainWordLetterPosition[i], m_GameBoardManager.GetCellValue( levelConfig.m_MainWordLetterPosition[i].m_iRow,
-					levelConfig.m_MainWordLetterPosition[i].m_iColumn), mainWord.m_sWord[i], iGemLetterBlockID);
+				AddLetterToGem( levelConfig.m_MainWordLetterPosition[iPositionIndex], m_GameBoardManager.GetCellValue( levelConfig.m_MainWordLetterPosition[iPositionIndex].m_iRow,
+					levelConfig.m_MainWordLetterPosition[iPositionIndex].m_iColumn), mainWord.m_sWord[i], iGemLetterBlockID);
+
+				iPositionIndex++;
 			}
 		}
 	}
@@ -1417,11 +1420,17 @@ void HelloWorld::ShowWinGamePopup()
 	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
 	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
 
+	// extra, regenerate word for current level
+	GameConfigManager::getInstance()->UpdateNewWordForLevel( sCurrentChapterID, iCurrentLevel);
+
+
+	// show win popup	
 	std::vector<Word> subWordList;	
 	EndGameNode* pEndGameNode = EndGameNode::createLayoutWin( m_GameBoardManager.GetCurrentScore(),
 		m_GameBoardManager.GetGameWordManager()->GetMainWord(), iCurrentLevel, sCurrentChapterID);
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStars());
 	m_pHUDLayer->addChild( pEndGameNode, 100);
+	
 }
 
 void HelloWorld::ShowFailGamePopup()

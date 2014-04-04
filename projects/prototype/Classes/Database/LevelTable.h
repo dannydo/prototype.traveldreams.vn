@@ -26,8 +26,8 @@ public:
 	static void releaseInstance();
 
 	std::vector<LevelInfo> getAllLevelsForChapter(std::string& sChapterId);
-	LevelInfo getLevel(const std::string& sChapterId, const int& iLevel);
-	bool updateLevel(LevelInfo levelInfo);
+	LevelInfo& getLevel(const std::string& sChapterId, const int& iLevel);
+	bool updateLevel(const LevelInfo& levelInfo);
 
 private:
 	void fetchLevelsForChapter(const std::string& sChapterId);

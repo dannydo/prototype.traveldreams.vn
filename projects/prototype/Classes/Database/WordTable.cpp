@@ -63,7 +63,7 @@ void WordTable::fetchWordsForChapter(const std::string& sChapterId)
 	sqlite3_free_table(re);
 }
 
-std::vector<WordInfo> WordTable::getAllWordsForChapter(std::string& sChapterId)
+std::vector<WordInfo>& WordTable::getAllWordsForChapter(const std::string& sChapterId)
 {
 	if(m_sCurrentChapterId != sChapterId)
 	{
@@ -92,7 +92,7 @@ WordInfo WordTable::getWordInfoOnChapter(const std::string& sChapterId, const st
 	return WordInfo::WordInfo();
 }
 
-bool WordTable::updateWors(WordInfo wordInfo)
+bool WordTable::updateWord(WordInfo wordInfo)
 {
 	String sql = "update Levels Set";
 	sql.appendWithFormat(" CountCollected=%d,", wordInfo.iCountCollected);

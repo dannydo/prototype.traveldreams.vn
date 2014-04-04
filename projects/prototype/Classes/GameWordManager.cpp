@@ -2,7 +2,7 @@
 #include "cocos2d.h"
 #include "GameBoardManager.h"
 #include "GameConfigManager.h"
-
+#include "Database\LevelTable.h"
 
 using namespace cocos2d;
 
@@ -204,8 +204,10 @@ void GameWordManager::GenerateWordForNewLevel(std::string sChapterID, int iLevel
 //	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
 //	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
 
+	LevelInfo levelInfo = LevelTable::getInstance()->getLevel( sChapterID, iLevel);	
+
 	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(sChapterID, iLevel);
-	m_iMainWordIndex = GetLoadedWordIndexFromID(m_pLevelConfig->m_sMainWordID);
+	m_iMainWordIndex = GetLoadedWordIndexFromID(levelInfo.sWordId); //m_pLevelConfig->m_sMainWordID);
 	
 
 	if (!m_pLevelConfig->m_bIsMainWordExistedOnBoard)		
@@ -271,6 +273,9 @@ void GameWordManager::ResetDataForNewPlay()
 	m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount = m_WordList[m_iMainWordIndex].m_iWordLength;
 	m_WordList[m_iMainWordIndex].m_iRemainNotAppearedCharacterCount = m_WordList[m_iMainWordIndex].m_iWordLength;
 
+	int tempRemovedIndexList[_GDS_WORD_MAX_LENGTH_];
+	int iListCount = 0;
+
 	for(int i=0; i< m_WordList[m_iMainWordIndex].m_iWordLength; i++)
 	{
 		if (m_pLevelConfig->m_MainWordUnlockedFlagList[i] ||  m_WordList[m_iMainWordIndex].m_sWord[i] == ' ')
@@ -278,8 +283,27 @@ void GameWordManager::ResetDataForNewPlay()
 			m_WordList[m_iMainWordIndex].m_ActivatedCharacterFlags[i] = true;
 			m_WordList[m_iMainWordIndex].m_AppearedCharacterFlags[i] = true;
 			m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount--;
-			m_WordList[m_iMainWordIndex].m_iRemainNotAppearedCharacterCount--;
+			m_WordList[m_iMainWordIndex].m_iRemainNotAppearedCharacterCount--;			
 		}
+		else
+		{
+			tempRemovedIndexList[iListCount] = i;		
+			iListCount++;
+		}
+	}
+
+	int iRandomRemovedLetter;
+	while(iListCount > m_pLevelConfig->m_iNumberLetterOfMainWord)
+	{
+		iRandomRemovedLetter = rand() % iListCount;
+
+		m_WordList[m_iMainWordIndex].m_ActivatedCharacterFlags[tempRemovedIndexList[iRandomRemovedLetter]] = true;
+		m_WordList[m_iMainWordIndex].m_AppearedCharacterFlags[tempRemovedIndexList[iRandomRemovedLetter]] = true;
+		m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount--;
+		m_WordList[m_iMainWordIndex].m_iRemainNotAppearedCharacterCount--;
+
+		tempRemovedIndexList[iRandomRemovedLetter] = tempRemovedIndexList[iListCount-1];
+		iListCount--;
 	}
 
 	m_iTotalCollectibleLettersOfMainWord = m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount;

@@ -16,9 +16,8 @@
 1	1	1	1	1	1	1	1
 1	1	1	1	1	1	1	1
 ;main word
-Pack1-BLACKBOARD
 5
-1 2 3 4 5
+0
 0
 ;display of main word, 1: break line ( + number letter of first line, not this include "SPACE" used to break line)
 0

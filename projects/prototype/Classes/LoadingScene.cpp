@@ -119,21 +119,23 @@ void LoadingLayer::initData()
 	{
 		if (UserDefault::getInstance()->getIntegerForKey("InitDatabase", 0) == 0)
 		{
-			WordlMapConfig wordMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
-			WordlMapConfig::WordMapChapterConfig wordMapChapterConfig = wordMapConfig.m_WorlMapChapterConfigs[0];
+			WordlMapConfig worldMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
+			WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[0];
 	
 			UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
 			userInfo.sFacebookToken = "CAAGQiytiRCoBAB5OUzRDO7OEejvNl8lheuOzZCeRG3ZBLSBPNsV7IAI8AVwVKshZCBQfo6QpLE1NZBv1OUZCpXfSeFwGyzito0hhEP3GLBIK5wCfSInTnv8u3sa1yzZBmB1FGmHPQXEJOADnOnPwETRTo81JSLXxcFNI5Q3T6PICutMERTEUdvtM1jejNfWz4lVZA1ZBZAYGVJOeXmO8Wg6j9FjqTWErOfNRrvBHfhcVw9QZDZD";
 			userInfo.sFacebookId = "100000135318088";
 			userInfo.sFirstName	 = "Van";
 			userInfo.sLastName = "Dao";
-			userInfo.sCurrentChapterId = wordMapChapterConfig.m_sChapterId;
+			userInfo.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
 			UserTable::getInstance()->updateUser(userInfo);
 
 			// Create data for one chapter
 			std::vector<std::string> wordList;
 			std::vector<int> mapLevels;
-			if(InitDatabase::getInstance()->createDataChapterAndLevel(wordMapChapterConfig.m_sChapterId, wordList, mapLevels))
+			GameConfigManager::getInstance()->GenerateWordsForLevels( worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
+
+			if(InitDatabase::getInstance()->createDataChapterAndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels))
 			{
 				UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
 			}

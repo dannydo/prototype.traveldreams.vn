@@ -90,7 +90,7 @@ bool LevelMapLayer::init()
 	for(int iIndex=0; iIndex<chapterConfig.m_iTotalevel; iIndex++)
 	{
 		LevelInfo levelInfo = levels[iIndex];
-		Point point = chapterConfig.m_positionLevel[iIndex];
+		Point point = chapterConfig.m_PositionLevel[iIndex];
 
 		char sLevel[5];
 		sprintf(sLevel, "%d", levelInfo.iLevel);
@@ -98,7 +98,7 @@ bool LevelMapLayer::init()
 		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
 		pLevelLabel->setPosition(Point(point.x-2, point.y+17));
 		
-		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel)
+		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel || 1)
 		{
 			Sprite* pButtonLevelSprite;
 			

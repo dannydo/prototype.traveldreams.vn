@@ -16,7 +16,7 @@
 1	1	1	0	0	1	1   1
 1	1	1	0	0	1	1   1
 ;main word
-Pack1-CHOPSTICKS
+10
 0
 0
 ;display of main word, 1: break line ( + number letter of first line, not this include "SPACE" used to break line)

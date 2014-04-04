@@ -80,7 +80,7 @@ std::vector<LevelInfo> LevelTable::getAllLevelsForChapter(std::string& sChapterI
 	return m_ChapterLevels;
 }
 
-LevelInfo LevelTable::getLevel(const std::string& sChapterId, const int& iLevel)
+LevelInfo& LevelTable::getLevel(const std::string& sChapterId, const int& iLevel)
 {	
 	if(m_sCurrentChapterId != sChapterId)
 	{
@@ -88,10 +88,10 @@ LevelInfo LevelTable::getLevel(const std::string& sChapterId, const int& iLevel)
 		m_sCurrentChapterId = sChapterId;
 	}
 
-	return m_ChapterLevels[iLevel];
+	return m_ChapterLevels[iLevel-1];//-1 cause levelID start from 1
 }
 
-bool LevelTable::updateLevel(LevelInfo levelInfo)
+bool LevelTable::updateLevel(const LevelInfo& levelInfo)
 {
 	String sql = "update Levels Set";
 	sql.appendWithFormat(" ChapterId='%s',", levelInfo.sChapterId.c_str());

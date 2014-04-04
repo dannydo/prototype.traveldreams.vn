@@ -25,9 +25,9 @@ public:
 	WordTable();
 	static void releaseInstance();
 
-	std::vector<WordInfo> getAllWordsForChapter(std::string& sChapterId);
+	std::vector<WordInfo>& getAllWordsForChapter(const std::string& sChapterId);
 	WordInfo getWordInfoOnChapter(const std::string& sChapterId, const std::string& sWordId);
-	bool updateWors(WordInfo wordInfo);
+	bool updateWord(WordInfo wordInfo);
 
 private:
 	void fetchWordsForChapter(const std::string& sChapterId);

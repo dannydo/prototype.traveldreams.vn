@@ -16,9 +16,8 @@
 0	1	0	1	0	0	1	0
 1	1	1	1	0	0	1	1
 ;main word
-Pack1-BOOKCASE
 4
-5 6 7 8
+0
 0
 ;display of main word, 1: break line ( + number letter of first line, not this include "SPACE" used to break line)
 0

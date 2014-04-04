@@ -122,8 +122,9 @@ public:
 	int m_BoardMatrix[_BOARD_MAX_ROW_NUMBER_][_BOARD_MAX_COLUMN_NUMBER_];
 	// main word
 	//int m_iMainWordID;
-	std::string m_sMainWordID;
-	bool m_MainWordUnlockedFlagList[_GDS_WORD_MAX_LENGTH_];
+	//std::string m_sMainWordID;
+	int m_iNumberLetterOfMainWord;
+	bool m_MainWordUnlockedFlagList[_GDS_WORD_MAX_LENGTH_]; //should remove this
 	bool m_bIsMainWordExistedOnBoard;
 	Cell m_MainWordLetterPosition[_GDS_WORD_MAX_LENGTH_];
 	// display of main word
@@ -167,7 +168,8 @@ struct ChapterConfig  {
 public:
 	int m_iTotalBackgroundImage;
 	int m_iTotalevel;
-	Point m_positionLevel[_MAXIMUM_LEVEL_ON_CHAPTER_];
+	Point m_PositionLevel[_MAXIMUM_LEVEL_ON_CHAPTER_];
+	std::vector<std::string> m_WordIDList;
 };
 
 struct WordlMapConfig {
@@ -277,6 +279,17 @@ public:
 	inline const int& GetCurrentLevelId() { return m_iCurrentLevelID; };
 	inline const WordlMapConfig& GetWordlMapConfig() { return m_WordlMapConfig; };
 
+	inline bool GetNextChapterID(const std::string& sChapterID, std::string& sNextChapterID){
+		int iChapterIndex = m_WordlMapConfig.m_WorlMapChapterConfigMap[sChapterID];		
+		if (iChapterIndex < m_WordlMapConfig.m_iTotalChapter)
+		{
+			sNextChapterID = m_WordlMapConfig.m_WorlMapChapterConfigs[ iChapterIndex+1].m_sChapterId;
+			return true;
+		}
+		else
+			return true;
+	}
+
 	inline const ObstacleDescription* GetObstacleDescription(const int& iObstacleTypeID) {
 		if (iObstacleTypeID < m_ObstacleDescriptionArray.size())
 			return m_ObstacleDescriptionArray[iObstacleTypeID];
@@ -285,6 +298,10 @@ public:
 	}
 
 	const ObstacleLevelDescription& GetObstacleLevelDescription(const int& iObstacleTypeID, const int& iLevel);
+
+
+	void GenerateWordsForLevels(const std::string& sChapterID, std::vector<std::string>& wordList, std::vector<int>& levelList);
+	void UpdateNewWordForLevel(const std::string& sChapterID, const int& iLevel);
 private:
 	void LoadConfigOfLevel(const std::string& sChapterID, const int& iLevelId);
 	void LoadConfigOfChapter(const std::string& sChapterID);

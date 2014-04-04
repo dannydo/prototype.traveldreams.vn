@@ -3,6 +3,8 @@
 #include "GameBoardManager.h"
 #include "GameWordManager.h"
 #include "cocos-ext.h"
+#include "Database\WordTable.h"
+#include "Database\LevelTable.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -104,10 +106,11 @@ void GameConfigManager::LoadConfigOfLevel(const std::string& sChapterID, const i
 
 	// main word
 	std::getline(inputStream, sTemp);
-	std::getline(inputStream, sTemp);
+	/*std::getline(inputStream, sTemp);
 	sTemp.erase( sTemp.size()-1, 1);  // remove \r at the end of line
 	//levelConfig.m_iMainWordID = GameWordManager::getInstance()->GetWordIndexFromContent(sTemp);		
-	levelConfig.m_sMainWordID = sTemp;
+	levelConfig.m_sMainWordID = sTemp;*/
+	inputStream >> levelConfig.m_iNumberLetterOfMainWord;
 	
 	memset( levelConfig.m_MainWordUnlockedFlagList, 0, sizeof(levelConfig.m_MainWordUnlockedFlagList));
 	int iAlreadyUnlockedLetterCount, iTemp;
@@ -123,9 +126,9 @@ void GameConfigManager::LoadConfigOfLevel(const std::string& sChapterID, const i
 	levelConfig.m_bIsMainWordExistedOnBoard = (iTemp > 0);
 	if (levelConfig.m_bIsMainWordExistedOnBoard)
 	{
-		int iMainWordIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(levelConfig.m_sMainWordID);
-		const Word& word = GameWordManager::getInstance()->GetWord(iMainWordIndex);
-		for(int i=0; i< word.m_iWordLength; i++)
+		//int iMainWordIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(levelConfig.m_sMainWordID);
+		//const Word& word = GameWordManager::getInstance()->GetWord(iMainWordIndex);
+		for(int i=0; i< levelConfig.m_iNumberLetterOfMainWord; i++) //word.m_iWordLength; i++)
 		{
 			inputStream >> levelConfig.m_MainWordLetterPosition[i].m_iRow;
 			levelConfig.m_MainWordLetterPosition[i].m_iRow--;
@@ -612,6 +615,7 @@ void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID)
 {
 	WordlMapConfig::WordMapChapterConfig wordMapChapterConfig = this->GetWordMapChapterConfig(sChapterID);
 	ChapterConfig& chapterConfig = m_ChapterConfig;
+	chapterConfig.m_WordIDList.clear();
 
 	std::string sPathFileData = wordMapChapterConfig.m_sPathData;
 	sPathFileData.append("/ChapterConfig.data");
@@ -627,16 +631,170 @@ void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID)
 	chapterConfig.m_iTotalevel = wordMapChapterConfig.m_iTotalevel;
 
 	std::string sTemp;
-	for(int iIndex = 0; iIndex < chapterConfig.m_iTotalevel; iIndex++)
+	int iIndex;
+	for(iIndex = 0; iIndex < chapterConfig.m_iTotalevel; iIndex++)
 	{
 		float fX, fY;
 		inputStream >> fX;
 		inputStream >> fY;
-		chapterConfig.m_positionLevel[iIndex] = Point(fX, fY);
+		chapterConfig.m_PositionLevel[iIndex] = Point(fX, fY);
+	}
+
+	int iWordCount;
+	inputStream >> iWordCount;
+	std::getline( inputStream, sTemp);	
+	for(iIndex = 0; iIndex < iWordCount; iIndex++)	
+	{			
+		std::getline( inputStream, sTemp);
+		//inputStream >> sTemp;
+		chapterConfig.m_WordIDList.push_back(sTemp.substr(0, sTemp.size()-1)); //not count /r at the end of line
 	}
 
 	delete[] data;
 	delete[] orginalData;
+}
+
+void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::vector<string>& wordList, std::vector<int>& levelList)
+{
+	ChapterConfig& chapterConfig = GetChapterConfig(sChapterID);	
+	 
+	int iIndex;
+	int iWordIndex;
+	GameWordManager* pGameWordManager = GameWordManager::getInstance();
+	std::vector<int> letterCountList;
+	int iLetterCount;
+
+	for(auto wordID : chapterConfig.m_WordIDList)
+	{
+		iWordIndex  = pGameWordManager->GetLoadedWordIndexFromID(wordID);
+		iLetterCount = 0;
+
+		const Word& word = pGameWordManager->GetWord(iWordIndex);
+		for(int i=0; i< word.m_iWordLength; i++)
+		{
+			if (word.m_sWord[i] != ' ')
+			{
+				iLetterCount++;
+			}
+		}
+		letterCountList.push_back(iLetterCount);
+		
+		wordList.push_back(wordID);
+		levelList.push_back(-1);
+	}
+	
+	std::vector<int> sortedWordIndexList;
+	
+	// we sort word from shortest to longest
+	int i,j, iWordCount = letterCountList.size();
+	for(i=0; i < letterCountList.size(); i++)
+		sortedWordIndexList.push_back(i);
+
+	int iTemp;
+	for(i=0; i < iWordCount-1; i++)
+		for(j=i+1; j < iWordCount; j++)
+			if (letterCountList[sortedWordIndexList[i]] > letterCountList[sortedWordIndexList[j]])
+			{
+				iTemp = sortedWordIndexList[i];
+				sortedWordIndexList[i] = sortedWordIndexList[j];
+				sortedWordIndexList[j] = iTemp;
+			}
+
+	// we sort level list based required word length from shorted to longest
+	std::vector<int> sortedLevelIndexList;
+	std::vector<int> requiredLetterOfLevelList;
+	for(i=1; i <= chapterConfig.m_iTotalevel; i++)
+	{
+		LevelConfig& levelConfig = GetLevelConfig(sChapterID, i);
+		sortedLevelIndexList.push_back(i-1);
+		requiredLetterOfLevelList.push_back(levelConfig.m_iNumberLetterOfMainWord);
+	}
+
+	for(i=0; i < chapterConfig.m_iTotalevel-1; i++)
+		for(j=i+1; j < chapterConfig.m_iTotalevel; j++)
+			if (requiredLetterOfLevelList[sortedLevelIndexList[i]] > requiredLetterOfLevelList[sortedLevelIndexList[j]])
+			{
+				iTemp = sortedLevelIndexList[i];
+				sortedLevelIndexList[i] = sortedLevelIndexList[j];
+				sortedLevelIndexList[j] = iTemp;
+			}
+
+	// map word to level
+	int iSortedLevelIndex = 0;
+	int iSortedWordIndex = 0;
+	while (iSortedLevelIndex < chapterConfig.m_iTotalevel)
+	{
+		if (iSortedWordIndex >= iWordCount)// there's a level not match with any word!!!!
+			MessageBox("Error", "Data of game chapter is invalid!");
+
+		int i1 = letterCountList[sortedWordIndexList[iSortedWordIndex]];
+		int i2 = requiredLetterOfLevelList[sortedLevelIndexList[iSortedLevelIndex]];
+
+		if (letterCountList[sortedWordIndexList[iSortedWordIndex]] >= requiredLetterOfLevelList[sortedLevelIndexList[iSortedLevelIndex]])
+		{
+			levelList[sortedWordIndexList[iSortedWordIndex]] = sortedLevelIndexList[iSortedLevelIndex]+1;
+			
+			iSortedLevelIndex++;
+			iSortedWordIndex++;
+		}
+		else
+		{
+			iSortedWordIndex++;			
+		}
+	}
+}
+
+// temporary used this instead of pre-calculation
+int CountLetterOfWord(const int& iWordLength, const char* sWord)
+{
+	int iIndex, iCount = 0;
+	for(iIndex = 0; iIndex < iWordLength; iIndex++)
+		if (sWord[iIndex] != ' ')
+			iCount++;
+	return iCount;
+}
+
+void GameConfigManager::UpdateNewWordForLevel(const std::string& sChapterID, const int& iLevel)
+{
+	LevelInfo& levelInfo = LevelTable::getInstance()->getLevel( sChapterID, iLevel);
+	LevelConfig& levelConfig = GetLevelConfig(sChapterID, iLevel);
+
+	std::vector<WordInfo>& wordList = WordTable::getInstance()->getAllWordsForChapter(sChapterID);
+	std::vector<int> candidate0IndexList;
+	std::vector<int> candidate1IndexList;
+	std::vector<int> candidate2IndexList;
+	int iIndex;
+
+	// first: not-appear-yet word has highest priority
+	for(iIndex = 0; iIndex < wordList.size(); iIndex++)
+	{
+		int iWordIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordList[iIndex].sWordId);
+		const Word& word = GameWordManager::getInstance()->GetWord(iWordIndex);
+
+		if (levelConfig.m_iNumberLetterOfMainWord <= CountLetterOfWord(word.m_iWordLength, word.m_sWord))
+		{		
+			if (wordList[iIndex].iCountCollected == 0)
+				candidate0IndexList.push_back(iIndex);
+			else if (wordList[iIndex].iCountCollected == 1)
+				candidate1IndexList.push_back(iIndex);
+			else
+				if (wordList[iIndex].iCountCollected == 0)
+					candidate2IndexList.push_back(iIndex);
+		}
+	}
+	
+	if (candidate0IndexList.size() > 0)
+	{
+		levelInfo.sWordId = wordList[candidate0IndexList[ rand() % candidate0IndexList.size()]].sWordId;	
+	}
+	else if (candidate1IndexList.size() > 0)
+	{
+		levelInfo.sWordId = wordList[candidate1IndexList[ rand() % candidate1IndexList.size()]].sWordId;
+	}
+	else
+		levelInfo.sWordId = wordList[candidate2IndexList[ rand() % candidate2IndexList.size()]].sWordId;		
+
+	LevelTable::getInstance()->updateLevel(levelInfo);
 }
 
 WordlMapConfig::WordMapChapterConfig& GameConfigManager::GetWordMapChapterConfig(const std::string& sChapterID)
