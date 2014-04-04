@@ -121,8 +121,11 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 			sqlRun.append("', 0, 0, 1, ");
 			sqlRun.appendWithFormat("%d);", iVersion);
 
+			int countCollected;
 			for (int iIndex=0; iIndex<wordList.size(); iIndex++)
 			{
+				countCollected = 0;
+
 				sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version) values(");
 				sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
 				sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
@@ -130,6 +133,7 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 
 				if (mapLevels[iIndex] != -1)
 				{
+					countCollected = 1;
 					sqlRun.append("insert into Levels (ChapterId,Level,WordId,Star,Score,BonusQuest,TotalBonusQuest,IsUnlock,Version) values(");
 					sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
 					sqlRun.appendWithFormat("%d,", mapLevels[iIndex]);
@@ -137,6 +141,11 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 					sqlRun.append("0,0,0,0,0,");
 					sqlRun.appendWithFormat("%d);", iVersion);
 				}
+
+				sqlRun.append("insert into Words (WordId,CountCollected,Version) values(");
+				sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
+				sqlRun.appendWithFormat("%d,", countCollected);
+				sqlRun.appendWithFormat("%d);", iVersion);
 			}
 
 			int iResult = sqlite3_exec(m_DatabaseSqlite, sqlRun.getCString(), NULL, NULL, NULL);

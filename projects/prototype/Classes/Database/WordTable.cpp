@@ -53,7 +53,7 @@ void WordTable::fetchWordsForChapter(const std::string& sChapterId)
 	for (int iRow=1; iRow<=nRow; iRow++)
 	{
 		WordInfo wordInfo;
-		wordInfo.sWordId = int(strtod(re[iRow*nColumn+0], NULL));
+		wordInfo.sWordId = re[iRow*nColumn+0];
 		wordInfo.iCountCollected = int(strtod(re[iRow*nColumn+1], NULL));
 		wordInfo.iVersion = int(strtod(re[iRow*nColumn+2], NULL));
 

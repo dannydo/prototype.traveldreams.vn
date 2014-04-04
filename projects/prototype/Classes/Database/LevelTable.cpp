@@ -46,7 +46,7 @@ void LevelTable::fetchLevelsForChapter(const std::string& sChapterId)
 	int nRow, nColumn;
 
 	String sql = "select * from Levels where ChapterId=";
-	sql.appendWithFormat("'%s'", sChapterId.c_str());
+	sql.appendWithFormat("'%s' order by Level asc ", sChapterId.c_str());
 
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
 
