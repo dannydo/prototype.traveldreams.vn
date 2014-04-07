@@ -114,6 +114,17 @@ void GameWordManager::PreLoadPackageForWord(std::string sWordID)
 	LoadWords( iPackageIndex);
 }
 
+const std::string& GameWordManager::GetPackagePathFromWordID(const std::string& sWordID)
+{
+	int iWordIndex = GetLoadedWordIndexFromID(sWordID);			
+	return m_WorldPackageList[m_WordList[iWordIndex].m_iPackageIndex ].m_sPackagePath;
+}
+
+const std::string& GameWordManager::GetPackagePathFromWord(const Word& word)
+{
+	return m_WorldPackageList[word.m_iPackageIndex ].m_sPackagePath;
+}
+
 void GameWordManager::LoadWords(const int& iPackageIndex)
 {
 	std::string sPackagePath = m_WorldPackageList[iPackageIndex].m_sPackagePath;
@@ -135,6 +146,8 @@ void GameWordManager::LoadWords(const int& iPackageIndex)
 	for(int iWordIndex = 0; iWordIndex < iWordCount; iWordIndex++)
 	{
 		Word newWord;
+		newWord.m_iPackageIndex = iPackageIndex;
+
 		std::getline(inputStream, sTemp);
 		std::getline(inputStream, sTemp);
 		strcpy( newWord.m_sWord, sTemp.data());		

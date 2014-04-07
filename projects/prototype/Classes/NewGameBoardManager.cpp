@@ -2399,8 +2399,12 @@ bool NewGameBoardManager::canActivatedAsSpecialComboHorizontal(const Cell& cell)
 	if (!m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_bIsBlankCell && 
 		m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType != _GCT_NONE_)
 	{
-		if ((cell.m_iRow - 1 >= 0 && m_TemporaryValueMatrix[cell.m_iRow - 1][cell.m_iColumn].m_eGemComboType != _GCT_NONE_)
-			&& (cell.m_iRow + 1 < m_iRowNumber && m_TemporaryValueMatrix[cell.m_iRow + 1][cell.m_iColumn].m_eGemComboType != _GCT_NONE_))
+		if (cell.m_iColumn + 1 < m_iColumnNumber && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn + 1].m_eGemComboType != _GCT_NONE_)
+		{
+			return true;
+		}
+		else if ((cell.m_iRow - 1 >= 0 && m_TemporaryValueMatrix[cell.m_iRow - 1][cell.m_iColumn].m_eGemComboType != _GCT_NONE_)
+			|| (cell.m_iRow + 1 < m_iRowNumber && m_TemporaryValueMatrix[cell.m_iRow + 1][cell.m_iColumn].m_eGemComboType != _GCT_NONE_))
 		{
 			return true;
 		}
@@ -2422,8 +2426,12 @@ bool NewGameBoardManager::canActivatedAsSpecialComboVertical(const Cell& cell)
 	if (!m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_bIsBlankCell && 
 		m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType != _GCT_NONE_)
 	{
-		if ((cell.m_iColumn - 1 >= 0 && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn - 1].m_eGemComboType != _GCT_NONE_)
-			&& (cell.m_iColumn + 1 < m_iColumnNumber && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn + 1].m_eGemComboType != _GCT_NONE_))
+		if (cell.m_iRow + 1 < m_iRowNumber && m_TemporaryValueMatrix[cell.m_iRow + 1][cell.m_iColumn].m_eGemComboType != _GCT_NONE_)
+		{
+			return true;
+		}
+		else if ((cell.m_iColumn - 1 >= 0 && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn - 1].m_eGemComboType != _GCT_NONE_)
+			|| (cell.m_iColumn + 1 < m_iColumnNumber && m_TemporaryValueMatrix[cell.m_iRow][cell.m_iColumn + 1].m_eGemComboType != _GCT_NONE_))
 		{
 			return true;
 		}

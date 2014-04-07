@@ -403,6 +403,8 @@ public:
 struct Word
 {
 public:	
+	int m_iPackageIndex;
+
 	char m_sWord[_GDS_WORD_MAX_LENGTH_];		
 	int m_iWordLength;	
 

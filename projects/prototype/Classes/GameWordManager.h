@@ -77,6 +77,9 @@ public:
 	bool UnlockLetter(const unsigned char& iLetter, int& iUnlockedLetterIndexOfMainWord, 
 		bool& bIsMainWordJustUnlocked);
 		//bool& bIsMainWordFullUnlocked);	
+
+	const std::string& GetPackagePathFromWordID(const std::string& sWordID);
+	const std::string& GetPackagePathFromWord(const Word& word);
 private:
 	void PreLoadPackageForWord(std::string sWordID);
 
@@ -101,7 +104,7 @@ private:
 
 	//int m_iWordCount;	
 	//Word m_WordList[_GDS_WORD_MAX_COUNT_];
-	std::vector<Word> m_WordList;
+	std::vector<Word> m_WordList;	
 
 	int m_iMainWordIndex;
 	int m_iTotalCollectibleLettersOfMainWord;
