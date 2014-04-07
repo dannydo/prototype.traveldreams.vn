@@ -163,7 +163,7 @@ public:
 
 	inline std::vector<DestroyedByComboCell>& GetDestroyBonusQuestGemList() { return m_DestroyBonusQuestGemList;}
 
-	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
+	bool RecheckAfterMoveV2(int iBeginMovingIndex, int iMovingListLength, int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& basicMatchingDestroyedCells, // std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList, //std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
@@ -172,7 +172,7 @@ public:
 		std::vector<NewCellInfo>& newCells,
 		bool bIsNewMove);		
 
-	bool FastCheckBlocks( int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
+	bool FastCheckBlocks( int iBeginMovingIndex, int iMovingListLength, int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<ComboEffectCell>& candidateDestroyedCells);		
 
 	int DecreaseMove() { return (m_iCurrentMove--);}
@@ -225,7 +225,7 @@ protected:
 	inline bool IsSimpleCombo(const GemComboType_e& eGemComboType) { return (eGemComboType >= _GCT_COMBO4_ && eGemComboType <= _GCT_COMBO6_);}
 
 	// Execute move util methods
-	void CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn);
+	void CopyDataToTempBoardMatrixAndResetFlags(int iBeginMovingIndex, int iMovingListLength, int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn);
 	void CreateBlockForBasicMatching(std::vector<Cell>& basicMatchingDestroyedCells);
 	void RemoveCellsByBasicMatching( std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectBundle*>& comboChainList, const int& iMoveRow, const int& iMoveColumn);
 	void CreateComboCells(const int& iSelectedRow, const int& iSelectedColumn, const std::vector<Cell>& basicMatchingDestroyedCells, std::vector<ComboEffectCell>& newComboCells);

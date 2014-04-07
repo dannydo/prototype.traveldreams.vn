@@ -22,6 +22,7 @@ public:
 	//inline ObstacleType_e GetCellObstacleType(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_eObstacleType;}
 
 	inline bool IsBlankCell(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell;}
+	inline bool IsLocalDragWall(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_bIsDragLocalWall;}
 
 	// only iSelectedRow or iSelectedColumn 0 1 at one time	 (iDeltaRow and iDeltaColumn != 0 corresponding)
 	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,

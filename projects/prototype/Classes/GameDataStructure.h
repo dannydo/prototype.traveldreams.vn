@@ -10,6 +10,8 @@
 #define _GDS_WORD_MAX_COUNT_		30
 #define _GDS_SUB_WORD_MAX_COUNT_	2
 
+#define _GDS_LOCAL_DRAG_WALL_CELL_CONFIG_ID_	-1 //id of localDragWall in config file
+
 #define _MAX_GEM_ID_	6
 #define _SPECIAL_COMBO_GEM_ID	10
 #define _BONUS_QUEST_GEM_ID_	11
@@ -222,6 +224,7 @@ struct CellValue
 public:
 	int m_iGemID;
 	bool m_bIsBlankCell;
+	bool m_bIsDragLocalWall;
 	GemComboType_e m_eGemComboType;
 	//ObstacleType_e m_eObstacleType;
 	int m_iObstacleBlockID;
@@ -235,6 +238,7 @@ public:
 	{
 		m_iGemID = -1;
 		m_bIsBlankCell = true;
+		m_bIsDragLocalWall = false;
 		m_eGemComboType = _GCT_NONE_;
 		m_iObstacleBlockID = -1;
 		//m_eObstacleType = _OT_NONE_;

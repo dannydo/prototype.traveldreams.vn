@@ -159,7 +159,7 @@ void NewGameBoardManager::ClearBonusQuestGemOnBoard(std::vector<Cell>& basicMatc
 	GenerateNewGems(newCells, false);
 }
 
-bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
+bool NewGameBoardManager::RecheckAfterMoveV2(int iBeginMovingIndex, int iMovingListLength, int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& basicMatchingDestroyedCells, //std::vector<DoubleComboCreationInfo>& newDoubleComboList, 
 		std::vector<ComboEffectBundle*>& comboChainList,// std::vector<ComboEffectBundle*>& triggeredCombo6ChainList,
 		std::vector<ComboEffectCell>& newComboCells,
@@ -181,11 +181,11 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 
 	int iRow, iColumn;
 
-	// if this phase trigger only by waiting combo 6 then not need to create temporary list
+	// if this phase trigger only by waiting combo 5 or 6-6-6 then not need to create temporary list and check double/tripple activation
 	if (!(iSelectedRow < 0 && iSelectedColumn < 0 && m_WaitingTriggerSecondTimeComboList.size()>0))
 	{
 		// create temporary list to compute result for shifting move
-		CopyDataToTempBoardMatrixAndResetFlags( iSelectedRow, iSelectedColumn, iDeltaRow, iDeltaColumn);
+		CopyDataToTempBoardMatrixAndResetFlags( iBeginMovingIndex, iMovingListLength, iSelectedRow, iSelectedColumn, iDeltaRow, iDeltaColumn);
 
 		// process double combo and tripple combo		
 		std::vector<ComboEffectDescription> advanceComboList;
@@ -334,11 +334,11 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColu
 }
 
 
-bool NewGameBoardManager::FastCheckBlocks( int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
+bool NewGameBoardManager::FastCheckBlocks( int iBeginMovingIndex, int iMovingListLength, int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<ComboEffectCell>& candidateDestroyedCells)
 {
 	// create temporary list to compute result for shifting move
-	CopyDataToTempBoardMatrixAndResetFlags( iSelectedRow, iSelectedColumn, iDeltaRow, iDeltaColumn);
+	CopyDataToTempBoardMatrixAndResetFlags( iBeginMovingIndex, iMovingListLength, iSelectedRow, iSelectedColumn, iDeltaRow, iDeltaColumn);
 
 	// checking
 	int iRow, iColumn, iGemID, iSameValueCellCount;
@@ -1276,7 +1276,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	if ( m_WaitingTriggerSecondTimeComboList.size() ==0)
 	{
 		// create temporary list to compute result for shifting move
-		CopyDataToTempBoardMatrixAndResetFlags( -1, -1, 0, 0);
+		CopyDataToTempBoardMatrixAndResetFlags( -1, -1, -1, -1, 0, 0);
 
 		// process double combo and tripple combo		
 		std::vector<ComboEffectDescription> advanceComboList;
@@ -1534,7 +1534,7 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 	return false;
 }
 
-void NewGameBoardManager::CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn)
+void NewGameBoardManager::CopyDataToTempBoardMatrixAndResetFlags(int iBeginMovingIndex, int iMovingListLength, int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn)
 {
 	int iRow, iColumn;
 
@@ -1574,45 +1574,63 @@ void NewGameBoardManager::CopyDataToTempBoardMatrixAndResetFlags(int iSelectedRo
 						//int iBlankCellCount = 0; //blank cell on the move
 						int iTranslationCell = 0;
 						int iSign = 1;
+						int iCalculatedColumn = iColumn, iCalculatedBeginMovingDelta = 0;
+						int iListLength = m_iColumnNumber;
 
 						if (iDeltaColumn != 0)
 						{
-							iSign = iDeltaColumn/abs(iDeltaColumn);
-							iTranslationCell = 0;
-							for(int iStep=1; iStep<= abs(iDeltaColumn); iStep++)
+							if (iColumn >= iBeginMovingIndex && iColumn < iBeginMovingIndex + iMovingListLength)
 							{
-								iTranslationCell += iSign;
-								if (iTranslationCell < 0)
-									iTranslationCell+= m_iColumnNumber;
+								iCalculatedColumn -= iBeginMovingIndex;
+								iCalculatedBeginMovingDelta = iBeginMovingIndex;
+								iListLength = iMovingListLength;
 
-								if (m_BoardValueMatrix[iRow][(iColumn + iTranslationCell)%m_iColumnNumber].m_bIsBlankCell)
-									iStep--;
+								iSign = iDeltaColumn/abs(iDeltaColumn);
+								iTranslationCell = 0;
+								for(int iStep=1; iStep<= abs(iDeltaColumn); iStep++)
+								{
+									iTranslationCell += iSign;
+									if (iTranslationCell < 0)
+										iTranslationCell+= iListLength;
+
+									if (m_BoardValueMatrix[iRow][(iCalculatedColumn + iTranslationCell) % iListLength + iCalculatedBeginMovingDelta ].m_bIsBlankCell)
+										iStep--;
+								}
 							}
 					
 						}
 
-						m_TemporaryValueMatrix[iRow][(iColumn + iTranslationCell)%m_iColumnNumber] = m_BoardValueMatrix[iRow][iColumn];
+						m_TemporaryValueMatrix[iRow][(iCalculatedColumn + iTranslationCell) % iListLength + iCalculatedBeginMovingDelta] = m_BoardValueMatrix[iRow][iColumn];
 					}
 					else if (iColumn == iSelectedColumn)
 					{
 						//int iBlankCellCount = 0; //blank cell on the move
 						int iTranslationCell = 0;
 						int iSign = 1;
+						int iCalculatedRow = iRow, iCalculatedBeginMovingDelta = 0;
+						int iListLength = m_iRowNumber;
+
 						if (iDeltaRow != 0)
 						{
-							iSign = iDeltaRow/abs(iDeltaRow);									
-							iTranslationCell = 0;
-							for(int iStep=1; iStep<= abs(iDeltaRow); iStep++)
+							if (iRow >= iBeginMovingIndex && iRow < iBeginMovingIndex + iMovingListLength)
 							{
-								iTranslationCell += iSign;
-								if (iTranslationCell < 0)
-									iTranslationCell+= m_iRowNumber;
-								if (m_BoardValueMatrix[(iRow + iTranslationCell) % m_iRowNumber][iColumn].m_bIsBlankCell)
-									iStep--;
-							}						
+								iCalculatedRow -= iBeginMovingIndex;
+								iCalculatedBeginMovingDelta = iBeginMovingIndex;
+
+								iSign = iDeltaRow/abs(iDeltaRow);									
+								iTranslationCell = 0;
+								for(int iStep=1; iStep<= abs(iDeltaRow); iStep++)
+								{
+									iTranslationCell += iSign;
+									if (iTranslationCell < 0)
+										iTranslationCell+= iListLength;
+									if (m_BoardValueMatrix[(iRow + iTranslationCell) % iListLength + iCalculatedBeginMovingDelta][iColumn].m_bIsBlankCell)
+										iStep--;
+								}						
+							}
 						}
 
-						m_TemporaryValueMatrix[(iRow + iTranslationCell) % m_iRowNumber][iColumn] = m_BoardValueMatrix[iRow][iColumn];
+						m_TemporaryValueMatrix[(iRow + iTranslationCell) % iListLength + iCalculatedBeginMovingDelta][iColumn] = m_BoardValueMatrix[iRow][iColumn];
 					}
 					else
 						m_TemporaryValueMatrix[iRow][iColumn] = m_BoardValueMatrix[iRow][iColumn];

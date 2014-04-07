@@ -31,10 +31,13 @@ void GameBoardManager::GenerateGameBoard()
 	for(iRow = 0; iRow < m_iRowNumber; iRow++)
 		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
 		{
-			if (m_pLevelConfig->m_BoardMatrix[iRow][iColumn] == 0)
+			if (m_pLevelConfig->m_BoardMatrix[iRow][iColumn] <= 0)
 			{
 				m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
 				m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
+
+				if (m_pLevelConfig->m_BoardMatrix[iRow][iColumn] == _GDS_LOCAL_DRAG_WALL_CELL_CONFIG_ID_)
+					m_BoardValueMatrix[iRow][iColumn].m_bIsDragLocalWall = true;
 
 				continue;
 			}

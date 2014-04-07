@@ -41,6 +41,7 @@ public:
 	//int m_iCharacterID;
 	//unsigned char m_iLetter;
 	int m_iGemLetterBlockID;
+	bool m_bIsDragLocalWall;
 
 	CellView()
 	{
@@ -48,6 +49,7 @@ public:
 		//m_iCharacterID = -1;
 		//m_iLetter = 255;
 		m_iGemLetterBlockID = -1;
+		m_bIsDragLocalWall = false;
 	}
 };
 
@@ -211,6 +213,7 @@ private:
 	CellView m_MovingCellList[_BOARD_MAX_LENGTH_];
 	CellView m_MovingCellMirrorList[_BOARD_MAX_LENGTH_];
 	int m_iMovingCellListLength;//this should be number of row or column
+	int m_iBeginMovingCellIndex;
 
 	NewGameBoardManager m_GameBoardManager;
 	cocos2d::Size m_SymbolSize;

@@ -761,7 +761,7 @@ void GameConfigManager::UpdateNewWordForLevel(const std::string& sChapterID, con
 
 	std::vector<WordInfo>& wordList = WordTable::getInstance()->getAllWordsForChapter(sChapterID);
 	std::vector<int> candidate0IndexList;
-	std::vector<int> candidate1IndexList;
+	//std::vector<int> candidate1IndexList;
 	std::vector<int> candidate2IndexList;
 	int iIndex;
 
@@ -776,7 +776,9 @@ void GameConfigManager::UpdateNewWordForLevel(const std::string& sChapterID, con
 			if (wordList[iIndex].iCountCollected == 0)
 				candidate0IndexList.push_back(iIndex);
 			else if (wordList[iIndex].iCountCollected == 1)
-				candidate1IndexList.push_back(iIndex);
+			{
+				//candidate1IndexList.push_back(iIndex);
+			}
 			else
 				if (wordList[iIndex].iCountCollected == 0)
 					candidate2IndexList.push_back(iIndex);
@@ -787,10 +789,10 @@ void GameConfigManager::UpdateNewWordForLevel(const std::string& sChapterID, con
 	{
 		levelInfo.sWordId = wordList[candidate0IndexList[ rand() % candidate0IndexList.size()]].sWordId;	
 	}
-	else if (candidate1IndexList.size() > 0)
+	/*else if (candidate1IndexList.size() > 0)
 	{
 		levelInfo.sWordId = wordList[candidate1IndexList[ rand() % candidate1IndexList.size()]].sWordId;
-	}
+	}*/
 	else
 		levelInfo.sWordId = wordList[candidate2IndexList[ rand() % candidate2IndexList.size()]].sWordId;		
 
