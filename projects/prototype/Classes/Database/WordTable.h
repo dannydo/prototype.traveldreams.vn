@@ -8,6 +8,10 @@ struct WordInfo
 	std::string sWordId;
 	int iCountCollected;
 	int iVersion;
+	int iOrderUnlock;
+	bool bIsNew;
+	int iMapChapterWordId;
+	std::string sChapterId;
 
 	WordInfo()
 	{
@@ -27,7 +31,8 @@ public:
 
 	std::vector<WordInfo>& getAllWordsForChapter(const std::string& sChapterId);
 	WordInfo getWordInfoOnChapter(const std::string& sChapterId, const std::string& sWordId);
-	bool updateWord(WordInfo wordInfo);
+	bool updateWord(const WordInfo& wordInfo);
+	void refreshWordsForChapter(const std::string& sChapterId);
 
 private:
 	void fetchWordsForChapter(const std::string& sChapterId);

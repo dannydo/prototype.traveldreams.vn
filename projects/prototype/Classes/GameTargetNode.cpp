@@ -75,7 +75,8 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pTargetImage->setRotation(-3.5);
 	m_pSpriteBatchNode->addChild(pTargetImage);
 
-	std::string sPath = "FlashCard/flashcardimage/";
+	std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(pMainWord);;
+	sPath.append("/FlashCard/");
 	sPath.append(pMainWord.m_sFlashCardImage);
 	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
 	pFlashCardImage->setPosition(Point(320.0f, 665.0f));
@@ -86,7 +87,8 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pLevelImage->setPosition(Point(0.0f, 0.0f));
 
 	char sLevel[10];
-	sprintf(sLevel, "%d", m_iCurrentLevel);
+	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
+	sprintf(sLevel, "%d", m_iCurrentLevel + iCalLevel);
 	LabelBMFont *pLabelLevel = LabelBMFont::create(sLevel, "fonts/Level-bitmap-font-game.fnt");
 	pLabelLevel->setAnchorPoint(Point(0.5f, 0.5f));
 	pLabelLevel->setPosition(Point(pLevelImage->getContentSize().width/2 + pLabelLevel->getContentSize().width/2.0f, 5.0f));

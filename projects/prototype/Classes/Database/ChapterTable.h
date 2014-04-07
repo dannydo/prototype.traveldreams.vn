@@ -10,6 +10,9 @@ struct ChapterInfo
 	int iTotalStar;
 	bool bIsUnlock;
 	int iVersion;
+	int iTotalFlashCardUnlock;
+	int iCountFlashCardNew;
+	int iTotalFlash;
 
 	ChapterInfo()
 	{
@@ -18,6 +21,9 @@ struct ChapterInfo
 		iTotalStar = 0;
 		bIsUnlock = false;
 		iVersion = 0;
+		iTotalFlashCardUnlock = 0;
+		iCountFlashCardNew = 0;
+		iTotalFlash = 0;
 	}
 };
 
@@ -29,7 +35,7 @@ public:
 	static void releaseInstance();
 	bool init();
 
-	inline std::vector<ChapterInfo> getChaptersInfo() { return m_Chapters; };
+	inline std::vector<ChapterInfo>& getChaptersInfo() { return m_Chapters; };
 	ChapterInfo getChapterInfo(const std::string sChapterId);
 	bool updateChapter(ChapterInfo chapterInfo);
 

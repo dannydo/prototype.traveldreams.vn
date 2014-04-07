@@ -30,7 +30,7 @@ public:
 	UserTable();
 	static void releaseInstance();
 
-	inline UserInfo getUserInfo() { return m_userInfo; };
+	inline UserInfo& getUserInfo() { return m_userInfo; };
 	
 	bool updateUser(const UserInfo& userInfo);
 	bool updateLife(const unsigned int& iLoseLife);

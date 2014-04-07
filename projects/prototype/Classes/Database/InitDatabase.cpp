@@ -77,14 +77,14 @@ bool InitDatabase::createDatabase()
 
 	std::string sqlRun = "";
 	sqlRun.append("CREATE TABLE if not exists Users (UserIdentifier TEXT PRIMARY KEY  NOT NULL, FacebookId TEXT, FacebookToken TEXT, FirstName TEXT, LastName TEXT, CurrentChapter TEXT, CurrentLevel INTEGER, Life INTEGER, LifeTimeRemaining INTEGER, LifeTImeBeginRemain INTEGER, Monney INTEGER, Version INTEGER);");
-	sqlRun.append("CREATE TABLE if not exists Chapters (ChapterId TEXT PRIMARY KEY NOT NULL, TotalLevelUnlock INTEGER, TotalStar INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER);");
+	sqlRun.append("CREATE TABLE if not exists Chapters (ChapterId TEXT PRIMARY KEY NOT NULL, TotalLevelUnlock INTEGER, TotalStar INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER, TotalFlashCardUnlock INTEGER, CountFlashCardNew INTEGER, TotalFlashCard INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Levels (LevelId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ChapterId TEXT, Level INTEGER, WordId TEXT, Star INTEGER, Score INTEGER, BonusQuest INTEGER, TotalBonusQuest INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists UnlockChapters (UnlockChapterId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ChapterId TEXT, Request INTEGER, Type TEXT, BeginTime INTEGER, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists PowerUps (PowerUpId TEXT PRIMARY KEY NOT NULL, Quantity INTEGER, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Transactions (TransactionsId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, PowerUpId TEXT, Quantity INTEGER, TotalAmount INTEGER, DateTime INTEGER, Version INTEGER, Type TEXT);");
 	sqlRun.append("CREATE TABLE if not exists Versions (VersionId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, VersionSync INTEGER, VersionDatabase INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Words (WordId TEXT PRIMARY KEY NOT NULL, CountCollected INTEGER, Version INTEGER);");
-	sqlRun.append("CREATE TABLE if not exists MapChapterWords (MapChapterWordId INTEGER PRIMARY KEY NOT NULL, ChapterId TEXT, WordId TEXT, Version INTEGER);");
+	sqlRun.append("CREATE TABLE if not exists MapChapterWords (MapChapterWordId INTEGER PRIMARY KEY NOT NULL, ChapterId TEXT, WordId TEXT, Version INTEGER, OrderUnlock INTEGER, IsNew INTEGER);");
 	sqlRun.append("insert into Versions values(1, 1, 1);");
 	sqlRun.append("insert into Users values('ohmyword', '', '', '', '', '', 1, 5, 0, 0, 0, 2);");
 
@@ -119,17 +119,20 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 			sqlRun.append("insert into Chapters values('");
 			sqlRun.append(sChapterId.c_str());
 			sqlRun.append("', 0, 0, 1, ");
-			sqlRun.appendWithFormat("%d);", iVersion);
+			sqlRun.appendWithFormat("%d,", iVersion);
+			sqlRun.append("0, 0,");
+			sqlRun.appendWithFormat("%d);", wordList.size());
 
 			int countCollected;
 			for (int iIndex=0; iIndex<wordList.size(); iIndex++)
 			{
 				countCollected = 0;
 
-				sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version) values(");
+				sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version,OrderUnlock,IsNew) values(");
 				sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
 				sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
-				sqlRun.appendWithFormat("%d);", iVersion);
+				sqlRun.appendWithFormat("%d,", iVersion);
+				sqlRun.append("0, 0);");
 
 				if (mapLevels[iIndex] != -1)
 				{

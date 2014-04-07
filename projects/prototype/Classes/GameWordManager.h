@@ -80,6 +80,8 @@ public:
 
 	const std::string& GetPackagePathFromWordID(const std::string& sWordID);
 	const std::string& GetPackagePathFromWord(const Word& word);
+	const std::string GetWordIdFromWord(const Word& word);
+
 private:
 	void PreLoadPackageForWord(std::string sWordID);
 

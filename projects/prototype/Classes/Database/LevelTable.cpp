@@ -70,7 +70,7 @@ void LevelTable::fetchLevelsForChapter(const std::string& sChapterId)
 	sqlite3_free_table(re);
 }
 
-std::vector<LevelInfo> LevelTable::getAllLevelsForChapter(std::string& sChapterId)
+std::vector<LevelInfo>& LevelTable::getAllLevelsForChapter(std::string& sChapterId)
 {
 	if(m_sCurrentChapterId != sChapterId)
 	{
