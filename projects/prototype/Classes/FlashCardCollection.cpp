@@ -1,6 +1,7 @@
 #include "FlashCardCollection.h"
 #include "FlashCardScene.h"
 #include "FooterNode.h"
+#include "GameConfigManager.h"
 
 USING_NS_CC;
 
@@ -54,44 +55,48 @@ bool FlashCardCollectionLayer::init()
 	m_pSlideShow = Node::create();
 	m_pSlideShow->setContentSize(CCSizeMake(640.0f, 800));
 	m_chapters = ChapterTable::getInstance()->getChaptersInfo();
+
+	WordlMapConfig worlMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
 	
 	for (int iIndex=0; iIndex<m_chapters.size(); iIndex++)
 	{
-		Node* pNodeChapter = Node::create();
 		ChapterInfo chapterInfo = m_chapters[iIndex];
-
-		/*
-		van dao
-		char sFilename[40];
-		sprintf(sFilename, "FlashCard/chapter/%d.png", chapterInfo.iChapter%2+1);
-		Sprite* pChapterImageSprite = Sprite::create(sFilename);
-		pNodeChapter->addChild(pChapterImageSprite);
-		
-
-		char sTotalLevel[5];
-		sprintf(sTotalLevel, "%d/%d", chapterInfo.iTotalLevelUnlock, 20);
-		LabelTTF* pLabelTotalLevel = LabelTTF::create(sTotalLevel, "Arial", 22);
-		pLabelTotalLevel->setColor(ccc3(0.0f, 0.0f, 0.0f));
-		pLabelTotalLevel->setPositionY(-pChapterImageSprite->getContentSize().height/2.0f-12);
-		pNodeChapter->addChild(pLabelTotalLevel);
-		*/
-		pNodeChapter->setAnchorPoint(Point(0.0f, 0.0f));
-		switch(iIndex%4)
+		if(chapterInfo.bIsUnlock)
 		{
-		case 0:
-			pNodeChapter->setPosition(Point(iIndex/4*640 + 170, 550.0f));
-			break;
-		case 1:
-			pNodeChapter->setPosition(Point(iIndex/4*640 + 470, 550.0f));
-			break;
-		case 2:
-			pNodeChapter->setPosition(Point(iIndex/4*640 + 170, 250.0f));
-			break;
-		case 3:
-			pNodeChapter->setPosition(Point(iIndex/4*640 + 470, 250.0f));
-			break;
+			Node* pNodeChapter = Node::create();
+			int iIndex = worlMapConfig.m_WorlMapChapterConfigMap[chapterInfo.sChapterId];
+			std::string sPath = worlMapConfig.m_WorlMapChapterConfigs[iIndex].m_sPathData;
+			sPath.append("/Flash-Card-icon.png");
+
+			Sprite* pChapterImageSprite = Sprite::create(sPath.c_str());
+			pNodeChapter->addChild(pChapterImageSprite);
+
+			// van dao
+			char sTotalLevel[5];
+			sprintf(sTotalLevel, "%d/%d", chapterInfo.iTotalLevelUnlock, 20);
+			LabelTTF* pLabelTotalLevel = LabelTTF::create(sTotalLevel, "Arial", 22);
+			pLabelTotalLevel->setColor(ccc3(0.0f, 0.0f, 0.0f));
+			pLabelTotalLevel->setPositionY(-pChapterImageSprite->getContentSize().height/2.0f-12);
+			pNodeChapter->addChild(pLabelTotalLevel);
+		
+			pNodeChapter->setAnchorPoint(Point(0.0f, 0.0f));
+			switch(iIndex%4)
+			{
+			case 0:
+				pNodeChapter->setPosition(Point(iIndex/4*640 + 170, 550.0f));
+				break;
+			case 1:
+				pNodeChapter->setPosition(Point(iIndex/4*640 + 470, 550.0f));
+				break;
+			case 2:
+				pNodeChapter->setPosition(Point(iIndex/4*640 + 170, 250.0f));
+				break;
+			case 3:
+				pNodeChapter->setPosition(Point(iIndex/4*640 + 470, 250.0f));
+				break;
+			}
+			m_pSlideShow->addChild(pNodeChapter);
 		}
-		m_pSlideShow->addChild(pNodeChapter);
 	}
 
 	m_pSlideShow->setPosition(Point(0.0f, 94.0f));

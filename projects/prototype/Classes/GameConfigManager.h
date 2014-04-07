@@ -279,6 +279,8 @@ public:
 	inline const int& GetCurrentLevelId() { return m_iCurrentLevelID; };
 	inline const WordlMapConfig& GetWordlMapConfig() { return m_WordlMapConfig; };
 
+	int CountLevelOfPreviousChapters(const std::string& sChapterID);
+
 	inline bool GetNextChapterID(const std::string& sChapterID, std::string& sNextChapterID){
 		int iChapterIndex = m_WordlMapConfig.m_WorlMapChapterConfigMap[sChapterID];		
 		if (iChapterIndex < m_WordlMapConfig.m_iTotalChapter)

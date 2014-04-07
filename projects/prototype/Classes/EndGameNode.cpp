@@ -114,12 +114,12 @@ bool EndGameNode::initWin()
 	m_pButtonManagerNode->addButtonNode(buttonNextNode);
 	m_pButtonManagerNode->addButtonNode(buttonReplayNode);
 	
-	//Update level data, hackcode chapter
 	m_levelInfo = LevelTable::getInstance()->getLevel(m_sChapterId, m_iCurrentLevel);
 	m_chapterInfo = ChapterTable::getInstance()->getChapterInfo(m_sChapterId);
 
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
 
+	// Van Dao
 	if (m_levelInfo.bIsUnlock == false)
 	{
 		m_chapterInfo.iTotalLevelUnlock++;
@@ -157,7 +157,6 @@ bool EndGameNode::initWin()
 		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 		UserTable::getInstance()->updateUser(userInfo);
 
-		// van dao m_levelInfo.sWordKey = m_mainWord.m_sWord;
 		m_levelInfo.bIsUnlock = true;
 		m_levelInfo.iTotalBonusQuest = m_iTotalBonusQuest;
 	}

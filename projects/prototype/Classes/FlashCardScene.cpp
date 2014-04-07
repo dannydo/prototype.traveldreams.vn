@@ -92,8 +92,8 @@ bool FlashCardLayer::init()
 	m_pFooterNode->disableButtonIntroAndFlashCard();
 	this->addChild(m_pFooterNode);
 
-	m_levels = LevelTable::getInstance()->getAllLevelsForChapter(m_chapterInfo.sChapterId);
-	m_iTotalFlashCard = m_levels.size();
+	m_Words = WordTable::getInstance()->getAllWordsForChapter(m_chapterInfo.sChapterId);
+	m_iTotalFlashCard = m_Words.size();
 	m_iIndexFlashCard = 1;
 
 	m_pSlideShow = Node::create();
@@ -239,29 +239,22 @@ void FlashCardLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent
 
 void FlashCardLayer::playVoiceWord()
 {
-	if (m_currentLevelInfo.bIsUnlock) 
+	if (m_currentWordInfo.iCountCollected > 1) 
 	{
-		SoundManager::PlaySpellingOfWord(this, m_currentWordInfo);
-		/*
-		char sSoundFile[100];
-		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-			sprintf(sSoundFile, "EnglishSoundPC/Words/%s.wav", m_currentWordInfo.m_sSoundFile.c_str());
-		#else
-			sprintf(sSoundFile, "EnglishSound/Words/%s.ogg", m_currentWordInfo.m_sSoundFile.c_str());
-		#endif
-		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);*/
+		SoundManager::PlaySpellingOfWord(this, m_currentWord);
 	}
 }
 
 void FlashCardLayer::playVoiceSentence()
 {
-	if (m_currentLevelInfo.bIsUnlock) 
+	// Van Dao
+	if (m_currentWordInfo.iCountCollected > 1) 
 	{
 		char sSoundFile[100];
 		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-			sprintf(sSoundFile, "EnglishSoundPC/Sentences/%s.wav", m_currentWordInfo.m_sSentenceSoundFile.c_str());
+			sprintf(sSoundFile, "EnglishSoundPC/Sentences/%s.wav", m_currentWord.m_sSentenceSoundFile.c_str());
 		#else
-			sprintf(sSoundFile, "EnglishSound/Sentences/%s.ogg", m_currentWordInfo.m_sSentenceSoundFile.c_str());
+			sprintf(sSoundFile, "EnglishSound/Sentences/%s.ogg", m_currentWord.m_sSentenceSoundFile.c_str());
 		#endif
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
 	}
@@ -269,7 +262,7 @@ void FlashCardLayer::playVoiceSentence()
 
 void FlashCardLayer::openDictionary(const char* sWord)
 {
-	if (m_currentLevelInfo.bIsUnlock) 
+	if (m_currentWordInfo.iCountCollected > 1) 
 	{
 		DictionaryNode* pDictionary = DictionaryNode::createLayout(sWord);
 		pDictionary->setPosition(Point(320.0f, 680.0f));
@@ -318,20 +311,18 @@ void FlashCardLayer::createNodeSlideShow()
 		m_pSlideShow->addChild(pLastCardRight);
 	}
 
-	/*
-	m_currentLevelInfo = m_levels[m_iIndexFlashCard-1];
-	m_pLabelWord = LabelTTF::create(m_currentLevelInfo.sWordKey.c_str(), "Arial", 32.0f);
+	m_currentWordInfo = m_Words[m_iIndexFlashCard-1];
+	m_pLabelWord = LabelTTF::create(m_currentWordInfo.sWordId.c_str(), "Arial", 32.0f);
 	m_pLabelWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
 	m_pLabelWord->setPosition(Point(320.0f, 650.0f));
 	m_pLabelWord->setVisible(false);
 	m_pSlideShow->addChild(m_pLabelWord);
 
-	if(m_currentLevelInfo.sWordKey != "")
+	if(m_currentWordInfo.sWordId != "")
 	{
-		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(m_currentLevelInfo.sWordKey); //GetWordIndexFromContent(m_currentLevelInfo.sWordKey);
-		m_currentWordInfo = GameWordManager::getInstance()->GetWord(iIndex);
+		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(m_currentWordInfo.sWordId); //GetWordIndexFromContent(m_currentLevelInfo.sWordKey);
+		m_currentWord = GameWordManager::getInstance()->GetWord(iIndex);
 	}
-	*/
 }
 
 Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
@@ -347,10 +338,10 @@ Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
 	pBackgroundBorder->setPosition(Point(320.0f, 400.0f));
 	pNode->addChild(pBackgroundBorder);
 
-	LevelInfo levelInfo = m_levels[iIndexFlashCard-1];
-	if(levelInfo.bIsUnlock)
+	WordInfo wordInfo = m_Words[iIndexFlashCard-1];
+	if(wordInfo.iCountCollected > 1)
 	{	
-		/*int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(levelInfo.sWordKey);
+		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordInfo.sWordId);
 		Word wordInfo = GameWordManager::getInstance()->GetWord(iIndex);
 
 		Sprite* pBackgroundFlashCardBorder = Sprite::create("FlashCard/flashcardbackgroundborder.png");
@@ -383,7 +374,6 @@ Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
 		pLabelWordSentence->setAnchorPoint(Point(0.5, 1.0f));
 		pLabelWordSentence->setPosition(Point(320.0f, 235.0f));
 		pNode->addChild(pLabelWordSentence);
-		*/
 
 		Sprite* pIconSoundSenetenceSprite = Sprite::create("FlashCard/icon_sound.png");
 		pIconSoundSenetenceSprite->setPosition(Point(500.0f, 636.0f));

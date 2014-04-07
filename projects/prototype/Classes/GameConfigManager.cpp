@@ -802,3 +802,16 @@ WordlMapConfig::WordMapChapterConfig& GameConfigManager::GetWordMapChapterConfig
 	int iIndex = m_WordlMapConfig.m_WorlMapChapterConfigMap[sChapterID];
 	return m_WordlMapConfig.m_WorlMapChapterConfigs[iIndex];
 }
+
+int GameConfigManager::CountLevelOfPreviousChapters(const std::string& sChapterID)
+{
+	int iIndexCurrentChapter = m_WordlMapConfig.m_WorlMapChapterConfigMap[sChapterID];
+
+	int iCountLevel = 0;
+	for(int iIndex=0; iIndex<iIndexCurrentChapter; iIndex++)
+	{
+		iCountLevel += m_WordlMapConfig.m_WorlMapChapterConfigs[iIndex].m_iTotalevel;
+	}
+
+	return iCountLevel;
+}

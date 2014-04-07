@@ -5,7 +5,7 @@
 #include "GameDataStructure.h"
 #include "Database\ChapterTable.h"
 #include "SettingMenuNode.h"
-#include "Database\LevelTable.h"
+#include "Database\WordTable.h"
 #include "FooterNode.h"
 
 class FlashCardLayer : public cocos2d::LayerColor
@@ -39,10 +39,10 @@ private:
 	cocos2d::Sprite* m_pIconSoundWordSprite;
 	cocos2d::Sprite* m_pIconSoundSenetenceSprite;
 
-	std::vector<LevelInfo> m_levels;
+	std::vector<WordInfo> m_Words;
 	ChapterInfo m_chapterInfo;
-	Word m_currentWordInfo;
-	LevelInfo m_currentLevelInfo;
+	Word m_currentWord;
+	WordInfo m_currentWordInfo;
 
 
 	bool m_bIsSwipe;
