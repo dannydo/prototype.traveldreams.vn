@@ -82,7 +82,7 @@ bool FlashCardLayer::init()
 	*/
 
 	char sTotalLevel[10];
-	sprintf(sTotalLevel, "%d/%d", 1, 20);
+	sprintf(sTotalLevel, "%d/%d", 1, m_chapterInfo.iTotalFlash);
 	m_pLabelIndex = LabelTTF::create(sTotalLevel, "Arial", 22);
 	m_pLabelIndex->setColor(ccc3(0.0f, 0.0f, 0.0f));
 	m_pLabelIndex->setPosition(Point(320.0f, 870.0f));
@@ -92,8 +92,13 @@ bool FlashCardLayer::init()
 	m_pFooterNode->disableButtonIntroAndFlashCard();
 	this->addChild(m_pFooterNode);
 
+	if(m_chapterInfo.iCountFlashCardNew > 0)
+	{
+		WordTable::getInstance()->refreshWordsForChapter(m_chapterInfo.sChapterId);
+	}
+
 	m_Words = WordTable::getInstance()->getAllWordsForChapter(m_chapterInfo.sChapterId);
-	m_iTotalFlashCard = m_Words.size();
+	m_iTotalFlashCard = m_chapterInfo.iTotalFlashCardUnlock;
 	m_iIndexFlashCard = 1;
 
 	m_pSlideShow = Node::create();
@@ -239,35 +244,19 @@ void FlashCardLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent
 
 void FlashCardLayer::playVoiceWord()
 {
-	if (m_currentWordInfo.iCountCollected > 1) 
-	{
-		SoundManager::PlaySpellingOfWord(this, m_currentWord);
-	}
+	SoundManager::PlaySpellingOfWord(this, m_currentWord);
 }
 
 void FlashCardLayer::playVoiceSentence()
 {
-	// Van Dao
-	if (m_currentWordInfo.iCountCollected > 1) 
-	{
-		char sSoundFile[100];
-		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-			sprintf(sSoundFile, "EnglishSoundPC/Sentences/%s.wav", m_currentWord.m_sSentenceSoundFile.c_str());
-		#else
-			sprintf(sSoundFile, "EnglishSound/Sentences/%s.ogg", m_currentWord.m_sSentenceSoundFile.c_str());
-		#endif
-		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);
-	}
+	SoundManager::PlaySentenceOfWord(this, m_currentWord);
 }
 
 void FlashCardLayer::openDictionary(const char* sWord)
 {
-	if (m_currentWordInfo.iCountCollected > 1) 
-	{
-		DictionaryNode* pDictionary = DictionaryNode::createLayout(sWord);
-		pDictionary->setPosition(Point(320.0f, 680.0f));
-		this->getParent()->addChild(pDictionary, 20);
-	}
+	DictionaryNode* pDictionary = DictionaryNode::createLayout(sWord);
+	pDictionary->setPosition(Point(320.0f, 680.0f));
+	this->getParent()->addChild(pDictionary, 20);
 }
 
 void FlashCardLayer::createNodeSlideShow()
@@ -278,9 +267,9 @@ void FlashCardLayer::createNodeSlideShow()
 	Node* pLastCardRight = this->createLayoutFlashCard(m_iIndexFlashCard + 1);
 
 	m_pSlideShow->removeAllChildren();
-	char sTotalLevel[10];
-	sprintf(sTotalLevel, "%d/%d", m_iIndexFlashCard, 20);
-	m_pLabelIndex->setString(sTotalLevel);
+	char sTotaFlashCard[10];
+	sprintf(sTotaFlashCard, "%d/%d", m_iIndexFlashCard, m_chapterInfo.iTotalFlash);
+	m_pLabelIndex->setString(sTotaFlashCard);
 
 	Node* pNodeDisplay = this->createLayoutFlashCard(m_iIndexFlashCard);
 	pNodeDisplay->setAnchorPoint(Point(0.0f, 0.0f));
@@ -322,6 +311,17 @@ void FlashCardLayer::createNodeSlideShow()
 	{
 		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(m_currentWordInfo.sWordId); //GetWordIndexFromContent(m_currentLevelInfo.sWordKey);
 		m_currentWord = GameWordManager::getInstance()->GetWord(iIndex);
+
+		// Update data when user view flash card new
+		if (m_currentWordInfo.bIsNew == true)
+		{
+			m_currentWordInfo.bIsNew = false;
+			m_chapterInfo.iCountFlashCardNew--;
+
+			WordTable::getInstance()->updateWord(m_currentWordInfo);
+			ChapterTable::getInstance()->updateChapter(m_chapterInfo);
+			m_Words = WordTable::getInstance()->getAllWordsForChapter(m_chapterInfo.sChapterId);
+		}
 	}
 }
 
@@ -342,34 +342,35 @@ Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
 	if(wordInfo.iCountCollected > 1)
 	{	
 		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordInfo.sWordId);
-		Word wordInfo = GameWordManager::getInstance()->GetWord(iIndex);
+		Word word = GameWordManager::getInstance()->GetWord(iIndex);
 
 		Sprite* pBackgroundFlashCardBorder = Sprite::create("FlashCard/flashcardbackgroundborder.png");
 		pBackgroundFlashCardBorder->setPosition(Point(320.0f, 400.0f));
 		pNode->addChild(pBackgroundFlashCardBorder);
 
-		std::string sPath = "FlashCard/flashcardimage/";
-		sPath.append(wordInfo.m_sFlashCardImage);
+		std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(word);;
+		sPath.append("/FlashCard/");
+		sPath.append(word.m_sFlashCardImage);
 		Sprite* pImageFlashcard = Sprite::create(sPath.c_str());
 		pImageFlashcard->setPosition(Point(320.0f, 430.0f));
 		pNode->addChild(pImageFlashcard);
 
-		LabelTTF* pLabelWord = LabelTTF::create(wordInfo.m_sWord, "Arial", 32.0f);
+		LabelTTF* pLabelWord = LabelTTF::create(word.m_sWord, "Arial", 32.0f);
 		pLabelWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
 		pLabelWord->setPosition(Point(320.0f, 650.0f));
 		pNode->addChild(pLabelWord);
 
-		LabelTTF* pLabelWordPhonetic = LabelTTF::create(wordInfo.m_sPhonetic.c_str(), "Arial", 20.0f);
+		LabelTTF* pLabelWordPhonetic = LabelTTF::create(word.m_sPhonetic.c_str(), "Arial", 20.0f);
 		pLabelWordPhonetic->setColor(ccc3(0.0f, 0.0f, 0.0f));
 		pLabelWordPhonetic->setPosition(Point(320.0f, 620.0f));
 		pNode->addChild(pLabelWordPhonetic);
 
-		LabelTTF* pLabelWordMean = LabelTTF::create(wordInfo.m_sMeaning.c_str(), "Arial", 25.0f);
+		LabelTTF* pLabelWordMean = LabelTTF::create(word.m_sMeaning.c_str(), "Arial", 25.0f);
 		pLabelWordMean->setColor(ccc3(0.0f, 0.0f, 0.0f));
 		pLabelWordMean->setPosition(Point(320.0f, 310.0f));
 		pNode->addChild(pLabelWordMean);
 
-		LabelTTF* pLabelWordSentence = LabelTTF::create(wordInfo.m_sSentence.c_str(), "Arial", 25.0f, Size(300.0f, 135.0f), TextHAlignment::CENTER, TextVAlignment::TOP);
+		LabelTTF* pLabelWordSentence = LabelTTF::create(word.m_sSentence.c_str(), "Arial", 25.0f, Size(300.0f, 135.0f), TextHAlignment::CENTER, TextVAlignment::TOP);
 		pLabelWordSentence->setColor(ccc3(0.0f, 0.0f, 0.0f));
 		pLabelWordSentence->setAnchorPoint(Point(0.5, 1.0f));
 		pLabelWordSentence->setPosition(Point(320.0f, 235.0f));
@@ -385,10 +386,7 @@ Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
 	}
 	else
 	{
-		LabelTTF* pLabelWarning = LabelTTF::create("Flashcard do not unlock.", "Arial", 32.0f);
-		pLabelWarning->setColor(ccc3(255.0f, 0.0f, 0.0f));
-		pLabelWarning->setPosition(Point(320.0f, 400.0f));
-		pNode->addChild(pLabelWarning);
+		return NULL;
 	}
 
 	return pNode;

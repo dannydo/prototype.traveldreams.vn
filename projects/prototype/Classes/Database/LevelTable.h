@@ -25,7 +25,7 @@ public:
 	LevelTable();
 	static void releaseInstance();
 
-	std::vector<LevelInfo> getAllLevelsForChapter(std::string& sChapterId);
+	std::vector<LevelInfo>& getAllLevelsForChapter(std::string& sChapterId);
 	LevelInfo& getLevel(const std::string& sChapterId, const int& iLevel);
 	bool updateLevel(const LevelInfo& levelInfo);
 

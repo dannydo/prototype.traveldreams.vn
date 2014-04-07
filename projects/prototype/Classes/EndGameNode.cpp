@@ -7,6 +7,8 @@
 #include "Database\VersionTable.h"
 #include "GameConfigManager.h"
 #include "Database\InitDatabase.h"
+#include "Database\WordTable.h"
+#include "WorldMapScene.h"
 
 USING_NS_CC;
 
@@ -123,6 +125,8 @@ bool EndGameNode::initWin()
 	if (m_levelInfo.bIsUnlock == false)
 	{
 		m_chapterInfo.iTotalLevelUnlock++;
+		m_chapterInfo.iCountFlashCardNew++;
+		m_chapterInfo.iTotalFlashCardUnlock++;
 
 		userInfo.sCurrentChapterId = m_levelInfo.sChapterId;
 		userInfo.iCurrentLevel = m_levelInfo.iLevel + 1;
@@ -168,6 +172,22 @@ bool EndGameNode::initWin()
 
 	LevelTable::getInstance()->updateLevel(m_levelInfo);
 
+	// Update Word for chapter
+	const std::string sWordId = GameWordManager::getInstance()->GetWordIdFromWord(m_mainWord);
+	WordInfo wordInfo = WordTable::getInstance()->getWordInfoOnChapter(m_levelInfo.sChapterId, sWordId);
+	if (wordInfo.bIsNew == false && wordInfo.iCountCollected <= 1)
+	{
+		m_chapterInfo.iCountFlashCardNew++;
+		m_chapterInfo.iTotalFlashCardUnlock++;
+
+		wordInfo.bIsNew = true;
+		wordInfo.iCountCollected++;
+		wordInfo.iOrderUnlock = m_chapterInfo.iTotalFlashCardUnlock;
+
+		WordTable::getInstance()->updateWord(wordInfo);
+		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
+	}
+
 	return true;
 }
 
@@ -211,7 +231,8 @@ bool EndGameNode::init()
 	pLabelScore->setPosition(Point(295.0f, 430.0f));
 	this->addChild(pLabelScore);
 
-	std::string sPath = "FlashCard/flashcardimage/";
+	std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(m_mainWord);;
+	sPath.append("/FlashCard/");
 	sPath.append(m_mainWord.m_sFlashCardImage);
 	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
 	pFlashCardImage->setPosition(Point(320.0f, 665.0f));
@@ -227,7 +248,8 @@ bool EndGameNode::init()
 	pLevelImage->setPosition(Point(0.0f, 0.0f));
 
 	char sLevel[10];
-	sprintf(sLevel, "%d", m_iCurrentLevel);
+	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
+	sprintf(sLevel, "%d", m_iCurrentLevel + iCalLevel);
 	LabelBMFont *pLabelLevel = LabelBMFont::create(sLevel, "fonts/Level-bitmap-font-game.fnt");
 	pLabelLevel->setAnchorPoint(Point(0.5f, 0.5f));
 	pLabelLevel->setPosition(Point(pLevelImage->getContentSize().width/2 + pLabelLevel->getContentSize().width/2.0f, 5.0f));
@@ -356,12 +378,14 @@ void EndGameNode::menuNextLevelCallBack(Object* sender)
 		std::string sNextChapterID;
 		if ( GameConfigManager::getInstance()->GetNextChapterID( m_sChapterId, sNextChapterID))
 		{
-			ChapterConfig& nextChapter = GameConfigManager::getInstance()->GetChapterConfig(sNextChapterID);						
+			ChapterConfig& nextChapter = GameConfigManager::getInstance()->GetChapterConfig(sNextChapterID);	
 			m_sChapterId = sNextChapterID;
-			m_iCurrentLevel = 1;		
+			m_iCurrentLevel = 1;
 		}
 		else // all level/chapter is finished
 		{
+			WorldMapScene* pWorldMap = WorldMapScene::create();
+			CCDirector::getInstance()->replaceScene(pWorldMap);
 			return;
 		}
 	}
@@ -401,7 +425,7 @@ void EndGameNode::menuRetryLevelWinCallBack(Object* sender)
 	
 
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
-	pGameWordManager->GenerateWordForNewLevel( m_sChapterId, m_iCurrentLevel);		
+	pGameWordManager->GenerateWordForNewLevel( m_sChapterId, m_iCurrentLevel);
 
 	CCScene *pGameScene = HelloWorld::createScene();
 	CCDirector::getInstance()->replaceScene(pGameScene);

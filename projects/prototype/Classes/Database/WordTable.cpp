@@ -45,8 +45,8 @@ void WordTable::fetchWordsForChapter(const std::string& sChapterId)
 	char **re;
 	int nRow, nColumn;
 
-	String sql = "select Words .* from Words inner join MapChapterWords on MapChapterWords.WordId  = Words.WordId where MapChapterWords.ChapterId=";
-	sql.appendWithFormat("'%s'", sChapterId.c_str());
+	String sql = "select * from Words inner join MapChapterWords on MapChapterWords.WordId  = Words.WordId where MapChapterWords.ChapterId=";
+	sql.appendWithFormat("'%s' order by OrderUnlock desc", sChapterId.c_str());
 
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
 
@@ -56,6 +56,10 @@ void WordTable::fetchWordsForChapter(const std::string& sChapterId)
 		wordInfo.sWordId = re[iRow*nColumn+0];
 		wordInfo.iCountCollected = int(strtod(re[iRow*nColumn+1], NULL));
 		wordInfo.iVersion = int(strtod(re[iRow*nColumn+2], NULL));
+		wordInfo.iMapChapterWordId = int(strtod(re[iRow*nColumn+3], NULL));
+		wordInfo.sChapterId = re[iRow*nColumn+4];
+		wordInfo.iOrderUnlock = int(strtod(re[iRow*nColumn+7], NULL));
+		wordInfo.bIsNew = bool(strtod(re[iRow*nColumn+8], NULL));
 
 		m_ChapterWords.push_back(wordInfo);
 	}
@@ -92,16 +96,37 @@ WordInfo WordTable::getWordInfoOnChapter(const std::string& sChapterId, const st
 	return WordInfo::WordInfo();
 }
 
-bool WordTable::updateWord(WordInfo wordInfo)
+void WordTable::refreshWordsForChapter(const std::string& sChapterId)
 {
-	String sql = "update Levels Set";
+	this->fetchWordsForChapter(sChapterId);
+}
+
+
+bool WordTable::updateWord(const WordInfo& wordInfo)
+{
+	String sql = "update Words Set";
 	sql.appendWithFormat(" CountCollected=%d,", wordInfo.iCountCollected);
 	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
-	sql.appendWithFormat(" where WordId='%s'", wordInfo.sWordId);
+	sql.appendWithFormat(" where WordId='%s';", wordInfo.sWordId.c_str());
+
+	sql.append("update MapChapterWords Set");
+	sql.appendWithFormat(" IsNew=%d,", wordInfo.bIsNew);
+	sql.appendWithFormat(" OrderUnlock=%d,", wordInfo.iOrderUnlock);
+	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
+	sql.appendWithFormat(" where MapChapterWordId=%d;", wordInfo.iMapChapterWordId);
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
 		return false;
+
+	for(int iIndex=0; iIndex<m_ChapterWords.size(); iIndex++)
+	{
+		if (m_ChapterWords[iIndex].sWordId == wordInfo.sWordId && m_ChapterWords[iIndex].sChapterId == wordInfo.sChapterId)
+		{
+			m_ChapterWords[iIndex] = wordInfo;
+			break;
+		}
+	}
 
 	return true;
 }

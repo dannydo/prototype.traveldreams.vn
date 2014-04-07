@@ -301,16 +301,16 @@ void SoundManager::PlaySoundEffectUtil(Node* pNode, void* data)
 
 float SoundManager::PlaySpellingOfWord(Node* pPlayingNode, const Word& word)
 {
-	char sSoundFile[64];
+	char sSoundFile[150];
 	
 
 	// check play voice on setting
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) == 1)
 	{
 		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-		sprintf(sSoundFile, "%s/EnglishSoundPC/Words/%s.wav", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundEnglishFile.c_str());
+		sprintf(sSoundFile, "%s/EN_SoundPC/Words/%s.wav", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundEnglishFile.c_str());
 		#else
-			sprintf(sSoundFile, "%s/EnglishSound/Words/%s.ogg", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundEnglishFile.c_str());
+			sprintf(sSoundFile, "%s/EN_Sound/Words/%s.ogg", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundEnglishFile.c_str());
 		#endif
 
 		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);	
@@ -318,9 +318,9 @@ float SoundManager::PlaySpellingOfWord(Node* pPlayingNode, const Word& word)
 
 		// play vietnamese sound file
 		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-			sprintf(sSoundFile, "%s/EnglishSoundPC/Words/%s.wav", GameWordManager::getInstance()->GetPackagePathFromWord(word), word.m_sSoundVietnameseFile.c_str());
+			sprintf(sSoundFile, "%s/EN_SoundPC/Words/%s.wav", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundVietnameseFile.c_str());
 		#else
-			sprintf(sSoundFile, "%s/EnglishSound/Words/%s.ogg", GameWordManager::getInstance()->GetPackagePathFromWord(word), word.m_sSoundVietnameseFile.c_str());
+			sprintf(sSoundFile, "%s/EN_Sound/Words/%s.ogg", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundVietnameseFile.c_str());
 		#endif
 
 		std::string sSoundVietnameseFile = sSoundFile;
@@ -339,9 +339,37 @@ float SoundManager::PlaySpellingOfWord(Node* pPlayingNode, const Word& word)
 	return 0;
 }
 
+float SoundManager::PlaySentenceOfWord(Node* pPlayingNode, const Word& word)
+{
+	char sSoundFile[150];
+	
+
+	// check play voice on setting
+	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnVoice", 1) == 1)
+	{
+		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+		sprintf(sSoundFile, "%s/EN_SoundPC/Sentences/%s.wav", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSentenceSoundFile.c_str());
+		#else
+			sprintf(sSoundFile, "%s/EN_Sound/Sentences/%s.ogg", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSentenceSoundFile.c_str());
+		#endif
+
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);	
+
+		pPlayingNode->runAction(
+			Sequence::create( 
+				DelayTime::create(word.m_fSentenceSoundLength),
+				NULL));
+
+		return word.m_fSentenceSoundLength;
+	}
+
+	return 0;
+}
+
 
 void SoundManager::PlayVietnameseSpelling(std::string sSoundVietnameseFile)
 {
 	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(
 		sSoundVietnameseFile.c_str());
 }
+

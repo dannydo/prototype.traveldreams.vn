@@ -1,0 +1,331 @@
+30
+BLACKBOARD
+bảng đen
+Blackboard_En_Male
+1.32
+Blackboard_Vi
+1.18
+Blackboard.jpg
+/'blækbɔ:k/
+We are laughing because the teacher wrote the wrong answer on the blackboard.
+Blackboard_FS_En_Male
+4.32
+CHALK
+phấn
+Chalk_En_Male
+1.21
+Chalk_Vi
+1.02
+Chalk.jpg
+/tʃɔ:k/
+Chalk is all over teacher's face.
+Chalk_FS_En_Male
+2.76
+TIMETABLE
+thời khóa biểu
+Timetable_En_Male
+1.48
+Timetable_Vi
+1.25
+Timetable.jpg
+/'taɪmteɪbl/
+He tattooed his timetable on his arm to remember it.
+Timetable_FS_En_Male
+4.13
+BOOKCASE
+tủ sách
+Bookcase_En_Male
+1.37
+Bookcase_Vi
+0.93
+Bookcase.jpg
+/ˈbʊkkeɪs/
+The heavy bookcase fell off on the fat librarian.
+Bookcase_FS_En_Male
+3.55
+UNIFORM
+đồng phục
+Uniform_En_Male
+1.41
+Uniform_Vi
+0.88
+Uniform.jpg
+/ˈjuːnɪfɔːm/
+My uniform makes me look like a prisoner.
+Uniform_FS_En_Male
+2.32
+PEN
+cây viết
+Pen_En_Male
+0.97
+Pen_Vi
+0.9
+Pen.jpg
+/pen/
+He dropped his pen in the toilets.
+Pen_FS_En_Male
+2.18
+CRAYON
+bút chì màu
+Crayon_En_Male
+1.18
+Crayon_Vi
+1.44
+Crayon.jpg
+/ˈkreɪən/
+My mum used my crayon for make-up.
+Crayon_FS_En_Male
+2.92
+SCISSORS
+cây kéo
+Scissors_En_Male
+1.16
+Scissors_Vi
+1.02
+Scissors.jpg
+/ˈsɪzəz/
+Never carry scissors in your pocket, it will tickle you.
+Scissors_FS_En_Male
+3.48
+TEACHER
+giáo viên
+Teacher_En_Male
+1
+Teacher_Vi
+1.28
+Teacher.jpg
+/ˈtiːtʃə(r)/
+The teacher did not know the answer.
+Teacher_FS_En_Male
+2.32
+CLASSMATE
+bạn cùng lớp
+Classmate_En_Male
+1.32
+Classmate_Vi
+1.18
+Classmate.jpg
+/ˈklɑːsmeɪt/
+My classmate only copied my wrong answers and got a zero.
+Classmate_FS_En_Male
+3.71
+STUDY
+học
+Study_En_Male
+0.74
+Study_Vi
+0.65
+Study.jpg
+/ˈstʌdi/
+They only study hard to impress their beautiful teacher.
+Study_FS_En_Male
+2.97
+CLASSROOM
+lớp học
+Classroom_En_Male
+1.34
+Classroom_Vi
+1.07
+Classroom.jpg
+/ˈklɑːsruːm/
+During the exam, somebody farted but we could not leave the classroom.
+Classroom_FS_En_Male
+4.78
+PENCIL SHARPENER
+đồ chuốt viết chì
+PencilSharpener_En_Male
+1.48
+PencilSharpener_Vi
+1.84
+PencilSharpener.jpg
+/ˈpensl ˈʃɑːpnə(r)/
+My little finger got stuck in the pencil sharpener.
+PencilSharpener_FS_En_Male
+3.46
+PAPER
+giấy
+Paper_En_Male
+0.97
+Paper_Vi
+0.79
+Paper.jpg
+/ˈpeɪpə(r)/
+Ready, “1,2 ,3 “Rock. Scissors. Paper!” You have lost. I won”.
+Paper_FS_En_Male
+7.09
+CHAIR
+cái ghế
+Chair_En_Male
+0.95
+Chair_Vi
+1.09
+Chair.jpg
+/tʃeə(r)/
+There is a ghost sitting on my chair.
+Chair_FS_En_Male
+2.27
+TABLE
+cái bàn
+Table_En_Male
+0.97
+Table_Vi
+1.09
+Table.jpg
+/ˈteɪbl/
+They were kissing under the table.
+Table_FS_En_Male
+2.18
+COMPUTER
+máy tính
+Computer_En_Male
+1.14
+Computer_Vi
+1.07
+Computer.jpg
+/kəmˈpjuːtə(r)/
+My computer never sleeps.
+Computer_FS_En_Male
+2.34
+RULER
+cây thước
+Ruler_En_Male
+1.18
+Ruler_Vi
+0.93
+Ruler.jpg
+/ˈruːlə(r)/
+Stop poking me with your ruler.
+Ruler_FS_En_Male
+1.93
+GLOBE
+quả địa cầu
+Globe_En_Male
+1.04
+Globe_Vi
+1.39
+Globe.jpg
+/ɡləʊb/
+Stop spinning the globe! I feel dizzy.
+Globe_FS_En_Male
+2.55
+ERASER
+cục tẩy
+Eraser_En_Male
+1.25
+Eraser_Vi
+1.04
+Eraser.jpg
+/ɪˈreɪzə(r)/
+This eraser tastes like chewing-gum.
+Eraser_FS_En_Male
+2.48
+LIVING ROOM
+phòng khách
+LivingRoom_En_Male
+1.28
+LivingRoom_Vi
+0.9
+LivingRoom.jpg
+/ˈlɪvɪŋ ruːm/
+Hooray! I found 20 dollars under the sofa in the living room.
+LivingRoom_FS_En_Male
+3.71
+KITCHEN
+nhà bếp
+Kitchen_En_Male
+1.18
+Kitchen_Vi
+0.95
+Kitchen.jpg
+/ˈkɪtʃɪn/
+The kitchen is on fire.
+Kitchen_FS_En_Male
+1.95
+CURTAIN
+cái màn
+Curtain_En_Male
+1.14
+Curtain_Vi
+1.02
+Curtain.jpg
+/ˈkɜːtn/
+She forgot to close the curtain when she was getting dressed.
+Curtain_FS_En_Male
+4.06
+WARDROBE
+tủ quần áo
+Wardrobe_En_Male
+1.23
+Wardrobe_Vi
+1.23
+Wardrobe.jpg
+/ˈwɔːdrəʊb/
+My husband found the neighbor hidden in our wardrobe.
+Wardrobe_FS_En_Male
+3.25
+MICROWAVE
+lò vi sóng
+Microwave_En_Male
+1.3
+Microwave_Vi
+1.25
+Microwave.jpg
+/ˈmaɪkrəweɪv/
+He has forgotten the cat in the microwave.
+Microwave_FS_En_Male
+2.65
+FRYING PAN
+cái chảo
+FryingPan_En_Male
+1.41
+FryingPan_Vi
+1.04
+FryingPan.jpg
+/fraɪɪŋ pæn/
+My mother hitted the thief with a frying pan.
+FryingPan_FS_En_Male
+2.97
+CHOPSTICKS
+đôi đũa
+Chopsticks_En_Male
+1.3
+Chopsticks_Vi
+1.04
+Chopsticks.jpg
+/ˈtʃɒpstɪks/
+The tourist tried to eat his soup with chopsticks.
+Chopsticks_FS_En_Male
+3.32
+HAIRDRYER
+máy sấy
+Hairdryer_En_Male
+1.11
+Hairdryer_Vi
+0.97
+Hairdryer.jpg
+/ˈheədraɪə(r)/
+Jack is trying to heat his coffee with a hair dryer.
+Hairdryer_FS_En_Male
+2.95
+TOILET PAPER
+giấy vệ sinh
+ToiletPaper_En_Male
+1.32
+ToiletPaper_Vi
+1.32
+ToiletPaper.jpg
+/ˈtɔɪlət ˈpeɪpə(r)/
+Oh no, there is no more toilet paper! What can I use now?
+ToiletPaper_FS_En_Male
+4.06
+BLOCK OF FLATS
+chung cư
+BlockOfFlats_En_Male
+1.62
+BlockOfFlats_Vi
+1.07
+BlockOfFlats.jpg
+/blɒk əv flæts/
+There was a power cut in my block of flats and the delivery man had to walk 30 floors.
+BlockOfFlats_FS_En_Male
+5.48

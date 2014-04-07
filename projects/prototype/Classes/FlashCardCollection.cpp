@@ -61,7 +61,7 @@ bool FlashCardCollectionLayer::init()
 	for (int iIndex=0; iIndex<m_chapters.size(); iIndex++)
 	{
 		ChapterInfo chapterInfo = m_chapters[iIndex];
-		if(chapterInfo.bIsUnlock)
+		if(chapterInfo.bIsUnlock && chapterInfo.iTotalFlashCardUnlock > 0)
 		{
 			Node* pNodeChapter = Node::create();
 			int iIndex = worlMapConfig.m_WorlMapChapterConfigMap[chapterInfo.sChapterId];
@@ -71,13 +71,21 @@ bool FlashCardCollectionLayer::init()
 			Sprite* pChapterImageSprite = Sprite::create(sPath.c_str());
 			pNodeChapter->addChild(pChapterImageSprite);
 
-			// van dao
-			char sTotalLevel[5];
-			sprintf(sTotalLevel, "%d/%d", chapterInfo.iTotalLevelUnlock, 20);
-			LabelTTF* pLabelTotalLevel = LabelTTF::create(sTotalLevel, "Arial", 22);
-			pLabelTotalLevel->setColor(ccc3(0.0f, 0.0f, 0.0f));
-			pLabelTotalLevel->setPositionY(-pChapterImageSprite->getContentSize().height/2.0f-12);
-			pNodeChapter->addChild(pLabelTotalLevel);
+			char sTotalFlashCard[10];
+			sprintf(sTotalFlashCard, "%d/%d", chapterInfo.iTotalFlashCardUnlock, chapterInfo.iTotalFlash);
+			LabelTTF* pLabelTotalFlashCard = LabelTTF::create(sTotalFlashCard, "Arial", 22);
+			pLabelTotalFlashCard->setColor(ccc3(0.0f, 0.0f, 0.0f));
+			pLabelTotalFlashCard->setPositionY(-pChapterImageSprite->getContentSize().height/2.0f-12);
+			pNodeChapter->addChild(pLabelTotalFlashCard);
+
+			// Show icon new
+			if(chapterInfo.iCountFlashCardNew > 0)
+			{
+				LabelTTF* pLabelNew = LabelTTF::create("New", "Arial", 22);
+				pLabelNew->setColor(ccc3(255.0f, 0.0f, 0.0f));
+				pLabelNew->setPositionY(pChapterImageSprite->getContentSize().height/2.0f-30);
+				pNodeChapter->addChild(pLabelNew);
+			}
 		
 			pNodeChapter->setAnchorPoint(Point(0.0f, 0.0f));
 			switch(iIndex%4)

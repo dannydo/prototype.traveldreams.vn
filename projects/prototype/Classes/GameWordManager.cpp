@@ -116,13 +116,21 @@ void GameWordManager::PreLoadPackageForWord(std::string sWordID)
 
 const std::string& GameWordManager::GetPackagePathFromWordID(const std::string& sWordID)
 {
-	int iWordIndex = GetLoadedWordIndexFromID(sWordID);			
+	int iWordIndex = GetLoadedWordIndexFromID(sWordID);
 	return m_WorldPackageList[m_WordList[iWordIndex].m_iPackageIndex ].m_sPackagePath;
 }
 
 const std::string& GameWordManager::GetPackagePathFromWord(const Word& word)
 {
-	return m_WorldPackageList[word.m_iPackageIndex ].m_sPackagePath;
+	return m_WorldPackageList[word.m_iPackageIndex].m_sPackagePath;
+}
+
+const std::string GameWordManager::GetWordIdFromWord(const Word& word)
+{
+	std::string sWordId = m_WorldPackageList[word.m_iPackageIndex].m_sPackgageID;
+	sWordId.append("-");
+	sWordId.append(word.m_sWord);
+	return sWordId;
 }
 
 void GameWordManager::LoadWords(const int& iPackageIndex)

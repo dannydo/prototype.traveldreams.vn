@@ -25,7 +25,7 @@ public:
 	bool init();
 	static void releaseInstance();
 
-	inline VersionInfo getVersionInfo() { return m_VersionInfo; };
+	inline VersionInfo& getVersionInfo() { return m_VersionInfo; };
 	bool updateVersion(const VersionInfo& versionInfo);
 
 private:

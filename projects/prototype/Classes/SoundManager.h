@@ -76,6 +76,8 @@ public:
 	static void PlaySoundEffect(const SoundEffectType& eSoundEffectType, float fDelayTime = 0.f);	
 
 	static float PlaySpellingOfWord(Node* pPlayingNode, const Word& word);
+	static float PlaySentenceOfWord(Node* pPlayingNode, const Word& word);
+
 private:
 	void PlayVietnameseSpelling(std::string sSoundVietnameseFile);	
 
