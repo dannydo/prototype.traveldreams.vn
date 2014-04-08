@@ -12,6 +12,7 @@
 #include "Database\UserTable.h"	 
 #include "Config.h"
 #include "GameConfigManager.h"
+#include "Database\WordTable.h"
 
 using namespace cocos2d;
 
@@ -112,6 +113,16 @@ bool LevelMapLayer::init()
 			else
 			{
 				pButtonLevelSprite = Sprite::create("World-Map/pass-level.png");
+
+				WordInfo wordInfo = WordTable::getInstance()->getWordInfoOnChapter(levelInfo.sChapterId, levelInfo.sWordId);
+				if(wordInfo.iCountCollected <= 1)
+				{
+					LabelTTF* pLabelNew = LabelTTF::create("New", "Arial", 22);
+					pLabelNew->setColor(ccc3(255.0f, 0.0f, 0.0f));
+					pLabelNew->setAnchorPoint(Point(0.5f, 0.5f));
+					pLabelNew->setPosition(Point(point.x-2, point.y-8));
+					m_pBackgroundNode->addChild(pLabelNew);
+				}
 			}
 
 			pButtonLevelSprite->setTag(levelInfo.iLevel);
