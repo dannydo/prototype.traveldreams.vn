@@ -125,8 +125,6 @@ bool EndGameNode::initWin()
 	if (m_levelInfo.bIsUnlock == false)
 	{
 		m_chapterInfo.iTotalLevelUnlock++;
-		m_chapterInfo.iCountFlashCardNew++;
-		m_chapterInfo.iTotalFlashCardUnlock++;
 
 		userInfo.sCurrentChapterId = m_levelInfo.sChapterId;
 		userInfo.iCurrentLevel = m_levelInfo.iLevel + 1;
@@ -146,8 +144,8 @@ bool EndGameNode::initWin()
 			if ( GameConfigManager::getInstance()->GetNextChapterID(worldMapChapterConfig.m_sChapterId, sNextChapterID))
 			{
 				GameConfigManager::getInstance()->GenerateWordsForLevels( sNextChapterID, wordList, mapLevels);
-						
 				InitDatabase::getInstance()->createDataChapterAndLevel( sNextChapterID, wordList, mapLevels);
+				ChapterTable::getInstance()->refreshChapters();
 
 				userInfo.sCurrentChapterId = sNextChapterID;
 				userInfo.iCurrentLevel = 1;
@@ -155,10 +153,10 @@ bool EndGameNode::initWin()
 			}
 			else // the last chapter is finished so game is end now!!!!
 			{
-				return true;
+				
 			}
 		}
-		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
+		
 		UserTable::getInstance()->updateUser(userInfo);
 
 		m_levelInfo.bIsUnlock = true;
@@ -175,18 +173,19 @@ bool EndGameNode::initWin()
 	// Update Word for chapter
 	const std::string sWordId = GameWordManager::getInstance()->GetWordIdFromWord(m_mainWord);
 	WordInfo wordInfo = WordTable::getInstance()->getWordInfoOnChapter(m_levelInfo.sChapterId, sWordId);
+
 	if (wordInfo.bIsNew == false && wordInfo.iCountCollected <= 1)
 	{
 		m_chapterInfo.iCountFlashCardNew++;
 		m_chapterInfo.iTotalFlashCardUnlock++;
 
 		wordInfo.bIsNew = true;
-		wordInfo.iCountCollected++;
 		wordInfo.iOrderUnlock = m_chapterInfo.iTotalFlashCardUnlock;
-
-		WordTable::getInstance()->updateWord(wordInfo);
-		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 	}
+
+	wordInfo.iCountCollected++;
+	WordTable::getInstance()->updateWord(wordInfo);
+	ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 
 	return true;
 }
@@ -381,9 +380,14 @@ void EndGameNode::menuNextLevelCallBack(Object* sender)
 			ChapterConfig& nextChapter = GameConfigManager::getInstance()->GetChapterConfig(sNextChapterID);	
 			m_sChapterId = sNextChapterID;
 			m_iCurrentLevel = 1;
+
+			WorldMapScene* pWorldMap = WorldMapScene::create();
+			CCDirector::getInstance()->replaceScene(pWorldMap);
+			return;
 		}
 		else // all level/chapter is finished
 		{
+			Breadcrumb::getInstance()->getSceneModePopBack();
 			WorldMapScene* pWorldMap = WorldMapScene::create();
 			CCDirector::getInstance()->replaceScene(pWorldMap);
 			return;

@@ -145,10 +145,17 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 					sqlRun.appendWithFormat("%d);", iVersion);
 				}
 
-				sqlRun.append("insert into Words (WordId,CountCollected,Version) values(");
-				sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
-				sqlRun.appendWithFormat("%d,", countCollected);
-				sqlRun.appendWithFormat("%d);", iVersion);
+				// Check WordId is exists on database
+				String sql = "select * from Words where WordId=";
+				sql.appendWithFormat("'%s'", wordList[iIndex].c_str());
+				sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+				if(nRow < 1)
+				{
+					sqlRun.append("insert into Words (WordId,CountCollected,Version) values(");
+					sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
+					sqlRun.appendWithFormat("%d,", countCollected);
+					sqlRun.appendWithFormat("%d);", iVersion);
+				}
 			}
 
 			int iResult = sqlite3_exec(m_DatabaseSqlite, sqlRun.getCString(), NULL, NULL, NULL);

@@ -12,6 +12,7 @@
 #include "Database\UserTable.h"	 
 #include "Config.h"
 #include "GameConfigManager.h"
+#include "Database\WordTable.h"
 
 using namespace cocos2d;
 
@@ -87,23 +88,24 @@ bool LevelMapLayer::init()
 	Point pointScroll;
 	std::vector<LevelInfo> levels = LevelTable::getInstance()->getAllLevelsForChapter(m_sChapterId);
 	
+	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
 	for(int iIndex=0; iIndex<chapterConfig.m_iTotalevel; iIndex++)
 	{
 		LevelInfo levelInfo = levels[iIndex];
 		Point point = chapterConfig.m_PositionLevel[iIndex];
 
-		char sLevel[5];
-		sprintf(sLevel, "%d", levelInfo.iLevel);
+		char sLevel[10];
+		sprintf(sLevel, "%d", levelInfo.iLevel + iCalLevel);
 		LabelTTF* pLevelLabel = LabelTTF::create(sLevel, "fonts/UTM Cookies.ttf", 32);
 		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
 		pLevelLabel->setPosition(Point(point.x-2, point.y+17));
 		
-		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel || 1)
+		if(levelInfo.bIsUnlock || (levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId))
 		{
 			Sprite* pButtonLevelSprite;
 			
 			
-			if(levelInfo.iLevel == userInfo.iCurrentLevel)
+			if(levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId)
 			{
 				pointScroll = point;
 				pButtonLevelSprite = Sprite::create("World-Map/new-level.png");
@@ -111,6 +113,16 @@ bool LevelMapLayer::init()
 			else
 			{
 				pButtonLevelSprite = Sprite::create("World-Map/pass-level.png");
+
+				WordInfo wordInfo = WordTable::getInstance()->getWordInfoOnChapter(levelInfo.sChapterId, levelInfo.sWordId);
+				if(wordInfo.iCountCollected <= 1)
+				{
+					LabelTTF* pLabelNew = LabelTTF::create("New", "Arial", 22);
+					pLabelNew->setColor(ccc3(255.0f, 0.0f, 0.0f));
+					pLabelNew->setAnchorPoint(Point(0.5f, 0.5f));
+					pLabelNew->setPosition(Point(point.x-2, point.y-8));
+					m_pBackgroundNode->addChild(pLabelNew);
+				}
 			}
 
 			pButtonLevelSprite->setTag(levelInfo.iLevel);
@@ -119,7 +131,7 @@ bool LevelMapLayer::init()
 			buttonPlayNode->setTag(levelInfo.iLevel);
 			pButtonManagerNode->addButtonNode(buttonPlayNode);
 
-			if (levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel)
+			if (levelInfo.bIsUnlock || (levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId))
 			{
 				Node* pStarAndBonusQuestNode = this->generateLayoutStarAndBonusQuest(levelInfo.iStar, levelInfo.iBonusQuest, levelInfo.iTotalBonusQuest);
 				pStarAndBonusQuestNode->setPosition(Point(point.x-2, point.y));

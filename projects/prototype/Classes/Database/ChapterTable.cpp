@@ -36,6 +36,11 @@ bool ChapterTable::init()
 	return true;
 }
 
+void ChapterTable::refreshChapters()
+{
+	this->fetchAllChapter();
+}
+
 ChapterInfo ChapterTable::getChapterInfo(const std::string sChapterId)
 {
 	for(int iIndex=0; iIndex<m_Chapters.size(); iIndex++)
@@ -51,6 +56,11 @@ ChapterInfo ChapterTable::getChapterInfo(const std::string sChapterId)
 
 void ChapterTable::fetchAllChapter()
 {
+	while(!m_Chapters.empty())
+	{
+		m_Chapters.pop_back();
+	}
+
 	char **re;
 	int nRow, nColumn;
 		

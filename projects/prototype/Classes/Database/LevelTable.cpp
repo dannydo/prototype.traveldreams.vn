@@ -109,5 +109,14 @@ bool LevelTable::updateLevel(const LevelInfo& levelInfo)
 	if(iResult != SQLITE_OK)
 		return false;
 
+	for(int iIndex=0; iIndex<m_ChapterLevels.size(); iIndex++)
+	{
+		if (m_ChapterLevels[iIndex].iLevel == levelInfo.iLevel && m_ChapterLevels[iIndex].sChapterId == levelInfo.sChapterId)
+		{
+			m_ChapterLevels[iIndex] = levelInfo;
+			break;
+		}
+	}
+
 	return true;
 }
