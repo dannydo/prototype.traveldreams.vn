@@ -851,8 +851,8 @@ void HelloWorld::onTouchEnded(Touch* pTouch, Event* pEvent)
 
 	bool bIsBlocked = false;
 
-	if ((m_eTouchMoveState == _TMS_MOVE_HORIZONTAL_ && m_GameBoardManager.IsRowLocked(m_SelectedCell.m_iRow)) || 
-		(m_eTouchMoveState == _TMS_MOVE_VERTICAL_ &&  m_GameBoardManager.IsColumnLocked(m_SelectedCell.m_iColumn)))
+	if ((m_eTouchMoveState == _TMS_MOVE_HORIZONTAL_ && m_GameBoardManager.IsRowLocked(m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn)) || 
+		(m_eTouchMoveState == _TMS_MOVE_VERTICAL_ &&  m_GameBoardManager.IsColumnLocked(m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn)))
 	{
 		bIsBlocked = true;		
 	}			
@@ -972,7 +972,7 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 			int iMinRow = m_SelectedCell.m_iRow, iMaxRow = m_SelectedCell.m_iRow;
 			while (iMinRow >0 && m_BoardViewMatrix[iMinRow][ m_SelectedCell.m_iColumn ].m_bIsDragLocalWall == false)
 				iMinRow--;
-			while (iMaxRow < iColumnNumber-1 && m_BoardViewMatrix[iMaxRow][ m_SelectedCell.m_iColumn ].m_bIsDragLocalWall == false)
+			while (iMaxRow < iRowNumber-1 && m_BoardViewMatrix[iMaxRow][ m_SelectedCell.m_iColumn ].m_bIsDragLocalWall == false)
 				iMaxRow++;
 
 
@@ -1010,8 +1010,8 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 		}*/
 	}
 
-	if ((m_eTouchMoveState == _TMS_MOVE_HORIZONTAL_ && m_GameBoardManager.IsRowLocked(m_SelectedCell.m_iRow)) || 
-		(m_eTouchMoveState == _TMS_MOVE_VERTICAL_ &&  m_GameBoardManager.IsColumnLocked(m_SelectedCell.m_iColumn)))
+	if ((m_eTouchMoveState == _TMS_MOVE_HORIZONTAL_ && m_GameBoardManager.IsRowLocked(m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn)) || 
+		(m_eTouchMoveState == _TMS_MOVE_VERTICAL_ &&  m_GameBoardManager.IsColumnLocked(m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn)))
 	{
 		onTouchEnded( pTouch, NULL);
 		return;

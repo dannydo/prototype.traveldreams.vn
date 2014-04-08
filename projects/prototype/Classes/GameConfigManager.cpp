@@ -111,17 +111,8 @@ void GameConfigManager::LoadConfigOfLevel(const std::string& sChapterID, const i
 	//levelConfig.m_iMainWordID = GameWordManager::getInstance()->GetWordIndexFromContent(sTemp);		
 	levelConfig.m_sMainWordID = sTemp;*/
 	inputStream >> levelConfig.m_iNumberLetterOfMainWord;
-	
-	memset( levelConfig.m_MainWordUnlockedFlagList, 0, sizeof(levelConfig.m_MainWordUnlockedFlagList));
-	int iAlreadyUnlockedLetterCount, iTemp;
-	inputStream >> iAlreadyUnlockedLetterCount;
-	for(int i=0; i< iAlreadyUnlockedLetterCount; i++)
-	{
-		inputStream >> iTemp; 
-		levelConfig.m_MainWordUnlockedFlagList[iTemp-1] = true;
-	}
-
-	//int iTemp;
+		
+	int iTemp;
 	inputStream >> iTemp;
 	levelConfig.m_bIsMainWordExistedOnBoard = (iTemp > 0);
 	if (levelConfig.m_bIsMainWordExistedOnBoard)
@@ -151,13 +142,13 @@ void GameConfigManager::LoadConfigOfLevel(const std::string& sChapterID, const i
 	}*/
 	//std::getline(inputStream, sTemp);
 
-	// display of main word
-	std::getline(inputStream, sTemp);
+	// display of main word ==> moved to config of word
+	/*std::getline(inputStream, sTemp);
 	inputStream >> iTemp;
 	levelConfig.m_bBreakLineWhenDisplayMainWord = (iTemp != 0);
 	if (levelConfig.m_bBreakLineWhenDisplayMainWord)
 		inputStream >> levelConfig.m_iLetterCountOfFirstLine; //note: include space
-	std::getline(inputStream, sTemp);
+	std::getline(inputStream, sTemp);*/
 
 	// config of dropping of main word
 	if (!levelConfig.m_bIsMainWordExistedOnBoard)
@@ -662,22 +653,24 @@ void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::ve
 	int iWordIndex;
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
 	std::vector<int> letterCountList;
-	int iLetterCount;
-
+	//int iLetterCount;
+	
+	// when generate words for levels of chapter first time, we dont need to check minimum-letter-required of letter to make sure every level
+	// should have word assign to it (error still can happen if word list is not match to level list)
 	for(auto wordID : chapterConfig.m_WordIDList)
 	{
 		iWordIndex  = pGameWordManager->GetLoadedWordIndexFromID(wordID);
-		iLetterCount = 0;
+		//iLetterCount = 0;
 
 		const Word& word = pGameWordManager->GetWord(iWordIndex);
-		for(int i=0; i< word.m_iWordLength; i++)
+		/*for(int i=0; i< word.m_iWordLength; i++)
 		{
 			if (word.m_sWord[i] != ' ')
 			{
 				iLetterCount++;
 			}
-		}
-		letterCountList.push_back(iLetterCount);
+		}*/
+		letterCountList.push_back(word.m_iMaximumLevelLetterRequired); //iLetterCount);
 		
 		wordList.push_back(wordID);
 		levelList.push_back(-1);
@@ -745,14 +738,14 @@ void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::ve
 }
 
 // temporary used this instead of pre-calculation
-int CountLetterOfWord(const int& iWordLength, const char* sWord)
+/*int CountLetterOfWord(const int& iWordLength, const char* sWord)
 {
 	int iIndex, iCount = 0;
 	for(iIndex = 0; iIndex < iWordLength; iIndex++)
 		if (sWord[iIndex] != ' ')
 			iCount++;
 	return iCount;
-}
+}*/
 
 void GameConfigManager::UpdateNewWordForLevel(const std::string& sChapterID, const int& iLevel)
 {
@@ -771,7 +764,7 @@ void GameConfigManager::UpdateNewWordForLevel(const std::string& sChapterID, con
 		int iWordIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordList[iIndex].sWordId);
 		const Word& word = GameWordManager::getInstance()->GetWord(iWordIndex);
 
-		if (levelConfig.m_iNumberLetterOfMainWord <= CountLetterOfWord(word.m_iWordLength, word.m_sWord))
+		if (levelConfig.m_iNumberLetterOfMainWord <=  word.m_iMaximumLevelLetterRequired &&  levelConfig.m_iNumberLetterOfMainWord >= word.m_iMinimumLevelLetterRequired) //CountLetterOfWord(word.m_iWordLength, word.m_sWord))
 		{		
 			if (wordList[iIndex].iCountCollected == 0)
 				candidate0IndexList.push_back(iIndex);
@@ -788,15 +781,22 @@ void GameConfigManager::UpdateNewWordForLevel(const std::string& sChapterID, con
 	if (candidate0IndexList.size() > 0)
 	{
 		levelInfo.sWordId = wordList[candidate0IndexList[ rand() % candidate0IndexList.size()]].sWordId;	
+		LevelTable::getInstance()->updateLevel(levelInfo);
 	}
 	/*else if (candidate1IndexList.size() > 0)
 	{
 		levelInfo.sWordId = wordList[candidate1IndexList[ rand() % candidate1IndexList.size()]].sWordId;
 	}*/
-	else
+	else if (candidate2IndexList.size() > 0)
+	{
 		levelInfo.sWordId = wordList[candidate2IndexList[ rand() % candidate2IndexList.size()]].sWordId;		
-
-	LevelTable::getInstance()->updateLevel(levelInfo);
+		LevelTable::getInstance()->updateLevel(levelInfo);
+	}
+	else 
+	{
+		// keep current word
+		// do nothing here
+	}	
 }
 
 WordlMapConfig::WordMapChapterConfig& GameConfigManager::GetWordMapChapterConfig(const std::string& sChapterID)

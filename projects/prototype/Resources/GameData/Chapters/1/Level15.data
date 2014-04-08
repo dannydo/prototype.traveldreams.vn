@@ -18,9 +18,6 @@
 ;main word
 11
 0
-0
-;display of main word, 1: break line ( + number letter of first line, not this include "SPACE" used to break line)
-0
 ;init rate, increase after move, decrease when destroyed, decrease when appeared, ratio betweens letters same generation
 100	10	1	1	100
 ; config columns appear, 1: all columns, 0: specific columns + column count + columns list

@@ -124,12 +124,12 @@ public:
 	//int m_iMainWordID;
 	//std::string m_sMainWordID;
 	int m_iNumberLetterOfMainWord;
-	bool m_MainWordUnlockedFlagList[_GDS_WORD_MAX_LENGTH_]; //should remove this
+	//bool m_MainWordUnlockedFlagList[_GDS_WORD_MAX_LENGTH_]; //should remove this
 	bool m_bIsMainWordExistedOnBoard;
 	Cell m_MainWordLetterPosition[_GDS_WORD_MAX_LENGTH_];
 	// display of main word
-	bool m_bBreakLineWhenDisplayMainWord;
-	int m_iLetterCountOfFirstLine; //note: include space
+	//bool m_bBreakLineWhenDisplayMainWord;
+	//int m_iLetterCountOfFirstLine; //note: include space
 	// config of main word
 	int m_iInitRateOfMainLetter; //letter of main word
 	int m_iIncreasePercentAfterEachMoveOfMainLetter;

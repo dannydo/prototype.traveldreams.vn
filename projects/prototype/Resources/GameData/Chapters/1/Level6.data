@@ -17,17 +17,18 @@
 0	0	1	1	1	1	0   0
 ;main word
 5
-0
 1
 5 3 5 4 5 5 5 6 5 7
-;display of main word, 1: break line ( + number letter of first line, not this include "SPACE" used to break line)
-0
 ;end game bonus type
 1
 ;boss
 0
 ;obstacle list: count, list
+2
+LOCK 0
 1
+3 7
+0
 SHIELD 1
 5
 5 3 5 4 5 5 5 6 5 7

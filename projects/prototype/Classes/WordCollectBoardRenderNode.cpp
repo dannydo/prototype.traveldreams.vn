@@ -207,9 +207,10 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	// break line based on level config
 	int iLetterCountOfFirstLine;
 
-	const LevelConfig* pLevelConfig = GameWordManager::getInstance()->GetLevelConfig();
-	if (pLevelConfig->m_bBreakLineWhenDisplayMainWord) 
-		iLetterCountOfFirstLine = pLevelConfig->m_iLetterCountOfFirstLine-1; //skip "SPACE"; 
+	//const LevelConfig* pLevelConfig = GameWordManager::getInstance()->GetLevelConfig();
+	//if (pLevelConfig->m_bBreakLineWhenDisplayMainWord) 
+	if (m_pMainWord->m_iLimitLetterCountOfFirstLine > 0)
+		iLetterCountOfFirstLine = m_pMainWord->m_iLimitLetterCountOfFirstLine-1; //skip "SPACE"; 
 	else
 		iLetterCountOfFirstLine = m_pMainWord->m_iWordLength;
 
@@ -238,10 +239,11 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	}	
 
 	// draw second line
-	if (pLevelConfig->m_bBreakLineWhenDisplayMainWord)
+	//if (pLevelConfig->m_bBreakLineWhenDisplayMainWord)
+	if (m_pMainWord->m_iLimitLetterCountOfFirstLine > 0)
 	{
-		int iStartLetterIndexOfSecondLine = pLevelConfig->m_iLetterCountOfFirstLine;
-		int iLetterCountOfSecondLine = m_pMainWord->m_iWordLength - pLevelConfig->m_iLetterCountOfFirstLine;
+		int iStartLetterIndexOfSecondLine = m_pMainWord->m_iLimitLetterCountOfFirstLine;//pLevelConfig->m_iLetterCountOfFirstLine;
+		int iLetterCountOfSecondLine = m_pMainWord->m_iWordLength - m_pMainWord->m_iLimitLetterCountOfFirstLine;//pLevelConfig->m_iLetterCountOfFirstLine;
 		int iIndexPositionOfSecondLine = (_WCBRN_MAX_SECOND_LINE_LETTERS_ - iLetterCountOfSecondLine + 1)/2;
 		for(i = 0; i<iLetterCountOfSecondLine; i++)
 		{

@@ -423,6 +423,9 @@ public:
 	std::string m_sSentenceSoundFile;
 	float m_fSentenceSoundLength;
 
+	int m_iLimitLetterCountOfFirstLine;
+	int m_iMinimumLevelLetterRequired, m_iMaximumLevelLetterRequired;
+
 	// following attributes only used when generate/collect letter in-game.
 	bool m_ActivatedCharacterFlags[_GDS_WORD_MAX_LENGTH_];
 	int m_iRemainInactivatedCharacterCount;

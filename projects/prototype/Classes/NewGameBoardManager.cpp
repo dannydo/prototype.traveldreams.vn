@@ -102,20 +102,32 @@ void NewGameBoardManager::ClearObstacleBlockID(const int& iObstacleBlockID)
 			}
 }
 
-bool NewGameBoardManager::IsRowLocked(const int& iRow)
+bool NewGameBoardManager::IsRowLocked(const int& iRow, const int& iColumn)
 {
-	for(int iColumn=0; iColumn < m_iColumnNumber; iColumn++)
-		if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID >= 0)
-			if (m_pObstacleProcessManager->IsRowLocked( m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))			
+	int iMinColumn = iColumn, iMaxColumn = iColumn;
+	while (iMinColumn >0 && m_BoardValueMatrix[iRow][iMinColumn ].m_bIsDragLocalWall == false)
+		iMinColumn--;
+	while (iMaxColumn < m_iColumnNumber-1 && m_BoardValueMatrix[iRow][iMaxColumn ].m_bIsDragLocalWall == false)
+		iMaxColumn++;
+
+	for(int iColumnIndex= iMinColumn; iColumnIndex <= iMaxColumn; iColumnIndex++)
+		if (m_BoardValueMatrix[iRow][iColumnIndex].m_iObstacleBlockID >= 0)
+			if (m_pObstacleProcessManager->IsRowLocked( m_BoardValueMatrix[iRow][iColumnIndex].m_iObstacleBlockID))			
 				return true;
 	return false;
 }
 
-bool NewGameBoardManager::IsColumnLocked(const int& iColumn)
+bool NewGameBoardManager::IsColumnLocked(const int& iRow, const int& iColumn)
 {
-	for(int iRow=0; iRow < m_iRowNumber; iRow++)
-		if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID >= 0)
-			if (m_pObstacleProcessManager->IsColumnLocked( m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID))			
+	int iMinRow = iRow, iMaxRow = iRow;
+	while (iMinRow >0 && m_BoardValueMatrix[iMinRow][ iColumn ].m_bIsDragLocalWall == false)
+		iMinRow--;
+	while (iMaxRow < m_iRowNumber-1 && m_BoardValueMatrix[iMaxRow][iColumn ].m_bIsDragLocalWall == false)
+		iMaxRow++;
+
+	for(int iRowIndex=iMinRow; iRowIndex <= iMaxRow; iRowIndex++)
+		if (m_BoardValueMatrix[iRowIndex][iColumn].m_iObstacleBlockID >= 0)
+			if (m_pObstacleProcessManager->IsColumnLocked( m_BoardValueMatrix[iRowIndex][iColumn].m_iObstacleBlockID))			
 				return true;
 	return false;
 }
@@ -2515,7 +2527,7 @@ bool NewGameBoardManager::haveCellMatch3(const Cell& cell)
 
 int NewGameBoardManager::haveMatch3WHenMoveRow(const int& iRow)
 {
-	if (IsRowLocked(iRow) == true)
+	if (IsRowLocked(0, iRow) == true)
 	{
 		return 0;
 	}
@@ -2570,7 +2582,7 @@ int NewGameBoardManager::haveMatch3WHenMoveRow(const int& iRow)
 
 int NewGameBoardManager::haveMatch3WHenMoveColumn(const int& iColumn)
 {
-	if (IsColumnLocked(iColumn) == true)
+	if (IsColumnLocked(0, iColumn) == true)
 	{
 		return 0;
 	}

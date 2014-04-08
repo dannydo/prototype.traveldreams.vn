@@ -154,8 +154,8 @@ public:
 	inline bool IsBossStateChanged() { return m_bIsBossStateChanged;}
 	inline void KillBoss() { m_LevelBossInfo.m_bIsEnable = false;}
 
-	bool IsRowLocked(const int& iRow);
-	bool IsColumnLocked(const int& iColumn);
+	bool IsRowLocked(const int& iRow, const int& iColumn);
+	bool IsColumnLocked(const int& iRow, const int& iColumn);
 
 	inline const int& GetPhaseMoveOfComboChain() { return m_iPhaseMoveInComboChain;}
 

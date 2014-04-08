@@ -192,6 +192,10 @@ void GameWordManager::LoadWords(const int& iPackageIndex)
 		inputStream >> newWord.m_sSentenceSoundFile;
 		inputStream >> newWord.m_fSentenceSoundLength;
 
+		inputStream >> newWord.m_iLimitLetterCountOfFirstLine;
+		inputStream >> newWord.m_iMinimumLevelLetterRequired;
+		inputStream >> newWord.m_iMaximumLevelLetterRequired;
+
 		m_WordList.push_back(newWord);
 	}
 
@@ -299,7 +303,7 @@ void GameWordManager::ResetDataForNewPlay()
 
 	for(int i=0; i< m_WordList[m_iMainWordIndex].m_iWordLength; i++)
 	{
-		if (m_pLevelConfig->m_MainWordUnlockedFlagList[i] ||  m_WordList[m_iMainWordIndex].m_sWord[i] == ' ')
+		if (m_WordList[m_iMainWordIndex].m_sWord[i] == ' ')
 		{
 			m_WordList[m_iMainWordIndex].m_ActivatedCharacterFlags[i] = true;
 			m_WordList[m_iMainWordIndex].m_AppearedCharacterFlags[i] = true;

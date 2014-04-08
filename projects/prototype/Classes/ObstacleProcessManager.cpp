@@ -187,8 +187,8 @@ void ObstacleProcessManager::UpdateAfterMove()
 
 bool ObstacleProcessManager::IsRowLocked(const int& iBlockID)
 {
-	int iColumn=0;
-	int iNumberOfColumn = m_pGameBoardManager->GetColumnNumber();
+	//int iColumn=0;
+	//int iNumberOfColumn = m_pGameBoardManager->GetColumnNumber();
 	int iObstacleTypeCount = GameConfigManager::getInstance()->GetObstacleTypeCount();
 
 	for(int iObstacleTypeID = 0; iObstacleTypeID < iObstacleTypeCount; iObstacleTypeID++)

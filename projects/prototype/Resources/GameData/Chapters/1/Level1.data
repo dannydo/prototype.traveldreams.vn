@@ -17,11 +17,8 @@
 0	0	0	0	0	0	0   0
 ;main word
 3
-0
 1
 5 4 5 5 5 6
-;display of main word, 1: break line ( + number letter of first line, not this include "SPACE" used to break line)
-0
 ;end game bonus type
 1
 ;boss
