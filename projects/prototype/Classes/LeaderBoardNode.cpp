@@ -1,11 +1,10 @@
 #include "LeaderBoardNode.h"
 #include "APIService\UserService.h"
-
 #include "APIService\Constants.h"
 #include "Database\UserTable.h"
 #include "Database\LevelTable.h"
-
 #include "LoadingImageNode.h"
+#include "GameConfigManager.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -70,8 +69,9 @@ bool LeaderBoardtNode::init()
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
 	if (userInfo.sFacebookId != "")
 	{
+		int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
 		UserService::getInstance()->addCallBackList(this);
-		UserService::getInstance()->getLeaderBoardLevel(m_iLevel);
+		UserService::getInstance()->getLeaderBoardLevel(iCalLevel + m_iLevel);
 	}
 
 	m_bIsSwipe = false;

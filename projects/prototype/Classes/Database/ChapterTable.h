@@ -38,6 +38,7 @@ public:
 	inline std::vector<ChapterInfo>& getChaptersInfo() { return m_Chapters; };
 	ChapterInfo getChapterInfo(const std::string sChapterId);
 	bool updateChapter(ChapterInfo chapterInfo);
+	void refreshChapters();
 
 private:
 	void fetchAllChapter();

@@ -87,23 +87,24 @@ bool LevelMapLayer::init()
 	Point pointScroll;
 	std::vector<LevelInfo> levels = LevelTable::getInstance()->getAllLevelsForChapter(m_sChapterId);
 	
+	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
 	for(int iIndex=0; iIndex<chapterConfig.m_iTotalevel; iIndex++)
 	{
 		LevelInfo levelInfo = levels[iIndex];
 		Point point = chapterConfig.m_PositionLevel[iIndex];
 
-		char sLevel[5];
-		sprintf(sLevel, "%d", levelInfo.iLevel);
+		char sLevel[10];
+		sprintf(sLevel, "%d", levelInfo.iLevel + iCalLevel);
 		LabelTTF* pLevelLabel = LabelTTF::create(sLevel, "fonts/UTM Cookies.ttf", 32);
 		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
 		pLevelLabel->setPosition(Point(point.x-2, point.y+17));
 		
-		if(levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel || 1)
+		if(levelInfo.bIsUnlock || (levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId))
 		{
 			Sprite* pButtonLevelSprite;
 			
 			
-			if(levelInfo.iLevel == userInfo.iCurrentLevel)
+			if(levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId)
 			{
 				pointScroll = point;
 				pButtonLevelSprite = Sprite::create("World-Map/new-level.png");
@@ -119,7 +120,7 @@ bool LevelMapLayer::init()
 			buttonPlayNode->setTag(levelInfo.iLevel);
 			pButtonManagerNode->addButtonNode(buttonPlayNode);
 
-			if (levelInfo.bIsUnlock || levelInfo.iLevel == userInfo.iCurrentLevel)
+			if (levelInfo.bIsUnlock || (levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId))
 			{
 				Node* pStarAndBonusQuestNode = this->generateLayoutStarAndBonusQuest(levelInfo.iStar, levelInfo.iBonusQuest, levelInfo.iTotalBonusQuest);
 				pStarAndBonusQuestNode->setPosition(Point(point.x-2, point.y));
