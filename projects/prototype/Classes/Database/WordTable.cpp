@@ -94,7 +94,7 @@ WordInfo WordTable::getWordInfoOnChapter(const std::string& sChapterId, const st
 		}
 	}
 
-	return WordInfo::WordInfo();
+	return WordInfo();
 }
 
 void WordTable::refreshWordsForChapter(const std::string& sChapterId)

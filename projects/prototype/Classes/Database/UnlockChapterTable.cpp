@@ -54,7 +54,7 @@ UnlockChapterInfo UnlockChapterTable::fetchUnlockChapter(const std::string sChap
 		unlockChapterInfo.sChapterId = re[nColumn+1];
 		unlockChapterInfo.iRequest = int(strtod(re[nColumn+2], NULL));
 		unlockChapterInfo.sType = re[nColumn+3];
-		unlockChapterInfo.uBeginTime = unsigned long(strtod(re[nColumn+4], NULL));
+		unlockChapterInfo.uBeginTime = long(strtod(re[nColumn+4], NULL));
 		unlockChapterInfo.iVersion = int(strtod(re[nColumn+5], NULL));
 	}
 

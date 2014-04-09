@@ -52,7 +52,7 @@ ChapterInfo ChapterTable::getChapterInfo(const std::string sChapterId)
 		}
 	}
 
-	return ChapterInfo::ChapterInfo();
+	return ChapterInfo();
 }
 
 void ChapterTable::fetchAllChapter()
@@ -132,7 +132,7 @@ std::string	ChapterTable::syncGetChapters()
 		sJsonData.appendWithFormat("\"Version\": %s,", re[iRow*nColumn+4]);
 		sJsonData.appendWithFormat("\"TotalFlashCardUnlock\": %s,", re[iRow*nColumn+5]);
 		sJsonData.appendWithFormat("\"CountFlashCardNew\": %s,", re[iRow*nColumn+6]);
-		sJsonData.appendWithFormat("\"TotalFlash\": %s", re[iRow*nColumn+7]);
+		sJsonData.appendWithFormat("\"TotalFlashCard\": %s", re[iRow*nColumn+7]);
 
 		if (iRow == nRow)
 			sJsonData.append("}");

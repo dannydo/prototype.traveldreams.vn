@@ -634,12 +634,15 @@ void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID)
 	int iWordCount;
 	inputStream >> iWordCount;
 	std::getline( inputStream, sTemp);	
-	for(iIndex = 0; iIndex < iWordCount; iIndex++)	
-	{			
+	for(iIndex = 0; iIndex < iWordCount; iIndex++) 
+	{
 		std::getline( inputStream, sTemp);
 		//inputStream >> sTemp;
-		chapterConfig.m_WordIDList.push_back(sTemp.substr(0, sTemp.size()-1)); //not count /r at the end of line
-	}
+		if (sTemp.c_str()[sTemp.size()-1] == '\r')
+			chapterConfig.m_WordIDList.push_back(sTemp.substr(0, sTemp.size()-1)); //not count /r at the end of line
+		else
+			chapterConfig.m_WordIDList.push_back(sTemp.substr(0, sTemp.size())); 
+	 }
 
 	delete[] data;
 	delete[] orginalData;

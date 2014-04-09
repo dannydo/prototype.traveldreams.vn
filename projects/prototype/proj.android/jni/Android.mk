@@ -40,7 +40,6 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/Database/InitDatabase.cpp \
 				   ../../Classes/Database/sqlite3.c \
 				   ../../Classes/Database/ChapterTable.cpp \
-				   ../../Classes/Database/FriendTable.cpp \
 				   ../../Classes/Database/LevelTable.cpp \
 				   ../../Classes/Database/UserTable.cpp \
 				   ../../Classes/Database/DictionaryDatabase.cpp \
@@ -51,6 +50,12 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/ButtonManagerNode.cpp \
 				   ../../Classes/HeaderNode.cpp \
 				   ../../Classes/ScrollManager.cpp \
+				   ../../Classes/Database/PowerUpTable.cpp \
+				   ../../Classes/Database/TransactionTable.cpp \
+				   ../../Classes/Database/UnlockChapterTable.cpp \
+				   ../../Classes/Database/VersionTable.cpp \
+				   ../../Classes/Database/WordTable.cpp \
+				   ../../Classes/APIService/SyncDataGame.cpp \
 				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \

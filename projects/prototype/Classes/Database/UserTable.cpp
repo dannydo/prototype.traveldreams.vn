@@ -55,7 +55,7 @@ void UserTable::fetchhUser()
 		m_userInfo.iCurrentLevel = int(strtod(re[nColumn+6], NULL));
 		m_userInfo.iLife = int(strtod(re[nColumn+7], NULL));
 		m_userInfo.iLifeTimeRemaining = int(strtod(re[nColumn+8], NULL));
-		m_userInfo.ulLifeTimeBeginRemain = unsigned long(strtod(re[nColumn+9], NULL));
+		m_userInfo.ulLifeTimeBeginRemain = long(strtod(re[nColumn+9], NULL));
 		m_userInfo.iMonney = int(strtod(re[nColumn+10], NULL));
 		m_userInfo.iVersion = int(strtod(re[nColumn+11], NULL));
 	}
