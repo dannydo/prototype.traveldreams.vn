@@ -171,6 +171,9 @@ bool HelloWorld::init()
 	m_pSaveTouch = NULL;
 	m_bIsEndGamePhase = false;
 
+	m_fIdleTime = 0;
+	//m_bIsShowingHint = false;
+
 	this->setTouchEnabled(true);	
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 	this->scheduleUpdate();
@@ -495,6 +498,11 @@ void HelloWorld::initLevel()
 	}
 
 
+	// pre-load hint sprite
+	m_pHintSprite = Sprite::createWithSpriteFrameName( "Hint.png");
+	m_pHintSprite->setVisible(false);	
+	m_pBoardBatchNode->addChild( m_pHintSprite, 200);
+
 	// create temp sprite, this's used to animate the drag line
 	m_pTempSpriteForAction = Sprite::createWithSpriteFrameName( "Bush_Background.png");
 	m_pTempSpriteForAction->retain();
@@ -508,6 +516,12 @@ void HelloWorld::initLevel()
 	// play sound
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kGameMusic);
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kPlayGame);	
+
+	// make sure fint hint at begin of game
+	this->runAction( CCSequence::create(
+				CCDelayTime::create(1.f),
+				CCCallFunc::create( this, callfunc_selector( HelloWorld::CheckHintAfterMove)),
+				NULL));		
 }
 
 void HelloWorld::menuCloseCallback(Object* pSender)
@@ -810,6 +824,13 @@ bool HelloWorld::onTouchBegan(Touch *pTouch, Event *pEvent)
 	else
 		return true;
 
+	// hide hint
+	if (m_pHintSprite->isVisible())
+	{
+		m_pHintSprite->setVisible(false);
+		m_fIdleTime = 0;
+	}
+
 	Point touchPosition = pTouch->getLocation();
 	if (touchPosition.x >= m_fBoardLeftPosition - m_SymbolSize.width/2.f && touchPosition.y >= m_fBoardBottomPosition - m_SymbolSize.height/2.f)
 		if (touchPosition.x <= m_fBoardLeftPosition + m_GameBoardManager.GetColumnNumber()* m_SymbolSize.width - m_SymbolSize.width/2.f
@@ -857,8 +878,8 @@ void HelloWorld::onTouchEnded(Touch* pTouch, Event* pEvent)
 		bIsBlocked = true;		
 	}			
 
-	// remove hint sprites
-	RemoveHint();	
+	// remove snap sprites
+	RemoveSnap();		
 
 	//if (m_eTouchMoveState < _TMS_BEGIN_ACTIVATE_COMBO_) //this is normal move
 	{
@@ -1031,10 +1052,57 @@ void HelloWorld::update(float fDeltaTime)
 		{
 			VerticalMoveUlti(m_pTempSpriteForAction->getPositionY());
 		}
+
+		//m_fIdleTime = 0;
 	}
 	else if (m_eTouchMoveState == _TMS_NONE_)
 	{
-		m_iMovingCellListLength = 0; 		
+		m_iMovingCellListLength = 0; 	
+
+		if (!m_bIsEffectPlaying && !m_bIsEndGamePhase && !m_pHintSprite->isVisible())
+		{
+			m_fIdleTime += fDeltaTime;
+
+			if (m_fIdleTime > 4.f) //should show hint now
+			{
+				const Hint& hint = m_GameBoardManager.GetHint();
+				if (hint.m_Position.m_iRow >=0 && hint.m_Position.m_iColumn >= 0)
+				{
+					//m_bIsShowingHint = true;
+					m_pHintSprite->setVisible(true);
+					if (m_BoardViewMatrix[hint.m_Position.m_iRow][hint.m_Position.m_iColumn].m_pSprite != NULL)
+					{
+						m_pHintSprite->setPosition( m_BoardViewMatrix[hint.m_Position.m_iRow][hint.m_Position.m_iColumn].m_pSprite->getPosition());
+
+						// rotate hint sprite to correct direction
+						if (hint.m_DeltaMove.m_iColumn != 0)
+						{
+							if (hint.m_DeltaMove.m_iColumn > 0)
+							{
+								// default
+								m_pHintSprite->setRotation(0);
+							}
+							else
+							{
+								m_pHintSprite->setRotation(180.f);
+							}
+						}
+						else
+						{
+							if (hint.m_DeltaMove.m_iRow > 0)
+							{
+								m_pHintSprite->setRotation(-90.f);
+							}
+							else
+							{
+								m_pHintSprite->setRotation(90.f);
+							}
+						}
+					}
+				}
+
+			}
+		}
 	}
 }
 
@@ -1381,8 +1449,18 @@ void HelloWorld::CheckBoardStateAfterMove()
 	}
 	else
 	{		
+		if (!m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked() && m_GameBoardManager.GetCurrentMove()!=0)
+		{
+			// delay check hint
+			this->runAction( CCSequence::create(
+						CCDelayTime::create(0.5f),
+						CCCallFunc::create( this, callfunc_selector( HelloWorld::CheckHintAfterMove)),
+						NULL));		
+		}
+
+
 		//EndUnlockLetterAnimation();
-		OnCompleteComboChain();
+		OnCompleteComboChain();		
 
 		/*//check end game
 		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked()) // complete objective ==> win		
@@ -1419,6 +1497,15 @@ void HelloWorld::CheckBoardStateAfterMove()
 
 		//UpdateObstacleListAfterMove();
 	}	
+}
+
+// if this called when user move row/column can cause error/lag???
+void HelloWorld::CheckHintAfterMove()
+{
+	if (!m_GameBoardManager.findHintForGame())
+	{
+		MessageBox("Notice", "No more move! SHUFFLE!!!... Sorry, not implemented yet!");
+	}
 }
 
 void HelloWorld::ExecuteBonusWinGameEffect()
@@ -1612,9 +1699,9 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 
 	if ( iMoveUnit == m_iSaveLastCellMoveDelta || iMoveUnit == 0 || iMoveUnit + iBlankCellOfFullLine == m_GameBoardManager.GetColumnNumber())
 	{		
-		if ( (iMoveUnit == 0 || iMoveUnit + iBlankCellOfFullLine == m_GameBoardManager.GetColumnNumber())  && iMoveUnit != m_iSaveLastCellMoveDelta && m_HintSprites.size() >0 )
+		if ( (iMoveUnit == 0 || iMoveUnit + iBlankCellOfFullLine == m_GameBoardManager.GetColumnNumber())  && iMoveUnit != m_iSaveLastCellMoveDelta && m_SnapSprites.size() >0 )
 		{			
-			RemoveHint();
+			RemoveSnap();
 		}
 		
 		m_iSaveLastCellMoveDelta = iMoveUnit;
@@ -1622,7 +1709,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 		return;
 	}
 	
-	RemoveHint();	
+	RemoveSnap();	
 	
 	m_iSaveLastCellMoveDelta = iMoveUnit;
 
@@ -1642,7 +1729,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 		//m_pMoveHintNode->setOpacity(0);
 		//m_pBoardBatchNode->addChild(m_pMoveHintNode);
 
-		Sprite* pHintSprite, *pHintMirrorSprite;
+		Sprite* pSnapSprite, *pSnapMirrorSprite;
 		auto snapEffectAction = RepeatForever::create(
 									Sequence::create(					
 										ScaleTo::create( 0.15f, 0.92f, 1.09f),
@@ -1678,42 +1765,42 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 
 
 
-			pHintSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
+			pSnapSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
 				m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_iGemLetterBlockID>=0?_GCT_HAS_LETTER_:cell.m_eGemComboType).c_str());
-			pHintSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0.2f)));
-			pHintSprite->setScaleX(1.09f);
-			pHintSprite->setScaleY(0.92f);			
+			pSnapSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0.2f)));
+			pSnapSprite->setScaleX(1.09f);
+			pSnapSprite->setScaleY(0.92f);			
 
-			pHintMirrorSprite = NULL;
+			pSnapMirrorSprite = NULL;
 
 			Size size = m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->getContentSize();
 			if (cell.m_iRow != m_SelectedCell.m_iRow)
 			{
-				MoveAllChildrenToOtherNode( m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite, pHintSprite);
-				m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->addChild(pHintSprite, -1);
+				MoveAllChildrenToOtherNode( m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite, pSnapSprite);
+				m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->addChild(pSnapSprite, -1);
 				m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->setOpacity(0);
 				
 
-				pHintSprite->setTag(0);
+				pSnapSprite->setTag(0);
 			}
 			else
 			{				
-				MoveAllChildrenToOtherNode( m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite, pHintSprite);
-				m_BoardViewMatrix[cell.m_iRow][ iCalculatedColumn ].m_pSprite->addChild(pHintSprite, -1);
+				MoveAllChildrenToOtherNode( m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite, pSnapSprite);
+				m_BoardViewMatrix[cell.m_iRow][ iCalculatedColumn ].m_pSprite->addChild(pSnapSprite, -1);
 				m_BoardViewMatrix[cell.m_iRow][ iCalculatedColumn ].m_pSprite->setOpacity(0);
 
 
 				// add hint to mirror too
-				pHintMirrorSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
+				pSnapMirrorSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
 																				m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_iGemLetterBlockID>=0?_GCT_HAS_LETTER_:cell.m_eGemComboType).c_str());				
-				pHintMirrorSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0.2f)));
-				pHintMirrorSprite->setScaleX(1.09f);
-				pHintMirrorSprite->setScaleY(0.92f);
+				pSnapMirrorSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0.2f)));
+				pSnapMirrorSprite->setScaleX(1.09f);
+				pSnapMirrorSprite->setScaleY(0.92f);
 
 				//if (m_BoardViewMirrorMatrix[cell.m_iRow][ (cell.m_iColumn + iTranslationCell) % iNumberOfColumn ].m_pSprite != NULL)
 
-				MoveAllChildrenToOtherNode( m_BoardViewMirrorMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite, pHintMirrorSprite);
-				m_BoardViewMirrorMatrix[cell.m_iRow][ iCalculatedColumn ].m_pSprite->addChild(pHintMirrorSprite, -1);
+				MoveAllChildrenToOtherNode( m_BoardViewMirrorMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite, pSnapMirrorSprite);
+				m_BoardViewMirrorMatrix[cell.m_iRow][ iCalculatedColumn ].m_pSprite->addChild(pSnapMirrorSprite, -1);
 				m_BoardViewMirrorMatrix[cell.m_iRow][ iCalculatedColumn ].m_pSprite->setOpacity(0);
 
 				// we need to mark it so we can reset its scale later
@@ -1721,33 +1808,33 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 				m_BoardViewMatrix[cell.m_iRow][ iCalculatedColumn ].m_pSprite->setScaleY(1.f);
 				m_BoardViewMirrorMatrix[cell.m_iRow][ iCalculatedColumn ].m_pSprite->setScaleX(1.f);
 				m_BoardViewMirrorMatrix[cell.m_iRow][ iCalculatedColumn ].m_pSprite->setScaleY(1.f);
-				pHintSprite->setTag(1);
-				pHintMirrorSprite->setTag(1);
+				pSnapSprite->setTag(1);
+				pSnapMirrorSprite->setTag(1);
 			}
 
-			pHintSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
+			pSnapSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
 			
-			m_HintSprites.push_back(pHintSprite);	
-			pHintSprite->runAction(snapEffectAction->clone());
+			m_SnapSprites.push_back(pSnapSprite);	
+			pSnapSprite->runAction(snapEffectAction->clone());
 
-			if (pHintMirrorSprite != NULL)
+			if (pSnapMirrorSprite != NULL)
 			{
-				pHintMirrorSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
+				pSnapMirrorSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
 
-				m_HintSprites.push_back(pHintMirrorSprite);
-				pHintMirrorSprite->runAction(snapEffectAction->clone());
+				m_SnapSprites.push_back(pSnapMirrorSprite);
+				pSnapMirrorSprite->runAction(snapEffectAction->clone());
 			}
 		}
 
 	}
 }
 
-void HelloWorld::RemoveHint()
+void HelloWorld::RemoveSnap()
 {
-	if ( m_HintSprites.size() >0 )
+	if ( m_SnapSprites.size() >0 )
 	{
 		//CCLOG("Remove hint");		
-		for(auto sprite:m_HintSprites)
+		for(auto sprite:m_SnapSprites)
 		{
 			if (sprite->getParent() != NULL)
 			{
@@ -1763,7 +1850,7 @@ void HelloWorld::RemoveHint()
 			sprite->removeFromParentAndCleanup(true);
 		}
 		
-		m_HintSprites.clear();
+		m_SnapSprites.clear();
 	}
 }
 
@@ -1855,7 +1942,7 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 	// temporary disable snap
 	//return;
 
-	// draw hint
+	// draw snap
 	if (m_eTouchMoveState != _TMS_MOVE_VERTICAL_)
 		return;
 
@@ -1866,16 +1953,16 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 	iMoveUnit = (int)fMoveUnit;
 	if ( iMoveUnit == m_iSaveLastCellMoveDelta || iMoveUnit == 0 || iMoveUnit + iBlankCellOfFullLine == m_GameBoardManager.GetRowNumber())
 	{		
-		if ( (iMoveUnit == 0 || iMoveUnit + iBlankCellOfFullLine == m_GameBoardManager.GetRowNumber()) && iMoveUnit != m_iSaveLastCellMoveDelta && m_HintSprites.size() >0 )
+		if ( (iMoveUnit == 0 || iMoveUnit + iBlankCellOfFullLine == m_GameBoardManager.GetRowNumber()) && iMoveUnit != m_iSaveLastCellMoveDelta && m_SnapSprites.size() >0 )
 		{
-			RemoveHint();
+			RemoveSnap();
 		}
 		m_iSaveLastCellMoveDelta = iMoveUnit;
 
 		return;
 	}
 
-	RemoveHint();
+	RemoveSnap();
 
 	
 	m_iSaveLastCellMoveDelta = iMoveUnit;
@@ -1899,7 +1986,7 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 		//m_pMoveHintNode = Sprite::createWithSpriteFrameName("Gem_A.png");
 		//m_pMoveHintNode->setOpacity(0);
 		//m_pBoardBatchNode->addChild(m_pMoveHintNode);
-		Sprite* pHintSprite, *pHintMirrorSprite;
+		Sprite* pSnapSprite, *pSnapMirrorSprite;
 		auto snapEffectAction = RepeatForever::create(
 									Sequence::create(					
 										ScaleTo::create( 0.15f, 0.92f, 1.09f),
@@ -1933,40 +2020,40 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 
 			int iCalculatedRow = (iTempCalculatedRow+ iTranslationCell) % iLengthOfBlock + iBeginIndexOfBlock;
 
-			pHintSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
+			pSnapSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
 				m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_iGemLetterBlockID>=0?_GCT_HAS_LETTER_:cell.m_eGemComboType).c_str());			
-			pHintSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0.2f)));
-			pHintSprite->setScaleX(1.09f);
-			pHintSprite->setScaleY(0.92f);
+			pSnapSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0.2f)));
+			pSnapSprite->setScaleX(1.09f);
+			pSnapSprite->setScaleY(0.92f);
 			
-			pHintMirrorSprite = NULL;
+			pSnapMirrorSprite = NULL;
 
 			Size size = m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->getContentSize();
 			if (cell.m_iColumn != m_SelectedCell.m_iColumn)
 			{				
-				MoveAllChildrenToOtherNode( m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite, pHintSprite);
-				m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->addChild(pHintSprite, -1);
+				MoveAllChildrenToOtherNode( m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite, pSnapSprite);
+				m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->addChild(pSnapSprite, -1);
 				m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->setOpacity(0);
 				
 			} 
 			else
 			{	
-				MoveAllChildrenToOtherNode( m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite, pHintSprite);
-				m_BoardViewMatrix[ iCalculatedRow][cell.m_iColumn].m_pSprite->addChild(pHintSprite, -1);
+				MoveAllChildrenToOtherNode( m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite, pSnapSprite);
+				m_BoardViewMatrix[ iCalculatedRow][cell.m_iColumn].m_pSprite->addChild(pSnapSprite, -1);
 				m_BoardViewMatrix[ iCalculatedRow][cell.m_iColumn].m_pSprite->setOpacity(0);
 
 
 				// add hint to mirror too
-				pHintMirrorSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
+				pSnapMirrorSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
 					m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_iGemLetterBlockID>=0?_GCT_HAS_LETTER_:cell.m_eGemComboType).c_str());				
 
-				pHintMirrorSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0.2f)));
-				pHintMirrorSprite->setScaleX(1.09f);
-				pHintMirrorSprite->setScaleY(0.92f);
+				pSnapMirrorSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0.2f)));
+				pSnapMirrorSprite->setScaleX(1.09f);
+				pSnapMirrorSprite->setScaleY(0.92f);
 
 				//if ( m_BoardViewMirrorMatrix[ iCalculatedRow][cell.m_iColumn].m_pSprite != NULL)
-				MoveAllChildrenToOtherNode( m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite, pHintMirrorSprite);
-				m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->addChild(pHintMirrorSprite, -1);
+				MoveAllChildrenToOtherNode( m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite, pSnapMirrorSprite);
+				m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->addChild(pSnapMirrorSprite, -1);
 				m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->setOpacity(0);
 
 
@@ -1975,21 +2062,21 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 				m_BoardViewMatrix[ iCalculatedRow][cell.m_iColumn].m_pSprite->setScaleY(1.f);
 				m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->setScaleX(1.f);
 				m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->setScaleY(1.f);
-				pHintSprite->setTag(1);
-				pHintMirrorSprite->setTag(1);
+				pSnapSprite->setTag(1);
+				pSnapMirrorSprite->setTag(1);
 
 			}
 
-			pHintSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
-			pHintSprite->runAction(snapEffectAction->clone());
+			pSnapSprite->setPosition( Point(size.width/2.f, size.height/2.f ));
+			pSnapSprite->runAction(snapEffectAction->clone());
 			
-			m_HintSprites.push_back(pHintSprite);
-			if (pHintMirrorSprite != NULL)
+			m_SnapSprites.push_back(pSnapSprite);
+			if (pSnapMirrorSprite != NULL)
 			{
-				pHintMirrorSprite->setPosition(Point(size.width/2.f, size.height/2.f ));
-				m_HintSprites.push_back(pHintMirrorSprite);
+				pSnapMirrorSprite->setPosition(Point(size.width/2.f, size.height/2.f ));
+				m_SnapSprites.push_back(pSnapMirrorSprite);
 
-				pHintMirrorSprite->runAction(snapEffectAction->clone());
+				pSnapMirrorSprite->runAction(snapEffectAction->clone());
 			}
 		}
 

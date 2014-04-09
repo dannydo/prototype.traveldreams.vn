@@ -264,6 +264,8 @@ protected:
 	LevelBossInfo m_LevelBossInfo;
 	bool m_bIsBossStateChanged;
 
+	Hint m_Hint;
+
 	//std::vector<ComboEffectDescription> m_WaitingTriggerCombo6List;
 	std::vector<ComboEffectDescription> m_WaitingTriggerSecondTimeComboList; //combo 5, combo 5-5, combo 6-6-6, this include waiting combo 6 too!!!!
 	std::vector<NewCellInfo> m_UnlockedGemLetterCellList;
@@ -274,10 +276,11 @@ private:
 	bool canActivatedAsSpecialComboHorizontal(const Cell& cell); //can be activate as combo 6 or double/tripple combo	
 	bool canActivatedAsSpecialComboVertical(const Cell& cell);
 
-	int haveMatch3WHenMoveRow(const int& iRow);
-	int haveMatch3WHenMoveColumn(const int& iColumn);
+	bool haveMatch3WHenMoveCellHorizontal(const int& iRow, const int& iColumn, Hint& outputHint);    
+	bool haveMatch3WHenMoveCellVertical(const int& iRow, const int& iColumn, Hint& outputHint);
 public:
-	Hint findHintForGame(); 
+	bool findHintForGame(); 
+	inline const Hint& GetHint() { return m_Hint;}
 };
 
 

@@ -70,8 +70,8 @@ bool LeaderBoardtNode::init()
 	if (userInfo.sFacebookId != "")
 	{
 		int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
-		UserService::getInstance()->addCallBackList(this);
-		UserService::getInstance()->getLeaderBoardLevel(iCalLevel + m_iLevel);
+//		UserService::getInstance()->addCallBackList(this);
+//		UserService::getInstance()->getLeaderBoardLevel(iCalLevel + m_iLevel);
 	}
 
 	m_bIsSwipe = false;

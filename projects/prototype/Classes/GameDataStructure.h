@@ -436,9 +436,11 @@ public:
 struct Hint
 {
 public:
-	int m_iRow;
+	Cell m_Position;
+	Cell m_DeltaMove;
+	/*int m_iRow;
 	int m_iColumn;
-	int m_deltaMove;
+	int m_deltaMove;*/
 };
 
 

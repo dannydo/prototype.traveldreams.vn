@@ -133,6 +133,7 @@ protected:
 
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();
+	void CheckHintAfterMove();
 	void UpdateObstacleListAfterMove();
 
 
@@ -140,7 +141,7 @@ protected:
 
 	void HorizontalMoveUlti(float fDeltaX);
 	void VerticalMoveUlti(float fDeltaY);
-	void RemoveHint();
+	void RemoveSnap();
 	
 
 	void PlayCombo4HelperEffect(ComboEffectBundle* pComboEffectBundle, float fDelayTime, float fDisplayTime, float fRotation, float fEffectScale = 1.f);
@@ -223,7 +224,7 @@ private:
 	Point m_StartTouchPosition;
 
 	int m_iSaveLastCellMoveDelta;
-	std::vector<Sprite*> m_HintSprites;
+	std::vector<Sprite*> m_SnapSprites;
 
 	WordCollectBoardRenderNode* m_pWordCollectBoardRenderNode;
 	int m_iMoveCount;
@@ -234,6 +235,10 @@ private:
 	bool m_bIsCellDragPlaying;
 	TouchMoveState m_ePlayingDragEffect;
 	bool m_bIsEndGamePhase;
+
+	float m_fIdleTime;
+	//bool m_bIsShowingHint;
+	Sprite* m_pHintSprite;
 
 	ComboCountRenderNode* m_pComboCountRenderNode;
 	StatusLayer* m_pStatusLayer;	

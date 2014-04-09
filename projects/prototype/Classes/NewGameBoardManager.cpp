@@ -2525,62 +2525,97 @@ bool NewGameBoardManager::haveCellMatch3(const Cell& cell)
 	return false;
 }
 
-int NewGameBoardManager::haveMatch3WHenMoveRow(const int& iRow)
+bool NewGameBoardManager::haveMatch3WHenMoveCellHorizontal(const int& iRow, const int& iColumn, Hint& outputHint)
 {
-	if (IsRowLocked(0, iRow) == true)
+	if (IsRowLocked(iRow, iColumn) == true)
 	{
 		return 0;
 	}
 
 	Cell currentCheckCell;
 	currentCheckCell.m_iRow = iRow;
-	int iDeltaMoveRow = 0;
+
+	// we must find boundary of current block cause it may have local-drag-wall in this board
+	int iMinColumn = iColumn, iMaxColumn = iColumn;
+	while (iMaxColumn < m_iColumnNumber - 1 && !m_BoardValueMatrix[iRow][iMaxColumn].m_bIsDragLocalWall)
+	{
+		iMaxColumn++;
+	}
+
+	int iBlockLength = iMaxColumn -iMinColumn + 1;
+	int iDeltaMoveColumn = 1;
 	int iIndexColumn, iTranslationCell;
 
-	while (iDeltaMoveRow < m_iColumnNumber - 1)
-	{
-		iDeltaMoveRow++;
-
+	while (iDeltaMoveColumn < iBlockLength)  //m_iColumnNumber - 1)
+	{		
 		// create temporary list to compute result for shifting move
-		for (iIndexColumn=0; iIndexColumn<m_iColumnNumber; iIndexColumn++)
+		for (iIndexColumn= 0; iIndexColumn< iBlockLength; iIndexColumn++)
 		{
-			if (!m_BoardValueMatrix[iRow][iIndexColumn].m_bIsBlankCell)
+			if (!m_BoardValueMatrix[iRow][iMinColumn + iIndexColumn].m_bIsBlankCell)
 			{	
 				//int iBlankCellCount = 0; //blank cell on the move
 				iTranslationCell = 0;
 
-				for(int iStep=1; iStep<= iDeltaMoveRow; iStep++)
+				for(int iStep=1; iStep<= iDeltaMoveColumn; iStep++)
 				{
 					iTranslationCell += 1;
-					if (m_BoardValueMatrix[iRow][(iIndexColumn + iTranslationCell)%m_iColumnNumber].m_bIsBlankCell)
+					if (m_BoardValueMatrix[iRow][ iMinColumn + (iIndexColumn + iTranslationCell) % iBlockLength].m_bIsBlankCell)
 						iStep--;
 				}
 
-				m_TemporaryValueMatrix[iRow][(iIndexColumn + m_iColumnNumber + iTranslationCell)%m_iColumnNumber] = m_BoardValueMatrix[iRow][iIndexColumn];
+				m_TemporaryValueMatrix[iRow][ iMinColumn +(iIndexColumn + iBlockLength + iTranslationCell) % iBlockLength] = m_BoardValueMatrix[iRow][iMinColumn + iIndexColumn];
 				
 			}
 			else
 			{
 				//blank cell
-				m_TemporaryValueMatrix[iRow][iIndexColumn].m_bIsBlankCell = true;
-				m_TemporaryValueMatrix[iRow][iIndexColumn].m_iGemID = -1;
+				m_TemporaryValueMatrix[iRow][iMinColumn + iIndexColumn].m_bIsBlankCell = true;
+				m_TemporaryValueMatrix[iRow][iMinColumn + iIndexColumn].m_iGemID = -1;
 			}
 		}
 
-		for (iIndexColumn=0; iIndexColumn<m_iColumnNumber; iIndexColumn++)
+		for (iIndexColumn=0; iIndexColumn< iBlockLength; iIndexColumn++)
 		{	
-			currentCheckCell.m_iColumn = iIndexColumn;
-			if(haveCellMatch3(currentCheckCell) == true)
-			{
-				return iDeltaMoveRow;
+			currentCheckCell.m_iColumn = iMinColumn + iIndexColumn;
+			if(canActivatedAsSpecialComboHorizontal(currentCheckCell) || haveCellMatch3(currentCheckCell) == true) // this move is valid
+			{				
+				// NOTE: because we need to get effective cells from target positions, we need to reverse sign
+				// and for easier computation, we convert it to active value
+				int iTempIndexColumn, iBlankCellCount =0;
+				for(iTempIndexColumn = iMinColumn; iTempIndexColumn <= iMaxColumn; iTempIndexColumn++)
+					if (m_BoardValueMatrix[ currentCheckCell.m_iRow][iTempIndexColumn].m_bIsBlankCell)
+						iBlankCellCount++;
+				iDeltaMoveColumn = iBlockLength - iBlankCellCount - iDeltaMoveColumn;
+
+
+				int iTranslationCell = 0;
+				for(int iStep=1; iStep <= iDeltaMoveColumn; iStep++)
+				{
+					iTranslationCell += 1;					
+					if (m_BoardValueMatrix [currentCheckCell.m_iRow][ (iIndexColumn + iTranslationCell) % iBlockLength + iMinColumn].m_bIsBlankCell)
+						iStep--;					
+				}			
+				int iCalculatedColumn = (iIndexColumn + iTranslationCell + iBlockLength) % iBlockLength + iMinColumn;
+
+
+				outputHint.m_Position = Cell( currentCheckCell.m_iRow, iCalculatedColumn);
+				outputHint.m_DeltaMove.m_iRow = 0;
+
+				if ( iCalculatedColumn < currentCheckCell.m_iColumn) // note: only direction is correct, the value is not
+					outputHint.m_DeltaMove.m_iColumn = iDeltaMoveColumn;
+				else				
+					outputHint.m_DeltaMove.m_iColumn = -iDeltaMoveColumn;
+				return true;				
 			}
 		}
+
+		iDeltaMoveColumn++;
 	}
 
-	return 0;
+	return false;
 }
 
-int NewGameBoardManager::haveMatch3WHenMoveColumn(const int& iColumn)
+bool NewGameBoardManager::haveMatch3WHenMoveCellVertical(const int& iRow, const int& iColumn, Hint& outputHint)
 {
 	if (IsColumnLocked(0, iColumn) == true)
 	{
@@ -2589,29 +2624,36 @@ int NewGameBoardManager::haveMatch3WHenMoveColumn(const int& iColumn)
 
 	Cell currentCheckCell;
 	currentCheckCell.m_iColumn = iColumn;
-	int iDeltaMoveColumn = 0;
+
+	// we must find boundary of current block cause it may have local-drag-wall in this board
+	int iMinRow = iRow, iMaxRow = iRow;
+	while (iMaxRow < m_iRowNumber - 1 && !m_BoardValueMatrix[iMaxRow][iColumn].m_bIsDragLocalWall)
+	{
+		iMaxRow++;
+	}
+
+	int iBlockLength = iMaxRow - iMinRow + 1;
+	int iDeltaMoveRow = 1;
 	int iIndexRow, iTranslationCell;
 
-	while (iDeltaMoveColumn < m_iRowNumber - 1)
-	{
-		iDeltaMoveColumn++;
-
+	while (iDeltaMoveRow < iBlockLength) //m_iRowNumber - 1)
+	{		
 		// create temporary list to compute result for shifting move
-		for (iIndexRow=0; iIndexRow<m_iRowNumber; iIndexRow++)
+		for (iIndexRow=0; iIndexRow< iBlockLength; iIndexRow++)
 		{
-			if (!m_BoardValueMatrix[iIndexRow][iColumn].m_bIsBlankCell)
+			if (!m_BoardValueMatrix[iMinRow + iIndexRow][iColumn].m_bIsBlankCell)
 			{	
 				//int iBlankCellCount = 0; //blank cell on the move
 				iTranslationCell = 0;
 
-				for(int iStep=1; iStep<= abs(iDeltaMoveColumn); iStep++)
+				for(int iStep=1; iStep<= abs(iDeltaMoveRow); iStep++)
 				{
 					iTranslationCell += 1;
-					if (m_BoardValueMatrix[(iIndexRow + iTranslationCell) % m_iRowNumber][iColumn].m_bIsBlankCell)
+					if (m_BoardValueMatrix[iMinRow + (iIndexRow + iTranslationCell) % iBlockLength][iColumn].m_bIsBlankCell)
 						iStep--;
 				}
 					
-				m_TemporaryValueMatrix[(iIndexRow + m_iRowNumber + iTranslationCell) % m_iRowNumber][iColumn] = m_BoardValueMatrix[iIndexRow][iColumn];
+				m_TemporaryValueMatrix[iMinRow + (iIndexRow + iBlockLength + iTranslationCell) % iBlockLength][iColumn] = m_BoardValueMatrix[iMinRow + iIndexRow][iColumn];
 			}
 			else
 			{ 
@@ -2621,70 +2663,106 @@ int NewGameBoardManager::haveMatch3WHenMoveColumn(const int& iColumn)
 			}
 		}
 
-		for (iIndexRow=0; iIndexRow<m_iRowNumber; iIndexRow++)
+		for (iIndexRow=0; iIndexRow < iBlockLength; iIndexRow++)
 		{	
-			currentCheckCell.m_iRow = iIndexRow;
-			if(haveCellMatch3(currentCheckCell) == true)
+			currentCheckCell.m_iRow = iMinRow + iIndexRow;
+			if(canActivatedAsSpecialComboVertical(currentCheckCell) || haveCellMatch3(currentCheckCell) == true)
 			{
-				return iDeltaMoveColumn;
+				// NOTE: because we need to get effective cells from target positions, we need to reverse sign
+				// and for easier computation, we convert it to active value
+				int iTempIndexRow, iBlankCellCount =0;
+				for(iTempIndexRow = iMinRow; iTempIndexRow <= iMaxRow; iTempIndexRow++)
+					if (m_BoardValueMatrix[iTempIndexRow][ currentCheckCell.m_iColumn].m_bIsBlankCell)
+						iBlankCellCount++;
+				iDeltaMoveRow = iBlockLength - iBlankCellCount - iDeltaMoveRow;
+
+
+				int iTranslationCell = 0;
+
+				for(int iStep=1; iStep <= iDeltaMoveRow; iStep++)
+				{
+					iTranslationCell += 1;					
+					if (m_BoardValueMatrix[ (iIndexRow + iTranslationCell) % iBlockLength + iMinRow] [currentCheckCell.m_iColumn].m_bIsBlankCell)
+						iStep--;					
+				}			
+				int iCalculateRow = (iIndexRow + iTranslationCell + iBlockLength) % iBlockLength + iMinRow;
+
+				outputHint.m_Position =  Cell(iCalculateRow, currentCheckCell.m_iColumn);				
+				outputHint.m_DeltaMove.m_iColumn = 0;
+
+				if ( iCalculateRow < currentCheckCell.m_iRow)							
+					outputHint.m_DeltaMove.m_iRow = iDeltaMoveRow;
+				else
+					outputHint.m_DeltaMove.m_iRow = -iDeltaMoveRow;
+				return true;
 			}
 		}
+
+		iDeltaMoveRow++;
 	}
 
-	return 0;
+	return false;
 }
 
-Hint NewGameBoardManager::findHintForGame()
-{
-	Hint hint;
-	hint.m_deltaMove = 0;
-	hint.m_iRow = -1;
-	hint.m_iColumn = -1;
-
+bool NewGameBoardManager::findHintForGame()
+{	
 	int iIndexRow, iIndexColumn;
+	m_Hint.m_Position = Cell(-1,-1);
+	m_Hint.m_DeltaMove = Cell(0,0);
 	
 	// create temporary list to compute result for shifting move
 	memcpy( m_TemporaryValueMatrix, m_BoardValueMatrix, sizeof(m_BoardValueMatrix));
 
+	bool bNewBlock;
+	bool bIsSuccessful = false;
+
 	for(iIndexRow=0; iIndexRow < m_iRowNumber; iIndexRow++)
 	{
-		int deltaMove = haveMatch3WHenMoveRow(iIndexRow);
+		bNewBlock = true;		
 
-		//Reset row moved
+		for( iIndexColumn = 0; iIndexColumn < m_iColumnNumber; iIndexColumn++)
+			if (bNewBlock && m_BoardValueMatrix[iIndexRow][iIndexColumn].m_bIsBlankCell == false) // we only hint at begin of each block
+			{
+				bIsSuccessful = haveMatch3WHenMoveCellHorizontal(iIndexRow, iIndexColumn, m_Hint);
+				bNewBlock = false;
+
+				if (bIsSuccessful )
+					return true;
+			}
+			else if (m_BoardValueMatrix[iIndexRow][iIndexColumn].m_bIsDragLocalWall)
+				bNewBlock = true;
+			
+		//Reset row moved before search in next row
 		for (iIndexColumn = 0; iIndexColumn < m_iColumnNumber; iIndexColumn++)
 		{
 			m_TemporaryValueMatrix[iIndexRow][iIndexColumn] = m_BoardValueMatrix[iIndexRow][iIndexColumn];
-		}
-
-		if(deltaMove != 0)
-		{
-			hint.m_deltaMove = deltaMove;
-			hint.m_iRow = iIndexRow;
-
-			return hint;
-		}
+		}		
 	}
 
 	for(iIndexColumn=0; iIndexColumn < m_iColumnNumber; iIndexColumn++)
 	{
-		int deltaMove = haveMatch3WHenMoveColumn(iIndexColumn);
+		bNewBlock = true;		
 
-		//Reset column moved
+		for( iIndexRow = 0; iIndexRow < m_iRowNumber; iIndexRow++)
+			if (bNewBlock && m_BoardValueMatrix[iIndexRow][iIndexColumn].m_bIsBlankCell == false) // we only hint at begin of each block
+			{
+				bIsSuccessful = haveMatch3WHenMoveCellVertical(iIndexRow, iIndexColumn, m_Hint);
+				bNewBlock = false;
+
+				if (bIsSuccessful)
+					return true;
+			}
+			else if (m_BoardValueMatrix[iIndexRow][iIndexColumn].m_bIsDragLocalWall)
+				bNewBlock = true;				
+
+		//Reset row moved before search in next row
 		for (iIndexRow = 0; iIndexRow < m_iRowNumber; iIndexRow++)
 		{
 			m_TemporaryValueMatrix[iIndexRow][iIndexColumn] = m_BoardValueMatrix[iIndexRow][iIndexColumn];
-		}
-
-		if(deltaMove != 0)
-		{
-			hint.m_deltaMove = deltaMove;
-			hint.m_iColumn = iIndexColumn;
-
-			return hint;
-		}
+		}		
 	}
 
-	return hint;
+	return false;
 }
 
 void NewGameBoardManager::FindSortAndFilterAdvanceCombos(std::vector<ComboEffectDescription>& advanceComboList, const int& iMoveRow, const int& iMoveColumn)
