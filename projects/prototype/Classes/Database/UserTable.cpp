@@ -161,3 +161,35 @@ unsigned long UserTable::getTimeLocalCurrent()
 	unsigned long iCurrentTime = now.tv_sec + now.tv_usec/1000000 ; //seconds
 	return iCurrentTime;
 }
+
+std::string UserTable::syncGetUser()
+{
+	char **re;
+	int nRow, nColumn;
+		
+	String sql = "select * from Users where Version>";
+	sql.appendWithFormat("%d ", VersionTable::getInstance()->getVersionInfo().iVersionSync);
+	sql.append("limit 1");
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	String sJsonData = "\"User\":{";
+	if (nRow > 0)
+	{
+		sJsonData.appendWithFormat("\"UserIdentifier\":\"%s\",", re[nColumn+0]);
+		sJsonData.appendWithFormat("\"FacebookId\":\"%s\",", re[nColumn+1]);
+		sJsonData.appendWithFormat("\"FacebookToken\":\"%s\",", re[nColumn+2]);
+		sJsonData.appendWithFormat("\"FirstName\":\"%s\",", re[nColumn+3]);
+		sJsonData.appendWithFormat("\"LastName\":\"%s\",", re[nColumn+4]);
+		sJsonData.appendWithFormat("\"CurrentChapterId\":\"%s\",", re[nColumn+5]);
+		sJsonData.appendWithFormat("\"CurrentLevel\":%s,", re[nColumn+6]);
+		sJsonData.appendWithFormat("\"Life\":%s,", re[nColumn+7]);
+		sJsonData.appendWithFormat("\"LifeTimeRemaining\":%s,", re[nColumn+8]);
+		sJsonData.appendWithFormat("\"lLifeTimeBeginRemain\":%s,", re[nColumn+9]);
+		sJsonData.appendWithFormat("\"Monney\":%s,", re[nColumn+10]);
+		sJsonData.appendWithFormat("\"Version\":%s", re[nColumn+11]);
+	}
+	sJsonData.append("}");
+	sqlite3_free_table(re);
+
+	return sJsonData.getCString();
+}

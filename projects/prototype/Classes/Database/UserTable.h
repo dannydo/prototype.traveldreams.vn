@@ -35,6 +35,8 @@ public:
 	bool updateUser(const UserInfo& userInfo);
 	bool updateLife(const unsigned int& iLoseLife);
 
+	std::string syncGetUser();
+
 private:
 	void fetchhUser();
 	unsigned long getTimeLocalCurrent();

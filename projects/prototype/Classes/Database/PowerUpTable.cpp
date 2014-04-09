@@ -78,3 +78,31 @@ bool PowerUpTable::updatePowerUp(const PowerUpInfo& powerUpInfo)
 
 	return true;
 }
+
+std::string	PowerUpTable::syncGetPoverUps()
+{
+	char **re;
+	int nRow, nColumn;
+		
+	String sql = "select * from PowerUps where Version>";
+	sql.appendWithFormat("%d ", VersionTable::getInstance()->getVersionInfo().iVersionSync);
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	String sJsonData = "\"PowerUps\":[";
+	for (int iRow=1; iRow<=nRow; iRow++)
+	{
+		sJsonData.append("{");
+		sJsonData.appendWithFormat("\"PowerUpdId\": \"%s\",", re[iRow*nColumn+0]);
+		sJsonData.appendWithFormat("\"Quantity\": %s,", re[iRow*nColumn+1]);
+		sJsonData.appendWithFormat("\"Version\": %s", re[iRow*nColumn+2]);
+
+		if (iRow == nRow)
+			sJsonData.append("}");
+		else
+			sJsonData.append("},");
+	}
+	sJsonData.append("]");
+	sqlite3_free_table(re);
+
+	return sJsonData.getCString();
+}

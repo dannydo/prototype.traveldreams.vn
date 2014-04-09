@@ -60,3 +60,33 @@ unsigned long TransactionTable::getTimeLocalCurrent()
 	unsigned long iCurrentTime = now.tv_sec + now.tv_usec/1000000 ; //seconds
 	return iCurrentTime;
 }
+
+std::string	TransactionTable::syncGetTransactions()
+{
+	char **re;
+	int nRow, nColumn;
+		
+	String sql = "select * from Transactions where Version>";
+	sql.appendWithFormat("%d ", VersionTable::getInstance()->getVersionInfo().iVersionSync);
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	String sJsonData = "\"Transactions\":[";
+	for (int iRow=1; iRow<=nRow; iRow++)
+	{
+		sJsonData.append("{");
+		sJsonData.appendWithFormat("\"PowerUpId\": \"%s\",", re[iRow*nColumn+1]);
+		sJsonData.appendWithFormat("\"Quantity\": %s,", re[iRow*nColumn+2]);
+		sJsonData.appendWithFormat("\"TotalAmount\": %s,", re[iRow*nColumn+3]);
+		sJsonData.appendWithFormat("\"DateTime\": %s,", re[iRow*nColumn+4]);
+		sJsonData.appendWithFormat("\"Version\": %s", re[iRow*nColumn+5]);
+
+		if (iRow == nRow)
+			sJsonData.append("}");
+		else
+			sJsonData.append("},");
+	}
+	sJsonData.append("]");
+	sqlite3_free_table(re);
+
+	return sJsonData.getCString();
+}

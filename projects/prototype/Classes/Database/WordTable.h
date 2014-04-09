@@ -34,6 +34,9 @@ public:
 	bool updateWord(const WordInfo& wordInfo);
 	void refreshWordsForChapter(const std::string& sChapterId);
 
+	std::string	syncGetWords();
+	std::string	syncGetMapChapterWords();
+
 private:
 	void fetchWordsForChapter(const std::string& sChapterId);
 

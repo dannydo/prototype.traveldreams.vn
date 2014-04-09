@@ -24,6 +24,8 @@ public:
 	UnlockChapterInfo fetchUnlockChapter(const std::string sChapterId, const std::string sType);
 	bool insertUnlockChapter(const UnlockChapterInfo& unlockChapterInfo);
 	bool updateUnlockChapter(const UnlockChapterInfo& unlockChapterInfo);
+
+	std::string	syncGetUnlockChapters();
 	
 private:
 	unsigned long getTimeLocalCurrent();

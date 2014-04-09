@@ -110,3 +110,36 @@ bool ChapterTable::updateChapter(ChapterInfo chapterInfo)
 
 	return true;
 }
+
+std::string	ChapterTable::syncGetChapters()
+{
+	char **re;
+	int nRow, nColumn;
+		
+	String sql = "select * from Chapters where Version>";
+	sql.appendWithFormat("%d ", VersionTable::getInstance()->getVersionInfo().iVersionSync);
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	String sJsonData = "\"Chapters\":[";
+	for (int iRow=1; iRow<=nRow; iRow++)
+	{
+		sJsonData.append("{");
+		sJsonData.appendWithFormat("\"ChapterId\": \"%s\",", re[iRow*nColumn+0]);
+		sJsonData.appendWithFormat("\"TotalLevelUnlock\": %s,", re[iRow*nColumn+1]);
+		sJsonData.appendWithFormat("\"TotalStar\": %s,", re[iRow*nColumn+2]);
+		sJsonData.appendWithFormat("\"IsUnlock\": %s,", re[iRow*nColumn+3]);
+		sJsonData.appendWithFormat("\"Version\": %s,", re[iRow*nColumn+4]);
+		sJsonData.appendWithFormat("\"TotalFlashCardUnlock\": %s,", re[iRow*nColumn+5]);
+		sJsonData.appendWithFormat("\"CountFlashCardNew\": %s,", re[iRow*nColumn+6]);
+		sJsonData.appendWithFormat("\"TotalFlash\": %s", re[iRow*nColumn+7]);
+
+		if (iRow == nRow)
+			sJsonData.append("}");
+		else
+			sJsonData.append("},");
+	}
+	sJsonData.append("]");
+	sqlite3_free_table(re);
+
+	return sJsonData.getCString();
+}

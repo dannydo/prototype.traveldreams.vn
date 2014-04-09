@@ -40,6 +40,8 @@ public:
 	bool updateChapter(ChapterInfo chapterInfo);
 	void refreshChapters();
 
+	std::string	syncGetChapters();
+
 private:
 	void fetchAllChapter();
 

@@ -29,6 +29,8 @@ public:
 	LevelInfo& getLevel(const std::string& sChapterId, const int& iLevel);
 	bool updateLevel(const LevelInfo& levelInfo);
 
+	std::string	syncGetLevels();
+
 private:
 	void fetchLevelsForChapter(const std::string& sChapterId);
 

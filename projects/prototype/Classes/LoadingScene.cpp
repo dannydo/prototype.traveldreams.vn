@@ -6,7 +6,8 @@
 #include "Database\DictionaryDatabase.h"	 
 #include "GameConfigManager.h"
 #include "GameWordManager.h"
-#include "Database/VersionTable.h"
+#include "Database\VersionTable.h"
+#include "APIService\SyncDataGame.h"
 
 using namespace cocos2d;
 
@@ -123,7 +124,7 @@ void LoadingLayer::initData()
 			WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[0];
 	
 			UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
-			userInfo.sFacebookToken = "CAAGQiytiRCoBAB5OUzRDO7OEejvNl8lheuOzZCeRG3ZBLSBPNsV7IAI8AVwVKshZCBQfo6QpLE1NZBv1OUZCpXfSeFwGyzito0hhEP3GLBIK5wCfSInTnv8u3sa1yzZBmB1FGmHPQXEJOADnOnPwETRTo81JSLXxcFNI5Q3T6PICutMERTEUdvtM1jejNfWz4lVZA1ZBZAYGVJOeXmO8Wg6j9FjqTWErOfNRrvBHfhcVw9QZDZD";
+			userInfo.sFacebookToken = "CAAGQiytiRCoBAPqmEfvePLrbdMuzDylsNQZAZAud0CKLLTFZAfIm4pkdUcCoyYGEGDr3sgwKZCNLdTNbMgD2pd90UqfvFgf4JjsDR9rtBrUfO3D2nj3V8ZApvpeoJWDfYh3PwAnPJsZCHl9lFwZCGfjLKisBhnmgEaZCRZAHxYh3P9ZAxukpGupiX91XKyfjHVFbAfRpyqWxH6fbSCVxfiuxoimd05Y4Rc1fjKkVsTcDtlrwZDZD";
 			userInfo.sFacebookId = "100000135318088";
 			userInfo.sFirstName	 = "Van";
 			userInfo.sLastName = "Dao";
@@ -149,6 +150,10 @@ void LoadingLayer::initData()
 			}
 		}
 	}
+
+	// Sync Data Game
+	SyncDataGame* sync = new SyncDataGame();
+	sync->syncRun();
 }
 
 void LoadingLayer::finishLoading()

@@ -24,6 +24,8 @@ public:
 
 	bool insertTransaction(const TransactionInfo& transactionInfo);
 
+	std::string	syncGetTransactions();
+
 private:
 	unsigned long getTimeLocalCurrent();
 
