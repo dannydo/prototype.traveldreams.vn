@@ -2,6 +2,7 @@
 #define __CHAPTER_TABLE_H__
 
 #include "cocos2d.h"
+#include "cocos-ext.h"
 
 struct ChapterInfo
 {
@@ -41,6 +42,7 @@ public:
 	void refreshChapters();
 
 	std::string	syncGetChapters();
+	bool updateDataSyncChapters(cs::JsonDictionary* pJsonSync, const int& iVersion);
 
 private:
 	void fetchAllChapter();

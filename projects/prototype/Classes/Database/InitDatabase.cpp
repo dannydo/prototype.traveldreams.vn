@@ -115,7 +115,6 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 			char sVersion[10];
 			sprintf(sVersion, "%d", iVersion);
 
-			std::string sqlChapter;
 			sqlRun.append("insert into Chapters values('");
 			sqlRun.append(sChapterId.c_str());
 			sqlRun.append("', 0, 0, 1, ");

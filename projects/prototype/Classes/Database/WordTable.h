@@ -2,6 +2,7 @@
 #define __WORD_TABLE_H__
 
 #include "cocos2d.h"
+#include "cocos-ext.h"
 
 struct WordInfo
 {
@@ -36,6 +37,8 @@ public:
 
 	std::string	syncGetWords();
 	std::string	syncGetMapChapterWords();
+	bool updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iVersion);
+	bool updateDataSyncMapChapterWords(cs::JsonDictionary* pJsonSync, const int& iVersion);
 
 private:
 	void fetchWordsForChapter(const std::string& sChapterId);

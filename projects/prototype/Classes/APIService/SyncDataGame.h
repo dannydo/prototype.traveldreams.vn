@@ -10,8 +10,20 @@ public:
 	SyncDataGame();
 	~SyncDataGame();
 
-	bool syncRun();
+	static SyncDataGame* getInstance();
+	static void releaseInstance();
+
+	void runSyncDataGame();
+	inline const bool& getIsFinishSync() { return isFinishSync; };
 
 private:
+	void onHttpRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
+
+	static SyncDataGame* m_SyncDataGame;
+
+	static cocos2d::extension::HttpRequest* m_pRequest;
+	static cocos2d::extension::HttpClient* m_pClient;
+
+	bool isFinishSync;
 };
 #endif

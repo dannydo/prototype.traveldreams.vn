@@ -2,6 +2,7 @@
 #define __USER_TABLE_H__
 
 #include "cocos2d.h"
+#include "cocos-ext.h"
 
 #define _SECONDS_FOR_NEW_LIFE_ 60
 #define _MAX_LIFE_ 5
@@ -36,6 +37,7 @@ public:
 	bool updateLife(const unsigned int& iLoseLife);
 
 	std::string syncGetUser();
+	bool updateDataSyncUser(cs::JsonDictionary* pJsonSync, const int& iVersion);
 
 private:
 	void fetchhUser();

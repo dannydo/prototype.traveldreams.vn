@@ -72,7 +72,7 @@ bool LoadingLayer::init()
 
 void LoadingLayer::update(float dt)
 {
-	if (m_bFinishLoad)
+	if (m_bFinishLoad && SyncDataGame::getInstance()->getIsFinishSync())
 	{
 		MainMenuScene* scene = MainMenuScene::create();
 		Director::getInstance()->replaceScene(scene);
@@ -152,8 +152,7 @@ void LoadingLayer::initData()
 	}
 
 	// Sync Data Game
-	SyncDataGame* sync = new SyncDataGame();
-	sync->syncRun();
+	SyncDataGame::getInstance()->runSyncDataGame();
 }
 
 void LoadingLayer::finishLoading()
