@@ -3,6 +3,7 @@
 #include "WorldMapScene.h"
 #include "ButtonNode.h"
 #include "StatusLayer.h"
+#include "SystemEventHandle.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -38,7 +39,6 @@ MainMenuScene::~MainMenuScene()
 
 MainMenuLayer::~MainMenuLayer()
 {
-	UserService::getInstance()->removeCallBackList(this);
 }
 
 bool MainMenuLayer::init()
@@ -60,47 +60,51 @@ bool MainMenuLayer::init()
 	ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonPlayGameSprite, CC_CALLBACK_1(MainMenuLayer::playGame, this));
 	buttonPlayNode->setPosition(Point(320.0f, 515.0f));
 
-	Sprite* pButtonLoginFacebookSprite = Sprite::create("LoadingAndMainMenu/FB_btn.png");
-	m_buttonLoginNode = ButtonNode::createButtonSprite(pButtonLoginFacebookSprite, CC_CALLBACK_1(MainMenuLayer::loginFacebook, this));
-	m_buttonLoginNode->setPosition(Point(320.0f, 355.0f));
-
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
 	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
 	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(MainMenuLayer::openSettingMenu, this));
 	m_pButtonSettingNode->setPosition(Point(50.0f, 50.0f));
 
-	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
-	pButtonManagerNode->addButtonNode(buttonPlayNode);
-	pButtonManagerNode->addButtonNode(m_buttonLoginNode);
-	pButtonManagerNode->addButtonNode(m_pButtonSettingNode);
-	this->addChild(pButtonManagerNode, 10);
+	m_pButtonManagerNode = ButtonManagerNode::create();
+	m_pButtonManagerNode->addButtonNode(buttonPlayNode);
+	m_pButtonManagerNode->addButtonNode(m_pButtonSettingNode);
+	this->addChild(m_pButtonManagerNode, 10);
+
+	this->addButtonLoginFacebook();
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	FacebookManager::getInstance()->loadPlugin();
 	if(FacebookManager::getInstance()->isLogined())
 	{
-		m_buttonLoginNode->setVisible(false);
+		m_pButtonManagerNode->removeButtonNode(m_buttonLoginNode);
+		m_isAddButtonLogin = true;
 	}
 #endif
 
-	this->scheduleUpdate();
-
 	m_pSettingNode = NULL;
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
+	this->scheduleUpdate();
 
 	return true;
+}
+
+void MainMenuLayer::addButtonLoginFacebook()
+{
+	Sprite* pButtonLoginFacebookSprite = Sprite::create("LoadingAndMainMenu/FB_btn.png");
+	m_buttonLoginNode = ButtonNode::createButtonSprite(pButtonLoginFacebookSprite, CC_CALLBACK_1(MainMenuLayer::loginFacebook, this));
+	m_buttonLoginNode->setPosition(Point(320.0f, 355.0f));
+	m_pButtonManagerNode->addButtonNode(m_buttonLoginNode);
+	m_isAddButtonLogin = false;
 }
 
 void MainMenuLayer::update(float dt)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	if(FacebookManager::getInstance()->isLogined())
+	if(FacebookManager::getInstance()->isLogined() && m_isAddButtonLogin == false && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) == 1)
 	{
 		m_sFacebookToken = FacebookManager::getInstance()->getAccessToken();
-		UserService::getInstance()->addCallBackList(this);
-		UserService::getInstance()->registryUser(m_sFacebookToken);
-		
-		this->unscheduleUpdate();
+		m_pButtonManagerNode->removeButtonNode(m_buttonLoginNode);
+		m_isAddButtonLogin = true;
 	}
 #endif
 }
@@ -113,26 +117,13 @@ void MainMenuLayer::playGame(Object* sender)
 
 void MainMenuLayer::loginFacebook(Object* sender)
 {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	if(m_buttonLoginNode->isVisible() == true) 
-	{
-		//FacebookManager::getInstance()->loginByMode();
-		MessageBox("To be implemented", "Facebook");
-	}
-#else
-	MessageBox("Facebook not run with platform window", "Facebook");
-#endif
+	UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
+	if (m_pSettingNode != NULL)
+		m_pSettingNode->setStatusButtonFacebook(1);
+	SystemEventHandle::getInstance()->onStartConnectFacebook();
 }
 
-void MainMenuLayer::LogoutFacebook()
-{
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    FacebookManager::getInstance()->logoutByMode();
-#else
-	MessageBox("Facebook not run with platform window", "Facebook");
-#endif
-}
-
+/*
 void MainMenuLayer::shareLinkFacebook()
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
@@ -157,6 +148,7 @@ void MainMenuLayer::shareDialogFacebook()
 	MessageBox("Facebook not run with platform window", "Facebook");
 #endif
 }
+*/
 
 void MainMenuLayer::openSettingMenu(Object *sender)
 {
@@ -175,26 +167,11 @@ void MainMenuLayer::openSettingMenu(Object *sender)
 	else
 	{
 		m_pSettingNode->hide();
-	}
-}
-
-void MainMenuLayer::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey)
-{
-	try 
-	{
-		cs::JsonDictionary* jsonData = pJsonDict->getSubDictionary("data");
-		bool bResult = jsonData->getItemBoolvalue("result", false);
-		if (bResult)
+		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		if(!FacebookManager::getInstance()->isLogined() && m_isAddButtonLogin == true)
 		{
-			UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
-			userInfo.sFacebookId = jsonData->getItemStringValue("facebook_id");
-			userInfo.sFacebookToken = m_sFacebookToken;
-			UserTable::getInstance()->updateUser(userInfo);
-			
-			m_buttonLoginNode->setVisible(false);
+			this->addButtonLoginFacebook();
 		}
-	}
-	catch (exception e)
-	{
+		#endif
 	}
 }

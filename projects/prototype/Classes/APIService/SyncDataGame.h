@@ -14,7 +14,7 @@ public:
 	static void releaseInstance();
 
 	void runSyncDataGame();
-	inline const bool& getIsFinishSync() { return isFinishSync; };
+	inline const bool& getIsFinishSync() { return m_bIsFinishSync; };
 
 private:
 	void onHttpRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
@@ -24,6 +24,6 @@ private:
 	static cocos2d::extension::HttpRequest* m_pRequest;
 	static cocos2d::extension::HttpClient* m_pClient;
 
-	bool isFinishSync;
+	bool m_bIsFinishSync;
 };
 #endif

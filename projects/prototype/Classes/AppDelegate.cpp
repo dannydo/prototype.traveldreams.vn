@@ -5,7 +5,8 @@
 #include "LoadingScene.h"
 
 #include "APIService\UserService.h"
-#include "Social\FacebookManager.h"
+#include "Social\FacebookManager.h"		
+#include "APIService\SyncDataGame.h"
 
 #include "Database\InitDatabase.h"
 #include "Database\ChapterTable.h"
@@ -39,6 +40,7 @@ AppDelegate::~AppDelegate()
 	UnlockChapterTable::releaseInstance();
 	TransactionTable::releaseInstance();
 	PowerUpTable::releaseInstance();
+	SyncDataGame::releaseInstance();
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	//FacebookManager::getInstance()->unloadPlugin();

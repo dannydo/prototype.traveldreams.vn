@@ -28,6 +28,8 @@ public:
 	void hide();
 	inline bool getShowSetting() { return m_iShowSetting; };
 	void addButtonSetting(ButtonNode* pSettingButton);
+	void update(float dt) override;
+	void setStatusButtonFacebook(const int& iStatus);
 
 private:
 	bool onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
@@ -41,15 +43,20 @@ private:
 	void clickFacebook(cocos2d::Object* sender);
 	void clickBack(cocos2d::Object* sender);
 	void actionBack();
+	void addButtonFacebook();
 
 	cocos2d::MenuItemToggle* m_pMenuVoice;
 	cocos2d::MenuItemToggle* m_pMenuEffect;
 	cocos2d::MenuItemToggle* m_pMenuMusic;
 	cocos2d::Sprite* m_pBackground;
 	ButtonNode* m_pSettingButton;
+	ButtonManagerNode* m_pButtonManagerNode;
+	bool m_isAddButtonFacebook;
+	ButtonNode* m_pButtonFacebook;
 
 	bool m_iShowSetting;
 	bool m_isClick;
+	int m_iStatusButtonFacebook;
 };
 
 class Breadcrumb

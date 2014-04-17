@@ -150,37 +150,23 @@ public class UserFacebook implements InterfaceUser {
             	else {
             		mStatusCallback.mCallByMode = SessionStatusCallback.CallByLogin;
             		mStatusCallback.mCallbackIndex = 1;
-            		String strAccessToken = session.getAccessToken();
             		
-            		if(strAccessToken == "") {
-	            		if (!session.isClosed()) {
-	            			OpenRequest openRequest = new Session.OpenRequest(mContext);
-	            			if (permissions != null) {
-	            				openRequest.setPermissions(Arrays.asList(permissions));
-	            			}
-	            			openRequest.setCallback(mStatusCallback);
-	            			
-	            			if (mNeedPublishPermissions) {
-	            				session.openForPublish(openRequest);
-	            			}
-	            			else {
-	            				session.openForRead(openRequest);
-	            			}
-	            		}
-	            		else {
-	            			Session.openActiveSession(mContext, true, mStatusCallback);
-	            		}
-            		}
-            		else {
-            			LogD("Access token:" + session.getAccessToken());
+            		if (!session.isClosed()) {
+            			OpenRequest openRequest = new Session.OpenRequest(mContext);
+            			if (permissions != null) {
+            				openRequest.setPermissions(Arrays.asList(permissions));
+            			}
+            			openRequest.setCallback(mStatusCallback);
+            			
             			if (mNeedPublishPermissions) {
-            				AccessToken access = AccessToken.createFromExistingAccessToken(strAccessToken, null, null, null, Arrays.asList(permissions));
-            				session.open(access, mStatusCallback);
+            				session.openForPublish(openRequest);
             			}
             			else {
-            				AccessToken access = AccessToken.createFromExistingAccessToken(strAccessToken, null, null, null, null);
-            				session.open(access, mStatusCallback);
+            				session.openForRead(openRequest);
             			}
+            		}
+            		else {
+            			Session.openActiveSession(mContext, true, mStatusCallback);
             		}
             	}
             }
@@ -219,6 +205,38 @@ public class UserFacebook implements InterfaceUser {
 		}
 		
 		return false;
+	}
+	
+	public void autoOpenActiveSession() {
+		//TODO Auto-generated method stub
+		LogD("Login By Token");
+		
+		if (mContext == null) {
+			LogD("mContext null");
+			UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Activity/context hasn't been initialized");
+			return;
+		}
+		
+		PluginWrapper.runOnMainThread(new Runnable() {
+		    @Override
+		    public void run() {
+		    	Session session = Session.getActiveSession();
+		    	if (session == null) {
+		        	session = new Session.Builder(mContext).setApplicationId(appId).build();
+		        	LogD("Set active session");
+		    	}
+		    	Session.setActiveSession(session);
+		    	
+		    	if (session.isOpened()) {
+					UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_SUCCEED, "Already logined!");
+		    	}
+		    	else {
+		    		mStatusCallback.mCallByMode = SessionStatusCallback.CallByLogin;
+		    		mStatusCallback.mCallbackIndex = 1;
+		    		Session.openActiveSession(mContext, true, mStatusCallback);
+		    	}
+		    }
+		});
 	}
 	
 	public void shareFacebookLink(JSONObject shareInfo) {
@@ -374,14 +392,14 @@ public class UserFacebook implements InterfaceUser {
 	}
 	
 	class SessionStatusCallback implements Session.StatusCallback {
-		int mCallbackIndex = -1;
 
-		String params = null;
-
-		int mCallByMode = CallByNull;
 		static final int CallByNull = 0;
 		static final int CallByLogin = 1;
 		static final int CallByLogout = 2;
+		
+		int mCallbackIndex = -1;
+		String params = null;
+		int mCallByMode = CallByNull;
 		
 		@Override
 		public void call(Session session, SessionState state,

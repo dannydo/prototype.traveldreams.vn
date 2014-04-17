@@ -113,6 +113,8 @@ void LoadingLayer::initData()
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnVoice", 1);
 	}
 
+	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", 0);
+
 	InitDatabase::getInstance();
 	DictionaryDatabase::getInstance();
 
@@ -124,31 +126,33 @@ void LoadingLayer::initData()
 			WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[0];
 	
 			UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
-			userInfo.sFacebookToken = "CAAGQiytiRCoBAPqmEfvePLrbdMuzDylsNQZAZAud0CKLLTFZAfIm4pkdUcCoyYGEGDr3sgwKZCNLdTNbMgD2pd90UqfvFgf4JjsDR9rtBrUfO3D2nj3V8ZApvpeoJWDfYh3PwAnPJsZCHl9lFwZCGfjLKisBhnmgEaZCRZAHxYh3P9ZAxukpGupiX91XKyfjHVFbAfRpyqWxH6fbSCVxfiuxoimd05Y4Rc1fjKkVsTcDtlrwZDZD";
-			userInfo.sFacebookId = "100000135318088";
-			userInfo.sFirstName	 = "Van";
-			userInfo.sLastName = "Dao";
 			userInfo.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
+			userInfo.iCurrentLevel = 1;
 			UserTable::getInstance()->updateUser(userInfo);
 
 			// Create data for one chapter
 			std::vector<std::string> wordList;
 			std::vector<int> mapLevels;
-			GameConfigManager::getInstance()->GenerateWordsForLevels( worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
+			GameConfigManager::getInstance()->GenerateWordsForLevels(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
 
 			if(InitDatabase::getInstance()->createDataChapterAndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels))
 			{
 				UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
 			}
-
-			if(userInfo.sFacebookId != "")
-			{
-				#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-					//FacebookManager::getInstance()->loadPlugin();
-					//FacebookManager::getInstance()->loginByMode();
-				#endif
-			}
 		}
+	}
+
+	if(UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", -1) == -1)
+	{
+		UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
+	}
+
+	if(UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) == 1)
+	{
+		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+			FacebookManager::getInstance()->loadPlugin();
+			FacebookManager::getInstance()->autoOpenActiveSession();
+		#endif
 	}
 
 	// Sync Data Game

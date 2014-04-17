@@ -1,6 +1,7 @@
 #include "UserService.h"
 #include "Constants.h"
 #include "Database\UserTable.h"
+#include "SystemEventHandle.h"
 
 USING_NS_CC; 
 USING_NS_CC_EXT;
@@ -40,42 +41,28 @@ UserService* UserService::getInstance()
 	return m_UserService;
 }
 
-void UserService::registryUser(const std::string strAccessToken)
+void UserService::checkUserFacebook(const std::string strAccessToken, const int& iUserId, const int& iTag)
 {
 	String strURL = _CONSTANT_URL_;
-	strURL.append("api/registry/");
+	strURL.append("api/checkUserFacebook/");
 	strURL.append(strAccessToken);
+	strURL.appendWithFormat("/%d", iUserId);
 
 	m_pRequest = new HttpRequest();
 	m_pRequest->setUrl(strURL.getCString());
 	m_pRequest->setRequestType(HttpRequest::Type::GET);
-	m_pRequest->setTag("RegistryToken");
 
-	m_pRequest->setResponseCallback(this, httpresponse_selector(UserService::onHttpRequestCompleted));
+	String sTag = "CheckUserFacebook";
+	sTag.appendWithFormat("_%d", iTag);
+	m_pRequest->setTag(sTag.getCString());
+
+	m_pRequest->setResponseCallback(this, httpresponse_selector(UserService::onCheckUserFacebookCompleted));
 	m_pClient->send(m_pRequest);
 	m_pRequest->release();
 	m_pRequest = NULL;
 }
 
-void UserService::getUserInfo()
-{
-	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
-	String strURL = _CONSTANT_URL_;
-	strURL.append("api/getUserByFacebookToken/");
-	strURL.append(userInfo.sFacebookToken);
-
-	m_pRequest = new HttpRequest();
-	m_pRequest->setUrl(strURL.getCString());
-	m_pRequest->setRequestType(HttpRequest::Type::GET);
-	m_pRequest->setTag("UserInfo");
-
-	m_pRequest->setResponseCallback(this, httpresponse_selector(UserService::onHttpRequestCompleted));
-	m_pClient->send(m_pRequest);
-	m_pRequest->release();
-	m_pRequest = NULL;
-}
-
-void UserService::getLeaderBoardLevel(const int& iLevel)
+void UserService::getLeaderBoardLevel(const int& iLevel, const int& iTag)
 {
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
 	String strURL = _CONSTANT_URL_;
@@ -86,12 +73,40 @@ void UserService::getLeaderBoardLevel(const int& iLevel)
 	m_pRequest = new HttpRequest();
 	m_pRequest->setUrl(strURL.getCString());
 	m_pRequest->setRequestType(HttpRequest::Type::GET);
-	m_pRequest->setTag("LeaderBoardLevel");
+
+	String sTag = "LeaderBoardLevel";
+	sTag.appendWithFormat("_%d", iTag);
+	m_pRequest->setTag(sTag.getCString());
 
 	m_pRequest->setResponseCallback(this, httpresponse_selector(UserService::onHttpRequestCompleted));
 	m_pClient->send(m_pRequest);
 	m_pRequest->release();
 	m_pRequest = NULL;
+}
+
+void UserService::onCheckUserFacebookCompleted(HttpClient *sender, HttpResponse *response)
+{
+	std::string sKey = "";
+	String strData = "";
+	sKey.append(response->getHttpRequest()->getTag());
+	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
+
+	if (response)
+    {
+		if (response->isSucceed()) 
+		{
+			
+			std::vector<char> *buffer = response->getResponseData();
+			
+			for (unsigned int i = 0; i < buffer->size(); i++)
+			{
+				strData.appendWithFormat("%c", (*buffer)[i]);
+			}
+		}
+	}
+
+	SystemEventHandle::getInstance()->onCheckUserFacebookResult(this->parseStringToJson(strData.getCString()), sKey);
+	
 }
 
 void UserService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)
