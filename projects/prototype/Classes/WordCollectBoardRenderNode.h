@@ -21,7 +21,7 @@ private:
 public:
 	static WordCollectBoardRenderNode* create();
 
-	void GenerateLabels();//call this after generate level data
+	void GenerateLabels(GameModeType_e eGameModeType);//call this after generate level data
 	//void draw() override;
 	void update(float dt) override;	
 
@@ -44,7 +44,7 @@ public:
 	float PlaySpellingSound();
 
 	void PlayUnlockLetterEffect(const int& iLetterIndex, const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position);
-	void PlayUnlockWordEffect(const float& fMoveTime, const float& fDisplayTime);
+	float PlayUnlockWordEffect();
 private:
 	//void LoadWords();
 	//void GetWordIndex();
@@ -68,7 +68,8 @@ private:
 	
 	//float m_LabelXPositionList[_GDS_WORD_MAX_LENGTH_];
 
-	SpriteBatchNode* m_pBatchNode;
+	SpriteBatchNode* m_pBackgroundBatchNode;
+	SpriteBatchNode* m_pFrontgroundBatchNode;
 	//Sprite* m_pBackground;
 	DrawNode* m_pColorNode;	
 	//Sprite* m_pLetterPanel;

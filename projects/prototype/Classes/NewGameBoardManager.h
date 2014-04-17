@@ -139,7 +139,7 @@ public:
 
 	inline const int& GetCurrentScore() { return m_iCurrentScore;}
 	inline const int& GetCurrentMove() { return m_iCurrentMove;}
-	inline const LevelConfig& GetLevelConfig() { return *m_pLevelConfig;}
+	//inline const LevelConfig& GetLevelConfig() { return *m_pLevelConfig;}
 	//inline const int& GetCurrentLevel() { return m_iCurrentLevel;}
 
 	inline void SetObstacleBlockID(const int& iRow, const int& iColumn, const int& iObstacleBlockID) { m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID = iObstacleBlockID;}	
@@ -159,7 +159,8 @@ public:
 
 	inline const int& GetPhaseMoveOfComboChain() { return m_iPhaseMoveInComboChain;}
 
-	void GenerateGameBoard();
+	void GenerateGameBoard(GameModeType_e eGameModeType, int iTimeModeStage = 1);	
+	void GeneratePositionOfLettersForTimeMode(std::vector<Cell>& positionList);
 
 	inline std::vector<DestroyedByComboCell>& GetDestroyBonusQuestGemList() { return m_DestroyBonusQuestGemList;}
 

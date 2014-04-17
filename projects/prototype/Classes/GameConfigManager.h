@@ -4,6 +4,7 @@
 #include "GameDataStructure.h"
 #include <map>
 #include "cocos2d.h"
+#include "CustomModeDefines.h"
 
 USING_NS_CC;
 
@@ -108,18 +109,13 @@ enum EndGameBonusType : int
 	_EGBT_CRAZY_PETS_ = 2
 };
 
-struct LevelConfig
+struct LevelConfig : public BaseLevelConfig
 {
 public:
-	// map size
-	int m_iRowNumber, m_iColumnNumber;
-	// number of move and color
+	
+	// number of move 
 	int m_iNumberOfMove;
-	int m_iNumberOfColor;
-	// score of stars
-	int m_ScoreOfStars[3];
-	// map matrix
-	int m_BoardMatrix[_BOARD_MAX_ROW_NUMBER_][_BOARD_MAX_COLUMN_NUMBER_];
+
 	// main word
 	//int m_iMainWordID;
 	//std::string m_sMainWordID;
@@ -148,6 +144,11 @@ public:
 	LevelBossConfig m_BossConfig;
 	// bonus quest config
 	BonusQuestConfig m_BonusQuestConfig;	
+
+	LevelConfig()
+	{
+		m_eGameModeType = _GMT_NORMAL_;
+	}
 
 	~LevelConfig()
 	{		
@@ -268,9 +269,11 @@ public:
 	void LoadObstacleConfig();
 	void LoadWordMapConfig();
 
+	void LoadCustomModeConfig();
+
 	LevelConfig& GetLevelConfig(const std::string& sChapterID, const int& iLevelId);
 	ChapterConfig& GetChapterConfig(const std::string& sChapterID);
-	WordlMapConfig::WordMapChapterConfig& GetWordMapChapterConfig(const std::string& sChapterID);
+	WordlMapConfig::WordMapChapterConfig& GetWordMapChapterConfig(const std::string& sChapterID);	
 
 	inline const GameConfig& GetGameConfig() { return m_GameConfig;}	
 	inline int GetObstacleTypeCount() { return m_ObstacleDescriptionArray.size();}
@@ -279,6 +282,8 @@ public:
 	inline const int& GetCurrentLevelId() { return m_iCurrentLevelID; };
 	inline const WordlMapConfig& GetWordlMapConfig() { return m_WordlMapConfig; };
 
+	TimeModeLevelConfig& GetTimeModeDemoConfig() { if (!m_bIsTimeModeLevelConfigLoaded) LoadCustomModeConfig(); return m_TimeModeLevelConfig;}
+	
 	int CountLevelOfPreviousChapters(const std::string& sChapterID);
 
 	inline bool GetNextChapterID(const std::string& sChapterID, std::string& sNextChapterID){
@@ -321,6 +326,11 @@ private:
 	std::vector<ObstacleDescription*> m_ObstacleDescriptionArray;
 	std::map<std::string,int> m_ObstaleNameToIDMap;
 	bool m_ObstacleCompatibleMatrix[_MAX_OBSTACLE_TYPE_COUNT_][_MAX_OBSTACLE_TYPE_COUNT_];
+
+
+	// custom mode
+	bool m_bIsTimeModeLevelConfigLoaded;
+	TimeModeLevelConfig m_TimeModeLevelConfig;
 };
 
 #endif _GAME_CONFIG_MANAGER_H_

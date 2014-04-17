@@ -139,6 +139,12 @@ public:
 	int m_iRatioBetweenLettersOfTrashWord;
 };
 
+enum GameModeType_e
+{
+	_GMT_NORMAL_, //moved based
+	_GMT_TIME_MODE_ //time based
+};
+
 enum GemComboType_e
 {
 	_GCT_HAS_LETTER_ =-1,

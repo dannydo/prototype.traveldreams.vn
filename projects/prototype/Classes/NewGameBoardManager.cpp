@@ -5,10 +5,8 @@
 #define _MAX_(a,b) ((a)>(b))?(a):(b)
 
 NewGameBoardManager::NewGameBoardManager() : GameBoardManager()
-{
-	m_iCurrentScore = 0;		
-	m_pObstacleProcessManager = new ObstacleProcessManager(this);
-	m_iPhaseMoveInComboChain = 0;
+{	
+	m_pObstacleProcessManager = new ObstacleProcessManager(this);	
 }
 
 NewGameBoardManager::~NewGameBoardManager()
@@ -16,63 +14,73 @@ NewGameBoardManager::~NewGameBoardManager()
 	delete m_pObstacleProcessManager;
 }
 
-void NewGameBoardManager::GenerateGameBoard()
-{	
-	GameBoardManager::GenerateGameBoard();
+void NewGameBoardManager::GenerateGameBoard(GameModeType_e eGameModeType, int iTimeModeStage)
+{
+	m_iCurrentScore = 0;
+	m_iPhaseMoveInComboChain = 0;
+	m_iTimeModeStage = iTimeModeStage;
+
+	GameBoardManager::GenerateGameBoard(eGameModeType);
 	
 	m_pGameWordManager = GameWordManager::getInstance();	
-	m_iCurrentMove = m_pLevelConfig->m_iNumberOfMove;
+	m_iCurrentMove = 100000; //default //m_pLevelConfig->m_iNumberOfMove;
 
 	m_pObstacleProcessManager->InitLevel();
 	//m_pGameWordManager->GenerateWordForNewLevel(); //already called by main menu
 
 
 	// process boss
-	if (m_pLevelConfig->m_bEnableBoss)
+	if (m_pLevelConfig->m_eGameModeType == _GMT_NORMAL_)
 	{
-		if (m_pLevelConfig->m_bIsMainWordExistedOnBoard)
-			m_pLevelConfig->m_bIsMainWordExistedOnBoard = false;
-		
-		m_pGameWordManager->EnableVersusBossMode();
+		LevelConfig*  pNormalLevelConfig = (LevelConfig*) m_pLevelConfig;
 
-		int iRow, iColumn, iRowInc, iColumnInc;
-		for(iRowInc = 0; iRowInc < m_pLevelConfig->m_BossConfig.m_iHeight; iRowInc++)
-			for(iColumnInc = 0; iColumnInc < m_pLevelConfig->m_BossConfig.m_iWidth; iColumnInc++)
-			{
-				iRow = m_pLevelConfig->m_BossConfig.m_Position.m_iRow + iRowInc;
-				iColumn = m_pLevelConfig->m_BossConfig.m_Position.m_iColumn + iColumnInc;
-				if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID >= 0)
-				{
-					m_pObstacleProcessManager->ForceDestroyObstacleBlock(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID);
-				}
+		m_iCurrentMove = pNormalLevelConfig->m_iNumberOfMove;
 
-				m_BoardValueMatrix[iRow][iColumn].Reset();
-				m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
-			}			
-
-		m_LevelBossInfo.m_bIsEnable = true;
-		m_LevelBossInfo.m_iCurrentHitPoint = m_pLevelConfig->m_BossConfig.m_HitPointPerLetter;
-		m_LevelBossInfo.m_iRemainLettersCount = m_pGameWordManager->GetMainWord().m_iRemainInactivatedCharacterCount;
-	}
-	else
-		m_LevelBossInfo.m_bIsEnable = false;
-
-
-	// generate bonus quest
-	m_BonusQuestManager.m_pGameBoardManager = this;
-	m_BonusQuestManager.InitLevel();
-	if (m_pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount > 0 && m_pLevelConfig->m_BonusQuestConfig.m_bIsBonusGemAppearOnStartGame)
-	{
-		for(int i=0; i< m_pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount; i++)
+		if (pNormalLevelConfig->m_bEnableBoss)
 		{
-			CellValue& cellValue = m_BoardValueMatrix[m_pLevelConfig->m_BonusQuestConfig.m_PositionOfBonusGemAtStartGame[i].m_iRow][m_pLevelConfig->m_BonusQuestConfig.m_PositionOfBonusGemAtStartGame[i].m_iColumn];
-			if (!cellValue.m_bIsBlankCell && cellValue.m_eGemComboType == _GCT_NONE_ && cellValue.m_iGemLetterBlockID < 0 && cellValue.m_iObstacleBlockID < 0)
+			if (pNormalLevelConfig->m_bIsMainWordExistedOnBoard)
+				pNormalLevelConfig->m_bIsMainWordExistedOnBoard = false;
+		
+			m_pGameWordManager->EnableVersusBossMode();
+
+			int iRow, iColumn, iRowInc, iColumnInc;
+			for(iRowInc = 0; iRowInc < pNormalLevelConfig->m_BossConfig.m_iHeight; iRowInc++)
+				for(iColumnInc = 0; iColumnInc < pNormalLevelConfig->m_BossConfig.m_iWidth; iColumnInc++)
+				{
+					iRow = pNormalLevelConfig->m_BossConfig.m_Position.m_iRow + iRowInc;
+					iColumn = pNormalLevelConfig->m_BossConfig.m_Position.m_iColumn + iColumnInc;
+					if (m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID >= 0)
+					{
+						m_pObstacleProcessManager->ForceDestroyObstacleBlock(m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID);
+					}
+
+					m_BoardValueMatrix[iRow][iColumn].Reset();
+					m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell = true;
+				}			
+
+			m_LevelBossInfo.m_bIsEnable = true;
+			m_LevelBossInfo.m_iCurrentHitPoint = pNormalLevelConfig->m_BossConfig.m_HitPointPerLetter;
+			m_LevelBossInfo.m_iRemainLettersCount = m_pGameWordManager->GetMainWord().m_iRemainInactivatedCharacterCount;
+		}
+		else
+			m_LevelBossInfo.m_bIsEnable = false;
+
+
+		// generate bonus quest
+		m_BonusQuestManager.m_pGameBoardManager = this;
+		m_BonusQuestManager.InitLevel();
+		if (pNormalLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount > 0 && pNormalLevelConfig->m_BonusQuestConfig.m_bIsBonusGemAppearOnStartGame)
+		{
+			for(int i=0; i< pNormalLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount; i++)
 			{
-				cellValue.m_iGemID = _BONUS_QUEST_GEM_ID_;
+				CellValue& cellValue = m_BoardValueMatrix[pNormalLevelConfig->m_BonusQuestConfig.m_PositionOfBonusGemAtStartGame[i].m_iRow][pNormalLevelConfig->m_BonusQuestConfig.m_PositionOfBonusGemAtStartGame[i].m_iColumn];
+				if (!cellValue.m_bIsBlankCell && cellValue.m_eGemComboType == _GCT_NONE_ && cellValue.m_iGemLetterBlockID < 0 && cellValue.m_iObstacleBlockID < 0)
+				{
+					cellValue.m_iGemID = _BONUS_QUEST_GEM_ID_;
+				}
 			}
 		}
 	}
-
 	// compute score/star for this level ==> score of stars now loaded from config file
 	/*m_LevelConfig.m_ScoreOfStars[0] = GetBonusScoreForUnlockMainWord(true);
 	int iTotalSubWordScore = 0;
@@ -88,6 +96,38 @@ void NewGameBoardManager::GenerateGameBoard()
 
 	m_LevelConfig.m_ScoreOfStars[1] = m_LevelConfig.m_ScoreOfStars[0] + iTotalSubWordScore /2;
 	m_LevelConfig.m_ScoreOfStars[2] = m_LevelConfig.m_ScoreOfStars[0] + iTotalSubWordScore;*/
+}
+
+void NewGameBoardManager::GeneratePositionOfLettersForTimeMode(std::vector<Cell>& positionList)
+{	
+	std::vector<Cell> seedList;	
+	int iRow, iColumn, iListSize = 0;
+
+	for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+	{		
+		for(iRow = 0; iRow < m_iRowNumber; iRow++)
+		{
+			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID < 0
+				&& m_BoardValueMatrix[iRow][iColumn].m_eGemComboType == _GCT_NONE_ && m_BoardValueMatrix[iRow][iColumn].m_iGemID < _MAX_GEM_ID_)
+			{
+				seedList.push_back(Cell(iRow, iColumn));
+				iListSize++;
+			}
+		}		
+	}
+
+	auto mainWord = m_pGameWordManager->GetMainWord();
+	int iRandomIndex;
+	for(int i=0; i< mainWord.m_iWordLength; i++)
+		if (mainWord.m_ActivatedCharacterFlags[i])
+			positionList.push_back( Cell());
+		else
+		{
+			iRandomIndex = rand() % iListSize;
+
+			positionList.push_back(seedList[iRandomIndex]);
+			seedList[iRandomIndex] = seedList[iListSize-1];			
+		}
 }
 
 void NewGameBoardManager::ClearObstacleBlockID(const int& iObstacleBlockID)
@@ -235,7 +275,7 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iBeginMovingIndex, int iMovingL
 	{
 		// ******** note: temporary hardcode and fix condition for combo 6 ************* 					
 		if (iSelectedRow >= 0)
-			for(iColumn =0; iColumn < m_iColumnNumber; iColumn++)
+			for(iColumn = iBeginMovingIndex; iColumn < iBeginMovingIndex + iMovingListLength; iColumn++)
 			{
 				if (m_TemporaryValueMatrix[iSelectedRow][iColumn].m_eGemComboType == _GCT_COMBO6_
 					&& ( (iSelectedRow>0 &&  m_TemporaryValueMatrix[iSelectedRow-1][iColumn].m_bIsBlankCell == false) ||
@@ -251,7 +291,7 @@ bool NewGameBoardManager::RecheckAfterMoveV2(int iBeginMovingIndex, int iMovingL
 				}
 			}
 		else if (iSelectedColumn >= 0)
-			for(iRow =0; iRow < m_iRowNumber; iRow++)
+			for(iRow = iBeginMovingIndex; iRow < iBeginMovingIndex + iMovingListLength; iRow++)
 			{
 				if (m_TemporaryValueMatrix[iRow][iSelectedColumn].m_eGemComboType == _GCT_COMBO6_
 					&& ( (iSelectedColumn>0 &&  m_TemporaryValueMatrix[iRow][iSelectedColumn-1].m_bIsBlankCell == false) ||
@@ -821,58 +861,63 @@ bool NewGameBoardManager::DestroySingleCellUtil(const int& iRow, const int& iCol
 			return false;
 		}
 
-		// note: destroy combo 5,6 wont activate boss or bonus quest game !!! ==> BUGS?
-		if (m_pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount > 0)
+		if (m_pLevelConfig->m_eGameModeType == _GMT_NORMAL_)
 		{
-			if ( iRow > 0 && m_BoardValueMatrix[iRow-1][iColumn].m_iGemID == _BONUS_QUEST_GEM_ID_)
-			{
-				m_BonusQuestManager.ActivateBonusQuest();
-				m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow-1, iColumn,-1,fDestroyAtTime));
-				m_BoardValueMatrix[iRow-1][iColumn].Reset();
-			}
-			if ( iRow < m_iRowNumber-1 && m_BoardValueMatrix[iRow+1][iColumn].m_iGemID == _BONUS_QUEST_GEM_ID_)
-			{
-				m_BonusQuestManager.ActivateBonusQuest();
-				m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow+1, iColumn, -1, fDestroyAtTime));
-				m_BoardValueMatrix[iRow+1][iColumn].Reset();
-			}
-			if ( iColumn > 0 && m_BoardValueMatrix[iRow][iColumn-1].m_iGemID == _BONUS_QUEST_GEM_ID_)
-			{
-				m_BonusQuestManager.ActivateBonusQuest();
-				m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow, iColumn-1, -1, fDestroyAtTime));
-				m_BoardValueMatrix[iRow][iColumn-1].Reset();
-			}
-			if ( iColumn < m_iColumnNumber-1 && m_BoardValueMatrix[iRow][iColumn+1].m_iGemID == _BONUS_QUEST_GEM_ID_)
-			{
-				m_BonusQuestManager.ActivateBonusQuest();
-				m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow, iColumn+1, -1, fDestroyAtTime));
-				m_BoardValueMatrix[iRow][iColumn+1].Reset();
-			}
-		}
+			LevelConfig*  pNormalLevelConfig = (LevelConfig*) m_pLevelConfig;
 
-		// count normal gems
-		m_BonusQuestManager.IncreaseBasicCellCountForBonusQuest(m_BoardValueMatrix[iRow][iColumn].m_iGemID);
-
-
-		if (m_LevelBossInfo.m_bIsEnable && !m_bIsBossStateChanged)
-		{
-			if ( (iRow >= m_pLevelConfig->m_BossConfig.m_Position.m_iRow -1 && iRow <= m_pLevelConfig->m_BossConfig.m_Position.m_iRow + m_pLevelConfig->m_BossConfig.m_iHeight)
-				&& (iColumn >= m_pLevelConfig->m_BossConfig.m_Position.m_iColumn -1 && iColumn <= m_pLevelConfig->m_BossConfig.m_Position.m_iColumn + m_pLevelConfig->m_BossConfig.m_iWidth))
+			// note: destroy combo 5,6 wont activate boss or bonus quest game !!! ==> BUGS?
+			if (pNormalLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount > 0)
 			{
-				CCLOG("Current HP:%d, current value of bJustReleaseALetter:%d", m_LevelBossInfo.m_iCurrentHitPoint, m_LevelBossInfo.m_bJustReleaseALetter?1:0);
-
-				m_bIsBossStateChanged = true;
-				m_LevelBossInfo.m_iCurrentHitPoint--;
-
-				if (m_LevelBossInfo.m_iCurrentHitPoint == 0)
+				if ( iRow > 0 && m_BoardValueMatrix[iRow-1][iColumn].m_iGemID == _BONUS_QUEST_GEM_ID_)
 				{
-					m_LevelBossInfo.m_bJustReleaseALetter = true;
-					m_LevelBossInfo.m_iRemainLettersCount--;
-					m_LevelBossInfo.m_fBossStateChangeAtTime = fDestroyAtTime;
+					m_BonusQuestManager.ActivateBonusQuest();
+					m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow-1, iColumn,-1,fDestroyAtTime));
+					m_BoardValueMatrix[iRow-1][iColumn].Reset();
+				}
+				if ( iRow < m_iRowNumber-1 && m_BoardValueMatrix[iRow+1][iColumn].m_iGemID == _BONUS_QUEST_GEM_ID_)
+				{
+					m_BonusQuestManager.ActivateBonusQuest();
+					m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow+1, iColumn, -1, fDestroyAtTime));
+					m_BoardValueMatrix[iRow+1][iColumn].Reset();
+				}
+				if ( iColumn > 0 && m_BoardValueMatrix[iRow][iColumn-1].m_iGemID == _BONUS_QUEST_GEM_ID_)
+				{
+					m_BonusQuestManager.ActivateBonusQuest();
+					m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow, iColumn-1, -1, fDestroyAtTime));
+					m_BoardValueMatrix[iRow][iColumn-1].Reset();
+				}
+				if ( iColumn < m_iColumnNumber-1 && m_BoardValueMatrix[iRow][iColumn+1].m_iGemID == _BONUS_QUEST_GEM_ID_)
+				{
+					m_BonusQuestManager.ActivateBonusQuest();
+					m_DestroyBonusQuestGemList.push_back(DestroyedByComboCell(iRow, iColumn+1, -1, fDestroyAtTime));
+					m_BoardValueMatrix[iRow][iColumn+1].Reset();
+				}
+			}
 
-					if (m_LevelBossInfo.m_iRemainLettersCount > 0)
-						m_LevelBossInfo.m_iCurrentHitPoint = m_pLevelConfig->m_BossConfig.m_HitPointPerLetter;										
-				}				
+			// count normal gems
+			m_BonusQuestManager.IncreaseBasicCellCountForBonusQuest(m_BoardValueMatrix[iRow][iColumn].m_iGemID);
+
+
+			if (m_LevelBossInfo.m_bIsEnable && !m_bIsBossStateChanged)
+			{
+				if ( (iRow >= pNormalLevelConfig->m_BossConfig.m_Position.m_iRow -1 && iRow <= pNormalLevelConfig->m_BossConfig.m_Position.m_iRow + pNormalLevelConfig->m_BossConfig.m_iHeight)
+					&& (iColumn >= pNormalLevelConfig->m_BossConfig.m_Position.m_iColumn -1 && iColumn <= pNormalLevelConfig->m_BossConfig.m_Position.m_iColumn + pNormalLevelConfig->m_BossConfig.m_iWidth))
+				{
+					CCLOG("Current HP:%d, current value of bJustReleaseALetter:%d", m_LevelBossInfo.m_iCurrentHitPoint, m_LevelBossInfo.m_bJustReleaseALetter?1:0);
+
+					m_bIsBossStateChanged = true;
+					m_LevelBossInfo.m_iCurrentHitPoint--;
+
+					if (m_LevelBossInfo.m_iCurrentHitPoint == 0)
+					{
+						m_LevelBossInfo.m_bJustReleaseALetter = true;
+						m_LevelBossInfo.m_iRemainLettersCount--;
+						m_LevelBossInfo.m_fBossStateChangeAtTime = fDestroyAtTime;
+
+						if (m_LevelBossInfo.m_iRemainLettersCount > 0)
+							m_LevelBossInfo.m_iCurrentHitPoint = pNormalLevelConfig->m_BossConfig.m_HitPointPerLetter;										
+					}				
+				}
 			}
 		}
 
@@ -1379,30 +1424,35 @@ bool NewGameBoardManager::ExecuteEndGameBonus(
 			notComboCells.push_back( randomCellEachColumnList[iRandomIndex]);		
 		}
 
-		int iRandomIndex;
-		int iMaxConvertedCell = MIN( MIN(m_iCurrentMove, 7), notComboCells.size());
-		m_iCurrentMove -= iMaxConvertedCell;
-
-		for(int i=0; i< iMaxConvertedCell; i++)
+		if (m_pLevelConfig->m_eGameModeType == _GMT_NORMAL_)
 		{
-			if (notComboCells.size() == 0)
-				break;
+			LevelConfig*  pNormalLevelConfig = (LevelConfig*) m_pLevelConfig;
 
-			iRandomIndex = rand() % notComboCells.size();
-			if (m_pLevelConfig->m_eEndGameBonusType == _EGBT_SPECIAL_GEMS_)
+			int iRandomIndex;
+			int iMaxConvertedCell = MIN( MIN(m_iCurrentMove, 7), notComboCells.size());
+			m_iCurrentMove -= iMaxConvertedCell;
+
+			for(int i=0; i< iMaxConvertedCell; i++)
 			{
-				m_TemporaryValueMatrix[notComboCells[iRandomIndex].m_iRow][notComboCells[iRandomIndex].m_iColumn].m_eGemComboType = _GCT_BONUS_END_GAME_SPECIAL_GEM_;
-				m_TemporaryValueMatrix[notComboCells[iRandomIndex].m_iRow][notComboCells[iRandomIndex].m_iColumn].m_iGemID = _BONUS_END_GAME_COMBO_GEM_ID;		
+				if (notComboCells.size() == 0)
+					break;
+
+				iRandomIndex = rand() % notComboCells.size();
+				if (pNormalLevelConfig->m_eEndGameBonusType == _EGBT_SPECIAL_GEMS_)
+				{
+					m_TemporaryValueMatrix[notComboCells[iRandomIndex].m_iRow][notComboCells[iRandomIndex].m_iColumn].m_eGemComboType = _GCT_BONUS_END_GAME_SPECIAL_GEM_;
+					m_TemporaryValueMatrix[notComboCells[iRandomIndex].m_iRow][notComboCells[iRandomIndex].m_iColumn].m_iGemID = _BONUS_END_GAME_COMBO_GEM_ID;		
+				}
+				else //_EGBT_CRAZY_PETS_
+					m_TemporaryValueMatrix[notComboCells[iRandomIndex].m_iRow][notComboCells[iRandomIndex].m_iColumn].m_eGemComboType = _GCT_BONUS_END_GAME_CRAZY_PET_;			
+		
+				ComboEffectCell comboCell(notComboCells[iRandomIndex], m_TemporaryValueMatrix[notComboCells[iRandomIndex].m_iRow][notComboCells[iRandomIndex].m_iColumn].m_eGemComboType,
+					m_TemporaryValueMatrix[notComboCells[iRandomIndex].m_iRow][notComboCells[iRandomIndex].m_iColumn].m_iGemID);
+				convertedToComboCells.push_back(comboCell);
+		
+				notComboCells[iRandomIndex] = notComboCells[notComboCells.size()-1];
+				notComboCells.pop_back();
 			}
-			else //_EGBT_CRAZY_PETS_
-				m_TemporaryValueMatrix[notComboCells[iRandomIndex].m_iRow][notComboCells[iRandomIndex].m_iColumn].m_eGemComboType = _GCT_BONUS_END_GAME_CRAZY_PET_;			
-		
-			ComboEffectCell comboCell(notComboCells[iRandomIndex], m_TemporaryValueMatrix[notComboCells[iRandomIndex].m_iRow][notComboCells[iRandomIndex].m_iColumn].m_eGemComboType,
-				m_TemporaryValueMatrix[notComboCells[iRandomIndex].m_iRow][notComboCells[iRandomIndex].m_iColumn].m_iGemID);
-			convertedToComboCells.push_back(comboCell);
-		
-			notComboCells[iRandomIndex] = notComboCells[notComboCells.size()-1];
-			notComboCells.pop_back();
 		}
 
 		// ************* check if there's a combo at the end of bonus ****************************************************	
@@ -2056,77 +2106,114 @@ void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bo
 				newCells.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemID));
 			}
 
-	// check and generate bonus quest gem
-	int iNewBonusQuestGemCount = 0;
-	if (bIsNewMove)
-	{
-		if (m_pLevelConfig->m_BonusQuestConfig.m_BonusGemAppearAtMoves)
-		{
-			int iMoveElapse = m_pLevelConfig->m_iNumberOfMove - m_iCurrentMove+1;
-			
-			for(int i=0; i < m_pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount; i++)
-				if (iMoveElapse == m_pLevelConfig->m_BonusQuestConfig.m_BonusGemAppearAtMoves[i])
-				{
-					iNewBonusQuestGemCount++;
-					m_BoardValueMatrix[newCells[newCells.size()-iNewBonusQuestGemCount].m_iRow][newCells[newCells.size()-iNewBonusQuestGemCount].m_iColumn].m_iGemID = _BONUS_QUEST_GEM_ID_;
-					newCells[newCells.size()-iNewBonusQuestGemCount].m_iGemID = _BONUS_QUEST_GEM_ID_;
-				}
-		}
-	}
 
-	std::vector<GemLetterData> outputLettersForGems;
-	std::vector<bool> gemCanContainLetterFlagList;	
-	int iGemCanContainLetterCount = 0;
-	for(auto cell: newCells)
+	if (m_pLevelConfig->m_eGameModeType == _GMT_NORMAL_)
 	{
-		if (cell.m_iGemID < _MAX_GEM_ID_)
+		const LevelConfig*  pNormalLevelConfig = (LevelConfig*) m_pLevelConfig;
+
+		// check and generate bonus quest gem
+		int iNewBonusQuestGemCount = 0;
+		if (bIsNewMove)
+		{		
+				if (pNormalLevelConfig->m_BonusQuestConfig.m_BonusGemAppearAtMoves)
+				{
+					int iMoveElapse = pNormalLevelConfig->m_iNumberOfMove - m_iCurrentMove+1;
+			
+					for(int i=0; i < pNormalLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount; i++)
+						if (iMoveElapse == pNormalLevelConfig->m_BonusQuestConfig.m_BonusGemAppearAtMoves[i])
+						{
+							iNewBonusQuestGemCount++;
+							m_BoardValueMatrix[newCells[newCells.size()-iNewBonusQuestGemCount].m_iRow][newCells[newCells.size()-iNewBonusQuestGemCount].m_iColumn].m_iGemID = _BONUS_QUEST_GEM_ID_;
+							newCells[newCells.size()-iNewBonusQuestGemCount].m_iGemID = _BONUS_QUEST_GEM_ID_;
+						}
+				}
+		}		
+
+		std::vector<GemLetterData> outputLettersForGems;
+		std::vector<bool> gemCanContainLetterFlagList;	
+		int iGemCanContainLetterCount = 0;
+		for(auto cell: newCells)
 		{
-			if (m_pLevelConfig->m_bMainWordCanDropOnAllColumn || m_pLevelConfig->m_MainWordDropOnColumnsFlagList[cell.m_iColumn])
+			if (cell.m_iGemID < _MAX_GEM_ID_)
 			{
-				gemCanContainLetterFlagList.push_back(true);
-				iGemCanContainLetterCount++;
+				if (pNormalLevelConfig->m_bMainWordCanDropOnAllColumn || pNormalLevelConfig->m_MainWordDropOnColumnsFlagList[cell.m_iColumn])
+				{
+					gemCanContainLetterFlagList.push_back(true);
+					iGemCanContainLetterCount++;
+				}
+				else
+					gemCanContainLetterFlagList.push_back(false);
+			}
+		}
+
+		m_pGameWordManager->GenerateNewLetters( gemCanContainLetterFlagList, iGemCanContainLetterCount, outputLettersForGems, bIsNewMove);	
+
+		unsigned char iLetter = 255;	
+		for(int iIndex = 0; iIndex < newCells.size()-iNewBonusQuestGemCount; iIndex++)	
+		{
+			iLetter = outputLettersForGems[iIndex].m_iLetter;		
+			NewCellInfo& cell = newCells[iIndex];
+			if (iLetter < 255)
+			{			
+				cell.m_iGemLetterBlockID = m_GemLetterManager.AllocFreeBlock(iLetter, outputLettersForGems[iIndex].m_bIsInMainWord);
+				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = cell.m_iGemLetterBlockID;			
 			}
 			else
-				gemCanContainLetterFlagList.push_back(false);
+			{
+				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = -1;
+
+				// generate obstacle that can be dropped!!!
+				for(auto pObstacleLevelConfig : pNormalLevelConfig->m_ObstacleConfigList)
+				{
+					if (pObstacleLevelConfig->m_bEnableGenerateByDrop)
+					{
+						const ObstacleDescription* pObstacleDescription = GameConfigManager::getInstance()->GetObstacleDescription(pObstacleLevelConfig->m_iObstacleID);
+						if (!pObstacleDescription->m_bAppearByDrop)
+							continue;
+
+						if (pObstacleLevelConfig->m_bCanDropOnAllColumn)
+						{
+							if (SuccessWithPercentRatio(pObstacleLevelConfig->m_iDropOnAllColumnRate))
+								m_pObstacleProcessManager->GenerateObstacle( pObstacleLevelConfig, m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID);
+						}
+						else if (pObstacleLevelConfig->m_DropOnColumnsRateList[cell.m_iColumn] >0)
+							if (SuccessWithPercentRatio(pObstacleLevelConfig->m_DropOnColumnsRateList[cell.m_iColumn]))
+								m_pObstacleProcessManager->GenerateObstacle( pObstacleLevelConfig, m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID);
+					}
+			
+				}
+			}
 		}
 	}
-
-	m_pGameWordManager->GenerateNewLetters( gemCanContainLetterFlagList, iGemCanContainLetterCount, outputLettersForGems, bIsNewMove);	
-
-	unsigned char iLetter = 255;	
-	for(int iIndex = 0; iIndex < newCells.size()-iNewBonusQuestGemCount; iIndex++)	
+	else // time mode
 	{
-		iLetter = outputLettersForGems[iIndex].m_iLetter;		
-		NewCellInfo& cell = newCells[iIndex];
-		if (iLetter < 255)
-		{			
-			cell.m_iGemLetterBlockID = m_GemLetterManager.AllocFreeBlock(iLetter, outputLettersForGems[iIndex].m_bIsInMainWord);
-			m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = cell.m_iGemLetterBlockID;			
-		}
+		// check for generating obstacles
+		unsigned char iLetter = 255;	
+		auto pTimeModeLevelConfig = (TimeModeLevelConfig*)m_pLevelConfig;
+		std::vector<TimeModeLevelConfig::ObstacleDropConfig>* pObstacleConfigList;
+
+		if (m_iTimeModeStage <= pTimeModeLevelConfig->m_ManualStageConfigList.size())
+			pObstacleConfigList = &pTimeModeLevelConfig->m_ManualStageConfigList[ m_iTimeModeStage-1]->m_ObstacleConfigList;
 		else
-		{
-			m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iGemLetterBlockID = -1;
+			pObstacleConfigList = &pTimeModeLevelConfig->m_ManualStageConfigList[ pTimeModeLevelConfig->m_ManualStageConfigList.size()-1]->m_ObstacleConfigList;
+		for(int iIndex = 0; iIndex < newCells.size(); iIndex++)	
+		{			
+			NewCellInfo& cell = newCells[iIndex];
+			Level_ObstacleConfig levelObstacleConfig;
 
 			// generate obstacle that can be dropped!!!
-			for(auto pObstacleLevelConfig : m_pLevelConfig->m_ObstacleConfigList)
-			{
-				if (pObstacleLevelConfig->m_bEnableGenerateByDrop)
-				{
-					const ObstacleDescription* pObstacleDescription = GameConfigManager::getInstance()->GetObstacleDescription(pObstacleLevelConfig->m_iObstacleID);
-					if (!pObstacleDescription->m_bAppearByDrop)
-						continue;
-
-					if (pObstacleLevelConfig->m_bCanDropOnAllColumn)
+			for(auto obstacleLevelConfig : *pObstacleConfigList)
+			{								
+				if (obstacleLevelConfig.m_DropOnColumnsRateList[cell.m_iColumn] >0)
+					if (SuccessWithPercentRatio(obstacleLevelConfig.m_DropOnColumnsRateList[cell.m_iColumn]))
 					{
-						if (SuccessWithPercentRatio(pObstacleLevelConfig->m_iDropOnAllColumnRate))
-							m_pObstacleProcessManager->GenerateObstacle( pObstacleLevelConfig, m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID);
+						levelObstacleConfig.m_iObstacleID = obstacleLevelConfig.m_iObstacleID;
+						levelObstacleConfig.m_iObstacleLevel = obstacleLevelConfig.m_iObstacleLevel;
+
+						m_pObstacleProcessManager->GenerateObstacle( &levelObstacleConfig, m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID);				
 					}
-					else if (pObstacleLevelConfig->m_DropOnColumnsRateList[cell.m_iColumn] >0)
-						if (SuccessWithPercentRatio(pObstacleLevelConfig->m_DropOnColumnsRateList[cell.m_iColumn]))
-							m_pObstacleProcessManager->GenerateObstacle( pObstacleLevelConfig, m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_iObstacleBlockID);
-				}
 			
-			}
+			}			
 		}
 	}
 }

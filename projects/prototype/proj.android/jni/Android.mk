@@ -51,6 +51,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/ButtonManagerNode.cpp \
 				   ../../Classes/HeaderNode.cpp \
 				   ../../Classes/ScrollManager.cpp \
+				   ../../Classes/TimeCountDownNode.cpp \
 				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \

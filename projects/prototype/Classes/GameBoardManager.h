@@ -10,9 +10,9 @@ class GameBoardManager
 {
 public:
 	GameBoardManager();
-	void GenerateGameBoard();
+	void GenerateGameBoard(GameModeType_e eGameModeType, int iTimeModeStage = 1);
 
-	inline const LevelConfig* GetLevelConfig() { return m_pLevelConfig;}
+	inline BaseLevelConfig* GetLevelConfig() { return m_pLevelConfig;}
 	inline int GetRowNumber() { return m_iRowNumber;}
 	inline int GetColumnNumber() { return m_iColumnNumber;}
 	inline int GetCellValue(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_iGemID;}
@@ -25,20 +25,21 @@ public:
 	inline bool IsLocalDragWall(const int& iRow, const int& iColumn) { return m_BoardValueMatrix[iRow][iColumn].m_bIsDragLocalWall;}
 
 	// only iSelectedRow or iSelectedColumn 0 1 at one time	 (iDeltaRow and iDeltaColumn != 0 corresponding)
-	bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
-		std::vector<Cell>& destroyCells, std::vector<ComboEffectCell>& activatedComboEffectCells, std::vector<Cell>& destroyedByEffectCells,
-		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells, std::vector<ComboEffectCell>& newComboCells);
+	//bool RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
+	//	std::vector<Cell>& destroyCells, std::vector<ComboEffectCell>& activatedComboEffectCells, std::vector<Cell>& destroyedByEffectCells,
+	//	std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells, std::vector<ComboEffectCell>& newComboCells);
 
-	int GetComboCount(const int& iTypeID) { return m_ComboCountList[iTypeID];}
+	//int GetComboCount(const int& iTypeID) { return m_ComboCountList[iTypeID];}
 	
 protected:
 	//void LoadGameConfig();
-	void LoadBasicComboPatternList();
+	//void LoadBasicComboPatternList();
 
-	void CountBasicCombo(); 
+	//void CountBasicCombo(); 
 protected:
 	const GameConfig& m_GameConfig;	
-	LevelConfig* m_pLevelConfig;	
+	BaseLevelConfig* m_pLevelConfig;	
+	int m_iTimeModeStage; //only used when in time mode
 
 	int m_iRowNumber, m_iColumnNumber;
 	CellValue m_BoardValueMatrix[ _BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];		
@@ -52,12 +53,12 @@ protected:
 	LinkedBlockDescription m_LinkedBlockList[_MAX_LINKED_BLOCK_COUNT_];
 	int m_iLinkedBlockCount;
 
-	BasicComboPattern m_BasicComboPatternList[20];
-	int m_iBasicComboPatternCount;
+	//BasicComboPattern m_BasicComboPatternList[20];
+	//int m_iBasicComboPatternCount;
 
 	// word manager
 	
-	// combo count based on type, just for test
+	// combo count based on type
 	int m_ComboCountList[_COMBO_TYPE_COUNT_];
 };
 

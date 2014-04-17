@@ -97,6 +97,8 @@ void LoadingLayer::initData()
 	GameConfigManager::getInstance()->LoadObstacleConfig();
 	GameConfigManager::getInstance()->LoadWordMapConfig();
 
+	GameConfigManager::getInstance()->LoadCustomModeConfig();
+
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnMusic", -1) == -1)
 	{
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnMusic", 1);

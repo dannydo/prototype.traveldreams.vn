@@ -51,7 +51,7 @@ ChapterInfo ChapterTable::getChapterInfo(const std::string sChapterId)
 		}
 	}
 
-	return ChapterInfo::ChapterInfo();
+	return ChapterInfo();
 }
 
 void ChapterTable::fetchAllChapter()

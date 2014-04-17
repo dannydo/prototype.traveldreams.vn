@@ -4,46 +4,50 @@
 
 BonusQuestManager::BonusQuestManager()
 {
-}
+	m_pLevelConfig = NULL;
 
-void BonusQuestManager::InitLevel()
-{
 	memset( m_IsBonusEnabledQuestFlags, 0, sizeof(m_IsBonusEnabledQuestFlags));
 	memset( m_IsBonusQuestActivatedFlags, 0, sizeof(m_IsBonusQuestActivatedFlags));
 	memset( m_IsBonusQuestDirtyFlags, 0, sizeof(m_IsBonusQuestDirtyFlags));	
 	memset( m_IsBonusQuestCompletedFlags, 0, sizeof(m_IsBonusQuestCompletedFlags));	
-	
+}
 
-	m_pLevelConfig = &m_pGameBoardManager->GetLevelConfig();
-	for(int i=0; i < _BQT_TYPE_COUNT_; i++)
+void BonusQuestManager::InitLevel()
+{			
+	auto pBaseLevelConfig = m_pGameBoardManager->GetLevelConfig();
+	if (pBaseLevelConfig->m_eGameModeType == _GMT_NORMAL_)
 	{
-		m_IsBonusEnabledQuestFlags[i] = m_pLevelConfig->m_BonusQuestConfig.m_IsBonusEnabledQuestFlags[i];
-		if (m_IsBonusEnabledQuestFlags[i])
+		m_pLevelConfig = (LevelConfig*) pBaseLevelConfig;
+		for(int i=0; i < _BQT_TYPE_COUNT_; i++)
 		{
-			switch (i)
+			m_IsBonusEnabledQuestFlags[i] = m_pLevelConfig->m_BonusQuestConfig.m_IsBonusEnabledQuestFlags[i];
+			if (m_IsBonusEnabledQuestFlags[i])
 			{
-				case _BQT_COLLECT_GEM_:
+				switch (i)
 				{
-					m_CollectGemObjective = m_pLevelConfig->m_BonusQuestConfig.m_CollectGemQuest;
-					memset(m_CollectGemParam.m_CountPerGemType, 0, sizeof( m_CollectGemObjective.m_CountPerGemType));
-					break;
-				}
-				case _BQT_COLLECT_COMBO_:
-				{
-					m_CollectComboObjective = m_pLevelConfig->m_BonusQuestConfig.m_CollectComboQuest;
-					memset(m_CollectComboParam.m_CountPerComboGem, 0, sizeof( m_CollectComboObjective.m_CountPerComboGem));
-					break;
-				}
-				case _BQT_COLLECT_BONUS_WORD_:
-				{
-					m_CollectBonusWordObjective.Set(m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest);
-					m_CollectBonusWordParam.m_iRemainLettersCount = m_CollectBonusWordObjective.m_iRequiredLetterCount;
+					case _BQT_COLLECT_GEM_:
+					{
+						m_CollectGemObjective = m_pLevelConfig->m_BonusQuestConfig.m_CollectGemQuest;
+						memset(m_CollectGemParam.m_CountPerGemType, 0, sizeof( m_CollectGemObjective.m_CountPerGemType));
+						break;
+					}
+					case _BQT_COLLECT_COMBO_:
+					{
+						m_CollectComboObjective = m_pLevelConfig->m_BonusQuestConfig.m_CollectComboQuest;
+						memset(m_CollectComboParam.m_CountPerComboGem, 0, sizeof( m_CollectComboObjective.m_CountPerComboGem));
+						break;
+					}
+					case _BQT_COLLECT_BONUS_WORD_:
+					{
+						m_CollectBonusWordObjective.Set(m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest);
+						m_CollectBonusWordParam.m_iRemainLettersCount = m_CollectBonusWordObjective.m_iRequiredLetterCount;
 					
-					//random bonus word
-					m_CollectBonusWordObjective.m_iSelectedBonusWordID =
-						GameWordManager::getInstance()->GetLoadedWordIndexFromID( m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[rand() % m_CollectBonusWordObjective.m_iBonusWordCount]);
-						//m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[rand() % m_CollectBonusWordObjective.m_iBonusWordCount];
-					break;
+						//random bonus word
+						m_CollectBonusWordObjective.m_iSelectedBonusWordID =
+							GameWordManager::getInstance()->GetLoadedWordIndexFromID( m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[rand() % m_CollectBonusWordObjective.m_iBonusWordCount]);
+							//m_pLevelConfig->m_BonusQuestConfig.m_CollectBonusWordQuest.m_BonusWordIDList[rand() % m_CollectBonusWordObjective.m_iBonusWordCount];
+						break;
+					}
 				}
 			}
 		}

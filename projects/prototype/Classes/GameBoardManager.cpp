@@ -4,20 +4,27 @@
 GameBoardManager::GameBoardManager(): m_GameConfig(GameConfigManager::getInstance()->GetGameConfig())
 {
 
-	m_ComboCountList[0] = m_ComboCountList[1] = m_ComboCountList[2] = 0;
+	//m_ComboCountList[0] = m_ComboCountList[1] = m_ComboCountList[2] = 0;
 }
 
-void GameBoardManager::GenerateGameBoard()
+void GameBoardManager::GenerateGameBoard(GameModeType_e eGameModeType, int iTimeModeStage)
 {	
-	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
-	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
-	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig( sCurrentChapterID, iCurrentLevel);
+	if (eGameModeType == _GMT_NORMAL_)
+	{
+		std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
+		int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
+		m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig( sCurrentChapterID, iCurrentLevel);
+	}
+	else
+	{
+		m_pLevelConfig = &GameConfigManager::getInstance()->GetTimeModeDemoConfig();
+	}
 
 	// Load game config
 	//LoadGameConfig();
 
 	// Load basic combo list
-	LoadBasicComboPatternList();
+	//LoadBasicComboPatternList();
 
 	//
 
@@ -285,7 +292,7 @@ bool GameBoardManager::DoAMove(int iSelectedRow, int iSelectedColumn,int iDeltaR
 }
 */
 
-
+/*
 bool GameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn, int iDeltaRow, int iDeltaColumn,
 		std::vector<Cell>& destroyCells, std::vector<ComboEffectCell>& activatedComboEffectCells, std::vector<Cell>& destroyedByEffectCells,
 		std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells, std::vector<Cell>& newCells,
@@ -655,20 +662,7 @@ bool GameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn,
 		// calculate move cells
 		for(iRow = 1; iRow < m_iRowNumber; iRow++)
 			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
-			{
-				/* if (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0 &&  m_BoardValueMatrix[iRow-1][iColumn].m_iGemID < 0
-					&& !m_BoardValueMatrix[iRow-1][iColumn].m_bIsBlankCell)
-				{
-					originalMovedCells.push_back(Cell(iRow, iColumn));
-					int iNewRow = iRow-1;
-					while (iNewRow >=0 && m_BoardValueMatrix[iNewRow][iColumn].m_iGemID < 0 &&  !m_BoardValueMatrix[iNewRow][iColumn].m_bIsBlankCell)
-						iNewRow--;
-					iNewRow++;
-
-					m_BoardValueMatrix[iNewRow][iColumn].m_iGemID = m_BoardValueMatrix[iRow][iColumn].m_iGemID;
-					m_BoardValueMatrix[iRow][iColumn].m_iGemID = -1;
-					targetMovedCells.push_back(Cell(iNewRow, iColumn));
-				}*/
+			{			
 				
 				if (m_BoardValueMatrix[iRow][iColumn].m_iGemID >= 0)
 				{
@@ -712,7 +706,7 @@ bool GameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn,
 
 	return (m_iLinkedBlockCount > 0);	
 }
-
+*/
 /*void GameBoardManager::LoadGameConfig()
 {
 	unsigned long iDataSize;
@@ -763,7 +757,7 @@ bool GameBoardManager::RecheckAfterMoveV2(int iSelectedRow, int iSelectedColumn,
 }
 */
 
-void GameBoardManager::LoadBasicComboPatternList()
+/*void GameBoardManager::LoadBasicComboPatternList()
 {
 	unsigned long iDataSize;
 	unsigned char* orginalData = cocos2d::CCFileUtils::sharedFileUtils()->getFileData("ComboBasicPattern.txt", "r", &iDataSize);
@@ -849,4 +843,4 @@ void GameBoardManager::CountBasicCombo()
 			}
 		}
 
-}
+}*/

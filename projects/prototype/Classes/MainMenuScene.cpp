@@ -69,10 +69,20 @@ bool MainMenuLayer::init()
 	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(MainMenuLayer::openSettingMenu, this));
 	m_pButtonSettingNode->setPosition(Point(50.0f, 50.0f));
 
+	//test time mode
+	Sprite* pButtonTestTimeModeGameSprite = Sprite::create("LoadingAndMainMenu/btn_play.png");
+	//pButtonTestTimeModeGameSprite->setScaleX(1.5f);
+	//pButtonTestTimeModeGameSprite->setScaleY(0.75f);
+	pButtonTestTimeModeGameSprite->setColor(Color3B( 100, 200, 200));
+	ButtonNode* buttonTestTimeModeNode = ButtonNode::createButtonSprite(pButtonTestTimeModeGameSprite, CC_CALLBACK_1(MainMenuLayer::startTimeModeDemo, this));
+	buttonTestTimeModeNode->setPosition(Point(320.0f, 215.0f));
+
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(buttonPlayNode);
 	pButtonManagerNode->addButtonNode(m_buttonLoginNode);
 	pButtonManagerNode->addButtonNode(m_pButtonSettingNode);
+
+	pButtonManagerNode->addButtonNode(buttonTestTimeModeNode);
 	this->addChild(pButtonManagerNode, 10);
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
@@ -197,4 +207,21 @@ void MainMenuLayer::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, st
 	catch (exception e)
 	{
 	}
+}
+
+
+#include "HelloWorldScene.h"
+#include "GameWordManager.h"
+
+// test time mode
+void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
+{
+	auto timeModeConfig = GameConfigManager::getInstance()->GetTimeModeDemoConfig();	
+	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(&timeModeConfig);
+
+	//WorldMapScene* scene = WorldMapScene::create();
+	//Director::getInstance()->replaceScene(scene);
+
+	auto scene = HelloWorld::createScene( _GMT_TIME_MODE_);
+	Director::getInstance()->replaceScene(scene);
 }

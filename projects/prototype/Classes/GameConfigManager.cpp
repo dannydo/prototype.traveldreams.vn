@@ -13,6 +13,7 @@ GameConfigManager* GameConfigManager::m_pInstance = NULL;
 
 GameConfigManager::GameConfigManager()
 {
+	m_bIsTimeModeLevelConfigLoaded = false;
 }
 
 GameConfigManager::~GameConfigManager()
@@ -24,6 +25,13 @@ GameConfigManager::~GameConfigManager()
  
 	for(auto pObstacleDescription : m_ObstacleDescriptionArray)
 		delete pObstacleDescription;
+
+
+	if (m_bIsTimeModeLevelConfigLoaded)
+	{
+		for(auto pManualConfig : m_TimeModeLevelConfig.m_ManualStageConfigList)
+			delete pManualConfig;
+	}
 }
 
 LevelConfig& GameConfigManager::GetLevelConfig(const std::string& sChapterID, const int& iLevelId)
@@ -638,7 +646,10 @@ void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID)
 	{			
 		std::getline( inputStream, sTemp);
 		//inputStream >> sTemp;
-		chapterConfig.m_WordIDList.push_back(sTemp.substr(0, sTemp.size()-1)); //not count /r at the end of line
+		if (sTemp.c_str()[sTemp.size()-1] == '\r')
+			chapterConfig.m_WordIDList.push_back(sTemp.substr(0, sTemp.size()-1)); //not count /r at the end of line
+		else
+			chapterConfig.m_WordIDList.push_back(sTemp.substr(0, sTemp.size())); 
 	}
 
 	delete[] data;
@@ -816,4 +827,118 @@ int GameConfigManager::CountLevelOfPreviousChapters(const std::string& sChapterI
 	}
 
 	return iCountLevel;
+}
+
+
+void GameConfigManager::LoadCustomModeConfig()
+{
+	if (m_bIsTimeModeLevelConfigLoaded)
+		return;
+
+	m_bIsTimeModeLevelConfigLoaded = true;
+
+	//std::string sPathFileData = wordMapChapterConfig.m_sPathData;
+	char sFileName[40] = "GameData/TimeModeDemo.data";
+	//sprintf(sFileName, "/Level%d.data", iLevelId);
+	//sPathFileData.append(sFileName);
+
+	m_LevelConfig.Clear();
+	TimeModeLevelConfig& levelConfig = m_TimeModeLevelConfig;
+
+	unsigned long iDataSize;
+	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData(sFileName, "r", &iDataSize);
+	char* data = new char[iDataSize];
+	memcpy(data, orginalData, iDataSize);
+	membuf dataBuf(data, data + iDataSize);
+	std::istream inputStream(&dataBuf);
+
+	std::string sTemp;	
+
+	// size map
+	std::getline(inputStream, sTemp);		
+	inputStream >> levelConfig.m_iRowNumber;
+	inputStream >> levelConfig.m_iColumnNumber;
+	std::getline(inputStream, sTemp);		
+
+	// color count
+	std::getline(inputStream, sTemp);				
+	inputStream >> levelConfig.m_iNumberOfColor;
+	std::getline(inputStream, sTemp);
+
+	// score of stars
+	std::getline(inputStream, sTemp);				
+	inputStream >> levelConfig.m_ScoreOfStars[0];
+	inputStream >> levelConfig.m_ScoreOfStars[1];
+	inputStream >> levelConfig.m_ScoreOfStars[2];
+	std::getline(inputStream, sTemp);
+
+	// map matrix
+	std::getline(inputStream, sTemp);		
+	int iRow, iColumn;
+	for(iRow = levelConfig.m_iRowNumber-1; iRow >=0; iRow--)
+		for(iColumn = 0; iColumn < levelConfig.m_iColumnNumber; iColumn++)
+		{
+			inputStream >> levelConfig.m_BoardMatrix[iRow][iColumn];
+		}
+	std::getline(inputStream, sTemp);
+
+	// word list
+	std::getline(inputStream, sTemp);
+	int iWordCount, iWordIndex;
+	inputStream >> iWordCount;
+	std::getline( inputStream, sTemp);		
+
+	std::string sWord;
+	for(int i=0; i< iWordCount; i++)
+	{
+		std::getline( inputStream, sWord);		
+		if (sWord.c_str()[sWord.size()-1] == '\r')
+			sWord = sWord.substr(0, sWord.size()-1); //not count /r at the end of line
+
+		iWordIndex  = GameWordManager::getInstance()->GetLoadedWordIndexFromID(sWord);
+		levelConfig.m_WordIndexList.push_back(iWordIndex);
+
+		levelConfig.m_WordCollectedCountList.push_back(0);
+	}	
+	
+	// Manual config of stages
+	std::getline(inputStream, sTemp);
+	int iManualStageConfigCount;
+	inputStream >> iManualStageConfigCount;
+	
+	TimeModeLevelConfig::ObstacleDropConfig obstacleConfig;
+	int iObstacleCount, i, j, k; 
+	bool bObstacleCanDropOnAllColumn;
+
+	for(i=0; i < iManualStageConfigCount; i++)
+	{
+		TimeModeLevelConfig::ManualStageConfig* pManualStageConfig = new TimeModeLevelConfig::ManualStageConfig();
+
+		inputStream >> pManualStageConfig->m_iMaximumEnergy;
+		inputStream >> pManualStageConfig->m_iEnergyLostRatePersecond;
+		inputStream >> iObstacleCount;
+		
+		for(j =0; j < iObstacleCount; j++)
+		{			
+			inputStream >> sTemp;
+			obstacleConfig.m_iObstacleID = m_ObstaleNameToIDMap[sTemp];
+			inputStream >> obstacleConfig.m_iObstacleLevel;
+			for( k =0; k < levelConfig.m_iColumnNumber; k++)
+				inputStream >> obstacleConfig.m_DropOnColumnsRateList[k];
+
+			pManualStageConfig->m_ObstacleConfigList.push_back(obstacleConfig);
+		}
+
+		levelConfig.m_ManualStageConfigList.push_back(pManualStageConfig);
+	}
+	std::getline(inputStream, sTemp);
+
+	// Config for auto increase difficulty for greater levels
+	std::getline(inputStream, sTemp);
+	inputStream >> levelConfig.m_iStageConfig_MaximumValueIncreasePercent;
+	inputStream >> levelConfig.m_iStageConfig_LostRateIncreasePercent;
+
+
+	delete[] data;
+	delete[] orginalData;
 }

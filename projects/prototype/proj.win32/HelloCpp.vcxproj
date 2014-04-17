@@ -178,6 +178,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\Social\FacebookManager.cpp" />
     <ClCompile Include="..\Classes\SoundManager.cpp" />
     <ClCompile Include="..\Classes\StatusLayer.cpp" />
+    <ClCompile Include="..\Classes\TimeCountDownNode.cpp" />
     <ClCompile Include="..\Classes\WordCollectBoardRenderNode.cpp" />
     <ClCompile Include="..\Classes\WorldMapScene.cpp" />
     <ClCompile Include="main.cpp" />
@@ -232,6 +233,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\Social\FacebookManager.h" />
     <ClInclude Include="..\Classes\SoundManager.h" />
     <ClInclude Include="..\Classes\StatusLayer.h" />
+    <ClInclude Include="..\Classes\TimeCountDownNode.h" />
     <ClInclude Include="..\Classes\WordCollectBoardRenderNode.h" />
     <ClInclude Include="..\Classes\WorldMapScene.h" />
     <ClInclude Include="main.h" />

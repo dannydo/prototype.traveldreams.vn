@@ -25,6 +25,8 @@ private:
 	void shareDialogFacebook();
 	void openSettingMenu(cocos2d::Object* sender);
 
+	void startTimeModeDemo(cocos2d::Object* sender);
+
 	void resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey) override;
 
 	cocos2d::CCMenuItemImage* m_pLoginfacebook;

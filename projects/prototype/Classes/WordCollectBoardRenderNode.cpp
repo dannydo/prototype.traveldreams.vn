@@ -119,10 +119,12 @@ bool WordCollectBoardRenderNode::init()
 		 
 	// GenerateLabels
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResourceDemo.plist");
-	m_pBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
+	m_pBackgroundBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
+	m_pFrontgroundBatchNode = CCSpriteBatchNode::create("ResourceDemo.pvr.ccz");
 
 	//m_pBatchNode->setPosition(10.f, 866.f);
-	this->addChild(m_pBatchNode, 10);
+	this->addChild(m_pBackgroundBatchNode, 9);
+	this->addChild(m_pFrontgroundBatchNode, 12);
 
 	/*timeval now;
 	gettimeofday( &now, NULL);
@@ -145,7 +147,7 @@ bool WordCollectBoardRenderNode::init()
 	auto pBackground = Sprite::createWithSpriteFrameName("Header_BG.png");
 	pBackground->setAnchorPoint( Point(0,0));
 	pBackground->setPositionY( winSize.height - pBackground->getContentSize().height);
-	m_pBatchNode->addChild(pBackground);
+	m_pBackgroundBatchNode->addChild(pBackground,-2);
 	
 	this->setTouchEnabled(true);	
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);	
@@ -154,22 +156,28 @@ bool WordCollectBoardRenderNode::init()
 	return true;
 }
 
-void WordCollectBoardRenderNode::GenerateLabels()
+void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType)
 {
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
 	m_pMainWord = &pGameWordManager->GetMainWord();
 
+	m_pColorNode = NULL;
+	if (eGameModeType == _GMT_NORMAL_)
+	{		
+		m_pColorNode = DrawNode::create();
+		CCPoint vertex[] = { ccp(0,0), ccp(1000,0), ccp(1000,1000), ccp(0,1000) };
+		m_pColorNode->drawPolygon(vertex, 4, ccc4f(0, 0, 0, 0.5f), 0, ccc4f(0, 0, 0, 0.5f) );
+		this->addChild(m_pColorNode, 19);
 	
-	
-	m_pColorNode = DrawNode::create();
-	CCPoint vertex[] = { ccp(0,0), ccp(1000,0), ccp(1000,1000), ccp(0,1000) };
-	m_pColorNode->drawPolygon(vertex, 4, ccc4f(0, 0, 0, 0.5f), 0, ccc4f(0, 0, 0, 0.5f) );
-	this->addChild(m_pColorNode, 19);
-
-	Sprite* pTip = Sprite::create("tip-msg.png");
-	pTip->setScale(1.2f);
-	pTip->setPosition(Point( 310.f, 790.f));
-	m_pColorNode->addChild(pTip);
+		Sprite* pTip = Sprite::create("tip-msg.png");
+		pTip->setScale(1.2f);
+		pTip->setPosition(Point( 310.f, 790.f));
+		m_pColorNode->addChild(pTip);
+	}
+	else
+	{
+		m_StartGameCallback();
+	}
 	
 
 	//m_pLetterPanel = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(' ').c_str());
@@ -201,7 +209,7 @@ void WordCollectBoardRenderNode::GenerateLabels()
 
 		iTotalLabelsWidth += m_LabelList[i]->getContentSize().width + 2.f;
 				
-		m_pBatchNode->addChild(m_LabelList[i], 2);
+		m_pFrontgroundBatchNode->addChild(m_LabelList[i], 2);
 	}	 
 
 	// break line based on level config
@@ -230,10 +238,10 @@ void WordCollectBoardRenderNode::GenerateLabels()
 		{
 			m_BubbleList[i] = Sprite::createWithSpriteFrameName("Main_Bubble_destroy.png");
 			m_BubbleList[i]->setRotation( rand() % 360);
-			iZOrder = 0; 
+			iZOrder = -3; 
 		}
 		m_BubbleList[i]->setPosition( Point(m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].x, 960.f - m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].y - 10.f));		
-		m_pBatchNode->addChild(m_BubbleList[i], iZOrder);
+		m_pBackgroundBatchNode->addChild(m_BubbleList[i], iZOrder);
 				
 		m_LabelList[i]->setPosition(Point(m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].x, 960.f - m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].y - 10.f));
 	}	
@@ -256,10 +264,10 @@ void WordCollectBoardRenderNode::GenerateLabels()
 			{
 				m_BubbleList[iStartLetterIndexOfSecondLine + i] = Sprite::createWithSpriteFrameName("Main_Bubble_destroy.png");
 				m_BubbleList[iStartLetterIndexOfSecondLine + i]->setRotation( rand() % 360);
-				iZOrder = 0;
+				iZOrder = -3;
 			}
 			m_BubbleList[iStartLetterIndexOfSecondLine + i]->setPosition( Point(m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].x, 960.f - m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].y - 10.f));		
-			m_pBatchNode->addChild(m_BubbleList[iStartLetterIndexOfSecondLine+i], iZOrder);
+			m_pBackgroundBatchNode->addChild(m_BubbleList[iStartLetterIndexOfSecondLine+i], iZOrder);
 					
 			m_LabelList[iStartLetterIndexOfSecondLine + i]->setPosition(Point(m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].x, 960.f - m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].y - 10.f));
 		}
@@ -316,19 +324,19 @@ void WordCollectBoardRenderNode::GenerateLabels()
 	// add header middle
 	auto pHeaderMiddle = Sprite::createWithSpriteFrameName("Header_middle.png");
 	pHeaderMiddle->setPosition(middlePosition );
-	m_pBatchNode->addChild(pHeaderMiddle);
+	m_pBackgroundBatchNode->addChild(pHeaderMiddle, -1);
 	Size headerMiddleSize = pHeaderMiddle->getContentSize();
 
 	// draw background of meaning
 	auto pHeaderLeft = Sprite::createWithSpriteFrameName("Header_left.png");
 	pHeaderLeft->setAnchorPoint(Point( 1.f, 0.5f));
 	pHeaderLeft->setPosition( Point( middlePosition.x - headerMiddleSize.width/2.f + 0.28f, middlePosition.y));
-	m_pBatchNode->addChild(pHeaderLeft);
+	m_pBackgroundBatchNode->addChild(pHeaderLeft, -1);
 
 	auto pHeaderRight = Sprite::createWithSpriteFrameName("Header_right.png");	
 	pHeaderRight->setAnchorPoint(Point( 0.f, 0.5f));
 	pHeaderRight->setPosition( Point( middlePosition.x + headerMiddleSize.width/2.f - 0.28f , middlePosition.y));
-	m_pBatchNode->addChild(pHeaderRight);
+	m_pBackgroundBatchNode->addChild(pHeaderRight, -1);
 
 
 	// reset flags
@@ -648,7 +656,7 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex,
 	pBubbleSprite->setScale(0.3f);
 	pBubbleSprite->setOpacity(76);///30%
 	pBubbleSprite->setVisible(false);
-	m_pBatchNode->addChild(pBubbleSprite,11);
+	m_pBackgroundBatchNode->addChild(pBubbleSprite,11);
 	pBubbleSprite->runAction(
 		Sequence::create(			
 			DelayTime::create(fDelayTime),
@@ -672,7 +680,7 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex,
 	Sprite* pLetterSrite = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(iLetter).c_str());			
 	pLetterSrite->setPosition( position);
 	pLetterSrite->setVisible(false);
-	m_pBatchNode->addChild(pLetterSrite,1);		
+	m_pFrontgroundBatchNode->addChild(pLetterSrite,1);		
 	pLetterSrite->runAction(
 		Sequence::create(
 			DelayTime::create(fDelayTime),
@@ -689,7 +697,7 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex,
 	pFlareSprite->setRotation( -20.f);
 	pFlareSprite->setOpacity(128);///50%
 	pFlareSprite->setVisible(false);
-	m_pBatchNode->addChild(pFlareSprite);
+	m_pFrontgroundBatchNode->addChild(pFlareSprite);
 	pFlareSprite->runAction(
 		Sequence::create(			
 			DelayTime::create(fDelayTime),
@@ -719,7 +727,7 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex,
 	m_BubbleList[iLetterIndex] = Sprite::createWithSpriteFrameName("Main_Bubble_destroy.png");
 	m_BubbleList[iLetterIndex]->setPosition(savePos);
 	m_BubbleList[iLetterIndex]->setRotation( rand() % 360);
-	m_pBatchNode->addChild( m_BubbleList[iLetterIndex], -1);
+	m_pBackgroundBatchNode->addChild( m_BubbleList[iLetterIndex], -3);
 
 	m_BubbleList[iLetterIndex]->setVisible(false);
 	m_BubbleList[iLetterIndex]->runAction(
@@ -743,7 +751,7 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex,
 	Sprite* pNewSrite = Sprite::createWithSpriteFrameName( GetImageInGemFileFromLetter(m_pMainWord->m_sWord[iLetterIndex]).c_str());						
 	pNewSrite->setVisible(false);
 	pNewSrite->setPosition( pos);	
-	m_pBatchNode->addChild(pNewSrite, 2);
+	 m_pFrontgroundBatchNode->addChild(pNewSrite, 2);
 	pNewSrite->runAction( 
 		Sequence::createWithTwoActions(
 			DelayTime::create( fDelayTime + 0.58f),			
@@ -757,7 +765,7 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex,
 	//m_iUnlockedLetterEffectEndTime = now.tv_sec*1000 + now.tv_usec / 1000 + (fDelayEffectTime + 0.22f + 0.17f + 1.f) * 1000;	
 }
 
-void WordCollectBoardRenderNode::PlayUnlockWordEffect(const float& fMoveTime, const float& fDisplayTime)
+float WordCollectBoardRenderNode::PlayUnlockWordEffect()
 {
 	/*m_pLetterPanel->runAction(
 			Sequence::create(
@@ -768,14 +776,205 @@ void WordCollectBoardRenderNode::PlayUnlockWordEffect(const float& fMoveTime, co
 				FadeOut::create(0.5f),
 				NULL));
 				*/
+	
+	//ParticleFire
+	Point centerPoint;
+	float fWindowWidth = Director::getInstance()->getWinSize().width;
+	if (m_pMainWord->m_iLimitLetterCountOfFirstLine <= 0) // only 1 line
+		centerPoint= Point( fWindowWidth/2.f, 875.f);
+	else
+		centerPoint= Point( fWindowWidth/2.f, 860.f);
+
+	Point centerWindow( fWindowWidth/2.f, Director::getInstance()->getWinSize().height/2.f);
+
+	float fPhase1Time = 0.4f;
+	float fPhase2Time = 0.08f * m_pMainWord->m_iWordLength + 1.f;
+	float fPhase3_1Time = 0.2f;
+	float fPhase3_2Time = 0.3f;	
+	float fPhase4Time = 4.3f;
+
+	// play unlock main word effect
+	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("CompleteMainWord.plist");
+	SpriteBatchNode* pFlareffectBatchNode = CCSpriteBatchNode::create("CompleteMainWord.pvr.ccz");
+	pFlareffectBatchNode->setAnchorPoint(Point(0,0));
+	pFlareffectBatchNode->setShaderProgram(ShaderCache::getInstance()->getProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
+	//pFlareffectBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);// ADDITIVE);
+	BlendFunc blendFunc;// = new BlendFunc();
+	blendFunc.src = GL_ONE;
+	blendFunc.dst = GL_ONE;
+	pFlareffectBatchNode->setBlendFunc(blendFunc);
+
+	//m_pBatchNode->setPosition(10.f, 866.f);
+	this->addChild(pFlareffectBatchNode, 11);
+
+	SpriteBatchNode* pLightffectBatchNode = CCSpriteBatchNode::create("CompleteMainWord.pvr.ccz");
+	pLightffectBatchNode->setAnchorPoint(Point(0,0));
+	this->addChild(pLightffectBatchNode, 10);
+
+
+	// phase 1 effect
+	auto pBlackSprite = Sprite::createWithSpriteFrameName("BlackRectangle.png");
+	pBlackSprite->setAnchorPoint( Point(0,0));
+	pBlackSprite->setScale(100.f);
+	pBlackSprite->setOpacity(0);
+	pLightffectBatchNode->addChild(pBlackSprite);	
+
+	pBlackSprite->runAction(
+		Sequence::create(
+			FadeTo::create( fPhase1Time - 0.1f, 255*0.6f),
+			DelayTime::create( fPhase2Time + fPhase3_1Time),
+			FadeOut::create( fPhase3_2Time),
+			RemoveSelf::create(),
+			//Hide::create(),
+			NULL));
+
+	// phase 2 + 3 effect
+	Sprite* pLight;	
+	for(int i=0; i< 5; i++)
+	{
+		pLight = Sprite::createWithSpriteFrameName( "MainWordLight.png");
+		pLight->setScaleX( 2.f);
+		pLight->setScaleY( 0.f);
+		pLight->setAnchorPoint( Point( 0, 0.5f));
+		pLight->setRotation( i * 72.f);
+
+		pLightffectBatchNode->addChild(pLight, 1);
+		
+		pLight->setPosition(centerPoint);		
+		pLight->runAction( 
+			Sequence::create(
+				DelayTime::create(fPhase1Time),
+				Spawn::createWithTwoActions(
+						ScaleTo::create( 0.25, 2.f, 0.7f),
+						Repeat::create( RotateBy::create( 1.f, 95.f), 100)),
+				NULL));
+		pLight->runAction(
+			Sequence::create(
+				DelayTime::create(fPhase1Time + fPhase2Time + fPhase3_1Time),
+				FadeOut::create(fPhase3_2Time),
+				RemoveSelf::create(),
+				NULL));
+	}
+
+	Sprite* pWordFlare;
+	for(int i = 0; i < m_pMainWord->m_iWordLength; i++)
+	{
+		if (m_pMainWord->m_sWord[i] != ' ')
+		{
+			pWordFlare = Sprite::createWithSpriteFrameName("MainWordFlare.png");
+			pFlareffectBatchNode->addChild(pWordFlare);
+
+			pWordFlare->setPosition( m_LabelList[i]->getPosition());//m_LabelList[2]->getPosition() + Point(30 * i, 0)); 
+			pWordFlare->setScale(0);
+			//pWordFlare->setVisible(false);
+			pWordFlare->runAction(
+				Sequence::createWithTwoActions(
+					DelayTime::create(fPhase1Time + 0.08f * i),
+					Spawn::createWithTwoActions(
+						ScaleTo::create( 0.08f, 1.16f),
+						Repeat::create( RotateBy::create( 0.142f, 359.f), 100))));
+
+			pWordFlare->runAction(
+				Sequence::create(
+					DelayTime::create(fPhase1Time + fPhase2Time),
+					MoveTo::create( fPhase3_1Time, centerPoint),
+					FadeOut::create(fPhase3_2Time),
+					RemoveSelf::create(),
+				NULL));
+
+			// move letters of main word
+			m_LabelList[i]->runAction(
+				Sequence::create(
+					DelayTime::create(fPhase1Time + fPhase2Time),
+					MoveTo::create( fPhase3_1Time, centerPoint),
+					FadeOut::create(fPhase3_2Time),
+					RemoveSelf::create(),
+				NULL));
+		}
+	}
+
+
+	auto pWhiteSprite = Sprite::createWithSpriteFrameName("WhiteRectangle.png");
+	pWhiteSprite->setAnchorPoint( Point(0,0));
+	pWhiteSprite->setScale(100.f);
+	pWhiteSprite->setOpacity(0);
+	//pWhiteSprite->setVisible(false);
+	pLightffectBatchNode->addChild(pWhiteSprite);	
+
+	pWhiteSprite->runAction(
+		Sequence::create(
+			DelayTime::create( fPhase1Time + fPhase2Time + fPhase3_1Time),
+			//FadeTo::create( 0.02f, 255*0.8f),			
+			//Show::create(),
+			FadeTo::create( 0.15f, 255),
+			FadeOut::create( fPhase3_2Time - 0.15f),
+			RemoveSelf::create(),
+			//Hide::create(),
+			NULL));
+
+	// phase 4 effect
+	float fPhase1_To_3Time = fPhase1Time + fPhase2Time + fPhase3_1Time + fPhase3_2Time;
+
+	std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(*m_pMainWord);;
+	sPath.append("/FlashCard/");
+	sPath.append(m_pMainWord->m_sFlashCardImage);
+	Sprite* pImageFlashcard = Sprite::create(sPath.c_str());
+	pImageFlashcard->setScale(0.6f);
+	pImageFlashcard->setPosition(centerPoint);
+	pImageFlashcard->setVisible(false);
+	this->addChild(pImageFlashcard, 100);
+	pImageFlashcard->runAction(
+		Sequence::create(
+			DelayTime::create( fPhase1_To_3Time),
+			Show::create(),
+			DelayTime::create( 0.2f),
+			Spawn::createWithTwoActions(
+				ScaleTo::create( 0.25f, 1.f, 1.f),
+				MoveTo::create( 0.25f, centerWindow)),
+			DelayTime::create( 3.f),
+			MoveTo::create( 0.1f, Point( centerPoint.x, centerPoint.y + 80.f)),
+			MoveTo::create( 0.25f, Point( centerPoint.x, - pImageFlashcard->getContentSize().height)),
+			RemoveSelf::create(),
+			NULL));
+
+
+
+	auto pCardFlareSprite = Sprite::createWithSpriteFrameName("CardFlare.png");	
+	pCardFlareSprite->setScale(1.5f);
+	pCardFlareSprite->setVisible(false);
+	pCardFlareSprite->setPosition(centerPoint);
+	pFlareffectBatchNode->addChild(pCardFlareSprite);	
+
+	pCardFlareSprite->runAction(
+		Sequence::create(
+			DelayTime::create( fPhase1_To_3Time),			
+			Show::create(),
+			Repeat::create( RotateBy::create( 1.f, 180.f), 10),			
+			//Hide::create(),
+			NULL));
+
+	pCardFlareSprite->runAction(
+		Sequence::create(
+			DelayTime::create( fPhase1_To_3Time),
+			DelayTime::create( 0.2f),
+			Spawn::createWithTwoActions(
+				ScaleTo::create( 0.25f, 2.f, 2.f),
+				MoveTo::create( 0.25f, centerWindow)),
+			DelayTime::create( 3.f),
+			MoveTo::create( 0.1f, Point( centerPoint.x, centerPoint.y + 80.f)),
+			MoveTo::create( 0.25f, Point( centerPoint.x, - pImageFlashcard->getContentSize().height)),
+			RemoveSelf::create(),
+			NULL));
+	
+	/*
 	for(int i=0; i< m_pMainWord->m_iWordLength; i++)
 	{
 		m_LabelList[i]->runAction(
-			Sequence::create(
-				MoveTo::create( fMoveTime, Point( 0, -400.f)),
-				DelayTime::create(fDisplayTime),
-				FadeOut::create(0.5f),
+			Sequence::create(			
+				DelayTime::create(fPhase1Time + fPhase2Time),
+				MoveTo::create( fPhase3Time, centerPoint),				
+				RemoveSelf::create(),
 				NULL));
-
-	}
+	}*/
+	return fPhase1Time + fPhase2Time + fPhase3_1Time + fPhase3_2Time + fPhase4Time;
 }

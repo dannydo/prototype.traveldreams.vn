@@ -8,9 +8,14 @@ ObstacleProcessManager::ObstacleProcessManager(NewGameBoardManager* pGameBoardMa
 
 void ObstacleProcessManager::InitLevel()
 {
-	const LevelConfig& levelConfig = m_pGameBoardManager->GetLevelConfig();
+	const BaseLevelConfig* pBaseLevelConfig = m_pGameBoardManager->GetLevelConfig();
+	if (pBaseLevelConfig->m_eGameModeType != _GMT_NORMAL_)
+		return;
+
+
+	const LevelConfig* pLevelConfig = (LevelConfig*) pBaseLevelConfig;
 	int iBlockID;
-	for(auto pObstacleLevelConfig : levelConfig.m_ObstacleConfigList)
+	for(auto pObstacleLevelConfig : pLevelConfig->m_ObstacleConfigList)
 	{
 		for(int i=0; i< pObstacleLevelConfig->m_iCount; i++)
 		{

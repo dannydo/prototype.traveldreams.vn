@@ -8,7 +8,7 @@
 
 USING_NS_CC;
 
-Scene* HelloWorld::createScene()
+Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage)
 {		
     // 'scene' is an autorelease object
     auto scene = Scene::create();
@@ -22,6 +22,7 @@ Scene* HelloWorld::createScene()
 
     // 'layer' is an autorelease object
     auto boardLayer = HelloWorld::create();	
+
 	boardLayer->m_pHUDLayer = Layer::create();
 
     // add layer as a child to scene
@@ -46,7 +47,7 @@ Scene* HelloWorld::createScene()
 	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pStatusLayer);
 
 	// init level
-	boardLayer->initLevel();
+	boardLayer->initLevel(eGameModeType, iTimeModeStage);
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
 	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
@@ -183,7 +184,7 @@ bool HelloWorld::init()
     return true;
 }
 
-void HelloWorld::initLevel()
+void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage)
 {		
 	/*switch( iLevel)
 	{
@@ -205,10 +206,31 @@ void HelloWorld::initLevel()
 			break;
 	};*/
 
-	string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
-	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
+	m_eGameModeType = eGameModeType;
+	m_iCurrentTimeModeStage = iTimeModeStage; //only used this field is this is time mode
 
-	m_GameBoardManager.GenerateGameBoard();
+	const BaseLevelConfig* pBaseLevelConfig;
+	const LevelConfig* pNormalLevelConfig = NULL;	
+	std::vector<Cell> positionOfLettersOfTimeMode;
+
+	if (m_eGameModeType == _GMT_NORMAL_)
+	{
+		string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
+		int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	
+	
+		m_GameBoardManager.GenerateGameBoard(m_eGameModeType);
+
+		pBaseLevelConfig = m_GameBoardManager.GetLevelConfig();
+		pNormalLevelConfig = (LevelConfig*)pBaseLevelConfig;
+	}
+	else
+	{
+		m_GameBoardManager.GenerateGameBoard(m_eGameModeType);
+		m_GameBoardManager.GeneratePositionOfLettersForTimeMode( positionOfLettersOfTimeMode);
+
+		pBaseLevelConfig = m_GameBoardManager.GetLevelConfig();
+	}
+	
 	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
 	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
 
@@ -266,15 +288,20 @@ void HelloWorld::initLevel()
 	m_eTouchMoveState = _TMS_NONE_;	
 
 	// init data for status layer
-	m_pStatusLayer->setCurrentScore( m_GameBoardManager.GetCurrentScore());	
-	m_pStatusLayer->setCurrentMove(m_GameBoardManager.GetCurrentMove());
-	
-	const LevelConfig& levelConfig = m_GameBoardManager.GetLevelConfig();
-	m_pStatusLayer->setScoreForStar( levelConfig.m_ScoreOfStars[0], levelConfig.m_ScoreOfStars[1], levelConfig.m_ScoreOfStars[2]);
+	if (m_eGameModeType == _GMT_NORMAL_)
+	{
+		m_pStatusLayer->setCurrentScore( m_GameBoardManager.GetCurrentScore());	
+		m_pStatusLayer->setCurrentMove(m_GameBoardManager.GetCurrentMove());
+	}
+	else
+		m_pStatusLayer->setCurrentScore( m_iCurrentTimeModeStage-1);	
+		
+
+	m_pStatusLayer->setScoreForStar( pBaseLevelConfig->m_ScoreOfStars[0], pBaseLevelConfig->m_ScoreOfStars[1], pBaseLevelConfig->m_ScoreOfStars[2]);
 	//m_pStatusLayer->update(0);
 
 	// init word-collect board
-	m_pWordCollectBoardRenderNode->GenerateLabels();
+	m_pWordCollectBoardRenderNode->GenerateLabels( eGameModeType);
 
 	// init graphic for gameBoard
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResourceDemo.plist");
@@ -394,19 +421,32 @@ void HelloWorld::initLevel()
 			else
 			{
 				bIsGemContainLetter = false;
-				if (levelConfig.m_bIsMainWordExistedOnBoard)
-				{
-					const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
 
-					for(int i=0; i< mainWord.m_iWordLength; i++)
-					{			
-						if (!mainWord.m_ActivatedCharacterFlags[i])
-							if(levelConfig.m_MainWordLetterPosition[i].m_iRow == iRow && levelConfig.m_MainWordLetterPosition[i].m_iColumn == iColumn)
-							{
-								bIsGemContainLetter = true;
-								break;
-							}
+				if (pBaseLevelConfig->m_eGameModeType == _GMT_NORMAL_) // pNormalLevelConfig != NULL
+				{
+					if (pNormalLevelConfig->m_bIsMainWordExistedOnBoard)
+					{
+						const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+
+						for(int i=0; i< mainWord.m_iWordLength; i++)
+						{			
+							if (!mainWord.m_ActivatedCharacterFlags[i])
+								if(pNormalLevelConfig->m_MainWordLetterPosition[i].m_iRow == iRow && pNormalLevelConfig->m_MainWordLetterPosition[i].m_iColumn == iColumn)
+								{
+									bIsGemContainLetter = true;
+									break;
+								}
+						}
 					}
+				}
+				else // time mode
+				{
+					for(auto& cell : positionOfLettersOfTimeMode)
+						if (cell.m_iRow == iRow && cell.m_iColumn == iColumn)
+						{
+							bIsGemContainLetter = true;
+							break;
+						}
 				}
 
 				for( iFlag =0; iFlag < 2; iFlag++)
@@ -456,9 +496,76 @@ void HelloWorld::initLevel()
 		}
 		
 
-	// add letter to gems if existing
-	if (levelConfig.m_bIsMainWordExistedOnBoard)
+	
+	if (m_eGameModeType == _GMT_NORMAL_)	
 	{
+		// add letter to gems if existing
+		if (pNormalLevelConfig->m_bIsMainWordExistedOnBoard)
+		{
+			const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+			int iGemLetterBlockID;
+			unsigned char iLetter;
+
+			int iPositionIndex = 0;
+			for(int i=0; i< mainWord.m_iWordLength; i++)
+			{			
+				if (!mainWord.m_ActivatedCharacterFlags[i])
+				{
+					iLetter = mainWord.m_sWord[i];
+					iGemLetterBlockID = m_GameBoardManager.AllocFreeGemLetterBlock( iLetter, true);
+					AddLetterToGem( pNormalLevelConfig->m_MainWordLetterPosition[iPositionIndex], m_GameBoardManager.GetCellValue( pNormalLevelConfig->m_MainWordLetterPosition[iPositionIndex].m_iRow,
+						pNormalLevelConfig->m_MainWordLetterPosition[iPositionIndex].m_iColumn), mainWord.m_sWord[i], iGemLetterBlockID);
+
+					iPositionIndex++;
+				}
+			}
+		}
+	
+
+		// add boss if this is versus mode
+		m_pBossSprite = NULL;
+
+		if (pNormalLevelConfig->m_bEnableBoss)
+		{
+			m_pBossSprite = Sprite::createWithSpriteFrameName("BigAlien.png");
+			m_pBossSprite->setPosition( ccp(m_fBoardLeftPosition + (pNormalLevelConfig->m_BossConfig.m_Position.m_iColumn + pNormalLevelConfig->m_BossConfig.m_iWidth/4.f)  * m_SymbolSize.width, 
+				m_fBoardBottomPosition + (pNormalLevelConfig->m_BossConfig.m_Position.m_iRow + pNormalLevelConfig->m_BossConfig.m_iHeight/4.f) * m_SymbolSize.height));
+			//pSprite->setScale(1.f);
+			m_pBoardBatchNode->addChild(m_pBossSprite, _BOSS_ZORDER_);
+
+			// add letter to boss
+			AddNewLetterToBossSprite(0);
+
+			// add HP Sprite to boss
+			AddHitPointSpritesToBossSprite(0);		
+		}
+	}
+	else// time mode
+	{
+		const TimeModeLevelConfig* pTimeModeLevelConfig = (TimeModeLevelConfig*)pBaseLevelConfig;		
+		int iMaximumEneryOfThisStage, iEnergyLostPersecondOfThisStage;
+		if (iTimeModeStage <= pTimeModeLevelConfig->m_ManualStageConfigList.size())
+		{
+			iMaximumEneryOfThisStage = pTimeModeLevelConfig->m_ManualStageConfigList[iTimeModeStage-1]->m_iMaximumEnergy;
+			iEnergyLostPersecondOfThisStage = pTimeModeLevelConfig->m_ManualStageConfigList[iTimeModeStage-1]->m_iEnergyLostRatePersecond;
+		}
+		else
+		{
+			int iTotalManualStageCount = pTimeModeLevelConfig->m_ManualStageConfigList.size();
+
+			iMaximumEneryOfThisStage = pTimeModeLevelConfig->m_ManualStageConfigList[iTotalManualStageCount-1]->m_iMaximumEnergy * 
+				(100 + pTimeModeLevelConfig->m_iStageConfig_MaximumValueIncreasePercent * (iTimeModeStage - iTotalManualStageCount))/100.f ;
+
+			iEnergyLostPersecondOfThisStage = pTimeModeLevelConfig->m_ManualStageConfigList[iTotalManualStageCount-1]->m_iEnergyLostRatePersecond * 
+				(100 + pTimeModeLevelConfig->m_iStageConfig_LostRateIncreasePercent * (iTimeModeStage - iTotalManualStageCount))/100.f ;			
+		}
+
+		m_pTimeCountDownNode = TimeCountDownNode::create( iMaximumEneryOfThisStage, iEnergyLostPersecondOfThisStage);
+		m_pTimeCountDownNode->setPositionY( m_fBoardBottomPosition + (iNumberOfRow  - 0.4f )* m_SymbolSize.height);
+		m_pTimeCountDownNode->SetOutOfTimeCallback(std::bind( &HelloWorld::OnTimeMode_OutOfTime, this));
+		this->addChild( m_pTimeCountDownNode, 1000);
+
+		// add letter to gem
 		const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
 		int iGemLetterBlockID;
 		unsigned char iLetter;
@@ -470,33 +577,13 @@ void HelloWorld::initLevel()
 			{
 				iLetter = mainWord.m_sWord[i];
 				iGemLetterBlockID = m_GameBoardManager.AllocFreeGemLetterBlock( iLetter, true);
-				AddLetterToGem( levelConfig.m_MainWordLetterPosition[iPositionIndex], m_GameBoardManager.GetCellValue( levelConfig.m_MainWordLetterPosition[iPositionIndex].m_iRow,
-					levelConfig.m_MainWordLetterPosition[iPositionIndex].m_iColumn), mainWord.m_sWord[i], iGemLetterBlockID);
+				AddLetterToGem( positionOfLettersOfTimeMode[iPositionIndex], m_GameBoardManager.GetCellValue( positionOfLettersOfTimeMode[iPositionIndex].m_iRow,
+					positionOfLettersOfTimeMode[iPositionIndex].m_iColumn), mainWord.m_sWord[i], iGemLetterBlockID);
 
 				iPositionIndex++;
 			}
-		}
+		}		
 	}
-	
-
-	// add boss if this is versus mode
-	m_pBossSprite = NULL;
-
-	if (levelConfig.m_bEnableBoss)
-	{
-		m_pBossSprite = Sprite::createWithSpriteFrameName("BigAlien.png");
-		m_pBossSprite->setPosition( ccp(m_fBoardLeftPosition + (levelConfig.m_BossConfig.m_Position.m_iColumn + levelConfig.m_BossConfig.m_iWidth/4.f)  * m_SymbolSize.width, 
-			m_fBoardBottomPosition + (levelConfig.m_BossConfig.m_Position.m_iRow + levelConfig.m_BossConfig.m_iHeight/4.f) * m_SymbolSize.height));
-		//pSprite->setScale(1.f);
-		m_pBoardBatchNode->addChild(m_pBossSprite, _BOSS_ZORDER_);
-
-		// add letter to boss
-		AddNewLetterToBossSprite(0);
-
-		// add HP Sprite to boss
-		AddHitPointSpritesToBossSprite(0);		
-	}
-
 
 	// pre-load hint sprite
 	m_pHintSprite = Sprite::createWithSpriteFrameName( "Hint.png");
@@ -704,7 +791,6 @@ std::string HelloWorld::GetImageFileFromGemID(int iGemID, GemComboType_e eGemCom
 	//return "Candy_6.png";
 }
 
-
 std::string HelloWorld::GetImageFileFromSnapGemID(int iGemID, GemComboType_e eGemComboType)
 {
 	switch (eGemComboType)
@@ -803,7 +889,16 @@ std::string HelloWorld::GetImageFileFromSnapGemID(int iGemID, GemComboType_e eGe
 			}					
 		}
 	}
+}
 
+SpriteFrame* HelloWorld::GetSpriteFrameFromGemID(int iGemID, GemComboType_e eGemComboType)
+{
+	return SpriteFrameCache::getInstance()->getSpriteFrameByName( GetImageFileFromGemID(iGemID, eGemComboType).c_str());	
+}
+
+SpriteFrame* HelloWorld::GetSpriteFrameFromSnapGemID(int iGemID, GemComboType_e eGemComboType)
+{
+	return SpriteFrameCache::getInstance()->getSpriteFrameByName( GetImageFileFromSnapGemID(iGemID, eGemComboType).c_str());
 }
 
 bool HelloWorld::onTouchBegan(Touch *pTouch, Event *pEvent)
@@ -1337,24 +1432,49 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 
 void HelloWorld::OnStartGame()
 {
-	Sprite* pTextSprite = Sprite::createWithSpriteFrameName("Level_Start.png");
-	Size textSize = pTextSprite->getContentSize();
-	Size winSize = Director::getInstance()->getWinSize();
+	if (m_GameBoardManager.GetLevelConfig()->m_eGameModeType == _GMT_NORMAL_)
+	{
+		Sprite* pTextSprite = Sprite::createWithSpriteFrameName("Level_Start.png");
+		Size textSize = pTextSprite->getContentSize();
+		Size winSize = Director::getInstance()->getWinSize();
 
-	pTextSprite->setPosition(Point( -textSize.width/2.f, winSize.height/2.f + 100.f));	
-	m_pTextEffectBatchNode->addChild(pTextSprite);
+		pTextSprite->setPosition(Point( -textSize.width/2.f, winSize.height/2.f + 100.f));	
+		m_pTextEffectBatchNode->addChild(pTextSprite);
 
-	pTextSprite->runAction(
-		Sequence::create(
-			MoveTo::create( 0.6f, Point( winSize.width/2.f - 40.f, winSize.height/2.f + 100.f)),
-			//MoveTo::create( 0.033f, Point( winSize.width/2.f - 40.f, winSize.height/2.f + 100.f)),
-			DelayTime::create(0.9f),
-			//MoveTo::create( 0.033f, Point( winSize.width/2.f - 70.f, winSize.height/2.f + 100.f)),
-			Spawn::createWithTwoActions(
-				EaseBackOut::create( MoveTo::create( 0.5f, Point( winSize.width + textSize.width/2.f, winSize.height/2.f + 100.f))),
-				FadeOut::create( 1.f)),
-			RemoveSelf::create(),
-			NULL));
+		pTextSprite->runAction(
+			Sequence::create(
+				MoveTo::create( 0.6f, Point( winSize.width/2.f - 40.f, winSize.height/2.f + 100.f)),
+				//MoveTo::create( 0.033f, Point( winSize.width/2.f - 40.f, winSize.height/2.f + 100.f)),
+				DelayTime::create(0.9f),
+				//MoveTo::create( 0.033f, Point( winSize.width/2.f - 70.f, winSize.height/2.f + 100.f)),
+				Spawn::createWithTwoActions(
+					EaseBackOut::create( MoveTo::create( 0.5f, Point( winSize.width + textSize.width/2.f, winSize.height/2.f + 100.f))),
+					FadeOut::create( 1.f)),
+				RemoveSelf::create(),
+				NULL));
+	}
+	else
+	{
+		char sText[20];
+		sprintf( sText, "STAGE %d", m_iCurrentTimeModeStage);
+		auto label = LabelTTF::create(sText, "fonts/UTM Cookies.ttf", 80);		
+		//label->setColor(Color3B( 100, 100, 100));
+		label->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 450));
+		label->disableStroke();		
+		this->addChild(label, 2000);
+
+		label->setScale( 0.7f);
+		label->runAction(
+			Sequence::create(
+				Spawn::createWithTwoActions(
+					ScaleTo::create(0.25f, 1.f),
+					MoveBy::create( 0.25f, Point( 0, 50.f))),
+				DelayTime::create(0.5f),
+				Spawn::createWithTwoActions(
+					FadeOut::create(0.2f),
+					MoveBy::create( 0.2f, Point( 0, 80.f))),
+				NULL));
+	}
 
 	// play sound effect 
 	SoundManager::PlaySoundEffect(_SET_START_LEVEL_);
@@ -1844,8 +1964,7 @@ void HelloWorld::RemoveSnap()
 					sprite->getParent()->setScaleX(1.1f);
 					sprite->getParent()->setScaleY(0.9f);
 				}
-			}
-
+			}			
 			MoveAllChildrenToOtherNode( sprite, (Sprite*)sprite->getParent());
 			sprite->removeFromParentAndCleanup(true);
 		}
@@ -2419,7 +2538,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 					if (m_GameBoardManager.GetGameWordManager()->UnlockLetter( iLetter,  iUnlockedLetterOfMainWord,  bIsMainWordJustUnlocked))
 					{
-						const LevelBossConfig& bossLevelConfig = m_GameBoardManager.GetLevelConfig().m_BossConfig;
+						const LevelBossConfig& bossLevelConfig = ((LevelConfig*) m_GameBoardManager.GetLevelConfig())->m_BossConfig;
 
 						m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect( iUnlockedLetterOfMainWord, fDelayEffectTime, iLetter,  //m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
 							ccp(m_fBoardLeftPosition + (  bossLevelConfig.m_Position.m_iColumn + bossLevelConfig.m_iWidth/4.f)  * m_SymbolSize.width, 
@@ -2786,8 +2905,11 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	}
 
 	// update display of score/move 
-	m_pStatusLayer->setCurrentMove( m_GameBoardManager.GetCurrentMove());
-	m_pStatusLayer->setCurrentScore( m_GameBoardManager.GetCurrentScore());
+	if (m_eGameModeType == _GMT_NORMAL_)
+	{
+		m_pStatusLayer->setCurrentMove( m_GameBoardManager.GetCurrentMove());
+		m_pStatusLayer->setCurrentScore( m_GameBoardManager.GetCurrentScore());
+	}	
 	//m_pStatusLayer->update(0);
 
 
@@ -2797,6 +2919,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 void HelloWorld::PlayEarnScoreEffect(const int& iScore,  const Cell& cell, const float& fDelay)
 {
+	m_pTimeCountDownNode->AddEnergy(iScore);
+
 	Point position( m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height);
 	char sBuffer[12];
 	sprintf(sBuffer, "%d", iScore);
@@ -3537,13 +3661,13 @@ void HelloWorld::ShowMainWordUnlockEffect()
 	//m_pWordCollectBoardRenderNode->PlayCharacterAnim(3, true);
 
 	
-	m_pEndGameEffectLayer = LayerColor::create(ccc4( 0,0,0, 100));
+	m_pEndGameEffectLayer = LayerColor::create(ccc4( 0,0,0, 0)); //100));	
 	this->getParent()->addChild(m_pEndGameEffectLayer, this->getZOrder());	
 
 
 	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
 
-	
+	/*
 	SpriteBatchNode* pSpriteBatchNode = SpriteBatchNode::create("ResourceDemo.pvr.ccz");
 	m_pEndGameEffectLayer->addChild(pSpriteBatchNode);
 
@@ -3587,22 +3711,22 @@ void HelloWorld::ShowMainWordUnlockEffect()
 				NULL));		
 
 		fPositionXIncrement += letterSpriteList[i]->getContentSize().width * fScaleRatio - 12.f;
-	}	
+	}	*/
 
 	float fSpellingTime = m_pWordCollectBoardRenderNode->PlaySpellingSound() + 0.9f;
 	
-	pSpriteBatchNode->runAction(
+	/*pSpriteBatchNode->runAction(
 		Sequence::create(
 			DelayTime::create( fSpellingTime), //mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.f),
 			FadeOut::create(0.5f),
 			RemoveSelf::create(),
-			NULL));	
+			NULL));	*/
 	
-	//m_pWordCollectBoardRenderNode->PlayUnlockWordEffect( 0.35f, fSpellingTime - 0.2f);
-
+	float fEffectTime = m_pWordCollectBoardRenderNode->PlayUnlockWordEffect();
+	//==> should delay show time of effect to match with spelling time!!!
 	this->runAction(
 		Sequence::create(
-			DelayTime::create( fSpellingTime), //mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.5f),
+			DelayTime::create( MAX( fSpellingTime, fEffectTime)), //mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.5f),
 			CallFunc::create( this,  callfunc_selector(HelloWorld::StartWinBonusPhase)),
 			NULL));
 
@@ -4537,40 +4661,48 @@ void HelloWorld::EndUnlockLetterAnimation()
 		//if (true)
 		//if (false)		
 		{
-			// should remove all bonus-quest gem before start bonus phase
-			if (m_GameBoardManager.HasBonusQuestGemOnBoard())
-			{
-				m_ComputeMoveResult.Reset();
-				m_GameBoardManager.ClearBonusQuestGemOnBoard( m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_OriginalMovedCells,
-															m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells);
 
-				PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells,
-						m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false);
+			if (m_eGameModeType == _GMT_NORMAL_)
+			{
+				// should remove all bonus-quest gem before start bonus phase
+				if (m_GameBoardManager.HasBonusQuestGemOnBoard())
+				{
+					m_ComputeMoveResult.Reset();
+					m_GameBoardManager.ClearBonusQuestGemOnBoard( m_ComputeMoveResult.m_BasicMatchingDestroyedCells, m_ComputeMoveResult.m_OriginalMovedCells,
+																m_ComputeMoveResult.m_TargetMovedCells, m_ComputeMoveResult.m_NewCells);
+
+					PlayEffect2( false, m_ComputeMoveResult.m_ConvertedComboCells, m_ComputeMoveResult.m_BasicMatchingDestroyedCells,
+							m_ComputeMoveResult.m_ComboChainList, m_ComputeMoveResult.m_NewComboCells, m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells,  m_ComputeMoveResult.m_UnlockedLetterCells, m_ComputeMoveResult.m_NewCells, false);
+				}
+				else // start bonus phase
+				{
+					// play sound effect 
+					SoundManager::PlaySoundEffect(_SET_COMPLETE_WORD_);
+
+					SoundManager::PlayBackgroundMusic(SoundManager::kEndGameBonus);
+
+					m_bIsEffectPlaying = true;//stop all interaction on board from now
+					m_bIsEndGamePhase = true; 
+
+					float fExtraDelay = 0.1f;
+					if (m_GameBoardManager.GetPhaseMoveOfComboChain() == 2)
+						fExtraDelay += 1.f;
+
+					m_pTempSpriteForAction->runAction( 					
+						Sequence::create(
+							DelayTime::create(fExtraDelay),
+							CCCallFunc::create( this, callfunc_selector( HelloWorld::ShowMainWordUnlockEffect)),
+							NULL));			
+
+					//ShowMainWordUnlockEffect();
+					//ExecuteBonusWinGameEffect();
+
+					UserTable::getInstance()->updateLife(0);
+				}
 			}
-			else // start bonus phase
+			else
 			{
-				// play sound effect 
-				SoundManager::PlaySoundEffect(_SET_COMPLETE_WORD_);
-
-				SoundManager::PlayBackgroundMusic(SoundManager::kEndGameBonus);
-
-				m_bIsEffectPlaying = true;//stop all interaction on board from now
-				m_bIsEndGamePhase = true; 
-
-				float fExtraDelay = 0.1f;
-				if (m_GameBoardManager.GetPhaseMoveOfComboChain() == 2)
-					fExtraDelay += 1.f;
-
-				m_pTempSpriteForAction->runAction( 					
-					Sequence::create(
-						DelayTime::create(fExtraDelay),
-						CCCallFunc::create( this, callfunc_selector( HelloWorld::ShowMainWordUnlockEffect)),
-						NULL));			
-
-				//ShowMainWordUnlockEffect();
-				//ExecuteBonusWinGameEffect();
-
-				UserTable::getInstance()->updateLife(0);
+				OnTimeMode_StageComplete();				
 			}
 		}
 		else  if (m_GameBoardManager.GetCurrentMove() == 0) // out of move ==> lose
@@ -4579,4 +4711,83 @@ void HelloWorld::EndUnlockLetterAnimation()
 			ShowLevelFailEffect();			
 		}
 	}
+}
+
+void HelloWorld::OnTimeMode_OutOfTime()
+{
+	m_bIsEffectPlaying = true;
+	//m_bIsEndGamePhase = true;
+	
+	auto label = LabelTTF::create("OUT OF TIME!", "fonts/UTM Cookies.ttf", 70);		
+	label->setColor(Color3B( 200, 30, 30));
+	label->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));
+	label->disableStroke();		
+	this->addChild(label, 2000);
+
+	//label->setScale( 0.7f);	
+
+	this->runAction( CCSequence::create(
+		DelayTime::create(4.5f),
+		CallFunc::create( this, callfunc_selector( HelloWorld::ReturnToMainMenu)),
+		NULL));
+}
+
+#include "MainMenuScene.h"
+
+void HelloWorld::ReturnToMainMenu()
+{
+	MainMenuScene* pMainMenu = MainMenuScene::create();
+	Director::getInstance()->replaceScene(pMainMenu);
+}
+
+void HelloWorld::OnTimeMode_StageComplete()
+{
+	m_bIsEffectPlaying = true;
+	//m_bIsEndGamePhase = true;
+
+	m_pTimeCountDownNode->StopUpdate();
+	
+
+	// show complete mainword effect
+	float fEffectTime = m_pWordCollectBoardRenderNode->PlayUnlockWordEffect();		
+
+	auto label = LabelTTF::create("STAGE COMPLETE!", "fonts/UTM Cookies.ttf", 70);		
+	//label->setColor(Color3B( 100, 100, 100));
+	label->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));
+	label->disableStroke();		
+	label->setVisible(false);
+	this->addChild(label, 2000);
+	
+	label->runAction(
+		Sequence::create(
+			DelayTime::create( fEffectTime),
+			Show::create(),				
+			NULL));
+
+	this->runAction( CCSequence::create(
+		DelayTime::create(3.f + fEffectTime),
+		CallFunc::create( this, callfunc_selector( HelloWorld::TimeMode_StartNextStage)),
+		NULL));
+
+	// increase collected count of main word in word list
+	int iMainWordIndex = m_GameBoardManager.GetGameWordManager()->GetLoadedIndexOfMainWord();
+	auto pLevelConfig = (TimeModeLevelConfig*)m_GameBoardManager.GetLevelConfig();
+	for(int i=0; i< pLevelConfig->m_WordIndexList.size(); i++)
+	{
+		if (pLevelConfig->m_WordIndexList[i] == iMainWordIndex)
+		{
+			pLevelConfig->m_WordCollectedCountList[i]++;
+			break;
+		}
+	}	
+}
+
+void HelloWorld::TimeMode_StartNextStage()
+{
+	auto timeModeConfig = (TimeModeLevelConfig*)m_GameBoardManager.GetLevelConfig();
+		//GameConfigManager::getInstance()->GetTimeModeDemoConfig();	
+	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(timeModeConfig);
+
+	auto newScene = HelloWorld::createScene( m_eGameModeType, m_iCurrentTimeModeStage+1);
+	Director::getInstance()->replaceScene(newScene);
 }

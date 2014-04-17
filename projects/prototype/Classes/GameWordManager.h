@@ -51,8 +51,12 @@ public:
 	void GenerateWordForNewLevel(std::string sChapterID, int iLevel);
 	void RetryCurrentLevel();
 
+	// temporary only random words of word list, should implement correctly later
+	void GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTimeModeConfig);
+
 
 	inline const Word& GetMainWord() { return m_WordList[m_iMainWordIndex];}	
+	inline const int GetLoadedIndexOfMainWord() { return m_iMainWordIndex;}
 	bool IsMainWordUnlocked() { return (m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount == 0);}
 	inline int GetTotalCollectibleLettersOfMainWord() { return m_iTotalCollectibleLettersOfMainWord;}
 	inline const LevelConfig* GetLevelConfig() { return m_pLevelConfig;}

@@ -284,6 +284,44 @@ void GameWordManager::GenerateWordForNewLevel(std::string sChapterID, int iLevel
 	ResetDataForNewPlay();
 }
 
+void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTimeModeConfig)
+{
+	m_pLevelConfig = NULL;
+	
+	int iSmallestColllectedCountOfWord = 1000, iSmallestCollectedWordCount = 0;
+
+	for(auto& iColllectedCount : pTimeModeConfig->m_WordCollectedCountList)
+		if (iSmallestColllectedCountOfWord > iColllectedCount)
+		{
+			iSmallestColllectedCountOfWord = iColllectedCount;
+			iSmallestCollectedWordCount = 1;
+		}
+		else if (iSmallestColllectedCountOfWord == iColllectedCount)
+		{
+			iSmallestCollectedWordCount++;
+		}
+
+
+	srand((unsigned int)time(NULL));
+	int iRandomIndex = rand() % iSmallestCollectedWordCount;
+	for(int i=0; i< pTimeModeConfig->m_WordIndexList.size(); i++)
+		if (iSmallestColllectedCountOfWord == pTimeModeConfig->m_WordCollectedCountList[i])
+		{
+			iRandomIndex--;
+			if (iRandomIndex == 0)
+			{
+				m_iMainWordIndex = pTimeModeConfig->m_WordIndexList[i];
+				break;
+			}
+		}
+	//m_iMainWordIndex = pTimeModeConfig->m_WordIndexList[iRandomIndex];
+
+	m_bAddDirectLetterOfMainWordToTrash = false;
+
+	// reset data
+	ResetDataForNewPlay();
+}
+
 void GameWordManager::RetryCurrentLevel()
 {
 	// reset data
@@ -317,18 +355,22 @@ void GameWordManager::ResetDataForNewPlay()
 		}
 	}
 
-	int iRandomRemovedLetter;
-	while(iListCount > m_pLevelConfig->m_iNumberLetterOfMainWord)
+	if (m_pLevelConfig != NULL) //normal mode
 	{
-		iRandomRemovedLetter = rand() % iListCount;
+		// random choose some letters of main word to match with requirement of level
+		int iRandomRemovedLetter;
+		while(iListCount > m_pLevelConfig->m_iNumberLetterOfMainWord)
+		{
+			iRandomRemovedLetter = rand() % iListCount;
 
-		m_WordList[m_iMainWordIndex].m_ActivatedCharacterFlags[tempRemovedIndexList[iRandomRemovedLetter]] = true;
-		m_WordList[m_iMainWordIndex].m_AppearedCharacterFlags[tempRemovedIndexList[iRandomRemovedLetter]] = true;
-		m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount--;
-		m_WordList[m_iMainWordIndex].m_iRemainNotAppearedCharacterCount--;
+			m_WordList[m_iMainWordIndex].m_ActivatedCharacterFlags[tempRemovedIndexList[iRandomRemovedLetter]] = true;
+			m_WordList[m_iMainWordIndex].m_AppearedCharacterFlags[tempRemovedIndexList[iRandomRemovedLetter]] = true;
+			m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount--;
+			m_WordList[m_iMainWordIndex].m_iRemainNotAppearedCharacterCount--;
 
-		tempRemovedIndexList[iRandomRemovedLetter] = tempRemovedIndexList[iListCount-1];
-		iListCount--;
+			tempRemovedIndexList[iRandomRemovedLetter] = tempRemovedIndexList[iListCount-1];
+			iListCount--;
+		}
 	}
 
 	m_iTotalCollectibleLettersOfMainWord = m_WordList[m_iMainWordIndex].m_iRemainInactivatedCharacterCount;
@@ -338,7 +380,7 @@ void GameWordManager::ResetDataForNewPlay()
 	m_iCountOfLettersOnBoard = 0;
 
 	// reset ratio
-	if (m_pLevelConfig->m_bIsMainWordExistedOnBoard)
+	if (m_pLevelConfig == NULL || m_pLevelConfig->m_bIsMainWordExistedOnBoard)
 		m_iMainWordGenerateRate = 0;
 	else
 		m_iMainWordGenerateRate = m_pLevelConfig->m_iInitRateOfMainLetter;	
@@ -387,8 +429,9 @@ bool GameWordManager::UnlockLetter(const unsigned char& iLetter, int& iUnlockedL
 		}	
 	}
 	// if letter of main word is unlocked then decrease the appear rate of remain letters
-	if (iUnlockedLetterIndexOfMainWord >=0)
-		m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate- m_pLevelConfig->m_iDecreasePercentAfterLetterDestroyedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);	
+	if (m_pLevelConfig != NULL && !m_pLevelConfig->m_bIsMainWordExistedOnBoard)
+		if (iUnlockedLetterIndexOfMainWord >=0)
+			m_iMainWordGenerateRate = MAX( m_iMainWordGenerateRate- m_pLevelConfig->m_iDecreasePercentAfterLetterDestroyedOfMainLetter, m_WordGenerateConfig.m_iMinimumRate);	
 
 	m_iCountOfLettersOnBoard--;
 	if (bNewCharacterIsUnlocked)
@@ -427,7 +470,7 @@ void GameWordManager::GenerateNewLetters(const std::vector<bool>& gemCanContainL
 
 	// generate letters from main word
 	int iAppearRatio = m_iMainWordGenerateRate;	
-	if (!m_pLevelConfig->m_bIsMainWordExistedOnBoard && !m_pLevelConfig->m_bEnableBoss)
+	if (m_pLevelConfig != NULL && !m_pLevelConfig->m_bIsMainWordExistedOnBoard && !m_pLevelConfig->m_bEnableBoss)
 	{
 		while(bShouldGenerateLetter && characterOutput.size() < iMaxNewLetters)
 		{
@@ -497,9 +540,10 @@ void GameWordManager::GenerateNewLetters(const std::vector<bool>& gemCanContainL
 	m_iCountOfLettersOnBoard += characterOutput.size();		
 
 	if (bIsNewMove)
-	{
-		m_iMainWordGenerateRate = MIN( m_iMainWordGenerateRate + m_pLevelConfig->m_iIncreasePercentAfterEachMoveOfMainLetter, m_WordGenerateConfig.m_iMaximumRate);			
-	}
+		if (m_pLevelConfig != NULL && !m_pLevelConfig->m_bIsMainWordExistedOnBoard)
+		{
+			m_iMainWordGenerateRate = MIN( m_iMainWordGenerateRate + m_pLevelConfig->m_iIncreasePercentAfterEachMoveOfMainLetter, m_WordGenerateConfig.m_iMaximumRate);			
+		}
 }
 
 /*bool GameWordManager::GenerateNewLetter(unsigned char& sOuputLetter, const GemComboType_e& eComboType)
@@ -599,7 +643,8 @@ void GameWordManager::GenerateNewLetters(const std::vector<bool>& gemCanContainL
 
 void GameWordManager::UpdateParamForNewMove()
 {
-	m_iMainWordGenerateRate = MIN( m_iMainWordGenerateRate + m_pLevelConfig->m_iIncreasePercentAfterEachMoveOfMainLetter, m_WordGenerateConfig.m_iMaximumRate);			
+	if (m_pLevelConfig != NULL && !m_pLevelConfig->m_bIsMainWordExistedOnBoard)
+		m_iMainWordGenerateRate = MIN( m_iMainWordGenerateRate + m_pLevelConfig->m_iIncreasePercentAfterEachMoveOfMainLetter, m_WordGenerateConfig.m_iMaximumRate);			
 }
 
 bool GameWordManager::GenerateLetterFromMainWord(unsigned char& sLetter)

@@ -12,7 +12,7 @@
 //#include "BonusWordNode.h"
 //#include "BonusWordNodeNew.h"	 
 #include "SettingMenuNode.h"
-
+#include "TimeCountDownNode.h"
 
 #define _MAX_CHARACTER_ID_	5
 #define _BOSS_ZORDER_ 200
@@ -89,13 +89,13 @@ class HelloWorld : public cocos2d::Layer
 {
 public:
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
-    static cocos2d::Scene* createScene();
+	static cocos2d::Scene* createScene(GameModeType_e eGameModeType = _GMT_NORMAL_, int iTimeModeStage = 1);
 
 	~HelloWorld();
 
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();  
-    virtual void initLevel();
+    virtual void initLevel(GameModeType_e eGameModeType, int iTimeModeStage);
     // a selector callback
     void menuCloseCallback(Object* pSender);
     
@@ -111,6 +111,9 @@ public:
 protected:
 	std::string GetImageFileFromGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
 	std::string GetImageFileFromSnapGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
+	SpriteFrame* GetSpriteFrameFromGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
+	SpriteFrame* GetSpriteFrameFromSnapGemID(int iGemID, GemComboType_e eGemComboType=_GCT_NONE_);	
+	
 	int GetUnmoveCellsFromCurrentMovingRowOrColumn();
 
 	inline int GetZOrder(const int& iRow, const int& iColumn, const bool& bIsBush) { return (m_GameBoardManager.GetRowNumber()-1-iRow)*m_GameBoardManager.GetColumnNumber() + iColumn + bIsBush*100;}
@@ -130,6 +133,11 @@ protected:
 
 	void OnStartGame();
 	void OnCompleteComboChain();
+
+	void OnTimeMode_OutOfTime();
+	void OnTimeMode_StageComplete();
+	void TimeMode_StartNextStage();
+	void ReturnToMainMenu();
 
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();
@@ -252,6 +260,12 @@ private:
 
 	SettingMenuNode* m_pSettingNode	;
 	ButtonNode* m_pButtonSettingNode;
+
+
+	// temporary code for timeMode demo
+	GameModeType_e m_eGameModeType;
+	int m_iCurrentTimeModeStage;
+	TimeCountDownNode* m_pTimeCountDownNode;
 };
 
 #endif // __HELLOWORLD_SCENE_H__
