@@ -160,7 +160,8 @@ public:
 	inline const int& GetPhaseMoveOfComboChain() { return m_iPhaseMoveInComboChain;}
 
 	void GenerateGameBoard(GameModeType_e eGameModeType, int iTimeModeStage = 1);	
-	void GeneratePositionOfLettersForTimeMode(std::vector<Cell>& positionList);
+	void GeneratePositionOfLettersForTimeMode(std::vector<Cell>& positionList, int iExistedCombo4Count, int iExistedCombo5Count, int iExistedCombo6Count);
+	void CountComboCellsOnBoard(int& iCombo4Count, int& iCombo5Count, int& iCombo6Count);
 
 	inline std::vector<DestroyedByComboCell>& GetDestroyBonusQuestGemList() { return m_DestroyBonusQuestGemList;}
 

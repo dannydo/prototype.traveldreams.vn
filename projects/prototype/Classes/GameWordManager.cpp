@@ -303,7 +303,7 @@ void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTi
 
 
 	srand((unsigned int)time(NULL));
-	int iRandomIndex = rand() % iSmallestCollectedWordCount;
+	int iRandomIndex = 15; //rand() % iSmallestCollectedWordCount + 1;
 	for(int i=0; i< pTimeModeConfig->m_WordIndexList.size(); i++)
 		if (iSmallestColllectedCountOfWord == pTimeModeConfig->m_WordCollectedCountList[i])
 		{

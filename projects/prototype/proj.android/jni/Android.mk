@@ -40,7 +40,6 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/Database/InitDatabase.cpp \
 				   ../../Classes/Database/sqlite3.c \
 				   ../../Classes/Database/ChapterTable.cpp \
-				   ../../Classes/Database/FriendTable.cpp \
 				   ../../Classes/Database/LevelTable.cpp \
 				   ../../Classes/Database/UserTable.cpp \
 				   ../../Classes/Database/DictionaryDatabase.cpp \

@@ -8,7 +8,7 @@
 
 USING_NS_CC;
 
-Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage)
+Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,  int iExistedCombo4Count, int iExistedCombo5Count, int iExistedCombo6Count)
 {		
     // 'scene' is an autorelease object
     auto scene = Scene::create();
@@ -47,7 +47,7 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage)
 	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pStatusLayer);
 
 	// init level
-	boardLayer->initLevel(eGameModeType, iTimeModeStage);
+	boardLayer->initLevel(eGameModeType, iTimeModeStage, iExistedCombo4Count, iExistedCombo5Count, iExistedCombo6Count);
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
 	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
@@ -184,7 +184,7 @@ bool HelloWorld::init()
     return true;
 }
 
-void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage)
+void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int iExistedCombo4Count, int iExistedCombo5Count, int iExistedCombo6Count)
 {		
 	/*switch( iLevel)
 	{
@@ -226,7 +226,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage)
 	else
 	{
 		m_GameBoardManager.GenerateGameBoard(m_eGameModeType);
-		m_GameBoardManager.GeneratePositionOfLettersForTimeMode( positionOfLettersOfTimeMode);
+		m_GameBoardManager.GeneratePositionOfLettersForTimeMode( positionOfLettersOfTimeMode, iExistedCombo4Count, iExistedCombo5Count, iExistedCombo6Count);
 
 		pBaseLevelConfig = m_GameBoardManager.GetLevelConfig();
 	}
@@ -569,18 +569,15 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage)
 		const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
 		int iGemLetterBlockID;
 		unsigned char iLetter;
-
-		int iPositionIndex = 0;
+		
 		for(int i=0; i< mainWord.m_iWordLength; i++)
 		{			
 			if (!mainWord.m_ActivatedCharacterFlags[i])
 			{
 				iLetter = mainWord.m_sWord[i];
 				iGemLetterBlockID = m_GameBoardManager.AllocFreeGemLetterBlock( iLetter, true);
-				AddLetterToGem( positionOfLettersOfTimeMode[iPositionIndex], m_GameBoardManager.GetCellValue( positionOfLettersOfTimeMode[iPositionIndex].m_iRow,
-					positionOfLettersOfTimeMode[iPositionIndex].m_iColumn), mainWord.m_sWord[i], iGemLetterBlockID);
-
-				iPositionIndex++;
+				AddLetterToGem( positionOfLettersOfTimeMode[i], m_GameBoardManager.GetCellValue( positionOfLettersOfTimeMode[i].m_iRow,
+					positionOfLettersOfTimeMode[i].m_iColumn), mainWord.m_sWord[i], iGemLetterBlockID);				
 			}
 		}		
 	}
@@ -4788,6 +4785,8 @@ void HelloWorld::TimeMode_StartNextStage()
 		//GameConfigManager::getInstance()->GetTimeModeDemoConfig();	
 	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(timeModeConfig);
 
-	auto newScene = HelloWorld::createScene( m_eGameModeType, m_iCurrentTimeModeStage+1);
+	int iCombo4Count, iCombo5Count, iCombo6Count;
+	m_GameBoardManager.CountComboCellsOnBoard( iCombo4Count, iCombo5Count, iCombo6Count);
+	auto newScene = HelloWorld::createScene( m_eGameModeType, m_iCurrentTimeModeStage+1, iCombo4Count, iCombo5Count, iCombo6Count);
 	Director::getInstance()->replaceScene(newScene);
 }

@@ -98,7 +98,7 @@ void NewGameBoardManager::GenerateGameBoard(GameModeType_e eGameModeType, int iT
 	m_LevelConfig.m_ScoreOfStars[2] = m_LevelConfig.m_ScoreOfStars[0] + iTotalSubWordScore;*/
 }
 
-void NewGameBoardManager::GeneratePositionOfLettersForTimeMode(std::vector<Cell>& positionList)
+void NewGameBoardManager::GeneratePositionOfLettersForTimeMode(std::vector<Cell>& positionList, int iExistedCombo4Count, int iExistedCombo5Count, int iExistedCombo6Count)
 {	
 	std::vector<Cell> seedList;	
 	int iRow, iColumn, iListSize = 0;
@@ -116,18 +116,91 @@ void NewGameBoardManager::GeneratePositionOfLettersForTimeMode(std::vector<Cell>
 		}		
 	}
 
-	auto mainWord = m_pGameWordManager->GetMainWord();
+	// set higher priority for combo from pervious stage
 	int iRandomIndex;
+	int iTotalComboCount = iExistedCombo4Count + iExistedCombo5Count + iExistedCombo6Count;	
+	iTotalComboCount = MIN(iTotalComboCount, iListSize);
+	Cell cell;
+	std::vector<Cell> rejectList; //save cells list that got reject when choose position for combo cell
+	for(int i=0; i< iTotalComboCount; i++)		
+	{
+		iRandomIndex = rand() % iListSize;
+		cell = seedList[iRandomIndex];
+		// make sure that neighbor cells are not combo cells
+		if ( (cell.m_iRow > 0 && m_BoardValueMatrix[cell.m_iRow-1][cell.m_iColumn].m_eGemComboType != _GCT_NONE_) ||
+			(cell.m_iRow < m_iRowNumber-1 && m_BoardValueMatrix[cell.m_iRow+1][cell.m_iColumn].m_eGemComboType != _GCT_NONE_) ||
+			(cell.m_iColumn > 0 && m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn-1].m_eGemComboType != _GCT_NONE_) ||
+			(cell.m_iColumn < m_iColumnNumber-1 && m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn+1].m_eGemComboType != _GCT_NONE_))
+		{
+			rejectList.push_back(cell);
+		}
+		else
+		{
+			if (iExistedCombo6Count > 0)
+			{			
+				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType = _GCT_COMBO6_;
+				iExistedCombo6Count--;
+			}	
+			else if (iExistedCombo5Count > 0)
+			{			
+				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType = _GCT_COMBO5_;
+				iExistedCombo5Count--;
+			}
+			else if (iExistedCombo4Count > 0)
+			{			
+				m_BoardValueMatrix[cell.m_iRow][cell.m_iColumn].m_eGemComboType = _GCT_COMBO4_;
+				iExistedCombo4Count --;
+			}
+		}
+
+		seedList[iRandomIndex] = seedList[iListSize-1];			
+		iListSize--;
+	}
+
+	// re-add rejectList to seedList
+	iListSize += rejectList.size();
+	seedList.insert(seedList.begin(), rejectList.begin(), rejectList.end());					
+
+	auto mainWord = const_cast<Word&>(m_pGameWordManager->GetMainWord());
+	//int iRandomIndex;
 	for(int i=0; i< mainWord.m_iWordLength; i++)
-		if (mainWord.m_ActivatedCharacterFlags[i])
-			positionList.push_back( Cell());
+	{
+		if (iListSize == 0 && !mainWord.m_ActivatedCharacterFlags[i])
+		{
+			mainWord.m_ActivatedCharacterFlags[i] = true;
+			mainWord.m_iRemainInactivatedCharacterCount--;
+		}
+		else if (mainWord.m_ActivatedCharacterFlags[i])
+			positionList.push_back( Cell(-1, -1));
 		else
 		{
 			iRandomIndex = rand() % iListSize;
 
 			positionList.push_back(seedList[iRandomIndex]);
 			seedList[iRandomIndex] = seedList[iListSize-1];			
+			iListSize--;
 		}
+	}
+}
+
+void NewGameBoardManager::CountComboCellsOnBoard(int& iCombo4Count, int& iCombo5Count, int& iCombo6Count)
+{
+	iCombo4Count = iCombo5Count = iCombo6Count = 0;
+	int iRow, iColumn;
+	for(iRow=0; iRow < m_iRowNumber; iRow++)
+		for(iColumn=0; iColumn < m_iColumnNumber; iColumn++)
+			switch(m_BoardValueMatrix[iRow][iColumn].m_eGemComboType)
+			{
+				case _GCT_COMBO4_:
+					iCombo4Count++;
+					break;
+				case _GCT_COMBO5_:
+					iCombo5Count++;
+					break;
+				case _GCT_COMBO6_:
+					iCombo6Count++;
+					break;
+			}
 }
 
 void NewGameBoardManager::ClearObstacleBlockID(const int& iObstacleBlockID)

@@ -89,13 +89,13 @@ class HelloWorld : public cocos2d::Layer
 {
 public:
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
-	static cocos2d::Scene* createScene(GameModeType_e eGameModeType = _GMT_NORMAL_, int iTimeModeStage = 1);
+	static cocos2d::Scene* createScene(GameModeType_e eGameModeType = _GMT_NORMAL_, int iTimeModeStage = 1, int iExistedCombo4Count =0, int iExistedCombo5Count = 0, int iExistedCombo6Count = 0);
 
 	~HelloWorld();
 
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();  
-    virtual void initLevel(GameModeType_e eGameModeType, int iTimeModeStage);
+    virtual void initLevel(GameModeType_e eGameModeType, int iTimeModeStage,  int iExistedCombo4Count, int iExistedCombo5Count, int iExistedCombo6Count);
     // a selector callback
     void menuCloseCallback(Object* pSender);
     
