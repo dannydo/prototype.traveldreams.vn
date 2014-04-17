@@ -1,0 +1,50 @@
+;size map
+8	8
+;number of color
+6
+;score of stars (1 word = 1 score)
+3	5	7
+;map matrix
+1	1	1	1	1	1	1   1
+0	1	1	1	1	1	1   0
+0	1	1	1	1	1	1   0
+0	1	1	1	1	1	1   0
+0	1	1	1	1	1	1   0
+0	1	1	1	1	1  	1   0
+1	1	1	1	1	1	1  	1
+1	1	1	1	1	1	1  	1
+;word list
+20
+Pack1-PEN
+Pack1-RULER
+Pack1-GLOBE
+Pack1-CRAYON
+Pack1-SCISSORS
+Pack1-PAPER
+Pack1-COMPUTER
+Pack1-TABLE
+Pack1-BOOKCASE
+Pack1-BLACKBOARD
+Pack1-KITCHEN
+Pack1-LIVING ROOM
+Pack1-HAIRDRYER
+Pack1-BLOCK OF FLATS
+Pack1-TOILET PAPER
+Pack1-ERASER
+Pack1-STUDY
+Pack1-CLASSMATE
+Pack1-UNIFORM
+Pack1-CHAIR
+;manual stage configs
+1
+10000
+100
+0
+;auto config for greater levels
+10
+10
+
+
+1
+SHIELD	1
+100	100	100	100 100	100	100	100
