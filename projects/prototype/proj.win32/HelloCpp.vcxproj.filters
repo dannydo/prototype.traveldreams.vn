@@ -180,6 +180,15 @@
     <ClCompile Include="..\Classes\APIService\SyncDataGame.cpp">
       <Filter>APIService</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\SystemEventHandle.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ConnectFacebookConfirm.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\WaitingNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -343,6 +352,15 @@
     </ClInclude>
     <ClInclude Include="..\Classes\APIService\SyncDataGame.h">
       <Filter>APIService</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\SystemEventHandle.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ConnectFacebookConfirm.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\WaitingNode.h">
+      <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

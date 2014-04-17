@@ -45,9 +45,9 @@ void VersionTable::fetchVersion()
 
 	if (nRow > 0)
 	{
-		m_VersionInfo.iVersionId = int(strtod(re[nColumn+0], NULL));
-		m_VersionInfo.iVersionSync = int(strtod(re[nColumn+1], NULL));
-		m_VersionInfo.iVersionDatabase = int(strtod(re[nColumn+2], NULL));
+		m_VersionInfo.iVersionId = int(strtod(re[nColumn+0], 0));
+		m_VersionInfo.iVersionSync = int(strtod(re[nColumn+1], 0));
+		m_VersionInfo.iVersionDatabase = int(strtod(re[nColumn+2], 0));
 	}
 
 	sqlite3_free_table(re);
@@ -66,5 +66,12 @@ bool VersionTable::updateVersion(const VersionInfo& versionInfo)
 
 	m_VersionInfo = versionInfo;
 
+	this->fetchVersion();
+
 	return true;
+}
+
+void VersionTable::refreshVersionInfo()
+{
+	this->fetchVersion();
 }

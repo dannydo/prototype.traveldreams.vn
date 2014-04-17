@@ -48,6 +48,7 @@ private:
 	
 	ScrollManager* m_pScrollManager;
 	bool m_bIsSwipe;
+	int m_iConnectServer;
 };
 
 #endif;

@@ -127,3 +127,24 @@ void ButtonManagerNode::addButtonNode(ButtonNode* pButtonNode)
 	m_buttonNodes.push_back(pButtonNode);
 	this->addChild(pButtonNode);
 }
+
+void ButtonManagerNode::removeButtonNode(ButtonNode* pButtonNode)
+{
+	int iIndex=-1;
+	for (iIndex=0; iIndex<m_buttonNodes.size(); iIndex++)
+	{
+		if(m_buttonNodes[iIndex] == pButtonNode)
+			break;
+	}
+
+	if (iIndex >= 0 && iIndex < m_buttonNodes.size())
+	{
+		for (int i=iIndex; i<m_buttonNodes.size()-1; i++)
+		{
+			m_buttonNodes[i] = m_buttonNodes[i+1];
+		}
+
+		m_buttonNodes.pop_back();
+		this->removeChild(pButtonNode);
+	}
+}

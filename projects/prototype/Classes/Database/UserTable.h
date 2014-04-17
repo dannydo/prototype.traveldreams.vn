@@ -21,6 +21,7 @@ struct UserInfo
 	unsigned long ulLifeTimeBeginRemain;
 	int iMonney;
 	int iVersion;
+	std::string sUserToken;
 };
 
 class UserTable

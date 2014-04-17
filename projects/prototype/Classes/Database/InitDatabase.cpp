@@ -76,7 +76,7 @@ bool InitDatabase::createDatabase()
 	int iResult;
 
 	std::string sqlRun = "";
-	sqlRun.append("CREATE TABLE if not exists Users (UserIdentifier TEXT PRIMARY KEY  NOT NULL, FacebookId TEXT, FacebookToken TEXT, FirstName TEXT, LastName TEXT, CurrentChapter TEXT, CurrentLevel INTEGER, Life INTEGER, LifeTimeRemaining INTEGER, LifeTImeBeginRemain INTEGER, Monney INTEGER, Version INTEGER);");
+	sqlRun.append("CREATE TABLE if not exists Users (UserIdentifier TEXT PRIMARY KEY  NOT NULL, FacebookId TEXT, FacebookToken TEXT, FirstName TEXT, LastName TEXT, CurrentChapter TEXT, CurrentLevel INTEGER, Life INTEGER, LifeTimeRemaining INTEGER, LifeTImeBeginRemain INTEGER, Monney INTEGER, Version INTEGER, UserToken TEXT);");
 	sqlRun.append("CREATE TABLE if not exists Chapters (ChapterId TEXT PRIMARY KEY NOT NULL, TotalLevelUnlock INTEGER, TotalStar INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER, TotalFlashCardUnlock INTEGER, CountFlashCardNew INTEGER, TotalFlashCard INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Levels (LevelId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ChapterId TEXT, Level INTEGER, WordId TEXT, Star INTEGER, Score INTEGER, BonusQuest INTEGER, TotalBonusQuest INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists UnlockChapters (UnlockChapterId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ChapterId TEXT, Request INTEGER, Type TEXT, BeginTime INTEGER, Version INTEGER);");
@@ -85,8 +85,8 @@ bool InitDatabase::createDatabase()
 	sqlRun.append("CREATE TABLE if not exists Versions (VersionId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, VersionSync INTEGER, VersionDatabase INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Words (WordId TEXT PRIMARY KEY NOT NULL, CountCollected INTEGER, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists MapChapterWords (MapChapterWordId INTEGER PRIMARY KEY NOT NULL, ChapterId TEXT, WordId TEXT, Version INTEGER, OrderUnlock INTEGER, IsNew INTEGER);");
-	sqlRun.append("insert into Versions values(1, 1, 1);");
-	sqlRun.append("insert into Users values('ohmyword', '', '', '', '', '', 1, 5, 0, 0, 0, 2);");
+	sqlRun.append("insert into Versions values(1, 0, 1);");
+	sqlRun.append("insert into Users values('ohmyword', '', '', '', '', '', 1, 5, 0, 0, 0, 1,'');");
 
 	iResult = sqlite3_exec(m_DatabaseSqlite, sqlRun.c_str(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
@@ -111,7 +111,7 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 		if(nRow < 1)
 		{
 			String sqlRun = "";
-			int iVersion = VersionTable::getInstance()->getVersionInfo().iVersionId + 1;
+			int iVersion = VersionTable::getInstance()->getVersionInfo().iVersionSync + 1;
 			char sVersion[10];
 			sprintf(sVersion, "%d", iVersion);
 
@@ -164,4 +164,21 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 	}
 
 	return bCreateSuccess;
+}
+
+bool InitDatabase::resetDatabase()
+{
+	char* sql = "Drop Table Chapters; Drop Table Levels; Drop Table MapChapterWords; Drop Table PowerUps; Drop Table Transactions; Drop Table UnlockChapters; Drop Table Users; Drop Table Versions; Drop Table Words;";
+	int iResult = sqlite3_exec(m_DatabaseSqlite, sql, NULL, NULL, NULL);
+
+	if(iResult == SQLITE_OK)
+	{
+		if(this->createDatabase())
+		{
+			VersionTable::getInstance()->refreshVersionInfo();
+			return true;
+		}
+	}
+
+	return false;
 }

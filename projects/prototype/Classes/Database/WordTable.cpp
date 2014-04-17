@@ -33,6 +33,7 @@ WordTable* WordTable::getInstance()
 
 bool WordTable::init()
 {
+	m_sCurrentChapterId = "";
 	return true;
 }
 
@@ -55,12 +56,12 @@ void WordTable::fetchWordsForChapter(const std::string& sChapterId)
 	{
 		WordInfo wordInfo;
 		wordInfo.sWordId = re[iRow*nColumn+0];
-		wordInfo.iCountCollected = int(strtod(re[iRow*nColumn+1], NULL));
-		wordInfo.iVersion = int(strtod(re[iRow*nColumn+2], NULL));
-		wordInfo.iMapChapterWordId = int(strtod(re[iRow*nColumn+3], NULL));
+		wordInfo.iCountCollected = int(strtod(re[iRow*nColumn+1], 0));
+		wordInfo.iVersion = int(strtod(re[iRow*nColumn+2], 0));
+		wordInfo.iMapChapterWordId = int(strtod(re[iRow*nColumn+3], 0));
 		wordInfo.sChapterId = re[iRow*nColumn+4];
-		wordInfo.iOrderUnlock = int(strtod(re[iRow*nColumn+7], NULL));
-		wordInfo.bIsNew = bool(strtod(re[iRow*nColumn+8], NULL));
+		wordInfo.iOrderUnlock = int(strtod(re[iRow*nColumn+7], 0));
+		wordInfo.bIsNew = bool(strtod(re[iRow*nColumn+8], 0));
 
 		m_ChapterWords.push_back(wordInfo);
 	}
@@ -107,13 +108,13 @@ bool WordTable::updateWord(const WordInfo& wordInfo)
 {
 	String sql = "update Words Set";
 	sql.appendWithFormat(" CountCollected=%d,", wordInfo.iCountCollected);
-	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
+	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 	sql.appendWithFormat(" where WordId='%s';", wordInfo.sWordId.c_str());
 
 	sql.append("update MapChapterWords Set");
 	sql.appendWithFormat(" IsNew=%d,", wordInfo.bIsNew);
 	sql.appendWithFormat(" OrderUnlock=%d,", wordInfo.iOrderUnlock);
-	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
+	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 	sql.appendWithFormat(" where MapChapterWordId=%d;", wordInfo.iMapChapterWordId);
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
@@ -233,14 +234,14 @@ bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iV
 			// Insert Words
 			sqlRun.append("insert into Words values(");
 			sqlRun.appendWithFormat("'%s',", sWordId.c_str());
-			sqlRun.appendWithFormat("%d,", pJsonWord->getItemIntValue("CountCollected ", 0));
+			sqlRun.appendWithFormat("%s,", pJsonWord->getItemStringValue("CountCollected"));
 			sqlRun.appendWithFormat("%d);", iVersion);
 		}
 		else
 		{
 			// Update Words
 			sqlRun.append("update Words Set");
-			sqlRun.appendWithFormat(" CountCollected=%d,", pJsonWord->getItemIntValue("CountCollected", 0));
+			sqlRun.appendWithFormat(" CountCollected=%s,", pJsonWord->getItemStringValue("CountCollected"));
 			sqlRun.appendWithFormat(" Version=%d", iVersion);
 			sqlRun.appendWithFormat(" where WordId='%s';", sWordId.c_str());
 		}
@@ -250,6 +251,8 @@ bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iV
 	if(iResult != SQLITE_OK)
 		return false;
 
+	if (m_sCurrentChapterId != "")
+		this->fetchWordsForChapter(m_sCurrentChapterId);
 	return true;
 }
 
@@ -301,16 +304,16 @@ bool WordTable::updateDataSyncMapChapterWords(cs::JsonDictionary* pJsonSync, con
 			sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
 			sqlRun.appendWithFormat("'%s',", sWordId.c_str());
 			sqlRun.appendWithFormat("%d,", iVersion);
-			sqlRun.appendWithFormat("%d,", pJsonMapChapterWord->getItemIntValue("OrderUnlock ", 0));
-			sqlRun.appendWithFormat("%d);", pJsonMapChapterWord->getItemIntValue("IsNew ", 0));
+			sqlRun.appendWithFormat("%s,", pJsonMapChapterWord->getItemStringValue("OrderUnlock"));
+			sqlRun.appendWithFormat("%s);", pJsonMapChapterWord->getItemStringValue("IsNew"));
 		}
 		else
 		{
 			// Update Words
 			sqlRun.append("update MapChapterWords Set");
 			sqlRun.appendWithFormat(" Version=%d,", iVersion);
-			sqlRun.appendWithFormat(" OrderUnlock=%d,", pJsonMapChapterWord->getItemIntValue("OrderUnlock", 0));
-			sqlRun.appendWithFormat(" IsNew=%d", pJsonMapChapterWord->getItemIntValue("IsNew", 0));
+			sqlRun.appendWithFormat(" OrderUnlock=%s,", pJsonMapChapterWord->getItemStringValue("OrderUnlock"));
+			sqlRun.appendWithFormat(" IsNew=%s", pJsonMapChapterWord->getItemStringValue("IsNew"));
 			sqlRun.appendWithFormat(" where WordId='%s'", sWordId.c_str());
 			sqlRun.appendWithFormat(" and ChapterId='%s';", sChapterId.c_str());
 		}
@@ -320,5 +323,7 @@ bool WordTable::updateDataSyncMapChapterWords(cs::JsonDictionary* pJsonSync, con
 	if(iResult != SQLITE_OK)
 		return false;
 
+	if (m_sCurrentChapterId != "")
+		this->fetchWordsForChapter(m_sCurrentChapterId);
 	return true;
 }

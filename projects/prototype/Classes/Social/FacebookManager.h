@@ -50,8 +50,11 @@ public:
     void logoutByMode();
 	void shareLink(const char* name, const char* caption, const char* description, const char* link, const char* picture);
 	void shareDialog(const char* name, const char* caption, const char* description, const char* link, const char* picture);
-	inline bool getLogined(){ return m_bLogined; };
-	void setLogined(bool bLogined);
+	void autoOpenActiveSession();
+
+	inline bool getFinishRun(){ return m_bIsFinishRun; };
+	void setFinishRun(const bool& bIsFinishRun); 
+
 	std::string getAccessToken();
 
 private:
@@ -62,7 +65,7 @@ private:
 
     cocos2d::plugin::ProtocolUser* _facebook;
     FacebookActionResult* _retListener;
-	bool m_bLogined;
+	bool m_bIsFinishRun;
 };
 
 #endif // __MY_USER_MANAGER_H__

@@ -19,6 +19,7 @@ public:
 	virtual void onTouchButtonEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
 
 	void addButtonNode(ButtonNode* pButtonNode);
+	void removeButtonNode(ButtonNode* pButtonNode);
 
 private:
 	void buttonCallBack();

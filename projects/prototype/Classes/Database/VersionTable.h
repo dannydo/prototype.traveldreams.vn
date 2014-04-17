@@ -27,6 +27,7 @@ public:
 
 	inline VersionInfo& getVersionInfo() { return m_VersionInfo; };
 	bool updateVersion(const VersionInfo& versionInfo);
+	void refreshVersionInfo();
 
 private:
 	void fetchVersion();

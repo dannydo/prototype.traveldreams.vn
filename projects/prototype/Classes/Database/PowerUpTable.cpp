@@ -48,8 +48,8 @@ void PowerUpTable::fetchAllPowerUp()
 	{
 		PowerUpInfo powerUpInfo;
 		powerUpInfo.sPowerUpId = re[iRow*nColumn+0];
-		powerUpInfo.iQuantity = int(strtod(re[iRow*nColumn+1], NULL));
-		powerUpInfo.iVersion = int(strtod(re[iRow*nColumn+2], NULL));
+		powerUpInfo.iQuantity = int(strtod(re[iRow*nColumn+1], 0));
+		powerUpInfo.iVersion = int(strtod(re[iRow*nColumn+2], 0));
 
 		m_PowerUps.push_back(powerUpInfo);
 	}
@@ -61,7 +61,7 @@ bool PowerUpTable::updatePowerUp(const PowerUpInfo& powerUpInfo)
 {
 	String sql = "update PowerUps Set";
 	sql.appendWithFormat(" Quantity=%d,", powerUpInfo.iQuantity);
-	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
+	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 	sql.appendWithFormat(" where PowerUpId='%s'", powerUpInfo.sPowerUpId.c_str());
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);

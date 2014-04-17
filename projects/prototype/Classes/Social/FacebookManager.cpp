@@ -23,6 +23,7 @@ THE SOFTWARE.
 ****************************************************************************/
 
 #include "cocos2d.h"
+#include "SystemEventHandle.h"
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 #include "FacebookManager.h"
@@ -82,7 +83,7 @@ void FacebookManager::loadPlugin()
 		{
 			TUserDeveloperInfo pFacebookInfo;
 			pFacebookInfo["FacebookAppId"] = "440402379424810";
-			pFacebookInfo["FacebookScope"] = "";
+			pFacebookInfo["FacebookScope"] = "email,publish_actions,publish_stream";
 			if (pFacebookInfo.empty()) {
 				char msg[256] = { 0 };
 				sprintf(msg, "Developer info is empty. PLZ fill your Facebook info in %s(nearby line %d)", __FILE__, __LINE__);
@@ -116,17 +117,18 @@ bool FacebookManager::isLogined()
 
 void FacebookManager::loginByMode()
 {
-	m_bLogined = false;
 	if (_facebook)
 	{
+		m_bIsFinishRun = false;
 	    _facebook->login();
 	}
 }
 
 void FacebookManager::logoutByMode()
 {
-    if (_facebook)
+    if (_facebook) 
 	{
+		m_bIsFinishRun = false;
         _facebook->logout();
     }
 }
@@ -135,6 +137,7 @@ void FacebookManager::shareLink(const char* name, const char* caption, const cha
 {
 	if (_facebook)
 	{
+		m_bIsFinishRun = false;
 		PluginParam paramName(name);
 		PluginParam paramCaption(caption);
 		PluginParam paramDescription(description);
@@ -149,21 +152,22 @@ void FacebookManager::shareDialog(const char* name, const char* caption, const c
 {
 	if (_facebook)
 	{
+		m_bIsFinishRun = false;
 		PluginParam paramName(name);
 		PluginParam paramCaption(caption);
 		PluginParam paramDescription(description);
 		PluginParam paramLink(link);
 		PluginParam paramPicture(picture);
 		
-		 _facebook->callFuncWithParam("shareFacebookDialog", &paramName,  &paramCaption,  &paramDescription, &paramLink, &paramPicture, NULL); 
+		_facebook->callFuncWithParam("shareFacebookDialog", &paramName,  &paramCaption,  &paramDescription, &paramLink, &paramPicture, NULL); 
 	}
 }
 
-void FacebookManager::setLogined(bool bLogined)
+void FacebookManager::autoOpenActiveSession()
 {
 	if (_facebook)
 	{
-		m_bLogined = bLogined;
+		_facebook->callFuncWithParam("autoOpenActiveSession", NULL);
 	}
 }
 
@@ -177,29 +181,44 @@ std::string FacebookManager::getAccessToken()
 	return sessionID;
 }
 
+void FacebookManager::setFinishRun(const bool& bIsFinishRun)
+{
+	m_bIsFinishRun = bIsFinishRun;
+}
+
 void FacebookActionResult::onActionResult(ProtocolUser* pPlugin, UserActionResultCode code, const char* msg)
 {
     char userStatus[1024] = { 0 };
     switch (code)
     {
     case kLoginSucceed:
-		FacebookManager::getInstance()->setLogined(true);
+		{
+			SystemEventHandle::getInstance()->onLoginFacebookResult(true);
+		break;
+		}
     case kLoginFailed:
-        sprintf(userStatus, "User of \"%s\" login %s", pPlugin->getPluginName(), (code == kLoginSucceed)? "Successed" : "Failed");
-        break;
+		{
+			SystemEventHandle::getInstance()->onLoginFacebookResult(false);
+			break;
+		}
     case kLogoutSucceed:
-        sprintf(userStatus, "User of \"%s\" logout", pPlugin->getPluginName());
-        break;
+		{
+			UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
+			break;
+		}
     default:
         break;
     }
+
+    FacebookManager::getInstance()->setFinishRun(true);
+
     //MessageBox(msg, userStatus);
 
     // get session ID
-    std::string sessionID = pPlugin->getSessionID();
-    log("User Session ID of plugin %s is : %s", pPlugin->getPluginName(), sessionID.c_str());
+    //std::string sessionID = pPlugin->getSessionID();
+    //log("User Session ID of plugin %s is : %s", pPlugin->getPluginName(), sessionID.c_str());
 
-    std::string strStatus = pPlugin->isLogined() ? "online" : "offline";
-    log("User status of plugin %s is : %s", pPlugin->getPluginName(), strStatus.c_str());
+    //std::string strStatus = pPlugin->isLogined() ? "online" : "offline";
+    //log("User status of plugin %s is : %s", pPlugin->getPluginName(), strStatus.c_str());
 }
 #endif

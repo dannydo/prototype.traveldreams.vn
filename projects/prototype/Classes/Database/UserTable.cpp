@@ -52,12 +52,13 @@ void UserTable::fetchhUser()
 		m_userInfo.sFirstName = re[nColumn+3];
 		m_userInfo.sLastName = re[nColumn+4];
 		m_userInfo.sCurrentChapterId = re[nColumn+5];
-		m_userInfo.iCurrentLevel = int(strtod(re[nColumn+6], NULL));
-		m_userInfo.iLife = int(strtod(re[nColumn+7], NULL));
-		m_userInfo.iLifeTimeRemaining = int(strtod(re[nColumn+8], NULL));
-		m_userInfo.ulLifeTimeBeginRemain = long(strtod(re[nColumn+9], NULL));
-		m_userInfo.iMonney = int(strtod(re[nColumn+10], NULL));
-		m_userInfo.iVersion = int(strtod(re[nColumn+11], NULL));
+		m_userInfo.iCurrentLevel = int(strtod(re[nColumn+6], 0));
+		m_userInfo.iLife = int(strtod(re[nColumn+7], 0));
+		m_userInfo.iLifeTimeRemaining = int(strtod(re[nColumn+8], 0));
+		m_userInfo.ulLifeTimeBeginRemain = long(strtod(re[nColumn+9], 0));
+		m_userInfo.iMonney = int(strtod(re[nColumn+10], 0));
+		m_userInfo.iVersion = int(strtod(re[nColumn+11], 0));
+		m_userInfo.sUserToken = re[nColumn+12];
 	}
 
 	sqlite3_free_table(re);
@@ -76,8 +77,9 @@ bool UserTable::updateUser(const UserInfo& userInfo)
 	sql.appendWithFormat(" LifeTimeRemaining=%d,", userInfo.iLifeTimeRemaining);
 	sql.appendWithFormat(" LifeTimeBeginRemain=%u,", userInfo.ulLifeTimeBeginRemain);
 	sql.appendWithFormat(" Monney=%d,", userInfo.iMonney);
-	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
-	sql.appendWithFormat(" where UserIdentifier='%s'", m_userInfo.sUserIdentifier.c_str());
+	sql.appendWithFormat(" Version=%d,", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
+	sql.appendWithFormat(" UserToken='%s',", userInfo.sUserToken.c_str());
+	sql.appendWithFormat(" UserIdentifier='%s'", userInfo.sUserIdentifier.c_str());
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
@@ -145,8 +147,7 @@ bool UserTable::updateLife(const unsigned int& iLoseLife)
 	sql.appendWithFormat(" Life=%d,", m_userInfo.iLife);
 	sql.appendWithFormat(" LifeTimeRemaining=%d,", m_userInfo.iLifeTimeRemaining);
 	sql.appendWithFormat(" LifeTimeBeginRemain=%u,", m_userInfo.ulLifeTimeBeginRemain);
-	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
-	sql.appendWithFormat(" where UserIdentifier='%s'", m_userInfo.sUserIdentifier.c_str());
+	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
@@ -176,21 +177,22 @@ std::string UserTable::syncGetUser()
 	{
 		std::string sUserIdentifier = re[nColumn+0];
 		if (sUserIdentifier != "ohmyword")
-			sJsonData.appendWithFormat("\"UserIdentifier\":\"%s\",", re[nColumn+0]);
+			sJsonData.appendWithFormat("\"UserId\":\"%s\",", re[nColumn+0]);
 		else
-			sJsonData.appendWithFormat("\"UserIdentifier\":\"%s\",", "");
+			sJsonData.appendWithFormat("\"UserId\":\"%s\",", "");
 
 		sJsonData.appendWithFormat("\"FacebookId\":\"%s\",", re[nColumn+1]);
 		sJsonData.appendWithFormat("\"FacebookToken\":\"%s\",", re[nColumn+2]);
 		sJsonData.appendWithFormat("\"FirstName\":\"%s\",", re[nColumn+3]);
 		sJsonData.appendWithFormat("\"LastName\":\"%s\",", re[nColumn+4]);
-		sJsonData.appendWithFormat("\"CurrentChapterId\":\"%s\",", re[nColumn+5]);
+		sJsonData.appendWithFormat("\"CurrentChapter\":\"%s\",", re[nColumn+5]);
 		sJsonData.appendWithFormat("\"CurrentLevel\":%s,", re[nColumn+6]);
 		sJsonData.appendWithFormat("\"Life\":%s,", re[nColumn+7]);
 		sJsonData.appendWithFormat("\"LifeTimeRemaining\":%s,", re[nColumn+8]);
 		sJsonData.appendWithFormat("\"lLifeTimeBeginRemain\":%s,", re[nColumn+9]);
 		sJsonData.appendWithFormat("\"Monney\":%s,", re[nColumn+10]);
-		sJsonData.appendWithFormat("\"Version\":%s", re[nColumn+11]);
+		sJsonData.appendWithFormat("\"Version\":%s,", re[nColumn+11]);
+		sJsonData.appendWithFormat("\"UserToken\":\"%s\"", re[nColumn+12]);
 	}
 	sJsonData.append("}");
 	sqlite3_free_table(re);
@@ -209,18 +211,20 @@ bool UserTable::updateDataSyncUser(cs::JsonDictionary* pJsonSync, const int& iVe
 		sql.appendWithFormat(" FirstName='%s',", pJsonUser->getItemStringValue("FirstName"));
 		sql.appendWithFormat(" LastName='%s',", pJsonUser->getItemStringValue("LastName"));
 		sql.appendWithFormat(" CurrentChapter='%s',", pJsonUser->getItemStringValue("CurrentChapter"));
-		sql.appendWithFormat(" CurrentLevel=%d,", pJsonUser->getItemIntValue("CurrentLevel", 1));
-		sql.appendWithFormat(" Life=%d,", pJsonUser->getItemIntValue("Life", 0));
+		sql.appendWithFormat(" CurrentLevel=%s,", pJsonUser->getItemStringValue("CurrentLevel"));
+		sql.appendWithFormat(" Life=%s,", pJsonUser->getItemStringValue("Life"));
 		sql.appendWithFormat(" LifeTimeRemaining=%d,", pJsonUser->getItemIntValue("LifeTimeRemaining", 0));
-		sql.appendWithFormat(" LifeTimeBeginRemain=%u,", pJsonUser->getItemIntValue("LifeTimeBeginRemain", 0));
-		sql.appendWithFormat(" Monney=%d,", pJsonUser->getItemIntValue("Monney", 0));
+		sql.appendWithFormat(" LifeTimeBeginRemain=%u,", this->getTimeLocalCurrent());
+		sql.appendWithFormat(" Monney=%s,", pJsonUser->getItemStringValue("Money"));
 		sql.appendWithFormat(" Version=%d,", iVersion);
-		sql.appendWithFormat(" UserIdentifier='%s'", pJsonUser->getItemStringValue("UserIdentifier"));
+		sql.appendWithFormat(" UserIdentifier='%s',", pJsonUser->getItemStringValue("UserId"));
+		sql.appendWithFormat(" UserToken='%s'", pJsonUser->getItemStringValue("UserToken"));
 
 		int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 		if(iResult != SQLITE_OK)
 			return false;
 	}
 
+	this->fetchhUser();
 	return true;
 }

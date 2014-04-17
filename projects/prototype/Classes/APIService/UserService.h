@@ -13,9 +13,8 @@ public:
 
 	static void releaseInstance();
 
-	void registryUser(const std::string strAccessToken);
-	void getUserInfo();
-	void getLeaderBoardLevel(const int& iLevel);
+	void checkUserFacebook(const std::string strAccessToken, const int& iUserId, const int& iTag);
+	void getLeaderBoardLevel(const int& iLevel, const int& iTag);
 	void addCallBackList(InterfaceService* callBack);
 	void removeCallBackList(InterfaceService *callBack);
 
@@ -23,6 +22,7 @@ public:
 
 private:
 	void onHttpRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
+	void onCheckUserFacebookCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
 
 	static UserService* m_UserService;
 	std::vector<InterfaceService*> m_callBackList;

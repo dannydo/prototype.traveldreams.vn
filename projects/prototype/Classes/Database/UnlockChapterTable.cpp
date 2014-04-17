@@ -50,12 +50,12 @@ UnlockChapterInfo UnlockChapterTable::fetchUnlockChapter(const std::string sChap
 	UnlockChapterInfo unlockChapterInfo;
 	if (nRow > 0)
 	{
-		unlockChapterInfo.iUnlockChapterId = int(strtod(re[nColumn+0], NULL));
+		unlockChapterInfo.iUnlockChapterId = int(strtod(re[nColumn+0], 0));
 		unlockChapterInfo.sChapterId = re[nColumn+1];
-		unlockChapterInfo.iRequest = int(strtod(re[nColumn+2], NULL));
+		unlockChapterInfo.iRequest = int(strtod(re[nColumn+2], 0));
 		unlockChapterInfo.sType = re[nColumn+3];
-		unlockChapterInfo.uBeginTime = long(strtod(re[nColumn+4], NULL));
-		unlockChapterInfo.iVersion = int(strtod(re[nColumn+5], NULL));
+		unlockChapterInfo.uBeginTime = long(strtod(re[nColumn+4], 0));
+		unlockChapterInfo.iVersion = int(strtod(re[nColumn+5], 0));
 	}
 
 	sqlite3_free_table(re);
@@ -68,7 +68,7 @@ bool UnlockChapterTable::updateUnlockChapter(const UnlockChapterInfo& unlockChap
 	String sql = "update UnlockChapters Set";
 	sql.appendWithFormat(" Request=%d,", unlockChapterInfo.iRequest);
 	sql.appendWithFormat(" BeginTime=%s,", this->getTimeLocalCurrent());
-	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
+	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 	sql.appendWithFormat(" where UnlockChapterId=%d", unlockChapterInfo.iUnlockChapterId);
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
@@ -85,7 +85,7 @@ bool UnlockChapterTable::insertUnlockChapter(const UnlockChapterInfo& unlockChap
 	sql.appendWithFormat(" %d,", unlockChapterInfo.iRequest);
 	sql.appendWithFormat(" '%s',", unlockChapterInfo.sType.c_str());
 	sql.appendWithFormat(" %u,", this->getTimeLocalCurrent());
-	sql.appendWithFormat(" %d)", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
+	sql.appendWithFormat(" %d)", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)

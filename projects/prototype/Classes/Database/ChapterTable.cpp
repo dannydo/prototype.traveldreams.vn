@@ -71,13 +71,13 @@ void ChapterTable::fetchAllChapter()
 	{
 		ChapterInfo chapterInfo;
 		chapterInfo.sChapterId = re[iRow*nColumn+0];
-		chapterInfo.iTotalLevelUnlock = int(strtod(re[iRow*nColumn+1], NULL));
-		chapterInfo.iTotalStar = int(strtod(re[iRow*nColumn+2], NULL));
-		chapterInfo.bIsUnlock = bool(strtod(re[iRow*nColumn+3], NULL));
-		chapterInfo.iVersion = int(strtod(re[iRow*nColumn+4], NULL));
-		chapterInfo.iTotalFlashCardUnlock = int(strtod(re[iRow*nColumn+5], NULL));
-		chapterInfo.iCountFlashCardNew = int(strtod(re[iRow*nColumn+6], NULL));
-		chapterInfo.iTotalFlash = int(strtod(re[iRow*nColumn+7], NULL));
+		chapterInfo.iTotalLevelUnlock = int(strtod(re[iRow*nColumn+1], 0));
+		chapterInfo.iTotalStar = int(strtod(re[iRow*nColumn+2], 0));
+		chapterInfo.bIsUnlock = bool(strtod(re[iRow*nColumn+3], 0));
+		chapterInfo.iVersion = int(strtod(re[iRow*nColumn+4], 0));
+		chapterInfo.iTotalFlashCardUnlock = int(strtod(re[iRow*nColumn+5], 0));
+		chapterInfo.iCountFlashCardNew = int(strtod(re[iRow*nColumn+6], 0));
+		chapterInfo.iTotalFlash = int(strtod(re[iRow*nColumn+7], 0));
 
 		m_Chapters.push_back(chapterInfo);
 	}
@@ -91,7 +91,7 @@ bool ChapterTable::updateChapter(ChapterInfo chapterInfo)
 	sql.appendWithFormat(" TotalLevelUnlock=%d,", chapterInfo.iTotalLevelUnlock);
 	sql.appendWithFormat(" TotalStar=%d,", chapterInfo.iTotalStar);
 	sql.appendWithFormat(" IsUnlock=%d,", chapterInfo.bIsUnlock);
-	sql.appendWithFormat(" Version=%d,", VersionTable::getInstance()->getVersionInfo().iVersionId + 1);
+	sql.appendWithFormat(" Version=%d,", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 	sql.appendWithFormat(" TotalFlashCardUnlock=%d,", chapterInfo.iTotalFlashCardUnlock);
 	sql.appendWithFormat(" CountFlashCardNew=%d,", chapterInfo.iCountFlashCardNew);
 	sql.appendWithFormat(" TotalFlashCard=%d", chapterInfo.iTotalFlash);
@@ -188,25 +188,25 @@ bool ChapterTable::updateDataSyncChapters(cs::JsonDictionary* pJsonSync, const i
 			// Insert Chapter
 			sqlRun.append("insert into Chapters values(");
 			sqlRun.appendWithFormat("'%s',", pJsonChapter->getItemStringValue("ChapterId"));
-			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("TotalLevelUnlock", 0));
-			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("TotalStar", 0));
-			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("IsUnlock", 0));
+			sqlRun.appendWithFormat("%s,", pJsonChapter->getItemStringValue("TotalLevelUnlock"));
+			sqlRun.appendWithFormat("%s,", pJsonChapter->getItemStringValue("TotalStar"));
+			sqlRun.appendWithFormat("%d,", 1);//pJsonChapter->getItemIntValue("IsUnlock", 0));
 			sqlRun.appendWithFormat("%d,", iVersion);
-			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("TotalFlashCardUnlock", 0));
-			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("CountFlashCardNew", 0));
-			sqlRun.appendWithFormat("%d);", pJsonChapter->getItemIntValue("TotalFlashCard", 0));
+			sqlRun.appendWithFormat("%s,", pJsonChapter->getItemStringValue("TotalFlashCardUnlock"));
+			sqlRun.appendWithFormat("%s,", pJsonChapter->getItemStringValue("CountFlashCardNew"));
+			sqlRun.appendWithFormat("%s);", pJsonChapter->getItemStringValue("TotalFlashCard"));
 		}
 		else
 		{
 			// Update Chapter
 			sqlRun.append("update Chapters Set");
-			sqlRun.appendWithFormat(" TotalLevelUnlock=%d,", pJsonChapter->getItemIntValue("TotalLevelUnlock", 0));
-			sqlRun.appendWithFormat(" TotalStar=%d,", pJsonChapter->getItemIntValue("TotalStar", 0));
-			sqlRun.appendWithFormat(" IsUnlock=%d,", pJsonChapter->getItemIntValue("IsUnlock", 0));
+			sqlRun.appendWithFormat(" TotalLevelUnlock=%s,", pJsonChapter->getItemStringValue("TotalLevelUnlock"));
+			sqlRun.appendWithFormat(" TotalStar=%s,", pJsonChapter->getItemStringValue("TotalStar"));
+			sqlRun.appendWithFormat(" IsUnlock=%d,", 1);//pJsonChapter->getItemIntValue("IsUnlock", 0));
 			sqlRun.appendWithFormat(" Version=%d,", iVersion);
-			sqlRun.appendWithFormat(" TotalFlashCardUnlock=%d,", pJsonChapter->getItemIntValue("TotalFlashCardUnlock", 0));
-			sqlRun.appendWithFormat(" CountFlashCardNew=%d,", pJsonChapter->getItemIntValue("CountFlashCardNew", 0));
-			sqlRun.appendWithFormat(" TotalFlashCard=%d", pJsonChapter->getItemIntValue("TotalFlashCard", 0));
+			sqlRun.appendWithFormat(" TotalFlashCardUnlock=%s,", pJsonChapter->getItemStringValue("TotalFlashCardUnlock"));
+			sqlRun.appendWithFormat(" CountFlashCardNew=%s,", pJsonChapter->getItemStringValue("CountFlashCardNew"));
+			sqlRun.appendWithFormat(" TotalFlashCard=%s", pJsonChapter->getItemStringValue("TotalFlashCard"));
 			sqlRun.appendWithFormat(" where ChapterId='%s';", pJsonChapter->getItemStringValue("ChapterId"));
 		}
 	}
@@ -214,6 +214,8 @@ bool ChapterTable::updateDataSyncChapters(cs::JsonDictionary* pJsonSync, const i
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sqlRun.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
 		return false;
+
+	this->fetchAllChapter();
 
 	return true;
 }

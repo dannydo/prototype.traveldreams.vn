@@ -56,7 +56,11 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/Database/UnlockChapterTable.cpp \
 				   ../../Classes/Database/VersionTable.cpp \
 				   ../../Classes/Database/WordTable.cpp \
-				   ../../Classes/APIService/SyncDataGame.cpp \				   ../../Classes/HelloWorldScene.cpp
+				   ../../Classes/APIService/SyncDataGame.cpp \
+				   ../../Classes/SystemEventHandle.cpp \
+				   ../../Classes/WaitingNode.cpp \
+				   ../../Classes/ConnectFacebookConfirm.cpp \
+				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
 					$(LOCAL_PATH)/../../../../plugin/protocols/platform/android

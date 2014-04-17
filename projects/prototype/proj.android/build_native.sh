@@ -62,7 +62,7 @@ echo "APP_ROOT = $APP_ROOT"
 echo "APP_ANDROID_ROOT = $APP_ANDROID_ROOT"
 
 # run the publish.sh in plugin/tools
-#${PLUGIN_ROOT}/tools/publish.sh
+${PLUGIN_ROOT}/tools/publish.sh
 
 # make sure assets is exist
 if [ -d "$APP_ANDROID_ROOT"/assets ]; then

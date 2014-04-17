@@ -70,8 +70,11 @@ bool LeaderBoardtNode::init()
 	if (userInfo.sFacebookId != "")
 	{
 		int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
-//		UserService::getInstance()->addCallBackList(this);
-//		UserService::getInstance()->getLeaderBoardLevel(iCalLevel + m_iLevel);
+		UserService::getInstance()->addCallBackList(this);
+		m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
+		m_iConnectServer++;
+		UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
+		UserService::getInstance()->getLeaderBoardLevel(iCalLevel + m_iLevel, m_iConnectServer);
 	}
 
 	m_bIsSwipe = false;
@@ -217,8 +220,10 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 {
 	LevelInfo levelInfo =  LevelTable::getInstance()->getLevel(m_sChapterId, m_iLevel);
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
+	String sTag = "LeaderBoardLevel";
+	sTag.appendWithFormat("_%d", m_iConnectServer);
 
-	if (sKey == "LeaderBoardLevel")
+	if (sKey == sTag.getCString())
 	{
 		cs::JsonDictionary* jsonData = pJsonDict->getSubDictionary("data");
 		if (jsonData->getItemBoolvalue("result", false))
@@ -232,7 +237,7 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 				for(int iIndex=0; iIndex < m_iLeaderBoardCount; iIndex++)
 				{
 					cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
-					int iScore = int(strtod(pJsonItem->getItemStringValue("Score"), NULL));
+					int iScore = int(strtod(pJsonItem->getItemStringValue("Score"), 0));
 
 					if (iScore > levelInfo.iScore)
 						iRank++;
@@ -355,7 +360,7 @@ void LeaderBoardtNode::parseJsonToLeadeBoard(cs::JsonDictionary* pJsonItem, cons
 {
 	if(iRank > 0 && iIndex >= 0)
 	{
-		int iScore = int(strtod(pJsonItem->getItemStringValue("Score"), NULL));
+		int iScore = int(strtod(pJsonItem->getItemStringValue("Score"), 0));
 		const char* sName = pJsonItem->getItemStringValue("FirstName");
 		const char* sFacebookId = pJsonItem->getItemStringValue("FacebookId");
 

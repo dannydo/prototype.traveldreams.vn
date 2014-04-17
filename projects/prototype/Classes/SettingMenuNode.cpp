@@ -5,6 +5,7 @@
 #include "SoundManager.h"
 #include "Database\UserTable.h"
 #include "FlashCardCollection.h"
+#include "SystemEventHandle.h"
 
 USING_NS_CC;
 
@@ -34,26 +35,26 @@ bool SettingMenuNode::init()
 	m_pBackground->setAnchorPoint(Point(0,0));
 	this->addChild(m_pBackground);
 
-	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
-	this->addChild(pButtonManagerNode);
+	m_pButtonManagerNode = ButtonManagerNode::create();
+	this->addChild(m_pButtonManagerNode);
 
 	Sprite* pEffectSprite = Sprite::create("PanelSetting/Fx_on.PNG");
 	Sprite* pEffectSpriteActive = Sprite::create("PanelSetting/Fx_off.PNG");
 	ButtonNode* pButtonEffectNode = ButtonNode::createButtonSprite(pEffectSprite, pEffectSpriteActive, CC_CALLBACK_0(SettingMenuNode::clickEffect, this));
 	pButtonEffectNode->setPosition(Point(410, 710));
-	pButtonManagerNode->addButtonNode(pButtonEffectNode);
+	m_pButtonManagerNode->addButtonNode(pButtonEffectNode);
 
 	Sprite* pMusicSprite = Sprite::create("PanelSetting/music_on.PNG");
 	Sprite* pMusicSpriteActive = Sprite::create("PanelSetting/music_off.PNG");
 	ButtonNode* pButtonMusicNode = ButtonNode::createButtonSprite(pMusicSprite, pMusicSpriteActive, CC_CALLBACK_0(SettingMenuNode::clickMusic, this));
 	pButtonMusicNode->setPosition(Point(410, 620));
-	pButtonManagerNode->addButtonNode(pButtonMusicNode);
+	m_pButtonManagerNode->addButtonNode(pButtonMusicNode);
 
 	Sprite* pVoiceSprite = Sprite::create("PanelSetting/voice_on.PNG");
 	Sprite* pVoiceSpriteActive = Sprite::create("PanelSetting/voice_off.PNG");
 	ButtonNode* pButtonVoiceNode = ButtonNode::createButtonSprite(pVoiceSprite, pVoiceSpriteActive, CC_CALLBACK_0(SettingMenuNode::clickVoice, this));
 	pButtonVoiceNode->setPosition(Point(410, 530));
-	pButtonManagerNode->addButtonNode(pButtonVoiceNode);
+	m_pButtonManagerNode->addButtonNode(pButtonVoiceNode);
 
 	if(UserDefault::getInstance()->getIntegerForKey("SettingTurnOnEffect", 1) == 0)
 		pButtonEffectNode->setStateActive(true);
@@ -65,24 +66,14 @@ bool SettingMenuNode::init()
 		pButtonVoiceNode->setStateActive(true);
 
 
-
+	 m_isAddButtonFacebook = false;
 	int iSize = Breadcrumb::getInstance()->getSceneModes().size();
 	switch(Breadcrumb::getInstance()->getSceneMode(iSize - 2))
 	{
 		case SceneMode::kExitGame:
 		{
-			Sprite* pFacebookLoginSprite = Sprite::create("PanelSetting/loginFB.PNG");
-			#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-				FacebookManager::getInstance()->loadPlugin();
-				if(FacebookManager::getInstance()->isLogined())
-					pFacebookLoginSprite = Sprite::create("PanelSetting/logoutFB.png");
-				else
-					pFacebookLoginSprite = Sprite::create("PanelSetting/loginFB.PNG");
-			#endif
-			
-			ButtonNode* pButtonFacebook = ButtonNode::createButtonSprite(pFacebookLoginSprite, CC_CALLBACK_1(SettingMenuNode::clickFacebook, this));
-			pButtonFacebook->setPosition(Point(261, 200.0f));
-			pButtonManagerNode->addButtonNode(pButtonFacebook);
+			m_isAddButtonFacebook = true;
+			this->addButtonFacebook();
 			break;
 		}
 		case SceneMode::kMainMenu :
@@ -90,7 +81,7 @@ bool SettingMenuNode::init()
 			Sprite* pBackSprite = Sprite::create("PanelSetting/menu-btn.png");
 			ButtonNode* pButtonBack = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
 			pButtonBack->setPosition(Point(261, 200.0f));
-			pButtonManagerNode->addButtonNode(pButtonBack);
+			m_pButtonManagerNode->addButtonNode(pButtonBack);
 			break;
 		}
 		case SceneMode::kWorldMap :
@@ -98,7 +89,7 @@ bool SettingMenuNode::init()
 			Sprite* pBackSprite = Sprite::create("PanelSetting/worldmap-btn.png");
 			ButtonNode* pButtonBack = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
 			pButtonBack->setPosition(Point(261, 200.0f));
-			pButtonManagerNode->addButtonNode(pButtonBack);
+			m_pButtonManagerNode->addButtonNode(pButtonBack);
 			break;
 		}
 		case SceneMode::kLevelMap :
@@ -110,7 +101,7 @@ bool SettingMenuNode::init()
 				pBackSprite = Sprite::create("PanelSetting/level-map-btn.png");
 			ButtonNode* pBackButtonNode = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
 			pBackButtonNode->setPosition(Point(261, 200.0f));
-			pButtonManagerNode->addButtonNode(pBackButtonNode);
+			m_pButtonManagerNode->addButtonNode(pBackButtonNode);
 			break;
 		}
 		case SceneMode::kFlashCardCollection :
@@ -118,7 +109,7 @@ bool SettingMenuNode::init()
 			Sprite* pBackSprite = Sprite::create("PanelSetting/flashcard.PNG");
 			ButtonNode* pButtonBack = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
 			pButtonBack->setPosition(Point(261, 200.0f));
-			pButtonManagerNode->addButtonNode(pButtonBack);
+			m_pButtonManagerNode->addButtonNode(pButtonBack);
 			break;
 		}
 	}
@@ -126,13 +117,57 @@ bool SettingMenuNode::init()
 	Sprite* pBackButtonSprite = Sprite::create("PanelSetting/tutorial-btn.png");
 	ButtonNode* pBackButtonNode = ButtonNode::createButtonSprite(pBackButtonSprite, CC_CALLBACK_1(SettingMenuNode::clickTutorial, this));
 	pBackButtonNode->setPosition(Point(261, 350.0f));
-	pButtonManagerNode->addButtonNode(pBackButtonNode);
+	m_pButtonManagerNode->addButtonNode(pBackButtonNode);
 
 
 	m_iShowSetting = false;
 	m_isClick = false;
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	FacebookManager::getInstance()->loadPlugin();
+#endif
+
+	this->scheduleUpdate();
+	m_iStatusButtonFacebook = -1;
+
 	return true;
+}
+
+void SettingMenuNode::update(float dt)
+{
+	if (m_isAddButtonFacebook)
+	{
+	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		if (m_iStatusButtonFacebook == 0 && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", -1) == 0)
+		{
+			this->addButtonFacebook();
+		}
+		else if (m_iStatusButtonFacebook == 1 && FacebookManager::getInstance()->isLogined() && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) == 1)
+		{
+			this->addButtonFacebook();
+		}
+	#endif
+	}
+}
+
+void SettingMenuNode::addButtonFacebook()
+{
+	m_pButtonManagerNode->removeButtonNode(m_pButtonFacebook);
+	Sprite* pFacebookLoginSprite = Sprite::create("PanelSetting/loginFB.PNG");
+	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		if(FacebookManager::getInstance()->isLogined())
+			pFacebookLoginSprite = Sprite::create("PanelSetting/logoutFB.png");
+	#endif
+
+	m_pButtonFacebook = ButtonNode::createButtonSprite(pFacebookLoginSprite, CC_CALLBACK_1(SettingMenuNode::clickFacebook, this));
+	m_pButtonFacebook->setPosition(Point(261, 200.0f));
+	m_pButtonManagerNode->addButtonNode(m_pButtonFacebook);
+	m_iStatusButtonFacebook = -1;
+}
+
+void SettingMenuNode::setStatusButtonFacebook(const int& iStatus)
+{
+	m_iStatusButtonFacebook = iStatus;
 }
 
 void SettingMenuNode::clickMusic()
@@ -231,11 +266,17 @@ void SettingMenuNode::actionBack()
 void SettingMenuNode::clickFacebook(Object* sender)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	//if(FacebookManager::getInstance()->isLogined())
-		//FacebookManager::getInstance()->logoutByMode();
-	//else
-		//FacebookManager::getInstance()->loginByMode();
-	MessageBox("To be implemented", "Facebook");
+	if(FacebookManager::getInstance()->isLogined() && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) == 1)
+	{	
+		FacebookManager::getInstance()->logoutByMode();
+		m_iStatusButtonFacebook = 0;
+	}
+	else
+	{
+		UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
+		SystemEventHandle::getInstance()->onStartConnectFacebook();
+		m_iStatusButtonFacebook = 1;
+	}
 #else
 	MessageBox("Facebook not run with platform window", "Facebook");
 #endif
