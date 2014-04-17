@@ -72,6 +72,8 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 		else
 		{
 			// Show popup error
+			Director::getInstance()->getRunningScene()->removeChildByTag(1000);
+			MessageBox("Sync Game Data Error!", "");
 		}
 
 		m_bIsConnectFacebook= false;
@@ -80,6 +82,10 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 	{
 		// Destroy popup sync
 		Director::getInstance()->getRunningScene()->removeChildByTag(1001);
+		if(!bResult)
+		{
+			MessageBox("Sync Game Data Error!", "");
+		}
 	}
 }
 
@@ -117,6 +123,8 @@ void SystemEventHandle::onLoginFacebookResult(const bool& bResult)
 	else
 	{
 		// Show popup error
+		MessageBox("Login", "Connect facebook error!");
+		Director::getInstance()->getRunningScene()->removeChildByTag(1000);
 	}
 }
 

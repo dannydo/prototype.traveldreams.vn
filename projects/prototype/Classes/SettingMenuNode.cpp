@@ -138,7 +138,7 @@ void SettingMenuNode::update(float dt)
 	if (m_isAddButtonFacebook)
 	{
 	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-		if (m_iStatusButtonFacebook == 0 && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", -1) == 0)
+		if (m_iStatusButtonFacebook == 0 && !FacebookManager::getInstance()->isLogined() && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", -1) == 0)
 		{
 			this->addButtonFacebook();
 		}
@@ -271,7 +271,7 @@ void SettingMenuNode::clickFacebook(Object* sender)
 		FacebookManager::getInstance()->logoutByMode();
 		m_iStatusButtonFacebook = 0;
 	}
-	else
+	else if(!FacebookManager::getInstance()->isLogined() && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", -1) == 0)
 	{
 		UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
 		SystemEventHandle::getInstance()->onStartConnectFacebook();

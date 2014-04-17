@@ -99,7 +99,7 @@ void SyncDataGame::runSyncDataGame()
 		sJsonData.appendWithFormat("\"Version\":%d", VersionTable::getInstance()->getVersionInfo().iVersionSync);
 		sJsonData.append("}}");
 
-		CCLOG("%s", sJsonData.getCString());
+		//CCLOG("%s", sJsonData.getCString());
 		//CCLOG("%d", sJsonData.length());
 	
 		// Post data to server
@@ -141,7 +141,7 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 
 			cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
 			pJsonDict->initWithDescription(strData.getCString());
-			CCLOG("%s", strData.getCString());
+			//CCLOG("%s", strData.getCString());
 			cs::JsonDictionary *pJsonData = pJsonDict->getSubDictionary("data");
 			if(pJsonData != NULL)
 			{
