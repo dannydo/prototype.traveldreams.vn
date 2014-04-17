@@ -18,22 +18,17 @@ UserService::UserService()
 void UserService::releaseInstance()
 {
 	if (m_pRequest == NULL)
-	{
 		delete m_pRequest;
-	}
 	else
-	{
 		m_pRequest->release();
-	}
 	m_pRequest = NULL;
 
-	m_pClient->release();
+	if (m_pClient != NULL)
+		m_pClient->release();
 	m_pClient = NULL;
 
 	if (m_UserService == NULL)
-	{
 		delete m_UserService;
-	}
 	m_UserService = NULL;
 }
 

@@ -3,6 +3,7 @@
 #include "VersionTable.h"
 
 USING_NS_CC; 
+USING_NS_CC_EXT;
 
 WordTable* WordTable::m_WordTable = NULL;
 
@@ -93,7 +94,7 @@ WordInfo WordTable::getWordInfoOnChapter(const std::string& sChapterId, const st
 		}
 	}
 
-	return WordInfo::WordInfo();
+	return WordInfo();
 }
 
 void WordTable::refreshWordsForChapter(const std::string& sChapterId)
@@ -127,6 +128,197 @@ bool WordTable::updateWord(const WordInfo& wordInfo)
 			break;
 		}
 	}
+
+	return true;
+}
+
+std::string	WordTable::syncGetWords()
+{
+	char **re;
+	int nRow, nColumn;
+		
+	String sql = "select * from Words where Version>";
+	sql.appendWithFormat("%d ", VersionTable::getInstance()->getVersionInfo().iVersionSync);
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	String sJsonData = "\"Words\":[";
+	for (int iRow=1; iRow<=nRow; iRow++)
+	{
+		sJsonData.append("{");
+		sJsonData.appendWithFormat("\"WordId\": \"%s\",", re[iRow*nColumn+0]);
+		sJsonData.appendWithFormat("\"CountCollected\": %s,", re[iRow*nColumn+1]);
+		sJsonData.appendWithFormat("\"Version\": %s", re[iRow*nColumn+2]);
+
+		if (iRow == nRow)
+			sJsonData.append("}");
+		else
+			sJsonData.append("},");
+	}
+	sJsonData.append("]");
+	sqlite3_free_table(re);
+
+	return sJsonData.getCString();
+}
+
+std::string	WordTable::syncGetMapChapterWords()
+{
+	char **re;
+	int nRow, nColumn;
+		
+	String sql = "select * from MapChapterWords where Version>";
+	sql.appendWithFormat("%d ", VersionTable::getInstance()->getVersionInfo().iVersionSync);
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	String sJsonData = "\"MapChapterWords\":[";
+	for (int iRow=1; iRow<=nRow; iRow++)
+	{
+		sJsonData.append("{");
+		sJsonData.appendWithFormat("\"ChapterId\": \"%s\",", re[iRow*nColumn+1]);
+		sJsonData.appendWithFormat("\"WordId\": \"%s\",", re[iRow*nColumn+2]);
+		sJsonData.appendWithFormat("\"Version\": %s,", re[iRow*nColumn+3]);
+		sJsonData.appendWithFormat("\"OrderUnlock\": %s,", re[iRow*nColumn+4]);
+		sJsonData.appendWithFormat("\"IsNew\": %s", re[iRow*nColumn+5]);
+
+		if (iRow == nRow)
+			sJsonData.append("}");
+		else
+			sJsonData.append("},");
+	}
+	sJsonData.append("]");
+	sqlite3_free_table(re);
+
+	return sJsonData.getCString();
+}
+
+bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iVersion)
+{
+	String sqlRun = "";
+	std::vector<WordInfo> words;
+
+	if (pJsonSync->getArrayItemCount("Words") > 0)
+	{
+		char **re;
+		int nRow, nColumn;
+		String sql = "select * from Words";
+		sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+		for(int iRow=1; iRow<=nRow; iRow++)
+		{
+			WordInfo wordInfo;
+			wordInfo.sWordId = re[iRow*nColumn+0];
+
+			words.push_back(wordInfo);
+		}
+
+		sqlite3_free_table(re);
+	}
+
+	for(int iIndex=0; iIndex<pJsonSync->getArrayItemCount("Words"); iIndex++)
+	{
+		cs::JsonDictionary* pJsonWord = pJsonSync->getSubItemFromArray("Words", iIndex);
+		bool isInsert = true;
+
+		std::string sWordId = pJsonWord->getItemStringValue("WordId");
+		for(int iIndexWord=0; iIndexWord<words.size(); iIndexWord++)
+		{
+			if (sWordId == words[iIndexWord].sWordId)
+			{
+				isInsert = false;
+				break;
+			}
+		}
+
+		if (isInsert)
+		{
+			// Insert Words
+			sqlRun.append("insert into Words values(");
+			sqlRun.appendWithFormat("'%s',", sWordId.c_str());
+			sqlRun.appendWithFormat("%d,", pJsonWord->getItemIntValue("CountCollected ", 0));
+			sqlRun.appendWithFormat("%d);", iVersion);
+		}
+		else
+		{
+			// Update Words
+			sqlRun.append("update Words Set");
+			sqlRun.appendWithFormat(" CountCollected=%d,", pJsonWord->getItemIntValue("CountCollected", 0));
+			sqlRun.appendWithFormat(" Version=%d", iVersion);
+			sqlRun.appendWithFormat(" where WordId='%s';", sWordId.c_str());
+		}
+	}
+
+	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sqlRun.getCString(), NULL, NULL, NULL);
+	if(iResult != SQLITE_OK)
+		return false;
+
+	return true;
+}
+
+bool WordTable::updateDataSyncMapChapterWords(cs::JsonDictionary* pJsonSync, const int& iVersion)
+{
+	String sqlRun = "";
+	std::vector<WordInfo> mapChapterWords;
+
+	if (pJsonSync->getArrayItemCount("MapChapterWords") > 0)
+	{
+		char **re;
+		int nRow, nColumn;
+		String sql = "select * from MapChapterWords";
+		sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+		for(int iRow=1; iRow<=nRow; iRow++)
+		{
+			WordInfo wordInfo;
+			wordInfo.sChapterId = re[iRow*nColumn+1];
+			wordInfo.sWordId = re[iRow*nColumn+2];
+
+			mapChapterWords.push_back(wordInfo);
+		}
+
+		sqlite3_free_table(re);
+	}
+
+	for(int iIndex=0; iIndex<pJsonSync->getArrayItemCount("MapChapterWords"); iIndex++)
+	{
+		cs::JsonDictionary* pJsonMapChapterWord = pJsonSync->getSubItemFromArray("MapChapterWords", iIndex);
+		bool isInsert = true;
+
+		std::string sChapterId = pJsonMapChapterWord->getItemStringValue("ChapterId");
+		std::string sWordId = pJsonMapChapterWord->getItemStringValue("WordId");
+		for(int iIndexMapChapterWord=0; iIndexMapChapterWord<mapChapterWords.size(); iIndexMapChapterWord++)
+		{
+			if (sChapterId == mapChapterWords[iIndexMapChapterWord].sChapterId && 
+				sWordId == mapChapterWords[iIndexMapChapterWord].sWordId)
+			{
+				isInsert = false;
+				break;
+			}
+		}
+
+		if (isInsert)
+		{
+			// Insert Words
+			sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version,OrderUnlock,IsNew) values(");
+			sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
+			sqlRun.appendWithFormat("'%s',", sWordId.c_str());
+			sqlRun.appendWithFormat("%d,", iVersion);
+			sqlRun.appendWithFormat("%d,", pJsonMapChapterWord->getItemIntValue("OrderUnlock ", 0));
+			sqlRun.appendWithFormat("%d);", pJsonMapChapterWord->getItemIntValue("IsNew ", 0));
+		}
+		else
+		{
+			// Update Words
+			sqlRun.append("update MapChapterWords Set");
+			sqlRun.appendWithFormat(" Version=%d,", iVersion);
+			sqlRun.appendWithFormat(" OrderUnlock=%d,", pJsonMapChapterWord->getItemIntValue("OrderUnlock", 0));
+			sqlRun.appendWithFormat(" IsNew=%d", pJsonMapChapterWord->getItemIntValue("IsNew", 0));
+			sqlRun.appendWithFormat(" where WordId='%s'", sWordId.c_str());
+			sqlRun.appendWithFormat(" and ChapterId='%s';", sChapterId.c_str());
+		}
+	}
+
+	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sqlRun.getCString(), NULL, NULL, NULL);
+	if(iResult != SQLITE_OK)
+		return false;
 
 	return true;
 }

@@ -11,7 +11,9 @@ public:
 	static TimeCountDownNode* create(int iMaximumEnergy, int iEnergyLostPerSecond);
 
 	inline void SetOutOfTimeCallback( std::function<void()> outOfTimeCallback) { m_OutOfTimeCallback = outOfTimeCallback;}
-	void AddEnergy(int iIncrementEnergy) { m_fCurrentEnergy += iIncrementEnergy;}
+	inline int IsEnergyEmpty() { return (m_fCurrentEnergy <=0);}
+
+	void AddEnergy(int iIncrementEnergy) { if (m_fCurrentEnergy<=0) return; m_fCurrentEnergy += iIncrementEnergy;}
 	void StopUpdate() { this->unscheduleUpdate();}
 
 	void update(float fDeltaTime) override;

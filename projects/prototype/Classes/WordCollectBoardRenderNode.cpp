@@ -177,8 +177,7 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType)
 	else
 	{
 		m_StartGameCallback();
-	}
-	
+	}	
 
 	//m_pLetterPanel = Sprite::createWithSpriteFrameName( GetImageFileFromLetter(' ').c_str());
 	//m_pBatchNode->addChild(m_pLetterPanel, 2);
@@ -244,7 +243,7 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType)
 		m_pBackgroundBatchNode->addChild(m_BubbleList[i], iZOrder);
 				
 		m_LabelList[i]->setPosition(Point(m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].x, 960.f - m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].y - 10.f));
-	}	
+	}		
 
 	// draw second line
 	//if (pLevelConfig->m_bBreakLineWhenDisplayMainWord)
@@ -298,6 +297,7 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType)
 		m_LabelList[i]->setPosition(ccp(m_LabelXPositionList[i], m_fStartPositionX));
 	}*/
 	
+
 	float fWindowWidth = Director::getInstance()->getWinSize().width;
 
 	// draw meaning
@@ -337,21 +337,18 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType)
 	pHeaderRight->setAnchorPoint(Point( 0.f, 0.5f));
 	pHeaderRight->setPosition( Point( middlePosition.x + headerMiddleSize.width/2.f - 0.28f , middlePosition.y));
 	m_pBackgroundBatchNode->addChild(pHeaderRight, -1);
-
-
+	
 	// reset flags
 	//memset( m_NewUnlockedLetterFlags, 0, sizeof(m_NewUnlockedLetterFlags));
 
-
 	// extra tutorial
-	if (strcmp( m_pMainWord->m_sWord, "PEN") == 0)
+	if (eGameModeType == _GMT_NORMAL_ && strcmp( m_pMainWord->m_sWord, "PEN") == 0)
 	{
 		Sprite* pTutorialSprite = Sprite::create("tutorial.png");
 		pTutorialSprite->setScale(1.2f);
 		m_pColorNode->addChild(pTutorialSprite);
 		pTutorialSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
-	}
-
+	}	
 }
 
 /*void WordCollectBoardRenderNode::UnlockCharacter(const float& fDelayTime, const int& iLetterIndex)

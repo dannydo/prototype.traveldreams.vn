@@ -642,8 +642,8 @@ void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID)
 	int iWordCount;
 	inputStream >> iWordCount;
 	std::getline( inputStream, sTemp);	
-	for(iIndex = 0; iIndex < iWordCount; iIndex++)	
-	{			
+	for(iIndex = 0; iIndex < iWordCount; iIndex++) 
+	{
 		std::getline( inputStream, sTemp);
 		//inputStream >> sTemp;
 		if (sTemp.c_str()[sTemp.size()-1] == '\r')

@@ -41,7 +41,7 @@ UnlockChapterInfo UnlockChapterTable::fetchUnlockChapter(const std::string sChap
 	char **re;
 	int nRow, nColumn;
 
-	String sql = "select * from UnlockChapterInfo where ChapterId=";
+	String sql = "select * from UnlockChapters where ChapterId=";
 	sql.appendWithFormat("'%s'", sChapterId.c_str());
 	sql.appendWithFormat(" and Type='%s'", sType.c_str());
 
@@ -54,7 +54,7 @@ UnlockChapterInfo UnlockChapterTable::fetchUnlockChapter(const std::string sChap
 		unlockChapterInfo.sChapterId = re[nColumn+1];
 		unlockChapterInfo.iRequest = int(strtod(re[nColumn+2], NULL));
 		unlockChapterInfo.sType = re[nColumn+3];
-		unlockChapterInfo.uBeginTime = unsigned long(strtod(re[nColumn+4], NULL));
+		unlockChapterInfo.uBeginTime = long(strtod(re[nColumn+4], NULL));
 		unlockChapterInfo.iVersion = int(strtod(re[nColumn+5], NULL));
 	}
 
@@ -100,4 +100,34 @@ unsigned long UnlockChapterTable::getTimeLocalCurrent()
 	gettimeofday(&now, NULL);
 	unsigned long iCurrentTime = now.tv_sec + now.tv_usec/1000000 ; //seconds
 	return iCurrentTime;
+}
+
+std::string	UnlockChapterTable::syncGetUnlockChapters()
+{
+	char **re;
+	int nRow, nColumn;
+		
+	String sql = "select * from UnlockChapters where Version>";
+	sql.appendWithFormat("%d ", VersionTable::getInstance()->getVersionInfo().iVersionSync);
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	String sJsonData = "\"UnlockChapters\":[";
+	for (int iRow=1; iRow<=nRow; iRow++)
+	{
+		sJsonData.append("{");
+		sJsonData.appendWithFormat("\"ChapterId\": \"%s\",", re[iRow*nColumn+1]);
+		sJsonData.appendWithFormat("\"Request\": %s,", re[iRow*nColumn+2]);
+		sJsonData.appendWithFormat("\"Type\": \"%s\",", re[iRow*nColumn+3]);
+		sJsonData.appendWithFormat("\"BeginTime\": %s,", re[iRow*nColumn+4]);
+		sJsonData.appendWithFormat("\"Version\": %s", re[iRow*nColumn+5]);
+
+		if (iRow == nRow)
+			sJsonData.append("}");
+		else
+			sJsonData.append("},");
+	}
+	sJsonData.append("]");
+	sqlite3_free_table(re);
+
+	return sJsonData.getCString();
 }

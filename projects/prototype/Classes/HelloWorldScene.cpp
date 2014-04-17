@@ -211,7 +211,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 
 	const BaseLevelConfig* pBaseLevelConfig;
 	const LevelConfig* pNormalLevelConfig = NULL;	
-	std::vector<Cell> positionOfLettersOfTimeMode;
+	std::vector<Cell> positionOfLettersOfTimeMode;	
 
 	if (m_eGameModeType == _GMT_NORMAL_)
 	{
@@ -226,10 +226,13 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 	else
 	{
 		m_GameBoardManager.GenerateGameBoard(m_eGameModeType);
+		
 		m_GameBoardManager.GeneratePositionOfLettersForTimeMode( positionOfLettersOfTimeMode, iExistedCombo4Count, iExistedCombo5Count, iExistedCombo6Count);
 
 		pBaseLevelConfig = m_GameBoardManager.GetLevelConfig();
 	}
+	CCLOG("Generate 4-1");
+
 	
 	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
 	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
@@ -283,7 +286,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 			m_fBoardLeftClipPosition = 0.f;
 			m_fMaskWidth = 560.f;
 			break;
-	};	
+	};		
 
 	m_eTouchMoveState = _TMS_NONE_;	
 
@@ -334,6 +337,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 
 	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/AnimationDetach/Animation detach.ExportJson");
 	
+	CCLOG("Generate 4-1-2");
 
 	// get symbol size
 	CCSprite* pSprite;
@@ -388,6 +392,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 		pSprite->setPosition(Point(position.x, position.y));
 		m_pBoardBatchNode->addChild(pSprite, GetZOrder( -1, iColumn, true));
 	}
+	
 
 	Size spriteSize;
 
@@ -494,11 +499,13 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 				}
 			}
 		}
-		
-
+			
 	
 	if (m_eGameModeType == _GMT_NORMAL_)	
 	{
+		m_pTimeCountDownNode = NULL; //no time count down node
+
+
 		// add letter to gems if existing
 		if (pNormalLevelConfig->m_bIsMainWordExistedOnBoard)
 		{
@@ -541,7 +548,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 		}
 	}
 	else// time mode
-	{
+	{		
 		const TimeModeLevelConfig* pTimeModeLevelConfig = (TimeModeLevelConfig*)pBaseLevelConfig;		
 		int iMaximumEneryOfThisStage, iEnergyLostPersecondOfThisStage;
 		if (iTimeModeStage <= pTimeModeLevelConfig->m_ManualStageConfigList.size())
@@ -558,7 +565,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 
 			iEnergyLostPersecondOfThisStage = pTimeModeLevelConfig->m_ManualStageConfigList[iTotalManualStageCount-1]->m_iEnergyLostRatePersecond * 
 				(100 + pTimeModeLevelConfig->m_iStageConfig_LostRateIncreasePercent * (iTimeModeStage - iTotalManualStageCount))/100.f ;			
-		}
+		}		
 
 		m_pTimeCountDownNode = TimeCountDownNode::create( iMaximumEneryOfThisStage, iEnergyLostPersecondOfThisStage);
 		m_pTimeCountDownNode->setPositionY( m_fBoardBottomPosition + (iNumberOfRow  - 0.4f )* m_SymbolSize.height);
@@ -579,8 +586,8 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 				AddLetterToGem( positionOfLettersOfTimeMode[i], m_GameBoardManager.GetCellValue( positionOfLettersOfTimeMode[i].m_iRow,
 					positionOfLettersOfTimeMode[i].m_iColumn), mainWord.m_sWord[i], iGemLetterBlockID);				
 			}
-		}		
-	}
+		}				
+	}	
 
 	// pre-load hint sprite
 	m_pHintSprite = Sprite::createWithSpriteFrameName( "Hint.png");
@@ -2916,7 +2923,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 void HelloWorld::PlayEarnScoreEffect(const int& iScore,  const Cell& cell, const float& fDelay)
 {
-	m_pTimeCountDownNode->AddEnergy(iScore);
+	if (m_pTimeCountDownNode != NULL)
+		m_pTimeCountDownNode->AddEnergy(iScore);
 
 	Point position( m_fBoardLeftPosition + cell.m_iColumn * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height);
 	char sBuffer[12];
@@ -4699,7 +4707,14 @@ void HelloWorld::EndUnlockLetterAnimation()
 			}
 			else
 			{
-				OnTimeMode_StageComplete();				
+				if (m_pTimeCountDownNode != NULL)
+				{
+					//already out of time before!!!!
+					if (m_pTimeCountDownNode->IsEnergyEmpty())
+						return;
+
+					OnTimeMode_StageComplete();				
+				}
 			}
 		}
 		else  if (m_GameBoardManager.GetCurrentMove() == 0) // out of move ==> lose

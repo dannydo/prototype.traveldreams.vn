@@ -302,19 +302,28 @@ void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTi
 		}
 
 
+	//CCLOG("Generate 1");
+
 	srand((unsigned int)time(NULL));
-	int iRandomIndex = 15; //rand() % iSmallestCollectedWordCount + 1;
+	int iRandomIndex;
+	if (iSmallestCollectedWordCount > 0)
+		iRandomIndex = rand() % iSmallestCollectedWordCount + 1;
+	else
+		iRandomIndex = rand() % pTimeModeConfig->m_WordCollectedCountList.size();
+
 	for(int i=0; i< pTimeModeConfig->m_WordIndexList.size(); i++)
 		if (iSmallestColllectedCountOfWord == pTimeModeConfig->m_WordCollectedCountList[i])
 		{
 			iRandomIndex--;
-			if (iRandomIndex == 0)
+			if (iRandomIndex <= 0)
 			{
 				m_iMainWordIndex = pTimeModeConfig->m_WordIndexList[i];
 				break;
 			}
 		}
 	//m_iMainWordIndex = pTimeModeConfig->m_WordIndexList[iRandomIndex];
+
+	//CCLOG("Generate 2");
 
 	m_bAddDirectLetterOfMainWordToTrash = false;
 

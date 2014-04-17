@@ -21,6 +21,8 @@ public:
 	inline std::vector<PowerUpInfo> getAllPowerUps() { return m_PowerUps; };
 	bool updatePowerUp(const PowerUpInfo& powerUpInfo);
 
+	std::string	syncGetPoverUps();
+
 private:
 	void fetchAllPowerUp();
 

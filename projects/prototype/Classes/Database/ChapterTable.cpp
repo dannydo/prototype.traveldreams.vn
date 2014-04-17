@@ -3,6 +3,7 @@
 #include "VersionTable.h"
 
 USING_NS_CC; 
+USING_NS_CC_EXT;
 
 ChapterTable* ChapterTable::m_ChapterTable = NULL;
 
@@ -107,6 +108,112 @@ bool ChapterTable::updateChapter(ChapterInfo chapterInfo)
 			m_Chapters[iIndex] = chapterInfo;
 		}
 	}
+
+	return true;
+}
+
+std::string	ChapterTable::syncGetChapters()
+{
+	char **re;
+	int nRow, nColumn;
+		
+	String sql = "select * from Chapters where Version>";
+	sql.appendWithFormat("%d ", VersionTable::getInstance()->getVersionInfo().iVersionSync);
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	String sJsonData = "\"Chapters\":[";
+	for (int iRow=1; iRow<=nRow; iRow++)
+	{
+		sJsonData.append("{");
+		sJsonData.appendWithFormat("\"ChapterId\": \"%s\",", re[iRow*nColumn+0]);
+		sJsonData.appendWithFormat("\"TotalLevelUnlock\": %s,", re[iRow*nColumn+1]);
+		sJsonData.appendWithFormat("\"TotalStar\": %s,", re[iRow*nColumn+2]);
+		sJsonData.appendWithFormat("\"IsUnlock\": %s,", re[iRow*nColumn+3]);
+		sJsonData.appendWithFormat("\"Version\": %s,", re[iRow*nColumn+4]);
+		sJsonData.appendWithFormat("\"TotalFlashCardUnlock\": %s,", re[iRow*nColumn+5]);
+		sJsonData.appendWithFormat("\"CountFlashCardNew\": %s,", re[iRow*nColumn+6]);
+		sJsonData.appendWithFormat("\"TotalFlashCard\": %s", re[iRow*nColumn+7]);
+
+		if (iRow == nRow)
+			sJsonData.append("}");
+		else
+			sJsonData.append("},");
+	}
+	sJsonData.append("]");
+	sqlite3_free_table(re);
+
+	return sJsonData.getCString();
+}
+
+bool ChapterTable::updateDataSyncChapters(cs::JsonDictionary* pJsonSync, const int& iVersion)
+{
+	String sqlRun = "";
+	std::vector<ChapterInfo> chapters;
+
+	if (pJsonSync->getArrayItemCount("Chapters") > 0)
+	{
+		char **re;
+		int nRow, nColumn;
+		String sql = "select * from Chapters";
+		sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+		for(int iRow=1; iRow<=nRow; iRow++)
+		{
+			ChapterInfo chapterInfo;
+			chapterInfo.sChapterId = re[iRow*nColumn+0];
+
+			chapters.push_back(chapterInfo);
+		}
+
+		sqlite3_free_table(re);
+	}
+
+	for(int iIndex=0; iIndex<pJsonSync->getArrayItemCount("Chapters"); iIndex++)
+	{
+		cs::JsonDictionary* pJsonChapter = pJsonSync->getSubItemFromArray("Chapters", iIndex);
+		bool isInsert = true;
+
+		std::string sChapterId = pJsonChapter->getItemStringValue("ChapterId");
+		for(int iIndexChapter=0; iIndexChapter<chapters.size(); iIndexChapter++)
+		{
+			if (sChapterId == chapters[iIndexChapter].sChapterId)
+			{
+				isInsert = false;
+				break;
+			}
+		}
+
+		if (isInsert)
+		{
+			// Insert Chapter
+			sqlRun.append("insert into Chapters values(");
+			sqlRun.appendWithFormat("'%s',", pJsonChapter->getItemStringValue("ChapterId"));
+			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("TotalLevelUnlock", 0));
+			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("TotalStar", 0));
+			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("IsUnlock", 0));
+			sqlRun.appendWithFormat("%d,", iVersion);
+			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("TotalFlashCardUnlock", 0));
+			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("CountFlashCardNew", 0));
+			sqlRun.appendWithFormat("%d);", pJsonChapter->getItemIntValue("TotalFlashCard", 0));
+		}
+		else
+		{
+			// Update Chapter
+			sqlRun.append("update Chapters Set");
+			sqlRun.appendWithFormat(" TotalLevelUnlock=%d,", pJsonChapter->getItemIntValue("TotalLevelUnlock", 0));
+			sqlRun.appendWithFormat(" TotalStar=%d,", pJsonChapter->getItemIntValue("TotalStar", 0));
+			sqlRun.appendWithFormat(" IsUnlock=%d,", pJsonChapter->getItemIntValue("IsUnlock", 0));
+			sqlRun.appendWithFormat(" Version=%d,", iVersion);
+			sqlRun.appendWithFormat(" TotalFlashCardUnlock=%d,", pJsonChapter->getItemIntValue("TotalFlashCardUnlock", 0));
+			sqlRun.appendWithFormat(" CountFlashCardNew=%d,", pJsonChapter->getItemIntValue("CountFlashCardNew", 0));
+			sqlRun.appendWithFormat(" TotalFlashCard=%d", pJsonChapter->getItemIntValue("TotalFlashCard", 0));
+			sqlRun.appendWithFormat(" where ChapterId='%s';", pJsonChapter->getItemStringValue("ChapterId"));
+		}
+	}
+
+	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sqlRun.getCString(), NULL, NULL, NULL);
+	if(iResult != SQLITE_OK)
+		return false;
 
 	return true;
 }

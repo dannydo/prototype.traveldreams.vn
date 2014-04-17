@@ -2,6 +2,7 @@
 #define __LEVEL_TABLE_H__
 
 #include "cocos2d.h"
+#include "cocos-ext.h"
 
 struct LevelInfo
 {
@@ -28,6 +29,9 @@ public:
 	std::vector<LevelInfo>& getAllLevelsForChapter(std::string& sChapterId);
 	LevelInfo& getLevel(const std::string& sChapterId, const int& iLevel);
 	bool updateLevel(const LevelInfo& levelInfo);
+
+	std::string	syncGetLevels();
+	bool updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& iVersion);
 
 private:
 	void fetchLevelsForChapter(const std::string& sChapterId);

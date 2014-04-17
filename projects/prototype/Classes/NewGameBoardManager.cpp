@@ -159,7 +159,7 @@ void NewGameBoardManager::GeneratePositionOfLettersForTimeMode(std::vector<Cell>
 
 	// re-add rejectList to seedList
 	iListSize += rejectList.size();
-	seedList.insert(seedList.begin(), rejectList.begin(), rejectList.end());					
+	seedList.insert(seedList.begin(), rejectList.begin(), rejectList.end());						
 
 	auto mainWord = const_cast<Word&>(m_pGameWordManager->GetMainWord());
 	//int iRandomIndex;

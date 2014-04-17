@@ -51,7 +51,12 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/HeaderNode.cpp \
 				   ../../Classes/ScrollManager.cpp \
 				   ../../Classes/TimeCountDownNode.cpp \
-				   ../../Classes/HelloWorldScene.cpp
+				   ../../Classes/Database/PowerUpTable.cpp \
+				   ../../Classes/Database/TransactionTable.cpp \
+				   ../../Classes/Database/UnlockChapterTable.cpp \
+				   ../../Classes/Database/VersionTable.cpp \
+				   ../../Classes/Database/WordTable.cpp \
+				   ../../Classes/APIService/SyncDataGame.cpp \				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
 					$(LOCAL_PATH)/../../../../plugin/protocols/platform/android

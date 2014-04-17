@@ -177,6 +177,9 @@
     <ClCompile Include="..\Classes\TimeCountDownNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\APIService\SyncDataGame.cpp">
+      <Filter>APIService</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -337,6 +340,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\TimeCountDownNode.h">
       <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\APIService\SyncDataGame.h">
+      <Filter>APIService</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
