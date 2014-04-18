@@ -1862,7 +1862,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 										NULL));
 
 		int iLengthOfBlock, iBeginIndexOfBlock, iTempCalculatedColumn;
-
+		SpriteFrame* pSpriteFrame, *pMirrorSpriteFrame, * pTempSpriteFrame;
 		for(auto cell : m_ComputeMoveResult.m_NewComboCells)
 		{
 			iTempCalculatedColumn = cell.m_iColumn;
@@ -1886,9 +1886,35 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 				}
 			}
 			int iCalculatedColumn = (iTempCalculatedColumn + iTranslationCell) % iLengthOfBlock + iBeginIndexOfBlock;
+						
+			pSpriteFrame = GetSpriteFrameFromSnapGemID( cell.m_iGemID, m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_iGemLetterBlockID>=0?_GCT_HAS_LETTER_:cell.m_eGemComboType);
+			pTempSpriteFrame = m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->getDisplayFrame();
+			pTempSpriteFrame->retain();
+			m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->setTag((int) pTempSpriteFrame);			
+			m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->setDisplayFrame(pSpriteFrame);
 
+			m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->runAction(snapEffectAction->clone());
+			
 
+			m_SnapSprites.push_back(m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite);
 
+			if (cell.m_iRow == m_SelectedCell.m_iRow) // change frame of mirror too
+			{
+				m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->setOpacity(254);
+				m_BoardViewMirrorMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->setOpacity(254);
+
+				pMirrorSpriteFrame = GetSpriteFrameFromSnapGemID( cell.m_iGemID, m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_iGemLetterBlockID>=0?_GCT_HAS_LETTER_:cell.m_eGemComboType);
+				pTempSpriteFrame = m_BoardViewMirrorMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->getDisplayFrame();
+				pTempSpriteFrame->retain();
+				m_BoardViewMirrorMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->setTag((int) pTempSpriteFrame);
+				m_BoardViewMirrorMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->setDisplayFrame(pMirrorSpriteFrame);
+
+				m_BoardViewMirrorMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->runAction(snapEffectAction->clone());
+
+				m_SnapSprites.push_back(m_BoardViewMirrorMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite);
+			}
+
+			/*
 			pSnapSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
 				m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_iGemLetterBlockID>=0?_GCT_HAS_LETTER_:cell.m_eGemComboType).c_str());
 			pSnapSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0.2f)));
@@ -1947,7 +1973,7 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 
 				m_SnapSprites.push_back(pSnapMirrorSprite);
 				pSnapMirrorSprite->runAction(snapEffectAction->clone());
-			}
+			}*/
 		}
 
 	}
@@ -1958,9 +1984,10 @@ void HelloWorld::RemoveSnap()
 	if ( m_SnapSprites.size() >0 )
 	{
 		//CCLOG("Remove hint");		
+		SpriteFrame* pSpriteFrame;
 		for(auto sprite:m_SnapSprites)
 		{
-			if (sprite->getParent() != NULL)
+			/*if (sprite->getParent() != NULL)
 			{
 				((Sprite*)sprite->getParent())->setOpacity(255);
 				if (sprite->getTag() == 1) // parent cell is on drag row/column
@@ -1970,7 +1997,22 @@ void HelloWorld::RemoveSnap()
 				}
 			}			
 			MoveAllChildrenToOtherNode( sprite, (Sprite*)sprite->getParent());
-			sprite->removeFromParentAndCleanup(true);
+			sprite->removeFromParentAndCleanup(true);*/
+			if (sprite->getOpacity() == 254)			
+			{			
+				sprite->setScaleX(1.1f);
+				sprite->setScaleY(0.9f);
+			}
+			else
+			{			
+				sprite->setScale(1.f);
+			}
+
+			pSpriteFrame = (SpriteFrame*)sprite->getTag();
+			sprite->setDisplayFrame(pSpriteFrame);
+			sprite->stopAllActions();
+			
+			delete pSpriteFrame;
 		}
 		
 		m_SnapSprites.clear();
@@ -2116,6 +2158,7 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 										ScaleTo::create( 0.25f, 1.13f, 0.88f),
 										ScaleTo::create( 0.15f, 1.09f, 0.92f),
 										NULL));
+		SpriteFrame* pSpriteFrame, *pMirrorSpriteFrame, * pTempSpriteFrame;
 
 		for(auto cell : m_ComputeMoveResult.m_NewComboCells)
 		{
@@ -2143,6 +2186,35 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 
 			int iCalculatedRow = (iTempCalculatedRow+ iTranslationCell) % iLengthOfBlock + iBeginIndexOfBlock;
 
+			pSpriteFrame = GetSpriteFrameFromSnapGemID( cell.m_iGemID, 
+				m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_iGemLetterBlockID>=0?_GCT_HAS_LETTER_:cell.m_eGemComboType);
+			pTempSpriteFrame = m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->getDisplayFrame();
+			pTempSpriteFrame->retain();
+			m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->setTag((int) pTempSpriteFrame);			
+			m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->setDisplayFrame(pSpriteFrame);
+
+			m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->runAction(snapEffectAction->clone());
+			
+
+			m_SnapSprites.push_back(m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite);
+
+			if (cell.m_iColumn == m_SelectedCell.m_iColumn) // change frame of mirror too
+			{
+				m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->setOpacity(254);
+				m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->setOpacity(254);
+
+				pMirrorSpriteFrame = GetSpriteFrameFromSnapGemID( cell.m_iGemID, m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_iGemLetterBlockID>=0?_GCT_HAS_LETTER_:cell.m_eGemComboType);
+				pTempSpriteFrame = m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->getDisplayFrame();
+				pTempSpriteFrame->retain();
+				m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->setTag((int) pTempSpriteFrame);
+				m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->setDisplayFrame(pMirrorSpriteFrame);
+
+				m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite->runAction(snapEffectAction->clone());
+
+				m_SnapSprites.push_back(m_BoardViewMirrorMatrix[iCalculatedRow][cell.m_iColumn].m_pSprite);
+			}		
+
+			/*
 			pSnapSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
 				m_BoardViewMatrix[iCalculatedRow][cell.m_iColumn].m_iGemLetterBlockID>=0?_GCT_HAS_LETTER_:cell.m_eGemComboType).c_str());			
 			pSnapSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0.2f)));
@@ -2200,7 +2272,7 @@ void HelloWorld::VerticalMoveUlti(float fDeltaY)
 				m_SnapSprites.push_back(pSnapMirrorSprite);
 
 				pSnapMirrorSprite->runAction(snapEffectAction->clone());
-			}
+			}*/
 		}
 
 	}

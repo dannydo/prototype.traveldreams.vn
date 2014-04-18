@@ -660,7 +660,7 @@ bool NewGameBoardManager::FastCheckBlocks( int iBeginMovingIndex, int iMovingLis
 	{		
 		// ******** note: temporary hardcode and fix condition for combo 6 ************* 					
 		if (iSelectedRow >= 0)
-			for(iIndexColumn =0; iIndexColumn < m_iColumnNumber; iIndexColumn++)
+			for(iIndexColumn = iBeginMovingIndex; iIndexColumn < iBeginMovingIndex + iMovingListLength; iIndexColumn++)
 			{
 				if (m_TemporaryValueMatrix[iSelectedRow][iIndexColumn].m_eGemComboType == _GCT_COMBO6_
 					&& ( (iSelectedRow>0 &&  m_TemporaryValueMatrix[iSelectedRow-1][iIndexColumn].m_bIsBlankCell == false) ||
@@ -686,7 +686,7 @@ bool NewGameBoardManager::FastCheckBlocks( int iBeginMovingIndex, int iMovingLis
 				}
 			}
 		else if (iSelectedColumn >= 0)
-			for(iIndexRow =0; iIndexRow < m_iRowNumber; iIndexRow++)
+			for(iIndexRow = iBeginMovingIndex; iIndexRow < iBeginMovingIndex+ iMovingListLength; iIndexRow++)
 			{
 				if (m_TemporaryValueMatrix[iIndexRow][iSelectedColumn].m_eGemComboType == _GCT_COMBO6_
 					&& ( (iSelectedColumn>0 &&  m_TemporaryValueMatrix[iIndexRow][iSelectedColumn-1].m_bIsBlankCell == false) ||
