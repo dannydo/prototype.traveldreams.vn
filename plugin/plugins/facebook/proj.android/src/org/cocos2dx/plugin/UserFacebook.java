@@ -24,6 +24,8 @@ import com.facebook.widget.WebDialog.OnCompleteListener;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
@@ -239,6 +241,25 @@ public class UserFacebook implements InterfaceUser {
 		});
 	}
 	
+	public boolean isNetworkOnline() {
+		boolean status=false;
+		try{
+		    ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+		    NetworkInfo netInfo = cm.getNetworkInfo(0);
+		    if (netInfo != null && netInfo.getState()==NetworkInfo.State.CONNECTED) {
+		        status= true;
+		    }else {
+		        netInfo = cm.getNetworkInfo(1);
+		        if(netInfo!=null && netInfo.getState()==NetworkInfo.State.CONNECTED)
+		            status= true;
+		    }
+		}catch(Exception e){
+		    e.printStackTrace();  
+		    return false;
+		}
+		return status;
+	}
+	
 	public void shareFacebookLink(JSONObject shareInfo) {
 		//TODO Auto-generated method stub
 		LogD("Share");
@@ -372,7 +393,7 @@ public class UserFacebook implements InterfaceUser {
 		}
 		return strAccessToken;
 	}
-
+	
 	@Override
 	public void setDebugMode(boolean debug) {
 		// TODO Auto-generated method stub
