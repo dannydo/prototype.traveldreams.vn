@@ -96,30 +96,53 @@ LevelInfo& LevelTable::getLevel(const std::string& sChapterId, const int& iLevel
 
 bool LevelTable::updateLevel(const LevelInfo& levelInfo)
 {
-	String sql = "update Levels Set";
-	sql.appendWithFormat(" ChapterId='%s',", levelInfo.sChapterId.c_str());
-	sql.appendWithFormat(" Level=%d,", levelInfo.iLevel);
-	sql.appendWithFormat(" WordId='%s',", levelInfo.sWordId.c_str());
-	sql.appendWithFormat(" Star=%d,", levelInfo.iStar);
-	sql.appendWithFormat(" Score=%d,", levelInfo.iScore);
-	sql.appendWithFormat(" BonusQuest=%d,", levelInfo.iBonusQuest);
-	sql.appendWithFormat(" TotalBonusQuest=%d,", levelInfo.iTotalBonusQuest);
-	sql.appendWithFormat(" IsUnlock=%d,", levelInfo.bIsUnlock);
-	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
-	sql.appendWithFormat(" where LevelId=%d", levelInfo.iLevelId);
+	int iIndex;
+	for(iIndex=0; iIndex<m_ChapterLevels.size(); iIndex++)
+	{
+		if (m_ChapterLevels[iIndex].iLevel == levelInfo.iLevel && m_ChapterLevels[iIndex].sChapterId == levelInfo.sChapterId)
+		{
+			break;
+		}
+	}
+
+	String sql = "";
+	if (iIndex < m_ChapterLevels.size())
+	{
+		sql = "update Levels Set";
+		sql.appendWithFormat(" ChapterId='%s',", levelInfo.sChapterId.c_str());
+		sql.appendWithFormat(" Level=%d,", levelInfo.iLevel);
+		sql.appendWithFormat(" WordId='%s',", levelInfo.sWordId.c_str());
+		sql.appendWithFormat(" Star=%d,", levelInfo.iStar);
+		sql.appendWithFormat(" Score=%d,", levelInfo.iScore);
+		sql.appendWithFormat(" BonusQuest=%d,", levelInfo.iBonusQuest);
+		sql.appendWithFormat(" TotalBonusQuest=%d,", levelInfo.iTotalBonusQuest);
+		sql.appendWithFormat(" IsUnlock=%d,", levelInfo.bIsUnlock);
+		sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
+		sql.appendWithFormat(" where LevelId=%d", levelInfo.iLevelId);
+
+		m_ChapterLevels[iIndex] = levelInfo;
+	}
+	else 
+	{
+		// Insert Level
+		sql.append("insert into Levels (ChapterId,Level,WordId,Star,Score,BonusQuest,TotalBonusQuest,IsUnlock,Version) values(");
+		sql.appendWithFormat("'%s',", levelInfo.sChapterId.c_str());
+		sql.appendWithFormat("%d,", levelInfo.iLevel);
+		sql.appendWithFormat("'%s',", levelInfo.sWordId.c_str());
+		sql.appendWithFormat("%d,", levelInfo.iStar);
+		sql.appendWithFormat("%d,", levelInfo.iScore);
+		sql.appendWithFormat("%d,",levelInfo.iBonusQuest);
+		sql.appendWithFormat("%d,", levelInfo.iTotalBonusQuest);
+		sql.appendWithFormat("%d,", levelInfo.bIsUnlock);
+		sql.appendWithFormat("%d);", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
+
+		if (m_sCurrentChapterId != "")
+			this->fetchLevelsForChapter(m_sCurrentChapterId);
+	}
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
 		return false;
-
-	for(int iIndex=0; iIndex<m_ChapterLevels.size(); iIndex++)
-	{
-		if (m_ChapterLevels[iIndex].iLevel == levelInfo.iLevel && m_ChapterLevels[iIndex].sChapterId == levelInfo.sChapterId)
-		{
-			m_ChapterLevels[iIndex] = levelInfo;
-			break;
-		}
-	}
 
 	return true;
 }

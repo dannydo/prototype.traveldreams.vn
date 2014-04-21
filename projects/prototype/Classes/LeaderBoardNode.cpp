@@ -9,6 +9,11 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "Social\FacebookManager.h"
+using namespace cocos2d::plugin;
+#endif
+
 LeaderBoardtNode::~LeaderBoardtNode()
 {
 	UserService::getInstance()->removeCallBackList(this);
@@ -66,8 +71,10 @@ bool LeaderBoardtNode::init()
 		m_arrIndex[iIndex] = -1;
 	}
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	FacebookManager::getInstance()->loadPlugin();
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
-	if (userInfo.sFacebookId != "")
+	if (userInfo.sFacebookId != "" && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) == 1 && FacebookManager::getInstance()->isLogined())
 	{
 		int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
 		UserService::getInstance()->addCallBackList(this);
@@ -76,6 +83,7 @@ bool LeaderBoardtNode::init()
 		UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
 		UserService::getInstance()->getLeaderBoardLevel(iCalLevel + m_iLevel, m_iConnectServer);
 	}
+#endif
 
 	m_bIsSwipe = false;
 
@@ -218,140 +226,146 @@ void LeaderBoardtNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
 
 void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey)
 {
-	LevelInfo levelInfo =  LevelTable::getInstance()->getLevel(m_sChapterId, m_iLevel);
-	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
-	String sTag = "LeaderBoardLevel";
-	sTag.appendWithFormat("_%d", m_iConnectServer);
-
-	if (sKey == sTag.getCString())
+	if (pJsonDict != NULL)
 	{
-		cs::JsonDictionary* jsonData = pJsonDict->getSubDictionary("data");
-		if (jsonData->getItemBoolvalue("result", false))
+		LevelInfo levelInfo =  LevelTable::getInstance()->getLevel(m_sChapterId, m_iLevel);
+		UserInfo userInfo = UserTable::getInstance()->getUserInfo();
+		String sTag = "LeaderBoardLevel";
+		sTag.appendWithFormat("_%d", m_iConnectServer);
+
+		if (sKey == sTag.getCString())
 		{
-			m_iLeaderBoardCount = jsonData->getArrayItemCount("list");
-
-			if (levelInfo.bIsUnlock)
+			cs::JsonDictionary* jsonData = pJsonDict->getSubDictionary("data");
+			if (jsonData != NULL)
 			{
-				// find index of me
-				int iRank = 1;
-				for(int iIndex=0; iIndex < m_iLeaderBoardCount; iIndex++)
+				if (jsonData->getItemBoolvalue("result", false))
 				{
-					cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
-					int iScore = int(strtod(pJsonItem->getItemStringValue("Score"), 0));
+					m_iLeaderBoardCount = jsonData->getArrayItemCount("list");
 
-					if (iScore > levelInfo.iScore)
-						iRank++;
-					else
-						break;
-				}
-
-				if (iRank == 1)
-				{
-					this->addItemToSlide(levelInfo.iScore, "Me", userInfo.sFacebookId.c_str(), iRank, 0);
-
-					if (m_iLeaderBoardCount > 5)
-						m_iLeaderBoardCount = 5;
-
-					for(int iIndex=0; iIndex < m_iLeaderBoardCount; iIndex++)
+					if (levelInfo.bIsUnlock)
 					{
-						iRank++;
-						cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
-						this->parseJsonToLeadeBoard(pJsonItem, iRank, iIndex+1);
+						// find index of me
+						int iRank = 1;
+						for(int iIndex=0; iIndex < m_iLeaderBoardCount; iIndex++)
+						{
+							cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
+							int iScore = int(strtod(pJsonItem->getItemStringValue("Score"), 0));
+
+							if (iScore > levelInfo.iScore)
+								iRank++;
+							else
+								break;
+						}
+
+						if (iRank == 1)
+						{
+							this->addItemToSlide(levelInfo.iScore, "Me", userInfo.sFacebookId.c_str(), iRank, 0);
+
+							if (m_iLeaderBoardCount > 5)
+								m_iLeaderBoardCount = 5;
+
+							for(int iIndex=0; iIndex < m_iLeaderBoardCount; iIndex++)
+							{
+								iRank++;
+								cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
+								this->parseJsonToLeadeBoard(pJsonItem, iRank, iIndex+1);
+							}
+						}
+						else
+						{
+							if (iRank > m_iLeaderBoardCount)
+							{
+								if (iRank >= 6)
+								{
+									this->addItemToSlide(levelInfo.iScore, "Me", userInfo.sFacebookId.c_str(), iRank, 5);
+
+									cs::JsonDictionary* pJsonItemLeft1 = jsonData->getSubItemFromArray("list", iRank-2);
+									this->parseJsonToLeadeBoard(pJsonItemLeft1, iRank-1, 4);
+
+									cs::JsonDictionary* pJsonItemLeft2 = jsonData->getSubItemFromArray("list", iRank-3);
+									this->parseJsonToLeadeBoard(pJsonItemLeft2, iRank-2, 3);
+								}
+								else
+								{
+									this->addItemToSlide(levelInfo.iScore, "Me", userInfo.sFacebookId.c_str(), iRank, iRank-1);
+
+									cs::JsonDictionary* pJsonItemLeft1 = jsonData->getSubItemFromArray("list", iRank-2);
+									this->parseJsonToLeadeBoard(pJsonItemLeft1, iRank-1, iRank-2);
+
+									cs::JsonDictionary* pJsonItemLeft2 = jsonData->getSubItemFromArray("list", iRank-3);
+									this->parseJsonToLeadeBoard(pJsonItemLeft2, iRank-2, iRank-3);
+								}
+							}
+							else
+							{
+								if (iRank >= 6)
+								{
+									this->addItemToSlide(levelInfo.iScore, "Me", userInfo.sFacebookId.c_str(), iRank, 4);
+
+									cs::JsonDictionary* pJsonItemRight = jsonData->getSubItemFromArray("list", iRank-1);
+									this->parseJsonToLeadeBoard(pJsonItemRight, iRank+1, 5);
+
+									cs::JsonDictionary* pJsonItemLeft = jsonData->getSubItemFromArray("list", iRank-2);
+									this->parseJsonToLeadeBoard(pJsonItemLeft, iRank-1, 3);
+								}
+								else
+								{
+									this->addItemToSlide(levelInfo.iScore, "Me", userInfo.sFacebookId.c_str(), iRank, iRank-1);
+
+									cs::JsonDictionary* pJsonItemRight = jsonData->getSubItemFromArray("list", iRank-1);
+									this->parseJsonToLeadeBoard(pJsonItemRight, iRank+1, iRank);
+
+									cs::JsonDictionary* pJsonItemLeft = jsonData->getSubItemFromArray("list", iRank-2);
+									this->parseJsonToLeadeBoard(pJsonItemLeft, iRank-1, iRank-2);
+								}
+							}
+
+							int iCount = 0;
+							for (int iIndex=0; iIndex<m_iLeaderBoardCount; iIndex++)
+							{
+								if(iCount > 2)
+									break;
+
+								if (iIndex < iRank-2)
+								{
+									iCount++;
+									cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
+									this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
+								}
+								else if (iIndex > iRank)
+								{
+									iCount++;
+									cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
+									this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
+								}
+							}
+						}
+
+						m_iLeaderBoardCount = m_iLeaderBoardCount + 1;
+						if (m_iLeaderBoardCount > 6 )
+							m_iLeaderBoardCount = 6;
+			
+						m_fMinPositionLeft = -((m_iLeaderBoardCount-5)*118.0f);
+					}
+					else
+					{
+						if (m_iLeaderBoardCount > 6)
+							m_iLeaderBoardCount = 6;
+
+						m_fMinPositionLeft = -((m_iLeaderBoardCount-5)*118.0f);
+
+						for(int iIndex=0; iIndex < m_iLeaderBoardCount; iIndex++)
+						{
+							cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
+							this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
+						}
 					}
 				}
 				else
 				{
-					if (iRank > m_iLeaderBoardCount)
-					{
-						if (iRank >= 6)
-						{
-							this->addItemToSlide(levelInfo.iScore, "Me", userInfo.sFacebookId.c_str(), iRank, 5);
 
-							cs::JsonDictionary* pJsonItemLeft1 = jsonData->getSubItemFromArray("list", iRank-2);
-							this->parseJsonToLeadeBoard(pJsonItemLeft1, iRank-1, 4);
-
-							cs::JsonDictionary* pJsonItemLeft2 = jsonData->getSubItemFromArray("list", iRank-3);
-							this->parseJsonToLeadeBoard(pJsonItemLeft2, iRank-2, 3);
-						}
-						else
-						{
-							this->addItemToSlide(levelInfo.iScore, "Me", userInfo.sFacebookId.c_str(), iRank, iRank-1);
-
-							cs::JsonDictionary* pJsonItemLeft1 = jsonData->getSubItemFromArray("list", iRank-2);
-							this->parseJsonToLeadeBoard(pJsonItemLeft1, iRank-1, iRank-2);
-
-							cs::JsonDictionary* pJsonItemLeft2 = jsonData->getSubItemFromArray("list", iRank-3);
-							this->parseJsonToLeadeBoard(pJsonItemLeft2, iRank-2, iRank-3);
-						}
-					}
-					else
-					{
-						if (iRank >= 6)
-						{
-							this->addItemToSlide(levelInfo.iScore, "Me", userInfo.sFacebookId.c_str(), iRank, 4);
-
-							cs::JsonDictionary* pJsonItemRight = jsonData->getSubItemFromArray("list", iRank-1);
-							this->parseJsonToLeadeBoard(pJsonItemRight, iRank+1, 5);
-
-							cs::JsonDictionary* pJsonItemLeft = jsonData->getSubItemFromArray("list", iRank-2);
-							this->parseJsonToLeadeBoard(pJsonItemLeft, iRank-1, 3);
-						}
-						else
-						{
-							this->addItemToSlide(levelInfo.iScore, "Me", userInfo.sFacebookId.c_str(), iRank, iRank-1);
-
-							cs::JsonDictionary* pJsonItemRight = jsonData->getSubItemFromArray("list", iRank-1);
-							this->parseJsonToLeadeBoard(pJsonItemRight, iRank+1, iRank);
-
-							cs::JsonDictionary* pJsonItemLeft = jsonData->getSubItemFromArray("list", iRank-2);
-							this->parseJsonToLeadeBoard(pJsonItemLeft, iRank-1, iRank-2);
-						}
-					}
-
-					int iCount = 0;
-					for (int iIndex=0; iIndex<m_iLeaderBoardCount; iIndex++)
-					{
-						if(iCount > 2)
-							break;
-
-						if (iIndex < iRank-2)
-						{
-							iCount++;
-							cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
-							this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
-						}
-						else if (iIndex > iRank)
-						{
-							iCount++;
-							cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
-							this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
-						}
-					}
-				}
-
-				m_iLeaderBoardCount = m_iLeaderBoardCount + 1;
-				if (m_iLeaderBoardCount > 6 )
-					m_iLeaderBoardCount = 6;
-			
-				m_fMinPositionLeft = -((m_iLeaderBoardCount-5)*118.0f);
-			}
-			else
-			{
-				if (m_iLeaderBoardCount > 6)
-					m_iLeaderBoardCount = 6;
-
-				m_fMinPositionLeft = -((m_iLeaderBoardCount-5)*118.0f);
-
-				for(int iIndex=0; iIndex < m_iLeaderBoardCount; iIndex++)
-				{
-					cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
-					this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
 				}
 			}
-		}
-		else
-		{
-
 		}
 	}
 }
