@@ -9,7 +9,7 @@
 USING_NS_CC;
 
 Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,  int iExistedCombo4Count, int iExistedCombo5Count, int iExistedCombo6Count)
-{		
+{				
     // 'scene' is an autorelease object
     auto scene = Scene::create();
     

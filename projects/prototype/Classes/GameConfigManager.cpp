@@ -881,25 +881,6 @@ void GameConfigManager::LoadCustomModeConfig()
 			inputStream >> levelConfig.m_BoardMatrix[iRow][iColumn];
 		}
 	std::getline(inputStream, sTemp);
-
-	// word list
-	std::getline(inputStream, sTemp);
-	int iWordCount, iWordIndex;
-	inputStream >> iWordCount;
-	std::getline( inputStream, sTemp);		
-
-	std::string sWord;
-	for(int i=0; i< iWordCount; i++)
-	{
-		std::getline( inputStream, sWord);		
-		if (sWord.c_str()[sWord.size()-1] == '\r')
-			sWord = sWord.substr(0, sWord.size()-1); //not count /r at the end of line
-
-		iWordIndex  = GameWordManager::getInstance()->GetLoadedWordIndexFromID(sWord);
-		levelConfig.m_WordIndexList.push_back(iWordIndex);
-
-		levelConfig.m_WordCollectedCountList.push_back(0);
-	}	
 	
 	// Manual config of stages
 	std::getline(inputStream, sTemp);
@@ -937,6 +918,27 @@ void GameConfigManager::LoadCustomModeConfig()
 	std::getline(inputStream, sTemp);
 	inputStream >> levelConfig.m_iStageConfig_MaximumValueIncreasePercent;
 	inputStream >> levelConfig.m_iStageConfig_LostRateIncreasePercent;
+	std::getline(inputStream, sTemp);
+
+	// word list
+	std::getline(inputStream, sTemp);
+	int iWordCount, iWordIndex;
+	inputStream >> iWordCount;
+	std::getline( inputStream, sTemp);		
+
+	std::string sWord;
+	for(int i=0; i< iWordCount; i++)
+	{
+		std::getline( inputStream, sWord);		
+		if (sWord.c_str()[sWord.size()-1] == '\r')
+			sWord = sWord.substr(0, sWord.size()-1); //not count /r at the end of line
+
+		iWordIndex  = GameWordManager::getInstance()->GetLoadedWordIndexFromID(sWord);
+		levelConfig.m_WordIndexList.push_back(iWordIndex);
+
+		levelConfig.m_WordCollectedCountList.push_back(0);
+	}	
+	
 
 
 	delete[] data;

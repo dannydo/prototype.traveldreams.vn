@@ -158,6 +158,9 @@ void GameWordManager::LoadWords(const int& iPackageIndex)
 
 		std::getline(inputStream, sTemp);
 		std::getline(inputStream, sTemp);
+
+		// process 
+
 		strcpy( newWord.m_sWord, sTemp.data());		
 		newWord.m_iWordLength = sTemp.size()-1;
 		newWord.m_sWord[newWord.m_iWordLength] = 0;

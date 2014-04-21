@@ -20,7 +20,6 @@
 
 using namespace cocos2d;
 USING_NS_CC_EXT;
-
 enum TouchMoveState
 {
 	_TMS_NONE_,

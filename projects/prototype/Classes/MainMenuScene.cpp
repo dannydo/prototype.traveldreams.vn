@@ -189,10 +189,16 @@ void MainMenuLayer::openSettingMenu(Object *sender)
 
 #include "HelloWorldScene.h"
 #include "GameWordManager.h"
+#include "CustomPackageDownloaderNode.h"
 
 // test time mode
 void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 {
+	CustomPackageDownloaderNode* pNode = CustomPackageDownloaderNode::create();
+	pNode->setPosition(Point(100.f, 400.f));
+	this->addChild(pNode, 1000);
+
+	/*
 	auto timeModeConfig = GameConfigManager::getInstance()->GetTimeModeDemoConfig();	
 	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(&timeModeConfig);
 
@@ -200,5 +206,5 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 	//Director::getInstance()->replaceScene(scene);
 
 	auto scene = HelloWorld::createScene( _GMT_TIME_MODE_);
-	Director::getInstance()->replaceScene(scene);
+	Director::getInstance()->replaceScene(scene);*/
 }

@@ -13,6 +13,14 @@
 0	1	1	1	1	1  	1   0
 1	1	1	1	1	1	1  	1
 1	1	1	1	1	1	1  	1
+;manual stage configs
+1
+10000
+100
+0
+;auto config for greater levels
+10
+10
 ;word list
 20
 Pack1-PEN
@@ -35,16 +43,7 @@ Pack1-STUDY
 Pack1-CLASSMATE
 Pack1-UNIFORM
 Pack1-CHAIR
-;manual stage configs
-1
-10000
-100
-0
-;auto config for greater levels
-10
-10
-
 
 1
 SHIELD	1
-100	100	100	100 100	100	100	100
+100	100	100	100 100	100	100	100 
