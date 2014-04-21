@@ -921,7 +921,7 @@ void GameConfigManager::LoadCustomModeConfig()
 	std::getline(inputStream, sTemp);
 
 	// word list
-	std::getline(inputStream, sTemp);
+	/*std::getline(inputStream, sTemp);
 	int iWordCount, iWordIndex;
 	inputStream >> iWordCount;
 	std::getline( inputStream, sTemp);		
@@ -937,7 +937,7 @@ void GameConfigManager::LoadCustomModeConfig()
 		levelConfig.m_WordIndexList.push_back(iWordIndex);
 
 		levelConfig.m_WordCollectedCountList.push_back(0);
-	}	
+	}*/	
 	
 
 

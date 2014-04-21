@@ -127,10 +127,32 @@ const std::string& GameWordManager::GetPackagePathFromWord(const Word& word)
 
 const std::string GameWordManager::GetWordIdFromWord(const Word& word)
 {
+	return word.m_sWordID;
+	/*
 	std::string sWordId = m_WorldPackageList[word.m_iPackageIndex].m_sPackgageID;
 	sWordId.append("-");
 	sWordId.append(word.m_sWord);
-	return sWordId;
+	return sWordId;*/
+}
+
+int GameWordManager::AddAndLoadCustomPackageToList(const std::string& sPackageID, const std::string& sPackagePath)
+{
+	ClearCache();
+
+	if (m_MapPackgeNameToIndex.find(sPackageID) == m_MapPackgeNameToIndex.end()) //this package is not added to list yet
+	{
+		WorldListPackgeDescription package;
+		package.m_sPackgageID = sPackageID;
+		package.m_sPackagePath = sPackagePath;
+		
+		m_MapPackgeNameToIndex[package.m_sPackgageID] = m_MapPackgeNameToIndex.size();
+		m_WorldPackageList.push_back(package);
+	}
+
+	int iPackageIndex = m_MapPackgeNameToIndex[sPackageID];
+	LoadWords(iPackageIndex);
+
+	return iPackageIndex;
 }
 
 void GameWordManager::LoadWords(const int& iPackageIndex)
@@ -159,14 +181,17 @@ void GameWordManager::LoadWords(const int& iPackageIndex)
 		std::getline(inputStream, sTemp);
 		std::getline(inputStream, sTemp);
 
-		// process 
+		// get word id first		
+		sprintf( sWordID, "%s-%s", m_WorldPackageList[iPackageIndex].m_sPackgageID.c_str(), sTemp.substr( 0, sTemp.size()-1).c_str()) ;
+		newWord.m_sWordID = sWordID;
+		m_MapWordIDToLoadedIndex[sWordID] = iWordIndex;
 
+		// get word content
+		std::getline(inputStream, sTemp);
 		strcpy( newWord.m_sWord, sTemp.data());		
 		newWord.m_iWordLength = sTemp.size()-1;
 		newWord.m_sWord[newWord.m_iWordLength] = 0;
-
-		sprintf( sWordID, "%s-%s", m_WorldPackageList[iPackageIndex].m_sPackgageID.c_str(), newWord.m_sWord);
-		m_MapWordIDToLoadedIndex[sWordID] = iWordIndex;
+		
 
 		//inputStream >> m_WordList[iWordIndex].m_sWord;		
 		//m_WordList[iWordIndex].m_iWordLength = strlen( m_WordList[iWordIndex].m_sWord);

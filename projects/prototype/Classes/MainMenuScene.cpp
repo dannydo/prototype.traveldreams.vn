@@ -195,7 +195,7 @@ void MainMenuLayer::openSettingMenu(Object *sender)
 void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 {
 	CustomPackageDownloaderNode* pNode = CustomPackageDownloaderNode::create();
-	pNode->setPosition(Point(100.f, 400.f));
+	pNode->setPosition(Point(40.f, 200.f));
 	this->addChild(pNode, 1000);
 
 	/*

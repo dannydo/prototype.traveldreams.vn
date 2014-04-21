@@ -48,6 +48,9 @@ public:
 
 	void ClearCache();
 
+	int AddAndLoadCustomPackageToList(const std::string& sPackageID, const std::string& sPackagePath );
+	inline const std::vector<Word>& GetWordList() { return m_WordList;}
+
 	void GenerateWordForNewLevel(std::string sChapterID, int iLevel);
 	void RetryCurrentLevel();
 
