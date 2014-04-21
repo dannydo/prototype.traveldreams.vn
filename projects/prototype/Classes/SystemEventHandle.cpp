@@ -103,6 +103,15 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 void SystemEventHandle::onStartConnectFacebook()
 {
 	// Show popup connect facebook
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	/*
+	if(FacebookManager::getInstance()->isNetworkOnline() == false)
+	{
+		MessageBox("Network is offline!", "");
+		return;
+	}
+	*/
+#endif
 	WaitingNode* pWaitingNode = WaitingNode::createLayout("Connecting...");
 	pWaitingNode->setPosition(320.0f, 480.0f);
 	pWaitingNode->setTag(1000);

@@ -173,6 +173,16 @@ void FacebookManager::autoOpenActiveSession()
 	}
 }
 
+bool FacebookManager::isNetworkOnline()
+{
+	if (_facebook)
+	{
+		return _facebook->callBoolFuncWithParam("isNetworkOnline", NULL);
+	}
+
+	return false;
+}
+
 std::string FacebookManager::getAccessToken() 
 {
 	std::string sessionID = "";

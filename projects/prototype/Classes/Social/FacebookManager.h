@@ -51,6 +51,7 @@ public:
 	void shareLink(const char* name, const char* caption, const char* description, const char* link, const char* picture);
 	void shareDialog(const char* name, const char* caption, const char* description, const char* link, const char* picture);
 	void autoOpenActiveSession();
+	bool isNetworkOnline();
 
 	inline bool getFinishRun(){ return m_bIsFinishRun; };
 	void setFinishRun(const bool& bIsFinishRun); 
