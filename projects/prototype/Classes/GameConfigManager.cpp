@@ -666,6 +666,9 @@ void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::ve
 	std::vector<int> letterCountList;
 	//int iLetterCount;
 	
+	//std::string sDebug;
+	//char sTextDebug[10];
+
 	// when generate words for levels of chapter first time, we dont need to check minimum-letter-required of letter to make sure every level
 	// should have word assign to it (error still can happen if word list is not match to level list)
 	for(auto wordID : chapterConfig.m_WordIDList)
@@ -685,8 +688,17 @@ void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::ve
 		
 		wordList.push_back(wordID);
 		levelList.push_back(-1);
+
+
+		/*sprintf(sTextDebug, " - %d", word.m_iMaximumLevelLetterRequired);
+		sDebug += word.m_sWord; //sTextDebug;
+		sDebug += sTextDebug;
+		sDebug += "+";*/
 	}
-	
+
+	//MessageBox( sDebug.c_str(), "Info");
+
+
 	std::vector<int> sortedWordIndexList;
 	
 	// we sort word from shortest to longest
@@ -694,7 +706,7 @@ void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::ve
 	for(i=0; i < letterCountList.size(); i++)
 		sortedWordIndexList.push_back(i);
 
-	int iTemp;
+	int iTemp;	
 	for(i=0; i < iWordCount-1; i++)
 		for(j=i+1; j < iWordCount; j++)
 			if (letterCountList[sortedWordIndexList[i]] > letterCountList[sortedWordIndexList[j]])
@@ -703,6 +715,7 @@ void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::ve
 				sortedWordIndexList[i] = sortedWordIndexList[j];
 				sortedWordIndexList[j] = iTemp;
 			}
+	
 
 	// we sort level list based required word length from shorted to longest
 	std::vector<int> sortedLevelIndexList;
@@ -729,7 +742,11 @@ void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::ve
 	while (iSortedLevelIndex < chapterConfig.m_iTotalevel)
 	{
 		if (iSortedWordIndex >= iWordCount)// there's a level not match with any word!!!!
-			MessageBox("Error", "Data of game chapter is invalid!");
+		{			
+			//char sText[100];
+			//sprintf(sText, "Data of game chapter is invalid! %d, %d", requiredLetterOfLevelList[sortedLevelIndexList[iSortedLevelIndex]], iSortedWordIndex);
+			MessageBox( "Data of game chapter is invalid!", "Error");
+		}
 
 		int i1 = letterCountList[sortedWordIndexList[iSortedWordIndex]];
 		int i2 = requiredLetterOfLevelList[sortedLevelIndexList[iSortedLevelIndex]];

@@ -26,6 +26,11 @@ CustomPackageDownloaderNode::~CustomPackageDownloaderNode()
 		//delete m_pAssetManager;
 }
 
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32)
+#include <dirent.h>
+#include <sys/stat.h>
+#endif
+
 void createDownloadedDir(const string& pathToSave)
 {    
     // Create the folder if it doesn't exist
@@ -48,8 +53,15 @@ void createDownloadedDir(const string& pathToSave)
 bool CustomPackageDownloaderNode::init()
 {	
 	auto pBackground = Sprite::create("CustomModeGUI/panel.png");
-	pBackground->setAnchorPoint(Point(0,0));	
+	pBackground->setAnchorPoint(Point(0,0));		
 	this->addChild(pBackground);
+
+	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
+	listener->setSwallowTouches(true);
+	listener->onTouchBegan = [this](Touch* touch, Event* event) { return true; };
+	listener->onTouchMoved = [this](Touch* touch, Event* event) { };
+	listener->onTouchEnded = [this](Touch* touch, Event* event) { };
+	EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, this);
 
 	
 	m_pCodeEditBox = EditBox::create(Size(320.f, 50.f), Scale9Sprite::create("CustomModeGUI/green_edit.png"));
@@ -66,7 +78,7 @@ bool CustomPackageDownloaderNode::init()
 	menu1Item->setPosition( Point(160.f, 100.f));
 
 
-	auto menu2Item = MenuItemImage::create("CustomModeGUI/EXIT.png","CustomModeGUI/EXIT.png", CC_CALLBACK_1(CustomPackageDownloaderNode::startDownloadCallback, this));
+	auto menu2Item = MenuItemImage::create("CustomModeGUI/EXIT.PNG","CustomModeGUI/EXIT.PNG", CC_CALLBACK_1(CustomPackageDownloaderNode::exitCallback, this));
 	menu2Item->setPosition( Point(420.f, 100.f));	
 
 	m_pMenu = Menu::create( menu1Item, menu2Item, NULL);
@@ -75,8 +87,8 @@ bool CustomPackageDownloaderNode::init()
 
 
 
-	m_pProgressLabel = LabelTTF::create("", "Arial", 30);
-    m_pProgressLabel->setPosition(Point(100, 150));
+	m_pProgressLabel = LabelTTF::create("", "Arial", 30);	
+    m_pProgressLabel->setPosition(Point(200, 200));
     addChild(m_pProgressLabel);
 
 
@@ -96,6 +108,9 @@ bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string
 
 void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 {	
+	if(m_pCodeEditBox->getText()[0] == 0)
+		return;
+
 	m_pMenu->setEnabled(false);
 
 	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
@@ -103,7 +118,7 @@ void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 	sprintf(sFolderUrl, "%s/folder/%s",sBaseUrl, m_pCodeEditBox->getText());
 
 	std::string sFolderName;
-	if (checkAndGetResultFolderName( string(sFolderUrl), m_sResultFolder) || m_sResultFolder.size()!=0)
+	if (checkAndGetResultFolderName( string(sFolderUrl), m_sResultFolder) && m_sResultFolder.size()!=0)
 	{		
 		sprintf(sDownloadUrl, "%s/download/%s",sBaseUrl, m_pCodeEditBox->getText());
 		sprintf(sVersionUrl, "%s/version/%s",sBaseUrl, m_pCodeEditBox->getText());
@@ -118,6 +133,7 @@ void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 	else
 	{
 		m_pProgressLabel->setString("Code is invalid!!");
+		m_pMenu->setEnabled(true);
 	}
 }
 
@@ -125,7 +141,7 @@ void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 #include "HelloWorldScene.h"
 
 void CustomPackageDownloaderNode::startCustomGame()
-{
+{	
 	auto& timeModeConfig = GameConfigManager::getInstance()->GetTimeModeDemoConfig();
 	timeModeConfig.m_WordIndexList.clear();
 	timeModeConfig.m_WordCollectedCountList.clear();
@@ -169,7 +185,7 @@ void CustomPackageDownloaderNode::onError(cocos2d::extension::AssetsManager::Err
     }
 	else if (errorCode == AssetsManager::ErrorCode::NETWORK)
     {
-        m_pProgressLabel->setString("network error");
+        m_pProgressLabel->setString("network error");		
     }
 
 	

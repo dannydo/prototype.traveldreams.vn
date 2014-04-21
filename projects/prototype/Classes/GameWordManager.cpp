@@ -138,6 +138,7 @@ const std::string GameWordManager::GetWordIdFromWord(const Word& word)
 int GameWordManager::AddAndLoadCustomPackageToList(const std::string& sPackageID, const std::string& sPackagePath)
 {
 	ClearCache();
+	
 
 	if (m_MapPackgeNameToIndex.find(sPackageID) == m_MapPackgeNameToIndex.end()) //this package is not added to list yet
 	{
@@ -145,7 +146,8 @@ int GameWordManager::AddAndLoadCustomPackageToList(const std::string& sPackageID
 		package.m_sPackgageID = sPackageID;
 		package.m_sPackagePath = sPackagePath;
 		
-		m_MapPackgeNameToIndex[package.m_sPackgageID] = m_MapPackgeNameToIndex.size();
+		m_MapPackgeNameToIndex[package.m_sPackgageID] = m_WorldPackageList.size();		
+
 		m_WorldPackageList.push_back(package);
 	}
 
@@ -157,18 +159,20 @@ int GameWordManager::AddAndLoadCustomPackageToList(const std::string& sPackageID
 
 void GameWordManager::LoadWords(const int& iPackageIndex)
 {
+
 	std::string sPackagePath = m_WorldPackageList[iPackageIndex].m_sPackagePath;
-	sPackagePath.append("/WordList.txt");
+	sPackagePath.append("/WordList.txt");	
 
 	unsigned long iDataSize;	
 	unsigned char* orginalData = cocos2d::CCFileUtils::getInstance()->getFileData(sPackagePath.c_str(), "r", &iDataSize);
+	
+
 	char* data = new char[iDataSize];
 	memcpy(data, orginalData, iDataSize);
 	membuf dataBuf(data, data + iDataSize);
 	std::istream inputStream(&dataBuf);
 
-	char sWordID[40];
-	
+	char sWordID[60];	
 
 	int iWordCount;
 	inputStream >> iWordCount;
@@ -179,19 +183,20 @@ void GameWordManager::LoadWords(const int& iPackageIndex)
 		newWord.m_iPackageIndex = iPackageIndex;
 
 		std::getline(inputStream, sTemp);
-		std::getline(inputStream, sTemp);
+		std::getline(inputStream, sTemp);		
 
 		// get word id first		
 		sprintf( sWordID, "%s-%s", m_WorldPackageList[iPackageIndex].m_sPackgageID.c_str(), sTemp.substr( 0, sTemp.size()-1).c_str()) ;
 		newWord.m_sWordID = sWordID;
 		m_MapWordIDToLoadedIndex[sWordID] = iWordIndex;
+				
 
 		// get word content
 		std::getline(inputStream, sTemp);
 		strcpy( newWord.m_sWord, sTemp.data());		
 		newWord.m_iWordLength = sTemp.size()-1;
 		newWord.m_sWord[newWord.m_iWordLength] = 0;
-		
+				
 
 		//inputStream >> m_WordList[iWordIndex].m_sWord;		
 		//m_WordList[iWordIndex].m_iWordLength = strlen( m_WordList[iWordIndex].m_sWord);
@@ -222,7 +227,7 @@ void GameWordManager::LoadWords(const int& iPackageIndex)
 
 		inputStream >> newWord.m_iLimitLetterCountOfFirstLine;
 		inputStream >> newWord.m_iMinimumLevelLetterRequired;
-		inputStream >> newWord.m_iMaximumLevelLetterRequired;
+		inputStream >> newWord.m_iMaximumLevelLetterRequired;		
 
 		m_WordList.push_back(newWord);
 	}

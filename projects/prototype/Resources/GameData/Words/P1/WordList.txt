@@ -294,6 +294,7 @@ LivingRoom_FS_En_Male
 -1
 6 10
 KITCHEN
+KITCHEN
 nhà bếp
 Kitchen_En_Male
 1.18
@@ -306,6 +307,7 @@ Kitchen_FS_En_Male
 1.95
 -1
 4 7
+CURTAIN
 CURTAIN
 cái màn
 Curtain_En_Male
@@ -320,6 +322,7 @@ Curtain_FS_En_Male
 -1
 4 7
 WARDROBE
+WARDROBE
 tủ quần áo
 Wardrobe_En_Male
 1.23
@@ -332,6 +335,7 @@ Wardrobe_FS_En_Male
 3.25
 -1
 5 9
+MICROWAVE
 MICROWAVE
 lò vi sóng
 Microwave_En_Male
@@ -346,6 +350,7 @@ Microwave_FS_En_Male
 -1
 5 9
 FRYING PAN
+FRYING PAN
 cái chảo
 FryingPan_En_Male
 1.41
@@ -358,6 +363,7 @@ FryingPan_FS_En_Male
 2.97
 -1
 5 9
+CHOPSTICKS
 CHOPSTICKS
 đôi đũa
 Chopsticks_En_Male
@@ -372,6 +378,7 @@ Chopsticks_FS_En_Male
 -1
 6 10
 HAIRDRYER
+HAIRDRYER
 máy sấy
 Hairdryer_En_Male
 1.11
@@ -385,6 +392,7 @@ Hairdryer_FS_En_Male
 -1
 5 9
 TOILET PAPER
+TOILET PAPER
 giấy vệ sinh
 ToiletPaper_En_Male
 1.32
@@ -397,6 +405,7 @@ ToiletPaper_FS_En_Male
 4.06
 -1
 7 11
+BLOCK OF FLATS
 BLOCK OF FLATS
 chung cư
 BlockOfFlats_En_Male
