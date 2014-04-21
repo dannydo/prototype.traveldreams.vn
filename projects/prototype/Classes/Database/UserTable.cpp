@@ -64,6 +64,11 @@ void UserTable::fetchhUser()
 	sqlite3_free_table(re);
 }
 
+void UserTable::refreshUserInfo()
+{
+	this->fetchhUser();
+}
+
 bool UserTable::updateUser(const UserInfo& userInfo)
 {
 	String sql = "update Users Set";

@@ -55,6 +55,8 @@ public:
 	inline bool getFinishRun(){ return m_bIsFinishRun; };
 	void setFinishRun(const bool& bIsFinishRun); 
 
+	inline bool getIsLogOut() { return m_bIsLogout; };
+
 	std::string getAccessToken();
 
 private:
@@ -66,6 +68,7 @@ private:
     cocos2d::plugin::ProtocolUser* _facebook;
     FacebookActionResult* _retListener;
 	bool m_bIsFinishRun;
+	bool m_bIsLogout;
 };
 
 #endif // __MY_USER_MANAGER_H__

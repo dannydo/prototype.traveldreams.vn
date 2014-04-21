@@ -77,8 +77,17 @@ void ConnectFacebookConfirm::runProcess()
 {
 	if(InitDatabase::getInstance()->resetDatabase())
 	{
+		m_UserInfo.iCurrentLevel = 1;
+		m_UserInfo.sCurrentChapterId = "";
+		m_UserInfo.sFirstName = "";
+		m_UserInfo.sLastName = "";
+		m_UserInfo.iMonney = 0;
+		m_UserInfo.iLife = 5;
+		m_UserInfo.iLifeTimeRemaining = 0;
+		m_UserInfo.iVersion = 1;
 		UserTable::getInstance()->updateUser(m_UserInfo);
-		SystemEventHandle::getInstance()->onStartSyncGame();
+
+		SystemEventHandle::getInstance()->onStartSyncGame(true);
 		UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
 	}
 }

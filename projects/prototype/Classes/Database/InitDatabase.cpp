@@ -1,5 +1,6 @@
 #include "InitDatabase.h"
 #include "VersionTable.h"
+#include "UserTable.h"
 
 USING_NS_CC; 
 
@@ -176,6 +177,8 @@ bool InitDatabase::resetDatabase()
 		if(this->createDatabase())
 		{
 			VersionTable::getInstance()->refreshVersionInfo();
+			UserTable::getInstance()->refreshUserInfo();
+
 			return true;
 		}
 	}

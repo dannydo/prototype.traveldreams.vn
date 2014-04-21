@@ -36,6 +36,7 @@ public:
 	
 	bool updateUser(const UserInfo& userInfo);
 	bool updateLife(const unsigned int& iLoseLife);
+	void refreshUserInfo();
 
 	std::string syncGetUser();
 	bool updateDataSyncUser(cs::JsonDictionary* pJsonSync, const int& iVersion);

@@ -12,7 +12,7 @@ public:
 	bool init();
 	static void releaseInstance();
 
-	void onStartSyncGame();
+	void onStartSyncGame(const bool& bIsShowSyncError);
 	void onGameSyncCompleted(const bool& bResult);
 
 	void onStartConnectFacebook();
@@ -24,5 +24,6 @@ private:
 
 	static SystemEventHandle* m_SystemEventHandle;
 	bool m_bIsConnectFacebook;
+	bool m_bIsShowSyncError;
 };
 #endif

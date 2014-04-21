@@ -120,6 +120,7 @@ void FacebookManager::loginByMode()
 	if (_facebook)
 	{
 		m_bIsFinishRun = false;
+		m_bIsLogout = false;
 	    _facebook->login();
 	}
 }
@@ -129,6 +130,7 @@ void FacebookManager::logoutByMode()
     if (_facebook) 
 	{
 		m_bIsFinishRun = false;
+		m_bIsLogout = true;
         _facebook->logout();
     }
 }
@@ -198,7 +200,10 @@ void FacebookActionResult::onActionResult(ProtocolUser* pPlugin, UserActionResul
 		}
     case kLoginFailed:
 		{
-			SystemEventHandle::getInstance()->onLoginFacebookResult(false);
+			UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
+			if (FacebookManager::getInstance()->getIsLogOut() == false)
+				SystemEventHandle::getInstance()->onLoginFacebookResult(false);
+
 			break;
 		}
     case kLogoutSucceed:

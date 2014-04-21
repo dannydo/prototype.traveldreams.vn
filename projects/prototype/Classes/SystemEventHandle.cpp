@@ -5,6 +5,7 @@
 #include "ConnectFacebookConfirm.h"
 #include "APIService\UserService.h"
 #include "WaitingNode.h"
+#include "GameConfigManager.h"
 
 USING_NS_CC; 
 
@@ -18,6 +19,7 @@ SystemEventHandle* SystemEventHandle::m_SystemEventHandle = NULL;
 SystemEventHandle::SystemEventHandle()
 {
 	m_bIsConnectFacebook = false;
+	m_bIsShowSyncError = false;
 }
 
 void SystemEventHandle::releaseInstance()
@@ -48,9 +50,10 @@ bool SystemEventHandle::init()
 	return true;
 }
 
-void SystemEventHandle::onStartSyncGame()
+void SystemEventHandle::onStartSyncGame(const bool& bIsShowSyncError)
 {
 	// Show popup sync game data
+	m_bIsShowSyncError = bIsShowSyncError ;
 	WaitingNode* pWaitingNode = WaitingNode::createLayout("Loading...");
 	pWaitingNode->setPosition(320.0f, 480.0f);
 	pWaitingNode->setTag(1001);
@@ -73,10 +76,13 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 		{
 			// Show popup error
 			Director::getInstance()->getRunningScene()->removeChildByTag(1000);
-			MessageBox("Sync Game Data Error!", "");
+			if (m_bIsShowSyncError)
+			{
+				// Show popup error
+				MessageBox("Sync Game Data Error!", "");
+				m_bIsShowSyncError = false;
+			}
 		}
-
-		m_bIsConnectFacebook= false;
 	}
 	else
 	{
@@ -84,7 +90,12 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 		Director::getInstance()->getRunningScene()->removeChildByTag(1001);
 		if(!bResult)
 		{
-			MessageBox("Sync Game Data Error!", "");
+			if (m_bIsShowSyncError)
+			{
+				// Show popup error
+				MessageBox("Sync Game Data Error!", "");
+				m_bIsShowSyncError = false;
+			}
 		}
 	}
 }
@@ -106,19 +117,26 @@ void SystemEventHandle::onLoginFacebookResult(const bool& bResult)
 {
 	if (bResult)
 	{
-		// Check token facebook with server
-		int iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
-		iConnectServer++;
-		UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", iConnectServer);
-		std::string sUserIdentifier = UserTable::getInstance()->getUserInfo().sUserIdentifier;
-		int iUserId = int(strtod(sUserIdentifier.c_str(), 0));
+		if (m_bIsConnectFacebook)
+		{
+			// Check token facebook with server
+			int iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
+			iConnectServer++;
+			UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", iConnectServer);
+			std::string sUserIdentifier = UserTable::getInstance()->getUserInfo().sUserIdentifier;
+			int iUserId = int(strtod(sUserIdentifier.c_str(), 0));
 
-		std::string sFacebookToken = "";
-		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-			sFacebookToken = FacebookManager::getInstance()->getAccessToken();
-		#endif
+			std::string sFacebookToken = "";
+			#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+				sFacebookToken = FacebookManager::getInstance()->getAccessToken();
+			#endif
 
-		UserService::getInstance()->checkUserFacebook(sFacebookToken, iUserId, iConnectServer);
+			UserService::getInstance()->checkUserFacebook(sFacebookToken, iUserId, iConnectServer);
+		}
+		else
+		{
+			UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
+		}
 	}
 	else
 	{
@@ -126,6 +144,8 @@ void SystemEventHandle::onLoginFacebookResult(const bool& bResult)
 		MessageBox("Login", "Connect facebook error!");
 		Director::getInstance()->getRunningScene()->removeChildByTag(1000);
 	}
+
+	m_bIsConnectFacebook = false;
 }
 
 void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict, std::string sKey)
@@ -164,8 +184,17 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 							// Delete and init data, update user and Sync data
 							if(InitDatabase::getInstance()->resetDatabase())
 							{
+								userInfo.iCurrentLevel = 1;
+								userInfo.sCurrentChapterId = "";
+								userInfo.sFirstName = "";
+								userInfo.sLastName = "";
+								userInfo.iMonney = 0;
+								userInfo.iLife = 5;
+								userInfo.iLifeTimeRemaining = 0;
+								userInfo.iVersion = 1;
+
 								UserTable::getInstance()->updateUser(userInfo);
-								this->onStartSyncGame();
+								this->onStartSyncGame(true);
 								UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
 							}
 						}
@@ -176,13 +205,37 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 						UserTable::getInstance()->updateUser(userInfo);
 						UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
 					}
-					else if (sKey == "USER_NOT_EXIST")
+					else if (sKey == "USER_MAP_OTHER_FACEBOOK")
 					{
-						// Sync data with get and set connect facebook success
-						userInfo.sUserIdentifier = "ohmyword";
-						UserTable::getInstance()->updateUser(userInfo);
-						this->onStartSyncGame();
-						UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
+						// Delete and init data, update user and Sync data
+						if(InitDatabase::getInstance()->resetDatabase())
+						{
+							UserDefault::getInstance()->setIntegerForKey("InitDatabase", 0);
+
+							WordlMapConfig worldMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
+							WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[0];
+
+							UserInfo userInfoNew = UserTable::getInstance()->getUserInfo();
+							userInfoNew.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
+							userInfoNew.iCurrentLevel = 1;
+							#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+							userInfoNew.sFacebookToken  = FacebookManager::getInstance()->getAccessToken();
+							#endif
+							UserTable::getInstance()->updateUser(userInfoNew);
+
+							// Create data for one chapter
+							std::vector<std::string> wordList;
+							std::vector<int> mapLevels;
+							GameConfigManager::getInstance()->GenerateWordsForLevels(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
+
+							if(InitDatabase::getInstance()->createDataChapterAndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels))
+							{
+								UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
+								this->onStartSyncGame(true);
+							}
+
+							UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
+						}
 					}
 				}
 			}

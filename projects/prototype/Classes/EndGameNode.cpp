@@ -9,6 +9,7 @@
 #include "Database\InitDatabase.h"
 #include "Database\WordTable.h"
 #include "WorldMapScene.h"
+#include "APIService\SyncDataGame.h"
 
 USING_NS_CC;
 
@@ -305,6 +306,8 @@ void EndGameNode::addYellowStar(const int& iYellowStar)
 		ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 		LevelTable::getInstance()->updateLevel(m_levelInfo);
 	}
+
+	SyncDataGame::getInstance()->runSyncDataGame();
 
 	this->sequenceUpdateStar();
 }

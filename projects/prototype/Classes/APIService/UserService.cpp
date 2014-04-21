@@ -47,6 +47,7 @@ void UserService::checkUserFacebook(const std::string strAccessToken, const int&
 	strURL.append("api/checkUserFacebook/");
 	strURL.append(strAccessToken);
 	strURL.appendWithFormat("/%d", iUserId);
+	//CCLOG("%s", strURL.getCString());
 
 	m_pRequest = new HttpRequest();
 	m_pRequest->setUrl(strURL.getCString());
@@ -105,6 +106,7 @@ void UserService::onCheckUserFacebookCompleted(HttpClient *sender, HttpResponse 
 		}
 	}
 
+	//CCLOG("%s", strData.getCString());
 	SystemEventHandle::getInstance()->onCheckUserFacebookResult(this->parseStringToJson(strData.getCString()), sKey);
 	
 }

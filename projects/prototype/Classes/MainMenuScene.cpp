@@ -116,6 +116,10 @@ void MainMenuLayer::update(float dt)
 		m_pButtonManagerNode->removeButtonNode(m_buttonLoginNode);
 		m_isAddButtonLogin = true;
 	}
+	else if(!FacebookManager::getInstance()->isLogined() && m_isAddButtonLogin == true &&  UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", -1) == 0)
+	{
+		this->addButtonLoginFacebook();
+	}
 #endif
 }
 
@@ -177,12 +181,6 @@ void MainMenuLayer::openSettingMenu(Object *sender)
 	else
 	{
 		m_pSettingNode->hide();
-		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-		if(!FacebookManager::getInstance()->isLogined() && m_isAddButtonLogin == true)
-		{
-			this->addButtonLoginFacebook();
-		}
-		#endif
 	}
 }
 
