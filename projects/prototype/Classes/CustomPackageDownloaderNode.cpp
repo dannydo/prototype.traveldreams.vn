@@ -66,7 +66,7 @@ bool CustomPackageDownloaderNode::init()
 	
 	m_pCodeEditBox = EditBox::create(Size(320.f, 50.f), Scale9Sprite::create("CustomModeGUI/green_edit.png"));
 	m_pCodeEditBox->setFont("Arial", 28);
-    m_pCodeEditBox->setPosition( Point(60.f, 350.f)); //Point(visibleOrigin.x+visibleSize.width/2, visibleOrigin.y+visibleSize.height/4));
+    m_pCodeEditBox->setPosition( Point(60.f, 260.f)); //Point(visibleOrigin.x+visibleSize.width/2, visibleOrigin.y+visibleSize.height/4));
     m_pCodeEditBox->setAnchorPoint(Point(0, 0.5f));
     m_pCodeEditBox->setPlaceHolder("Code");
 	m_pCodeEditBox->setInputMode(EditBox::InputMode::ANY);
@@ -91,17 +91,83 @@ bool CustomPackageDownloaderNode::init()
     m_pProgressLabel->setPosition(Point(200, 200));
     addChild(m_pProgressLabel);
 
-
-
 	//init folder to save data
 	m_sPathToSave = FileUtils::getInstance()->getWritablePath();
 	m_sPathToSave += "downloaded";	
 	createDownloadedDir(m_sPathToSave);
 
+	// add tableView to contain old downloaded package
+	m_pTableView = TableView::create(this, Size(250.f, 80.f));
+	m_pTableView->setDirection(ScrollView::Direction::HORIZONTAL);
+    m_pTableView->setPosition(Point(60, 300));
+    m_pTableView->setDelegate(this);
+    this->addChild(m_pTableView);
+
+	LoadPackageListFromFile();
+    m_pTableView->reloadData();
+	
+
 	// try to load custom mode config
 	GameConfigManager::getInstance()->GetTimeModeDemoConfig();
 
 	return true;
+}
+
+void CustomPackageDownloaderNode::AddNewPackageToList(const CustomPackageInfo& customPackageInfo)
+{
+	for(auto& package : m_CustomPackageList)
+		if (package.m_sCode.compare(customPackageInfo.m_sCode))
+		{
+			return;
+		}
+
+	m_CustomPackageList.push_back( customPackageInfo);
+	m_pTableView->reloadData();
+}
+
+#include <iostream>
+#include <fstream>
+
+void CustomPackageDownloaderNode::SavePackageListToFile()
+{
+	string sConfigFile = m_sPathToSave + "/packageList.data";
+	ofstream ostream(sConfigFile);
+	if (ostream.is_open())
+	{
+		ostream << m_CustomPackageList.size();		
+		ostream.put(' ');
+		for(auto& package : m_CustomPackageList)
+		{
+			ostream << package.m_sCode;
+			ostream.put(' ');
+			ostream << package.m_sPackageFolder;
+			ostream.put(' ');
+		}
+
+		ostream.close();
+	}
+}
+
+void CustomPackageDownloaderNode::LoadPackageListFromFile()
+{
+	string sConfigFile = m_sPathToSave + "/packageList.data";
+	ifstream istream(sConfigFile);
+	if (istream.is_open())
+	{
+		int iPackageCount;
+		istream >> iPackageCount;
+		CustomPackageInfo package;
+		for(int i=0; i< iPackageCount ; i++)
+		{
+
+			istream >> package.m_sCode;
+			istream >> package.m_sPackageFolder;
+
+			m_CustomPackageList.push_back(package);
+		}
+
+		istream.close();
+	}	
 }
 
 bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string& sFolderName);
@@ -181,7 +247,15 @@ void CustomPackageDownloaderNode::onError(cocos2d::extension::AssetsManager::Err
     {
         m_pProgressLabel->setString("no new version");
 
-		startCustomGame();
+		// add new package to list
+		CustomPackageInfo customPackageInfo;
+		customPackageInfo.m_sCode = m_pCodeEditBox->getText();
+		customPackageInfo.m_sPackageFolder = m_sResultFolder;
+		AddNewPackageToList(customPackageInfo);
+
+		SavePackageListToFile();
+
+		//startCustomGame();
     }
 	else if (errorCode == AssetsManager::ErrorCode::NETWORK)
     {
@@ -205,8 +279,75 @@ void CustomPackageDownloaderNode::onSuccess()
 
 	m_pMenu->setEnabled(true);
 
+	// add new package to list
+	CustomPackageInfo customPackageInfo;
+	customPackageInfo.m_sCode = m_pCodeEditBox->getText();
+	customPackageInfo.m_sPackageFolder = m_sResultFolder;
+	AddNewPackageToList(customPackageInfo);
+
+	SavePackageListToFile();
+
 	startCustomGame();
 }
+
+
+
+void CustomPackageDownloaderNode::tableCellTouched(TableView* table, TableViewCell* cell)
+{
+    //CCLOG("cell touched at index: %i", cell->getIdx());
+	CustomPackageInfo packageInfo = m_CustomPackageList[cell->getIdx()];
+	m_sResultFolder = packageInfo.m_sPackageFolder;
+
+	startCustomGame();
+}
+
+Size CustomPackageDownloaderNode::tableCellSizeForIndex(TableView *table, unsigned int idx)
+{
+    if (idx == 2) {
+        return Size(100, 100);
+    }
+    return Size(80, 80);
+}
+
+TableViewCell* CustomPackageDownloaderNode::tableCellAtIndex(TableView *table, unsigned int idx)
+{
+    //auto string = String::createWithFormat("%d", idx);
+    TableViewCell *cell = table->dequeueCell();
+    if (!cell) {
+		cell = new TableViewCell();
+        cell->autorelease();        
+				
+		auto sprite = Sprite::create("CustomModeGUI/YellowSquare.png");
+        sprite->setAnchorPoint(Point::ZERO);
+        sprite->setPosition(Point(0, 0));
+		//sprite->setScale( 0.65f);
+        cell->addChild(sprite);
+
+		auto label = LabelTTF::create(m_CustomPackageList[idx].m_sCode.c_str(), "Helvetica", 20.0);
+        label->setPosition(Point::ZERO);
+		label->setAnchorPoint(Point::ZERO);
+        label->setTag(idx);
+        cell->addChild(label);
+    }
+    else
+    {
+        auto label = (LabelTTF*)cell->getChildByTag(123);
+        label->setString(m_CustomPackageList[idx].m_sCode.c_str()); //string->getCString());
+    }
+
+
+    return cell;
+}
+
+unsigned int CustomPackageDownloaderNode::numberOfCellsInTableView(TableView *table)
+{
+    //return 20;
+	return m_CustomPackageList.size();
+}
+
+
+
+
 
 #include <curl/curl.h>
 #include <curl/easy.h>
