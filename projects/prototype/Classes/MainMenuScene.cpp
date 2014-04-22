@@ -66,12 +66,9 @@ bool MainMenuLayer::init()
 	m_pButtonSettingNode->setPosition(Point(50.0f, 50.0f));
 	
 	//test time mode
-	Sprite* pButtonTestTimeModeGameSprite = Sprite::create("LoadingAndMainMenu/btn_play.png");
-	//pButtonTestTimeModeGameSprite->setScaleX(1.5f);
-	//pButtonTestTimeModeGameSprite->setScaleY(0.75f);
-	pButtonTestTimeModeGameSprite->setColor(Color3B( 100, 200, 200));
+	Sprite* pButtonTestTimeModeGameSprite = Sprite::create("LoadingAndMainMenu/btn_custom.png");
 	ButtonNode* buttonTestTimeModeNode = ButtonNode::createButtonSprite(pButtonTestTimeModeGameSprite, CC_CALLBACK_1(MainMenuLayer::startTimeModeDemo, this));
-	buttonTestTimeModeNode->setPosition(Point(320.0f, 215.0f));
+	buttonTestTimeModeNode->setPosition(Point(320.0f, 407.0f));
 
 	m_pButtonManagerNode = ButtonManagerNode::create();
 	m_pButtonManagerNode->addButtonNode(buttonPlayNode);	
@@ -100,9 +97,9 @@ bool MainMenuLayer::init()
 
 void MainMenuLayer::addButtonLoginFacebook()
 {
-	Sprite* pButtonLoginFacebookSprite = Sprite::create("LoadingAndMainMenu/FB_btn.png");
+	Sprite* pButtonLoginFacebookSprite = Sprite::create("LoadingAndMainMenu/btn_login.png");
 	m_buttonLoginNode = ButtonNode::createButtonSprite(pButtonLoginFacebookSprite, CC_CALLBACK_1(MainMenuLayer::loginFacebook, this));
-	m_buttonLoginNode->setPosition(Point(320.0f, 355.0f));
+	m_buttonLoginNode->setPosition(Point(320.0f, 297.0f));
 	m_pButtonManagerNode->addButtonNode(m_buttonLoginNode);
 	m_isAddButtonLogin = false;
 }

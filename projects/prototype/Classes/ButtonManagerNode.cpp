@@ -50,8 +50,11 @@ bool ButtonManagerNode::onTouchButtonBegan(Touch* pTouch,  Event* pEvent)
 		if(pRectButton->containsPoint(touchButton))
 		{
 			m_isClickButton = true;
-			auto scaleAction = ScaleTo::create(0.1f, 1.150f, 0.85f);
-			pButtonSprite->runAction(scaleAction);
+			auto scaleAction = ScaleTo::create(0.05f, 0.9f);
+			auto scaleAction1 = ScaleTo::create(0.08f, 0.93f);
+			auto scaleAction2 = ScaleTo::create(0.1f, 0.9f);
+
+			pButtonSprite->runAction(Sequence::create(scaleAction, scaleAction1, scaleAction2, NULL));
 			m_iIndexButtonActive = iIndex;
 
 			// play sound effect
@@ -93,16 +96,16 @@ void ButtonManagerNode::onTouchButtonEnded(Touch* pTouch,  Event* pEvent)
 		if(pRectButton->containsPoint(touchButton))
 		{
 			auto actionCallback = CallFunc::create(this, callfunc_selector(ButtonManagerNode::buttonCallBack));
-			auto scaleAction = ScaleTo::create(0.05, 0.9f, 1.1f);
-			auto scaleAction1 = ScaleTo::create(0.08, 1.1f, 0.9f);
-			auto scaleAction2 = ScaleTo::create(0.1, 1.0f, 1.0f);
+			auto scaleAction = ScaleTo::create(0.05, 1.05f);
+			auto scaleAction1 = ScaleTo::create(0.08, 0.98f);
+			auto scaleAction2 = ScaleTo::create(0.1, 1.0f);
 			pButtonSprite->runAction(Sequence::create(scaleAction, scaleAction1, scaleAction2, actionCallback, NULL));
 		}
 		else
 		{
-			auto scaleAction = ScaleTo::create(0.05, 0.9f, 1.1f);
-			auto scaleAction1 = ScaleTo::create(0.08, 1.1f, 0.9f);
-			auto scaleAction2 = ScaleTo::create(0.1, 1.0f, 1.0f);
+			auto scaleAction = ScaleTo::create(0.05, 1.05f);
+			auto scaleAction1 = ScaleTo::create(0.08, 0.98f);
+			auto scaleAction2 = ScaleTo::create(0.1, 1.0f);
 			pButtonSprite->runAction(Sequence::create(scaleAction, scaleAction1, scaleAction2, NULL));
 		}
 	}

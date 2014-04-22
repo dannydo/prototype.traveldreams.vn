@@ -116,7 +116,7 @@ bool CustomPackageDownloaderNode::init()
 void CustomPackageDownloaderNode::AddNewPackageToList(const CustomPackageInfo& customPackageInfo)
 {
 	for(auto& package : m_CustomPackageList)
-		if (package.m_sCode.compare(customPackageInfo.m_sCode))
+		if (package.m_sCode.compare(customPackageInfo.m_sCode) == 0)
 		{
 			return;
 		}
@@ -326,7 +326,7 @@ TableViewCell* CustomPackageDownloaderNode::tableCellAtIndex(TableView *table, u
 		auto label = LabelTTF::create(m_CustomPackageList[idx].m_sCode.c_str(), "Helvetica", 20.0);
         label->setPosition(Point::ZERO);
 		label->setAnchorPoint(Point::ZERO);
-        label->setTag(idx);
+        label->setTag(123);
         cell->addChild(label);
     }
     else
