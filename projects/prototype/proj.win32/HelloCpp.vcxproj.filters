@@ -204,6 +204,9 @@
     <ClCompile Include="..\Classes\FunctionCommon.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\ConfirmQuitLevelNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -390,6 +393,9 @@
       <Filter>Database</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\FunctionCommon.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ConfirmQuitLevelNode.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
