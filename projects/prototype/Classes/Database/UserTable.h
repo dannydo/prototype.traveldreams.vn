@@ -22,6 +22,7 @@ struct UserInfo
 	int iMonney;
 	int iVersion;
 	std::string sUserToken;
+	std::string sDeviceId;
 };
 
 class UserTable

@@ -27,6 +27,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings.Secure;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -258,6 +260,16 @@ public class UserFacebook implements InterfaceUser {
 		    return false;
 		}
 		return status;
+	}
+	
+	public String getDeviceId() {
+		try{
+			return Secure.getString(mContext.getContentResolver(), Secure.ANDROID_ID);
+		}catch(Exception e) {
+		    e.printStackTrace();
+		}
+		
+		return "";
 	}
 	
 	public void shareFacebookLink(JSONObject shareInfo) {

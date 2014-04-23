@@ -33,6 +33,7 @@ public:
 	std::vector<WordInfo>& getAllWordsForChapter(const std::string& sChapterId);
 	WordInfo getWordInfoOnChapter(const std::string& sChapterId, const std::string& sWordId);
 	bool updateWord(const WordInfo& wordInfo);
+	bool insertWord(const WordInfo& wordInfo);
 	void refreshWordsForChapter(const std::string& sChapterId);
 
 	std::string	syncGetWords();

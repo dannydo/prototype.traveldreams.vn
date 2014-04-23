@@ -59,6 +59,7 @@ void UserTable::fetchhUser()
 		m_userInfo.iMonney = int(strtod(re[nColumn+10], 0));
 		m_userInfo.iVersion = int(strtod(re[nColumn+11], 0));
 		m_userInfo.sUserToken = re[nColumn+12];
+		m_userInfo.sDeviceId = re[nColumn+13];
 	}
 
 	sqlite3_free_table(re);

@@ -143,6 +143,8 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\CustomNode.cpp" />
     <ClCompile Include="..\Classes\CustomPackageDownloaderNode.cpp" />
     <ClCompile Include="..\Classes\Database\ChapterTable.cpp" />
+    <ClCompile Include="..\Classes\Database\CSPackageTable.cpp" />
+    <ClCompile Include="..\Classes\Database\CSWordTable.cpp" />
     <ClCompile Include="..\Classes\Database\DictionaryDatabase.cpp" />
     <ClCompile Include="..\Classes\Database\PowerUpTable.cpp" />
     <ClCompile Include="..\Classes\Database\GameTracking.cpp" />
@@ -203,6 +205,8 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\CustomNode.h" />
     <ClInclude Include="..\Classes\CustomPackageDownloaderNode.h" />
     <ClInclude Include="..\Classes\Database\ChapterTable.h" />
+    <ClInclude Include="..\Classes\Database\CSPackageTable.h" />
+    <ClInclude Include="..\Classes\Database\CSWordTable.h" />
     <ClInclude Include="..\Classes\Database\DictionaryDatabase.h" />
     <ClInclude Include="..\Classes\Database\PowerUpTable.h" />
     <ClInclude Include="..\Classes\Database\GameTracking.h" />

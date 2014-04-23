@@ -70,7 +70,7 @@ void FooterNode::openSettingMenu(Object* sender)
 	if(m_pSettingNode == NULL)
 	{
 		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-524.0f, 0.0f));
+		m_pSettingNode->setPosition(Point(-505.0f, 0.0f));
 		m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
 		this->getParent()->addChild(m_pSettingNode);
 	}

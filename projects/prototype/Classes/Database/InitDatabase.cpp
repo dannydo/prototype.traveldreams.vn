@@ -4,6 +4,11 @@
 
 USING_NS_CC; 
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "Social\FacebookManager.h"
+using namespace cocos2d::plugin;
+#endif
+
 InitDatabase* InitDatabase::m_InitDatabase = NULL;
 
 InitDatabase::InitDatabase()
@@ -36,6 +41,10 @@ InitDatabase* InitDatabase::getInstance()
 
 bool InitDatabase::init()
 {
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	FacebookManager::getInstance()->loadPlugin();
+#endif
+
 	m_spath = FileUtils::sharedFileUtils()->getWritablePath() + "ohmyword.db3";
 	
 	if(!FileUtils::getInstance()->isFileExist(m_spath))
@@ -77,7 +86,7 @@ bool InitDatabase::createDatabase()
 	int iResult;
 
 	std::string sqlRun = "";
-	sqlRun.append("CREATE TABLE if not exists Users (UserIdentifier TEXT PRIMARY KEY  NOT NULL, FacebookId TEXT, FacebookToken TEXT, FirstName TEXT, LastName TEXT, CurrentChapter TEXT, CurrentLevel INTEGER, Life INTEGER, LifeTimeRemaining INTEGER, LifeTImeBeginRemain INTEGER, Monney INTEGER, Version INTEGER, UserToken TEXT);");
+	sqlRun.append("CREATE TABLE if not exists Users (UserIdentifier TEXT PRIMARY KEY  NOT NULL, FacebookId TEXT, FacebookToken TEXT, FirstName TEXT, LastName TEXT, CurrentChapter TEXT, CurrentLevel INTEGER, Life INTEGER, LifeTimeRemaining INTEGER, LifeTImeBeginRemain INTEGER, Monney INTEGER, Version INTEGER, UserToken TEXT, DeviceId TEXT);");
 	sqlRun.append("CREATE TABLE if not exists Chapters (ChapterId TEXT PRIMARY KEY NOT NULL, TotalLevelUnlock INTEGER, TotalStar INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER, TotalFlashCardUnlock INTEGER, CountFlashCardNew INTEGER, TotalFlashCard INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Levels (LevelId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ChapterId TEXT, Level INTEGER, WordId TEXT, Star INTEGER, Score INTEGER, BonusQuest INTEGER, TotalBonusQuest INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists UnlockChapters (UnlockChapterId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ChapterId TEXT, Request INTEGER, Type TEXT, BeginTime INTEGER, Version INTEGER);");
@@ -86,8 +95,18 @@ bool InitDatabase::createDatabase()
 	sqlRun.append("CREATE TABLE if not exists Versions (VersionId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, VersionSync INTEGER, VersionDatabase INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Words (WordId TEXT PRIMARY KEY NOT NULL, CountCollected INTEGER, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists MapChapterWords (MapChapterWordId INTEGER PRIMARY KEY NOT NULL, ChapterId TEXT, WordId TEXT, Version INTEGER, OrderUnlock INTEGER, IsNew INTEGER);");
+	sqlRun.append("CREATE TABLE if not exists CSPackage (PackageId TEXT PRIMARY KEY NOT NULL, PackageName TEXT);");
+	sqlRun.append("CREATE TABLE if not exists CSWords (WordId TEXT, PackageId TEXT, CollectedCount INTEGER);");
 	sqlRun.append("insert into Versions values(1, 0, 1);");
-	sqlRun.append("insert into Users values('ohmyword', '', '', '', '', '', 1, 5, 0, 0, 0, 1,'');");
+
+	std::string sDeviceId = "windows";
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	sDeviceId = FacebookManager::getInstance()->getDeviceId();
+#endif
+
+	sqlRun.append("insert into Users values('ohmyword', '', '', '', '', '', 1, 5, 0, 0, 0, 1,'','");
+	sqlRun.append(sDeviceId.c_str());
+	sqlRun.append("');");
 
 	iResult = sqlite3_exec(m_DatabaseSqlite, sqlRun.c_str(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
@@ -169,7 +188,7 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 
 bool InitDatabase::resetDatabase()
 {
-	char* sql = "Drop Table Chapters; Drop Table Levels; Drop Table MapChapterWords; Drop Table PowerUps; Drop Table Transactions; Drop Table UnlockChapters; Drop Table Users; Drop Table Versions; Drop Table Words;";
+	char* sql = "Drop Table Chapters; Drop Table Levels; Drop Table MapChapterWords; Drop Table PowerUps; Drop Table Transactions; Drop Table UnlockChapters; Drop Table Users; Drop Table Versions; Drop Table Words; Drop Table CSPackage; Drop Table CSWords;";
 	int iResult = sqlite3_exec(m_DatabaseSqlite, sql, NULL, NULL, NULL);
 
 	if(iResult == SQLITE_OK)
