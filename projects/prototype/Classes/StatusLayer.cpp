@@ -233,3 +233,8 @@ void StatusLayer::generateLayoutMove()
 
 	m_SpriteNumberMove->setPositionX(width/4.0f - (iTotal-1)*15 - 32);
 }
+
+void StatusLayer::hiddenLayoutMove()
+{
+	m_SpriteNumberMove->setVisible(false);
+}

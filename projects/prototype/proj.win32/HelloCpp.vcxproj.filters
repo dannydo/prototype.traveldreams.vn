@@ -201,6 +201,9 @@
     <ClCompile Include="..\Classes\Database\CSPackageTable.cpp">
       <Filter>Database</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\FunctionCommon.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -385,6 +388,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Database\CSPackageTable.h">
       <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\FunctionCommon.h">
+      <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -37,37 +37,24 @@ bool EndGameCustomModeNode::init()
 	this->addChild(pBackground);
 	this->setContentSize(pBackground->getContentSize());
 
-	m_pSpriteBatchNode = SpriteBatchNode::create("Target-End-Game/TargetEndgame.pvr.ccz");
-	SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("Target-End-Game/TargetEndgame.plist");
-	this->addChild(m_pSpriteBatchNode);
+	//m_pSpriteBatchNode = SpriteBatchNode::create("Target-End-Game/TargetEndgame.pvr.ccz");
+	//SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("Target-End-Game/TargetEndgame.plist");
+	//this->addChild(m_pSpriteBatchNode);
 
-	Sprite* pBackgroundBoard = Sprite::createWithSpriteFrameName("panel.png");
+	Sprite* pBackgroundBoard = Sprite::create("Target-End-Game/panel-level_popup.png");
 	pBackgroundBoard->setPosition(Point(320.0f, 610.0f));
-	m_pSpriteBatchNode->addChild(pBackgroundBoard);
-
-	Sprite* pButtonCloseSprite = Sprite::create("Target-End-Game/btn_close.png");
-	ButtonNode* buttonCloseNode = ButtonNode::createButtonSprite(pButtonCloseSprite, CC_CALLBACK_1(EndGameCustomModeNode::menuCloseCallBack, this));
-	buttonCloseNode->setPosition(Point(582.0f, 914.0f));
-
-	Sprite* pMonsterImage = Sprite::createWithSpriteFrameName("pet-r.png");
-	pMonsterImage->setPosition(Point(548.0f, 378.0f));
-	m_pSpriteBatchNode->addChild(pMonsterImage);
-
-	Sprite* pPetImage = Sprite::createWithSpriteFrameName("pet-l.png");
-	pPetImage->setPosition(Point(102.0f, 378.0f));
-	m_pSpriteBatchNode->addChild(pPetImage);
-
-	Sprite* pButtonNextGameSprite = Sprite::create("Target-End-Game/btn_next.png");
-	ButtonNode* buttonNextNode = ButtonNode::createButtonSprite(pButtonNextGameSprite, CC_CALLBACK_1(EndGameCustomModeNode::menuCloseCallBack, this));
-	buttonNextNode->setPosition(Point(432.0f, 302.0f));
+	this->addChild(pBackgroundBoard);
 
 	Sprite* pButtonReplayGameSprite = Sprite::create("Target-End-Game/btn_replay.png");
 	ButtonNode* buttonReplayNode = ButtonNode::createButtonSprite(pButtonReplayGameSprite, CC_CALLBACK_1(EndGameCustomModeNode::menuRetryLevelCallBack, this));
-	buttonReplayNode->setPosition(Point(234.0f, 302.0f));
+	buttonReplayNode->setPosition(Point(225.0f, 279.0f));
+
+	Sprite* pButtonCloseSprite = Sprite::create("Target-End-Game/btn_close.png");
+	ButtonNode* buttonCloseNode = ButtonNode::createButtonSprite(pButtonCloseSprite, CC_CALLBACK_1(EndGameCustomModeNode::menuCloseCallBack, this));
+	buttonCloseNode->setPosition(Point(572.0f, 894.0f));
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(buttonCloseNode);
-	pButtonManagerNode->addButtonNode(buttonNextNode);
 	pButtonManagerNode->addButtonNode(buttonReplayNode);
 	this->addChild(pButtonManagerNode);
 

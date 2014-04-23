@@ -162,6 +162,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\FlashCardCollection.cpp" />
     <ClCompile Include="..\Classes\FlashCardScene.cpp" />
     <ClCompile Include="..\Classes\FooterNode.cpp" />
+    <ClCompile Include="..\Classes\FunctionCommon.cpp" />
     <ClCompile Include="..\Classes\GameBoardManager.cpp" />
     <ClCompile Include="..\Classes\GameTargetNode.cpp" />
     <ClCompile Include="..\Classes\GameWordManager.cpp" />
@@ -224,6 +225,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\FlashCardCollection.h" />
     <ClInclude Include="..\Classes\FlashCardScene.h" />
     <ClInclude Include="..\Classes\FooterNode.h" />
+    <ClInclude Include="..\Classes\FunctionCommon.h" />
     <ClInclude Include="..\Classes\GameBoardManager.h" />
     <ClInclude Include="..\Classes\GameDataStructure.h" />
     <ClInclude Include="..\Classes\GameTargetNode.h" />
