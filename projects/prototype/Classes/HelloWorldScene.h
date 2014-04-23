@@ -232,6 +232,7 @@ private:
 
 	int m_iSaveLastCellMoveDelta;
 	std::vector<Sprite*> m_SnapSprites;
+	std::vector<Sprite*> m_SnapNeedResetAnchorSprites;
 
 	WordCollectBoardRenderNode* m_pWordCollectBoardRenderNode;
 	int m_iMoveCount;

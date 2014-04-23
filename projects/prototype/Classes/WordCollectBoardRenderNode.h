@@ -21,7 +21,7 @@ private:
 public:
 	static WordCollectBoardRenderNode* create();
 
-	void GenerateLabels(GameModeType_e eGameModeType);//call this after generate level data
+	void GenerateLabels(GameModeType_e eGameModeType, int iTimeModeStage);//call this after generate level data
 	//void draw() override;
 	void update(float dt) override;	
 
@@ -50,6 +50,8 @@ private:
 	//void GetWordIndex();
 
 	virtual bool init();			
+
+	void PlayTimeModeWordStart(int iTimeModeStage);
 private:	
 	std::function<void()> m_StartGameCallback;
 

@@ -345,10 +345,6 @@ void GameConfigManager::LoadGameConfig()
 	inputStream >> m_GameConfig.m_iScoreOfGem;
 	std::getline( inputStream, sComment);
 
-	// read combo config
-	//std::getline( inputStream, sComment);	
-	//inputStream >> m_GameConfig.m_iComboCombineRatio;
-
 	// destroy cell ratio
 	std::getline( inputStream, sComment);
 	std::getline( inputStream, sComment);
@@ -936,6 +932,83 @@ void GameConfigManager::LoadCustomModeConfig()
 	inputStream >> levelConfig.m_iStageConfig_MaximumValueIncreasePercent;
 	inputStream >> levelConfig.m_iStageConfig_LostRateIncreasePercent;
 	std::getline(inputStream, sTemp);
+
+	// read score of gem
+	std::getline( inputStream, sTemp);
+	inputStream >> levelConfig.m_ScoreConfig.m_iScoreOfGem;
+	std::getline( inputStream, sTemp);
+
+	// destroy cell ratio
+	std::getline( inputStream, sTemp);
+	std::getline( inputStream, sTemp);
+	//simple combo 4,5,6
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio4;
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio6;
+	std::getline( inputStream, sTemp);
+	
+	//double combo: 4-4, 4-5, 5-5, 6-4, 6-5, 6-6
+	std::getline( inputStream, sTemp);
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio4_4;
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio4_5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio5_5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio6_4;
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio6_5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio6_6;
+	std::getline( inputStream, sTemp);
+
+	//tripple combo: 4-4-4, 5-5-5, 6-6-6
+	std::getline( inputStream, sTemp);
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio4_4_4;
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio5_5_5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iCombEffectDestroyCellRatio6_6_6;
+	std::getline( inputStream, sTemp);
+
+
+	// *********** bonus score when create combo
+	//simple combo 4,5,6
+	std::getline( inputStream, sTemp);
+	std::getline( inputStream, sTemp);
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreCreateCombo4;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreCreateCombo5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreCreateCombo6;
+	std::getline( inputStream, sTemp);
+
+	
+	// *********** bonus score when activate combo
+	//simple combo 4,5,6
+	std::getline( inputStream, sTemp);
+	std::getline( inputStream, sTemp);
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo4;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo6;
+	std::getline( inputStream, sTemp);
+
+	//double combo: 4-4, 4-5, 5-5, 6-4, 6-5, 6-6
+	std::getline( inputStream, sTemp);
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo4_4;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo4_5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo5_5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo6_4;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo6_5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo6_6;
+	std::getline( inputStream, sTemp);
+
+	//tripple combo: 4-4-4, 5-5-5, 6-6-6
+	std::getline( inputStream, sTemp);
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo4_4_4;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo5_5_5;
+	inputStream >> levelConfig.m_ScoreConfig.m_iBonusScoreActivateCombo6_6_6;
+	std::getline( inputStream, sTemp);
+
+	// read word config
+	std::getline( inputStream, sTemp);
+	inputStream >> levelConfig.m_ScoreConfig.m_iScoreLetterOfMainWord;
+	std::getline( inputStream, sTemp);
+	std::getline( inputStream, sTemp);
+	inputStream >> levelConfig.m_ScoreConfig.m_iScoreRatioCompleteMainWord;
+	std::getline( inputStream, sTemp);
+
 
 	// word list
 	/*std::getline(inputStream, sTemp);

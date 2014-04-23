@@ -304,7 +304,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 	//m_pStatusLayer->update(0);
 
 	// init word-collect board
-	m_pWordCollectBoardRenderNode->GenerateLabels( eGameModeType);
+	m_pWordCollectBoardRenderNode->GenerateLabels( eGameModeType, iTimeModeStage);
 
 	// init graphic for gameBoard
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResourceDemo.plist");
@@ -568,7 +568,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 		}		
 
 		m_pTimeCountDownNode = TimeCountDownNode::create( iMaximumEneryOfThisStage, iEnergyLostPersecondOfThisStage);
-		m_pTimeCountDownNode->setPositionY( m_fBoardBottomPosition + (iNumberOfRow  - 0.4f )* m_SymbolSize.height);
+		//m_pTimeCountDownNode->setPositionY( m_fBoardBottomPosition + (iNumberOfRow  - 0.4f )* m_SymbolSize.height);
 		m_pTimeCountDownNode->SetOutOfTimeCallback(std::bind( &HelloWorld::OnTimeMode_OutOfTime, this));
 		this->addChild( m_pTimeCountDownNode, 1000);
 
@@ -1459,7 +1459,9 @@ void HelloWorld::OnStartGame()
 	}
 	else
 	{
-		char sText[20];
+		m_pTimeCountDownNode->Start();
+
+		/*char sText[20];
 		sprintf( sText, "STAGE %d", m_iCurrentTimeModeStage);
 		auto label = LabelTTF::create(sText, "fonts/UTM Cookies.ttf", 80);		
 		//label->setColor(Color3B( 100, 100, 100));
@@ -1477,7 +1479,7 @@ void HelloWorld::OnStartGame()
 				Spawn::createWithTwoActions(
 					FadeOut::create(0.2f),
 					MoveBy::create( 0.2f, Point( 0, 80.f))),
-				NULL));
+				NULL));*/
 	}
 
 	// play sound effect 
@@ -1892,9 +1894,8 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 			pTempSpriteFrame->retain();
 			m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->setTag((int) pTempSpriteFrame);			
 			m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->setDisplayFrame(pSpriteFrame);
-
+									
 			m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->runAction(snapEffectAction->clone());
-			
 
 			m_SnapSprites.push_back(m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite);
 
@@ -1913,6 +1914,12 @@ void HelloWorld::HorizontalMoveUlti(float fDeltaX)
 
 				m_SnapSprites.push_back(m_BoardViewMirrorMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite);
 			}
+			else //change anchor of other snap cell
+			{
+				m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite->runAction( SetAnchorAction::Create(Point( 0.5f, 0)));
+				m_SnapNeedResetAnchorSprites.push_back(m_BoardViewMatrix[cell.m_iRow][iCalculatedColumn].m_pSprite);
+			}
+			
 
 			/*
 			pSnapSprite = Sprite::createWithSpriteFrameName( GetImageFileFromSnapGemID( cell.m_iGemID, 
@@ -2014,8 +2021,14 @@ void HelloWorld::RemoveSnap()
 			
 			delete pSpriteFrame;
 		}
+
+		for(auto sprite: m_SnapNeedResetAnchorSprites)
+		{
+			sprite->runAction(SetAnchorAction::Create(Point( 0.5f, 0.5f)));
+		}
 		
 		m_SnapSprites.clear();
+		m_SnapNeedResetAnchorSprites.clear();
 	}
 }
 

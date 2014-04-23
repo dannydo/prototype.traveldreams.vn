@@ -29,7 +29,7 @@ public:
 		int m_iObstacleID;
 		int m_iObstacleLevel;
 		
-		int m_DropOnColumnsRateList[_BOARD_MAX_COLUMN_NUMBER_];
+		int m_DropOnColumnsRateList[_BOARD_MAX_COLUMN_NUMBER_];		
 	};
 
 	struct ManualStageConfig
@@ -55,6 +55,9 @@ public:
 	// auto config with increasing difficulty for greater levels
 	int m_iStageConfig_MaximumValueIncreasePercent;
 	int m_iStageConfig_LostRateIncreasePercent;
+
+	// special score config only used in this level
+	GameConfig m_ScoreConfig;
 	
 	TimeModeLevelConfig()
 	{

@@ -2,8 +2,10 @@
 #define _TIME_COUNT_DOWN_NODE_H_
 
 #include "cocos2d.h"
+#include "cocos-ext.h"
 
 using namespace cocos2d;
+USING_NS_CC_EXT;
 
 class TimeCountDownNode : public Node
 {
@@ -13,6 +15,8 @@ public:
 	inline void SetOutOfTimeCallback( std::function<void()> outOfTimeCallback) { m_OutOfTimeCallback = outOfTimeCallback;}
 	inline int IsEnergyEmpty() { return (m_fCurrentEnergy <=0);}
 
+	inline void Start() { m_bIsStarted = true;}
+
 	void AddEnergy(int iIncrementEnergy) { if (m_fCurrentEnergy<=0) return; m_fCurrentEnergy += iIncrementEnergy;}
 	void StopUpdate() { this->unscheduleUpdate();}
 
@@ -21,6 +25,7 @@ public:
 private:
 	 void init(int iMaximumEnergy, int iEnergyLostPerSecond);
 private:
+	bool m_bIsStarted;
 	float m_fCurrentEnergy;
 	//float m_fNodeWidth, m_fNodeHeight, 
 	float fEnergyWidth;
@@ -29,6 +34,11 @@ private:
 	float m_fEnergyLostPersecond;
 
 	std::function<void()> m_OutOfTimeCallback;
+
+
+	SpriteBatchNode* m_pBatchNode;
+	Scale9Sprite* m_pMidEnergyBar;
+	Sprite* m_pMirrorMidEnergyBar;
 };
 
 #endif // _TIME_COUNT_DOWN_NODE_H_

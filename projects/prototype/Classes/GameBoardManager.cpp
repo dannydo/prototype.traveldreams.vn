@@ -1,9 +1,8 @@
 #include "GameBoardManager.h"
 #include "cocos2d.h"
 
-GameBoardManager::GameBoardManager(): m_GameConfig(GameConfigManager::getInstance()->GetGameConfig())
+GameBoardManager::GameBoardManager()
 {
-
 	//m_ComboCountList[0] = m_ComboCountList[1] = m_ComboCountList[2] = 0;
 }
 
@@ -11,13 +10,23 @@ void GameBoardManager::GenerateGameBoard(GameModeType_e eGameModeType, int iTime
 {	
 	if (eGameModeType == _GMT_NORMAL_)
 	{
+		m_GameConfig = GameConfigManager::getInstance()->GetGameConfig();
+
 		std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
 		int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
 		m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig( sCurrentChapterID, iCurrentLevel);
 	}
 	else
-	{
+	{		
 		m_pLevelConfig = &GameConfigManager::getInstance()->GetTimeModeDemoConfig();
+
+		m_GameConfig = ((TimeModeLevelConfig*)m_pLevelConfig)->m_ScoreConfig;
+		auto& baseGameConfig = GameConfigManager::getInstance()->GetGameConfig();
+		
+		m_GameConfig.m_iScoreLetterOfBonusWord = baseGameConfig.m_iScoreLetterOfBonusWord;
+		m_GameConfig.m_iBonusScoreCompleteBonusQuest = baseGameConfig.m_iBonusScoreCompleteBonusQuest;
+		m_GameConfig.m_iBonusScoreActivateBonusEndGameCombo = baseGameConfig.m_iBonusScoreActivateBonusEndGameCombo;
+		m_GameConfig.m_iEndGameComboEffectDestroyCellRatio = baseGameConfig.m_iEndGameComboEffectDestroyCellRatio;	
 	}
 
 	// Load game config

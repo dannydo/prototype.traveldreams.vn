@@ -37,7 +37,7 @@ protected:
 
 	//void CountBasicCombo(); 
 protected:
-	const GameConfig& m_GameConfig;	
+	GameConfig m_GameConfig;	
 	BaseLevelConfig* m_pLevelConfig;	
 	int m_iTimeModeStage; //only used when in time mode
 
