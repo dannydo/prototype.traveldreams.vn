@@ -216,6 +216,8 @@ void CustomPackageDownloaderNode::startCustomGame()
 	m_sResultFolder.insert(0, "/");
 	m_sResultFolder.insert(0, m_sPathToSave);
 
+	timeModeConfig.m_sCustomPackageID = sPackageID;
+
 	int iWordPackageIndex = GameWordManager::getInstance()->AddAndLoadCustomPackageToList( sPackageID, m_sResultFolder);
 	auto& wordList = GameWordManager::getInstance()->GetWordList();
 	for(int iWordIndex=0; iWordIndex < wordList.size(); iWordIndex++)
@@ -228,7 +230,7 @@ void CustomPackageDownloaderNode::startCustomGame()
 	}
 
 	// start game
-	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(&timeModeConfig);	
+	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(&timeModeConfig, true);	
 
 	auto scene = HelloWorld::createScene( _GMT_TIME_MODE_);
 	Director::getInstance()->replaceScene(scene);

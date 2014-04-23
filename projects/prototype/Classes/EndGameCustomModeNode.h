@@ -1,5 +1,5 @@
-#ifndef _END_GAME_H_
-#define _END_GAME_H_
+#ifndef _END_GAME_CUSTOM_MODE_NODE_H_
+#define _END_GAME_CUSTOM_MODE_NODE_H_
 
 #include "cocos2d.h"
 #include "ButtonManagerNode.h"

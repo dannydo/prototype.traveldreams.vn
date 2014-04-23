@@ -3,6 +3,7 @@
 #include "GameBoardManager.h"
 #include "GameConfigManager.h"
 #include "Database\LevelTable.h"
+#include "Database\CSWordTable.h"
 
 using namespace cocos2d;
 
@@ -241,9 +242,15 @@ int GameWordManager::GetLoadedWordIndexFromID(const std::string& sWordID)
 	if ( m_MapWordIDToLoadedIndex.find(sWordID) == m_MapWordIDToLoadedIndex.end()) //this word not loaded yet
 	{
 		PreLoadPackageForWord(sWordID);
-	}
 
-	return m_MapWordIDToLoadedIndex[sWordID];
+		if ( m_MapWordIDToLoadedIndex.find(sWordID) == m_MapWordIDToLoadedIndex.end())
+			return -1;
+		else
+			return m_MapWordIDToLoadedIndex[sWordID];
+	}
+	else{
+		return m_MapWordIDToLoadedIndex[sWordID];
+	}
 
 	/*int iWordCount = m_WordList.size();
 	for(int iWordIndex=0; iWordIndex < iWordCount; iWordIndex++)
@@ -317,9 +324,43 @@ void GameWordManager::GenerateWordForNewLevel(std::string sChapterID, int iLevel
 	ResetDataForNewPlay();
 }
 
-void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTimeModeConfig)
+long GameWordManager::GetTotalPlayTimeOfTimeModeSession()
 {
-	m_pLevelConfig = NULL;
+	timeval now;
+	gettimeofday(&now, NULL);
+	unsigned long iCurrentTime = now.tv_sec * 1000 + now.tv_usec/1000 ; //miliseconds
+	return (iCurrentTime - m_iStartTimeOfTimeModeGameSession)/1000;
+}
+
+void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTimeModeConfig, bool bStartNewTimeModeSession)
+{
+	m_pLevelConfig = NULL; //not have normal level config
+
+
+	if (bStartNewTimeModeSession)
+	{	
+		timeval now;
+		gettimeofday(&now, NULL);
+		m_iStartTimeOfTimeModeGameSession = now.tv_sec * 1000 + now.tv_usec/1000 ; //miliseconds
+
+		auto wordDBList = CSWordTable::getInstance()->getAllCSWordsForPackage(pTimeModeConfig->m_sCustomPackageID);
+		auto currentWordIndexList = pTimeModeConfig->m_WordIndexList;
+	
+		int iLoadedWordIndex, i, iCurrentWordListSize = currentWordIndexList.size();
+		for(auto wordDB: wordDBList)
+		{
+			iLoadedWordIndex = GetLoadedWordIndexFromID( wordDB.sCSWordId);
+			if (iLoadedWordIndex >= 0)
+			{
+				for(i=0; i< iCurrentWordListSize; i++)
+				{
+					if ( iLoadedWordIndex == currentWordIndexList[i])
+						pTimeModeConfig->m_WordCollectedCountList[i] = wordDB.iCollectedCount;
+				}
+			}		
+		}
+	}
+
 	
 	int iSmallestColllectedCountOfWord = 1000, iSmallestCollectedWordCount = 0;
 

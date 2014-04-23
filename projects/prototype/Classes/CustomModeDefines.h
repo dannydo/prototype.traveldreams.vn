@@ -43,6 +43,8 @@ public:
 	};
 
 public:		
+	std::string m_sCustomPackageID;
+
 	// word list
 	std::vector<int> m_WordIndexList;
 	std::vector<int> m_WordCollectedCountList;

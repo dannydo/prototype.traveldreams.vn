@@ -136,7 +136,7 @@ protected:
 	void OnTimeMode_OutOfTime();
 	void OnTimeMode_StageComplete();
 	void TimeMode_StartNextStage();
-	void ReturnToMainMenu();
+	void ShowTimeModeResultPopup();
 
 	void OnEndDragEffect();
 	void CheckBoardStateAfterMove();

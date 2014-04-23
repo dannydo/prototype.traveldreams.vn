@@ -2533,6 +2533,12 @@ int NewGameBoardManager::GetEarnedStars()
 		return 0;
 }
 
+int NewGameBoardManager::GetEarnedStartsOfTimeMode(int iTimeModeStage)
+{
+	m_iCurrentScore = iTimeModeStage;
+	return GetEarnedStars();
+}
+
 ComboEffectType NewGameBoardManager::GetComboEffectTypeFromComboType(const GemComboType_e& eGemComboType, const int& iMoveRow, const int& iMoveColumn)
 {	
 	switch(eGemComboType)

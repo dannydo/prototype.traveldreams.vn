@@ -194,6 +194,7 @@ public:
 	int IncreaseScoreForCreateCombo(const GemComboType_e& eComboType);
 
 	int GetEarnedStars();
+	int GetEarnedStartsOfTimeMode(int iTimeModeStage);
 
 
 

@@ -55,8 +55,8 @@ public:
 	void RetryCurrentLevel();
 
 	// temporary only random words of word list, should implement correctly later
-	void GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTimeModeConfig);
-
+	void GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTimeModeConfig, bool bStartNewTimeModeSession = false);
+	long GetTotalPlayTimeOfTimeModeSession();
 
 	inline const Word& GetMainWord() { return m_WordList[m_iMainWordIndex];}	
 	inline const int GetLoadedIndexOfMainWord() { return m_iMainWordIndex;}
@@ -130,6 +130,22 @@ private:
 
 	// 	
 	std::vector<unsigned char> m_TrashLettersCollection;
+
+
+	// time mode only
+	unsigned long m_iStartTimeOfTimeModeGameSession;
+	/*struct TimeModeAnalysedWordInfo
+	{
+		int m_iLoadedWordIndex;
+		int m_iCollectedCount;
+
+		TimeModeAnalysedWordInfo(const int& iLoadedWordIndex, const int& iCollectedCount)
+		{
+			m_iLoadedWordIndex = iLoadedWordIndex;
+			m_iCollectedCount = iCollectedCount;
+		}
+	};
+	std::vector<TimeModeAnalysedWordInfo> m_TimeModeAnalysedWordList;*/
 };
 
 #endif _GAME_WORD_MANAGER_H_

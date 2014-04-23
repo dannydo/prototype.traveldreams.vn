@@ -142,6 +142,11 @@ void EndGameCustomModeNode::updateStar()
 
 void EndGameCustomModeNode::menuRetryLevelCallBack(Object* sender)
 {
+	auto timeModeConfig = &GameConfigManager::getInstance()->GetTimeModeDemoConfig();
+		//m_GameBoardManager.GetLevelConfig();
+	//GameConfigManager::getInstance()->GetTimeModeDemoConfig();	
+	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(timeModeConfig);
+
 	auto scene = HelloWorld::createScene( _GMT_TIME_MODE_);
 	Director::getInstance()->replaceScene(scene);
 }

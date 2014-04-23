@@ -66,7 +66,7 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,
     boardLayer->m_pHUDLayer->addChild(menu, 10);
 	//menuLayer->setTouchEnabled(true);
 	//scene->addChild(boardLayer->m_pHUDLayer);
-	boardLayer->addChild(boardLayer->m_pHUDLayer, 99);
+	boardLayer->addChild(boardLayer->m_pHUDLayer, 1099);
 
 
 	// combo count render node
@@ -335,9 +335,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 
 	animCache->addAnimationsWithFile("ComboEffect/DestroyShieldAnimations.plist"); 
 
-	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/AnimationDetach/Animation detach.ExportJson");
-	
-	CCLOG("Generate 4-1-2");
+	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/AnimationDetach/Animation detach.ExportJson");		
 
 	// get symbol size
 	CCSprite* pSprite;
@@ -570,7 +568,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 		m_pTimeCountDownNode = TimeCountDownNode::create( iMaximumEneryOfThisStage, iEnergyLostPersecondOfThisStage);
 		//m_pTimeCountDownNode->setPositionY( m_fBoardBottomPosition + (iNumberOfRow  - 0.4f )* m_SymbolSize.height);
 		m_pTimeCountDownNode->SetOutOfTimeCallback(std::bind( &HelloWorld::OnTimeMode_OutOfTime, this));
-		this->addChild( m_pTimeCountDownNode, 1000);
+		this->m_pHUDLayer->addChild( m_pTimeCountDownNode, 100);
 
 		// add letter to gem
 		const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
@@ -4818,23 +4816,35 @@ void HelloWorld::OnTimeMode_OutOfTime()
 	auto label = LabelTTF::create("OUT OF TIME!", "fonts/UTM Cookies.ttf", 70);		
 	label->setColor(Color3B( 200, 30, 30));
 	label->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));
-	label->disableStroke();		
+	label->disableStroke();
 	this->addChild(label, 2000);
+
+	label->runAction( 
+		Sequence::createWithTwoActions(
+			DelayTime::create(3.f),
+			Hide::create()));
 
 	//label->setScale( 0.7f);	
 
 	this->runAction( CCSequence::create(
-		DelayTime::create(4.5f),
-		CallFunc::create( this, callfunc_selector( HelloWorld::ReturnToMainMenu)),
+		DelayTime::create(3.f),
+		CallFunc::create( this, callfunc_selector( HelloWorld::ShowTimeModeResultPopup)),
 		NULL));
 }
 
-#include "MainMenuScene.h"
+//#include "MainMenuScene.h"
+#include "EndGameCustomModeNode.h"
 
-void HelloWorld::ReturnToMainMenu()
+void HelloWorld::ShowTimeModeResultPopup()
 {
-	MainMenuScene* pMainMenu = MainMenuScene::create();
-	Director::getInstance()->replaceScene(pMainMenu);
+	auto timeModeConfig = (TimeModeLevelConfig*)m_GameBoardManager.GetLevelConfig();
+	//MainMenuScene* pMainMenu = MainMenuScene::create();
+	//Director::getInstance()->replaceScene(pMainMenu);
+
+	auto pEndGameNode = EndGameCustomModeNode::createLayout( m_iCurrentTimeModeStage, MIN( m_iCurrentTimeModeStage, timeModeConfig->m_WordIndexList.size()) , 
+					GameWordManager::getInstance()->GetTotalPlayTimeOfTimeModeSession());	
+	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStartsOfTimeMode(m_iCurrentTimeModeStage-1));
+	m_pHUDLayer->addChild(pEndGameNode, 1000);
 }
 
 void HelloWorld::OnTimeMode_StageComplete()
@@ -4846,7 +4856,7 @@ void HelloWorld::OnTimeMode_StageComplete()
 	
 
 	// show complete mainword effect
-	float fEffectTime = m_pWordCollectBoardRenderNode->PlayUnlockWordEffect();		
+	float fEffectTime = m_pWordCollectBoardRenderNode->PlayUnlockWordEffect();
 
 	auto label = LabelTTF::create("STAGE COMPLETE!", "fonts/UTM Cookies.ttf", 70);		
 	//label->setColor(Color3B( 100, 100, 100));
@@ -4864,25 +4874,37 @@ void HelloWorld::OnTimeMode_StageComplete()
 	this->runAction( CCSequence::create(
 		DelayTime::create(3.f + fEffectTime),
 		CallFunc::create( this, callfunc_selector( HelloWorld::TimeMode_StartNextStage)),
-		NULL));
-
-	// increase collected count of main word in word list
-	int iMainWordIndex = m_GameBoardManager.GetGameWordManager()->GetLoadedIndexOfMainWord();
-	auto pLevelConfig = (TimeModeLevelConfig*)m_GameBoardManager.GetLevelConfig();
-	for(int i=0; i< pLevelConfig->m_WordIndexList.size(); i++)
-	{
-		if (pLevelConfig->m_WordIndexList[i] == iMainWordIndex)
-		{
-			pLevelConfig->m_WordCollectedCountList[i]++;
-			break;
-		}
-	}	
+		NULL));	
 }
+
+#include "Database\CSWordTable.h"
 
 void HelloWorld::TimeMode_StartNextStage()
 {
 	auto timeModeConfig = (TimeModeLevelConfig*)m_GameBoardManager.GetLevelConfig();
-		//GameConfigManager::getInstance()->GetTimeModeDemoConfig();	
+
+	// increase collected count of main word in word list
+	int iMainWordIndex = m_GameBoardManager.GetGameWordManager()->GetLoadedIndexOfMainWord();	
+	int iCollectedCount;
+	for(int i=0; i< timeModeConfig->m_WordIndexList.size(); i++)
+	{
+		if (timeModeConfig->m_WordIndexList[i] == iMainWordIndex)
+		{
+			timeModeConfig->m_WordCollectedCountList[i]++;
+			iCollectedCount = timeModeConfig->m_WordCollectedCountList[i]++;
+			break;
+		}
+	}	
+
+	// update db to increase collect count of main word
+	CSWordInfo customWordDB;
+	customWordDB.sCSWordId = GameWordManager::getInstance()->GetMainWord().m_sWordID;
+	customWordDB.sPackageId = timeModeConfig->m_sCustomPackageID;
+	customWordDB.iCollectedCount = iCollectedCount;
+	CSWordTable::getInstance()->updateCSWord(customWordDB);
+	
+
+	// start new stage
 	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(timeModeConfig);
 
 	int iCombo4Count, iCombo5Count, iCombo6Count;
