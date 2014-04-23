@@ -16,6 +16,7 @@ public:
 	void setScoreForStar(const float& iScore1Star, const float& iScore2Star, const float& iScore3Star);
 	void setCurrentMove(const int& iCurrentMove);
 	void setSpeedUpdateScore(const float& iSpeedUpdateScore);
+	void hiddenLayoutMove();
 
 private:
 	void clippingNodeCircle();

@@ -14,7 +14,6 @@ public:
 	static EndGameNode* createLayoutWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId);
 	static EndGameNode* createLayoutLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel,  const std::string sChapterId);
 
-	bool init() override;
 	bool initWin();
 	bool initLose();
 
@@ -38,7 +37,6 @@ private:
 	void updateBonusQuest();
 
 	cocos2d::SpriteBatchNode* m_pSpriteBatchNode;
-	ButtonManagerNode* m_pButtonManagerNode;
 
 	LevelInfo m_levelInfo;
 	ChapterInfo m_chapterInfo;

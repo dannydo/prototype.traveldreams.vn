@@ -9,6 +9,7 @@
 #include "Database\InitDatabase.h"
 #include "SystemEventHandle.h"
 #include "WaitingNode.h"
+#include "ConfirmQuitLevelNode.h"
 
 USING_NS_CC;
 
@@ -115,7 +116,7 @@ bool SettingMenuNode::init()
 				m_pButtonManagerNode->addButtonNode(pButtonBackToGame);
 
 				Sprite* pQuitLevelSprite = Sprite::create("PanelSetting/btn_quitlevel.png");
-				ButtonNode* pButtonQuitLevel = ButtonNode::createButtonSprite(pQuitLevelSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
+				ButtonNode* pButtonQuitLevel = ButtonNode::createButtonSprite(pQuitLevelSprite, CC_CALLBACK_1(SettingMenuNode::clickQuitLevel, this));
 				pButtonQuitLevel->setPosition(Point(252.5f, 278.0f));
 				m_pButtonManagerNode->addButtonNode(pButtonQuitLevel);
 			}
@@ -355,7 +356,14 @@ void SettingMenuNode::clickMainMenu(cocos2d::Object* sender)
 
 void SettingMenuNode::clickQuitLevel(cocos2d::Object* sender)
 {
+	this->hide();
 
+	// check play time mode van dao
+	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
+	std::string sChapterId = GameConfigManager::getInstance()->GetCurrentChapterID();
+	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(sChapterId) + iCurrentLevel;
+	ConfirmQuitLevelNode* confirmQuitLevel = ConfirmQuitLevelNode::createLayout(iCalLevel);
+	this->getParent()->addChild(confirmQuitLevel, 10000);
 }
 
 void SettingMenuNode::clickResume(cocos2d::Object* sender)
