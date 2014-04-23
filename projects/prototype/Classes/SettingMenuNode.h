@@ -42,13 +42,21 @@ private:
 	void clickTutorial(cocos2d::Object* sender);
 	void clickFacebook(cocos2d::Object* sender);
 	void clickBack(cocos2d::Object* sender);
+	void clickReset(cocos2d::Object* sender);
+	void clickMainMenu(cocos2d::Object* sender);
+	void clickQuitLevel(cocos2d::Object* sender);
+	void clickResume(cocos2d::Object* sender);
+
+	void runResetGame();
+	void finishResetGame();
+
 	void actionBack();
 	void addButtonFacebook();
 
 	cocos2d::MenuItemToggle* m_pMenuVoice;
 	cocos2d::MenuItemToggle* m_pMenuEffect;
 	cocos2d::MenuItemToggle* m_pMenuMusic;
-	cocos2d::Sprite* m_pBackground;
+	
 	ButtonNode* m_pSettingButton;
 	ButtonManagerNode* m_pButtonManagerNode;
 	bool m_isAddButtonFacebook;
@@ -69,6 +77,8 @@ public:
 	SceneMode getSceneMode(int iIndex);
 	inline std::vector<SceneMode> getSceneModes() { return m_sceneModes; };
 	void addSceneMode(SceneMode sceneMode);
+
+	void resetSceneNodeToMainMenu();
 
 private:
 	Breadcrumb();

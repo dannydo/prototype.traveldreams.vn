@@ -16,6 +16,8 @@ public:
 	void runSyncDataGame();
 	inline const bool& getIsFinishSync() { return m_bIsFinishSync; };
 
+	void pushDataCustomGameMode(const std::string& sPackageId);
+
 private:
 	void onHttpRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
 

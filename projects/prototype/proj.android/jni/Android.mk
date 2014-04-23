@@ -61,6 +61,9 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/WaitingNode.cpp \
 				   ../../Classes/ConnectFacebookConfirm.cpp \
 				   ../../Classes/CustomPackageDownloaderNode.cpp \
+				   ../../Classes/EndGameCustomModeNode.cpp \
+				   ../../Classes/Database/CSPackageTable.cpp \
+				   ../../Classes/Database/CSWordTable.cpp \
 				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \

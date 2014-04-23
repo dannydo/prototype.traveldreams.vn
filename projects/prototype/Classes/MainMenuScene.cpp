@@ -166,7 +166,7 @@ void MainMenuLayer::openSettingMenu(Object *sender)
 	if(m_pSettingNode == NULL)
 	{
 		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-524.0f, 0.0f));
+		m_pSettingNode->setPosition(Point(-505.0f, 0.0f));
 		m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
 		this->addChild(m_pSettingNode);
 	}
@@ -189,17 +189,15 @@ void MainMenuLayer::openSettingMenu(Object *sender)
 // test time mode
 void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 {
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	if(!FacebookManager::getInstance()->isLogined() || UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) != 1)
+	{
+		//MessageBox("Please login facebook before play game!","");
+		//return;
+	}
+#endif
+
 	CustomPackageDownloaderNode* pNode = CustomPackageDownloaderNode::create();
 	pNode->setPosition(Point(40.f, 200.f));
 	this->addChild(pNode, 1000);
-
-	/*
-	auto timeModeConfig = GameConfigManager::getInstance()->GetTimeModeDemoConfig();	
-	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(&timeModeConfig);
-
-	//WorldMapScene* scene = WorldMapScene::create();
-	//Director::getInstance()->replaceScene(scene);
-
-	auto scene = HelloWorld::createScene( _GMT_TIME_MODE_);
-	Director::getInstance()->replaceScene(scene);*/
 }

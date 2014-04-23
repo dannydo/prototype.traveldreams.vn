@@ -10,6 +10,8 @@
 #include "Database\WordTable.h"
 #include "Database\InitDatabase.h"
 #include "SystemEventHandle.h"
+#include "Database\CSPackageTable.h"
+#include "Database\CSWordTable.h"
 
 USING_NS_CC; 
 USING_NS_CC_EXT;
@@ -128,50 +130,55 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
 	bool bResult = true;
 
-	if (response)
+	if (sKey == "SyncGameData")
 	{
-		if (response->isSucceed()) 
+		if (response)
 		{
-			std::vector<char> *buffer = response->getResponseData();
+			if (response->isSucceed()) 
+			{
+				std::vector<char> *buffer = response->getResponseData();
 			
-			for (unsigned int i = 0; i < buffer->size(); i++)
-			{
-				strData.appendWithFormat("%c", (*buffer)[i]);
-			}
-
-			cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
-			pJsonDict->initWithDescription(strData.getCString());
-			//CCLOG("Sync %s", strData.getCString());
-			cs::JsonDictionary *pJsonData = pJsonDict->getSubDictionary("data");
-			if(pJsonData != NULL)
-			{
-				if (pJsonData->getItemBoolvalue("result", false))
+				for (unsigned int i = 0; i < buffer->size(); i++)
 				{
-					cs::JsonDictionary *pJsonSync = pJsonData->getSubDictionary("sync");
-					if (pJsonSync != NULL)
+					strData.appendWithFormat("%c", (*buffer)[i]);
+				}
+
+				cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
+				pJsonDict->initWithDescription(strData.getCString());
+				//CCLOG("Sync %s", strData.getCString());
+				cs::JsonDictionary *pJsonData = pJsonDict->getSubDictionary("data");
+				if(pJsonData != NULL)
+				{
+					if (pJsonData->getItemBoolvalue("result", false))
 					{
-						int iVersion = int(strtod(pJsonSync->getItemStringValue("Version"), 0));
-						if (!UserTable::getInstance()->updateDataSyncUser(pJsonSync, iVersion))
-							bResult = false;
-				
-						if(!ChapterTable::getInstance()->updateDataSyncChapters(pJsonSync, iVersion))
-							bResult = false;
-
-						if(!LevelTable::getInstance()->updateDataSyncLevels(pJsonSync, iVersion))
-							bResult = false;
-
-						if(!WordTable::getInstance()->updateDataSyncWords(pJsonSync, iVersion))
-							bResult = false;
-
-						if(!WordTable::getInstance()->updateDataSyncMapChapterWords(pJsonSync, iVersion))
-							bResult = false;
-
-						if(bResult)
+						cs::JsonDictionary *pJsonSync = pJsonData->getSubDictionary("sync");
+						if (pJsonSync != NULL)
 						{
-							VersionInfo versionInfo = VersionTable::getInstance()->getVersionInfo();
-							versionInfo.iVersionSync = iVersion;
-							VersionTable::getInstance()->updateVersion(versionInfo);
+							int iVersion = int(strtod(pJsonSync->getItemStringValue("Version"), 0));
+							if (!UserTable::getInstance()->updateDataSyncUser(pJsonSync, iVersion))
+								bResult = false;
+				
+							if(!ChapterTable::getInstance()->updateDataSyncChapters(pJsonSync, iVersion))
+								bResult = false;
+
+							if(!LevelTable::getInstance()->updateDataSyncLevels(pJsonSync, iVersion))
+								bResult = false;
+
+							if(!WordTable::getInstance()->updateDataSyncWords(pJsonSync, iVersion))
+								bResult = false;
+
+							if(!WordTable::getInstance()->updateDataSyncMapChapterWords(pJsonSync, iVersion))
+								bResult = false;
+
+							if(bResult)
+							{
+								VersionInfo versionInfo = VersionTable::getInstance()->getVersionInfo();
+								versionInfo.iVersionSync = iVersion;
+								VersionTable::getInstance()->updateVersion(versionInfo);
+							}
 						}
+						else
+							bResult = false;
 					}
 					else
 						bResult = false;
@@ -184,10 +191,79 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 		}
 		else
 			bResult = false;
-	}
-	else
-		bResult = false;
 
-	m_bIsFinishSync = true;
-	SystemEventHandle::getInstance()->onGameSyncCompleted(bResult);
+		m_bIsFinishSync = true;
+		SystemEventHandle::getInstance()->onGameSyncCompleted(bResult);
+	}
+	else if (sKey == "PushDataCustomGameMode")
+	{
+		if (response)
+		{
+			if (response->isSucceed()) 
+			{
+				std::vector<char> *buffer = response->getResponseData();
+			
+				for (unsigned int i = 0; i < buffer->size(); i++)
+				{
+					strData.appendWithFormat("%c", (*buffer)[i]);
+				}
+				//CCLOG("Sync %s", strData.getCString());
+			}
+		}
+	}
+}
+
+void SyncDataGame::pushDataCustomGameMode(const std::string& sPackageId)
+{
+	// Load data from database
+	String sJsonData = "data={\"data\":{";
+
+	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
+	sJsonData.append("\"User\":{");
+	
+	sJsonData.appendWithFormat("\"UserId\":\"%s\",", userInfo.sUserIdentifier.c_str());
+	sJsonData.appendWithFormat("\"UserToken\":\"%s\",", userInfo.sUserToken.c_str());
+	sJsonData.appendWithFormat("\"DeviceId\":\"%s\"", userInfo.sDeviceId.c_str());
+	sJsonData.append("},");
+
+	CSPackageInfo csPackageInfo = CSPackageTable::getInstance()->getCSPackageInfo(sPackageId);
+	sJsonData.append("\"Package\":{");
+	sJsonData.appendWithFormat("\"PackageId\":\"%s\"", csPackageInfo.sPackageId.c_str());
+	sJsonData.append("},");
+
+	std::vector<CSWordInfo> csWords = CSWordTable::getInstance()->getAllCSWordsForPackage(sPackageId);
+	sJsonData.append("\"WordList\":[");
+	int iSize = csWords.size();
+	for (int iIndex=0; iIndex<iSize; iIndex++)
+	{
+		sJsonData.append("{");
+		sJsonData.appendWithFormat("\"WordId\":\"%s\",", csWords[iIndex].sCSWordId.c_str());
+		sJsonData.appendWithFormat("\"CollectedCount\":\"%d\"", csWords[iIndex].iCollectedCount);
+
+		if (iIndex == iSize-1)
+			sJsonData.append("}");
+		else
+			sJsonData.append("},");
+	}
+	sJsonData.append("]");
+	
+	sJsonData.append("}}");
+
+	//CCLOG("Sync %s", sJsonData.getCString());
+	//CCLOG("%d", sJsonData.length());
+	
+	// Post data to server
+	String strURL = _CONSTANT_URL_;
+	strURL.append("api-custom/pushData");
+	m_pRequest = new HttpRequest();
+	m_pRequest->setUrl(strURL.getCString());
+	m_pRequest->setRequestType(HttpRequest::Type::POST);
+	m_pRequest->setTag("PushDataCustomGameMode");
+	m_pRequest->setRequestData(sJsonData.getCString(), sJsonData.length());
+	m_pRequest->setResponseCallback(this, httpresponse_selector(SyncDataGame::onHttpRequestCompleted));
+
+	m_pClient->send(m_pRequest);
+	m_pRequest->release();
+	m_pRequest = NULL;
+
 }

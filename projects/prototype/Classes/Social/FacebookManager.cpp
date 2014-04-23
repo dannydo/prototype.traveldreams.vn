@@ -183,6 +183,16 @@ bool FacebookManager::isNetworkOnline()
 	return false;
 }
 
+std::string FacebookManager::getDeviceId()
+{
+	if (_facebook)
+	{
+		return _facebook->callStringFuncWithParam("getDeviceId", NULL);
+	}
+
+	return "";
+}
+
 std::string FacebookManager::getAccessToken() 
 {
 	std::string sessionID = "";

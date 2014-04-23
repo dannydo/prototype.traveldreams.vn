@@ -133,6 +133,42 @@ bool WordTable::updateWord(const WordInfo& wordInfo)
 	return true;
 }
 
+bool WordTable::insertWord(const WordInfo& wordInfo)
+{
+	char **re;
+	int nRow, nColumn;
+
+	String sql = "select * from Words inner join MapChapterWords on MapChapterWords.WordId  = Words.WordId where MapChapterWords.ChapterId=";
+	sql.appendWithFormat("'%s'", wordInfo.sChapterId.c_str());
+	sql.appendWithFormat(" and MapChapterWords.WordId='%s'", wordInfo.sWordId.c_str());
+
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	if (nRow > 0)
+		return true;
+
+	// Insert Words
+	String sqlRun="";
+	sqlRun.append("insert into Words values(");
+	sqlRun.appendWithFormat("'%s',", wordInfo.sWordId.c_str());
+	sqlRun.appendWithFormat("%d,", wordInfo.iCountCollected);
+	sqlRun.appendWithFormat("%d);", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
+
+	// Insert Words
+	sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version,OrderUnlock,IsNew) values(");
+	sqlRun.appendWithFormat("'%s',", wordInfo.sChapterId.c_str());
+	sqlRun.appendWithFormat("'%s',", wordInfo.sWordId.c_str());
+	sqlRun.appendWithFormat("%d,", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
+	sqlRun.appendWithFormat("%d,", wordInfo.iOrderUnlock);
+	sqlRun.appendWithFormat("%d);", wordInfo.bIsNew);
+
+	int iResult = sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sqlRun.getCString(), &re, &nRow, &nColumn,NULL);
+	if(iResult != SQLITE_OK)
+		return false;
+
+	return true;
+}
+
 std::string	WordTable::syncGetWords()
 {
 	char **re;
