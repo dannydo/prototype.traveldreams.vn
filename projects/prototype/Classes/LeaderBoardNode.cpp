@@ -76,14 +76,6 @@ bool LeaderBoardtNode::init()
 	}
 #endif
 
-	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
-	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
-	UserService::getInstance()->addCallBackList(this);
-	m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
-	m_iConnectServer++;
-	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
-	UserService::getInstance()->getLeaderBoardLevel(iCalLevel + m_iLevel, m_iConnectServer);
-
 	m_bIsSwipe = false;
 
 	return true;
