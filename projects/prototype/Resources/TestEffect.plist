@@ -7,11 +7,11 @@
             <key>3_Nice.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{501,574},{140,45}}</string>
+                <string>{{229,875},{140,45}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
-                <true/>
+                <false/>
                 <key>sourceColorRect</key>
                 <string>{{0,0},{140,45}}</string>
                 <key>sourceSize</key>
@@ -20,7 +20,7 @@
             <key>4_Lovely.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{269,673},{197,48}}</string>
+                <string>{{229,762},{197,48}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -33,7 +33,7 @@
             <key>5_Beautiful.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{269,723},{264,58}}</string>
+                <string>{{229,702},{264,58}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -46,7 +46,7 @@
             <key>6_Briliant.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,673},{265,61}}</string>
+                <string>{{229,639},{265,61}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -59,11 +59,11 @@
             <key>7_Artistic.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{184,574},{315,97}}</string>
+                <string>{{130,587},{315,97}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
-                <false/>
+                <true/>
                 <key>sourceColorRect</key>
                 <string>{{0,0},{315,97}}</string>
                 <key>sourceSize</key>
@@ -108,6 +108,175 @@
                 <key>sourceSize</key>
                 <string>{570,180}</string>
             </dict>
+            <key>Stage.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{229,812},{160,61}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{160,61}}</string>
+                <key>sourceSize</key>
+                <string>{160,61}</string>
+            </dict>
+            <key>StageNumber/0.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{495,702},{49,57}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{49,57}}</string>
+                <key>sourceSize</key>
+                <string>{49,57}</string>
+            </dict>
+            <key>StageNumber/1.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{493,813},{49,57}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{49,57}}</string>
+                <key>sourceSize</key>
+                <string>{49,57}</string>
+            </dict>
+            <key>StageNumber/2.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{487,762},{49,57}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{49,57}}</string>
+                <key>sourceSize</key>
+                <string>{49,57}</string>
+            </dict>
+            <key>StageNumber/3.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{496,639},{49,57}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{49,57}}</string>
+                <key>sourceSize</key>
+                <string>{49,57}</string>
+            </dict>
+            <key>StageNumber/4.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{489,872},{49,57}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{49,57}}</string>
+                <key>sourceSize</key>
+                <string>{49,57}</string>
+            </dict>
+            <key>StageNumber/5.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{430,872},{49,57}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{49,57}}</string>
+                <key>sourceSize</key>
+                <string>{49,57}</string>
+            </dict>
+            <key>StageNumber/6.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{442,813},{49,57}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{49,57}}</string>
+                <key>sourceSize</key>
+                <string>{49,57}</string>
+            </dict>
+            <key>StageNumber/7.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{391,813},{49,57}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{49,57}}</string>
+                <key>sourceSize</key>
+                <string>{49,57}</string>
+            </dict>
+            <key>StageNumber/8.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{428,762},{49,57}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{49,57}}</string>
+                <key>sourceSize</key>
+                <string>{49,57}</string>
+            </dict>
+            <key>StageNumber/9.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{371,875},{49,57}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{49,57}}</string>
+                <key>sourceSize</key>
+                <string>{49,57}</string>
+            </dict>
+            <key>Stage_Complete.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,587},{318,126}}</string>
+                <key>offset</key>
+                <string>{0,-4}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,8},{318,126}}</string>
+                <key>sourceSize</key>
+                <string>{318,134}</string>
+            </dict>
+            <key>Time_Out.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{229,574},{273,63}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{273,63}}</string>
+                <key>sourceSize</key>
+                <string>{273,63}</string>
+            </dict>
         </dict>
         <key>metadata</key>
         <dict>
@@ -116,9 +285,9 @@
             <key>realTextureFileName</key>
             <string>TestEffect.pvr.ccz</string>
             <key>size</key>
-            <string>{548,783}</string>
+            <string>{548,926}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:ca03b30f202c4a373ea76bcd2377112e:c871ce90b99defd88bf1e3ffce1dd5ff:4241480c2580243a2430ac8926a58395$</string>
+            <string>$TexturePacker:SmartUpdate:2153d697a9c8b4a253eacc5cf209a64e:d2c36d76ec6db5d2c362f2b487b38d27:4241480c2580243a2430ac8926a58395$</string>
             <key>textureFileName</key>
             <string>TestEffect.pvr.ccz</string>
         </dict>

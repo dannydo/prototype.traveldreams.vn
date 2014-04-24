@@ -72,6 +72,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 
 	Sprite* pButtonPlayGameSprite = Sprite::create("Target-End-Game/btn_big_play.png");
 	ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonPlayGameSprite, CC_CALLBACK_1(GameTargetNode::menuPlayLevelCallBack, this));
+	buttonPlayNode->setScale(0.9f);
 	buttonPlayNode->setPosition(Point(320.0f, 293.0f));
 
 	Sprite* pButtonCloseSprite = Sprite::create("Target-End-Game/btn_close.png");
@@ -84,7 +85,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	this->addChild(pButtonManagerNode);
 
 	LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel, m_sChapterId);
-	pLeaderBoard->setPosition(Point(320.0f, 114.0f));
+	pLeaderBoard->setPosition(Point(320.0f, 109.0f));
 	this->addChild(pLeaderBoard);
 
 	return true;
@@ -104,7 +105,7 @@ void GameTargetNode::menuCloseCallBack(Object* sender)
 void GameTargetNode::generateLayoutStartAndBonusQuest()
 {
 	LevelConfig* pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(m_sChapterId, m_iCurrentLevel);
-	int iTotalBonusQuest = pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount;
+	int iTotalBonusQuest = 2;//pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount;
 
 	LevelInfo levelInfo = LevelTable::getInstance()->getLevel(m_sChapterId, m_iCurrentLevel);
 
@@ -113,13 +114,17 @@ void GameTargetNode::generateLayoutStartAndBonusQuest()
 		Sprite* pStarImage;
 		if (levelInfo.iStar > iIndex)
 		{
-			pStarImage = Sprite::create("Target-End-Game/star_yellow.png");
+			pStarImage = Sprite::create("Target-End-Game/star_win_small.png");
+			if (iIndex == 1)
+				pStarImage->setScale(1.4f);
 		}
 		else
 		{
-			pStarImage = Sprite::create("Target-End-Game/star_purple.png");
+			pStarImage = Sprite::create("Target-End-Game/star_target_small.png");
+			if (iIndex == 1)
+				pStarImage->setScale(1.4f);
 		}
-		pStarImage->setPosition(Point(210.0f + iIndex*108.0f - iTotalBonusQuest*46, 760.0f));
+		pStarImage->setPosition(Point(220.0f + iIndex*100.0f - iTotalBonusQuest*46, 760.0f));
 		this->addChild(pStarImage);
 	}
 
@@ -128,13 +133,13 @@ void GameTargetNode::generateLayoutStartAndBonusQuest()
 		Sprite* pMushRoom;
 		if (levelInfo.iBonusQuest > iIndex)
 		{
-			pMushRoom = Sprite::create("Target-End-Game/mushroom.png");
+			pMushRoom = Sprite::create("Target-End-Game/mushroom_win.png");
 		}
 		else
 		{
-			pMushRoom = Sprite::create("Target-End-Game/mushroom-fail.PNG");
+			pMushRoom = Sprite::create("Target-End-Game/mushroom_fail.png");
 		}
-		pMushRoom->setPosition(Point(539.0f + iIndex*98.0f - iTotalBonusQuest*50, 760.0f));
+		pMushRoom->setPosition(Point(526.0f + iIndex*91.0f - iTotalBonusQuest*50, 760.0f));
 		this->addChild(pMushRoom);
 	}
 

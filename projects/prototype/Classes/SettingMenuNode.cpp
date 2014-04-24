@@ -10,6 +10,7 @@
 #include "SystemEventHandle.h"
 #include "WaitingNode.h"
 #include "ConfirmQuitLevelNode.h"
+#include "PopupConfirmNode.h"
 
 USING_NS_CC;
 
@@ -305,10 +306,7 @@ void SettingMenuNode::clickFacebook(Object* sender)
 
 void SettingMenuNode::clickReset(cocos2d::Object* sender)
 {
-	auto actionHideSettingMenu = CallFunc::create(this, callfunc_selector(SettingMenuNode::hide));
-	auto actionRunProcess = CallFunc::create(this, callfunc_selector(SettingMenuNode::runResetGame));
-	auto actionFinishWord = CallFunc::create(this, callfunc_selector(SettingMenuNode::finishResetGame));
-	//this->runAction(Sequence::create(DelayTime::create(0.001f), actionHideSettingMenu, DelayTime::create(0.2f), actionRunProcess, actionFinishWord, NULL));
+	this->hide();
 }
 
 void SettingMenuNode::runResetGame()
@@ -340,11 +338,9 @@ void SettingMenuNode::runResetGame()
 		UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
 		SystemEventHandle::getInstance()->onStartSyncGame(true);
 	}
-}
 
-void SettingMenuNode::finishResetGame()
-{
-	this->getParent()->removeChildByTag(1000);
+	PopupConfirmNode* popupConfirm = PopupConfirmNode::createLayout("DO YOU WANT TO RESET GAME", PopupConfirmType::eResetGame);
+	this->getParent()->addChild(popupConfirm, 10000);
 }
 
 void SettingMenuNode::clickMainMenu(cocos2d::Object* sender)
@@ -357,13 +353,22 @@ void SettingMenuNode::clickMainMenu(cocos2d::Object* sender)
 void SettingMenuNode::clickQuitLevel(cocos2d::Object* sender)
 {
 	this->hide();
-
+	 
 	// check play time mode van dao
-	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
-	std::string sChapterId = GameConfigManager::getInstance()->GetCurrentChapterID();
-	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(sChapterId) + iCurrentLevel;
-	ConfirmQuitLevelNode* confirmQuitLevel = ConfirmQuitLevelNode::createLayout(iCalLevel);
-	this->getParent()->addChild(confirmQuitLevel, 10000);
+	bool bPlayCustomMode = false;
+	if (bPlayCustomMode)
+	{
+		PopupConfirmNode* popupConfirm = PopupConfirmNode::createLayout("DO YOU WANT TO QUIT GAME", PopupConfirmType::eQuitGameCustomMode);
+		this->getParent()->addChild(popupConfirm, 10000);
+	}
+	else
+	{
+		int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
+		std::string sChapterId = GameConfigManager::getInstance()->GetCurrentChapterID();
+		int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(sChapterId) + iCurrentLevel;
+		ConfirmQuitLevelNode* confirmQuitLevel = ConfirmQuitLevelNode::createLayout(iCalLevel);
+		this->getParent()->addChild(confirmQuitLevel, 10000);
+	}
 }
 
 void SettingMenuNode::clickResume(cocos2d::Object* sender)

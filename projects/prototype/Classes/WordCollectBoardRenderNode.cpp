@@ -158,6 +158,7 @@ bool WordCollectBoardRenderNode::init()
 
 void WordCollectBoardRenderNode::PlayTimeModeWordStart(int iTimeModeStage)
 {
+	/*
 	char sText[20];
 	sprintf( sText, "STAGE %d", iTimeModeStage);
 	auto label = LabelTTF::create(sText, "fonts/UTM Cookies.ttf", 80);		
@@ -176,10 +177,10 @@ void WordCollectBoardRenderNode::PlayTimeModeWordStart(int iTimeModeStage)
 			Spawn::createWithTwoActions(
 				FadeOut::create(0.2f),
 				MoveBy::create( 0.2f, Point( 0, 80.f))),
-			NULL));
+			NULL));*/
 
 
-	float fPhase1Time = 1.6f;
+	float fPhase1Time = 1.6f; //phase 1- text effect played by main board view
 
 	auto pColorNode = DrawNode::create();
 	CCPoint vertex[] = { ccp(0,0), ccp(1000,0), ccp(1000,1000), ccp(0,1000) };

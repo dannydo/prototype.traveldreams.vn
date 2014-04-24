@@ -20,7 +20,7 @@ void TimeCountDownNode::init(int iMaximumEnergy, int iEnergyLostPerSecond)
 	m_bIsStarted = false;
 	m_fMaximumEnergy = iMaximumEnergy;
 	m_fEnergyLostPersecond = iEnergyLostPerSecond;
-	m_fCurrentEnergy = m_fMaximumEnergy /2.f;
+	m_fCurrentEnergy = m_fMaximumEnergy /4.f;
 
 	Size winSize = Director::getInstance()->getWinSize();
 	
@@ -106,6 +106,7 @@ void TimeCountDownNode::update(float fDeltaTime)
 
 		//m_pMirrorMidEnergyBar->setScaleX( fEnergyWidth / m_pMidEnergyBar->getContentSize().width);
 		m_pMirrorMidEnergyBar->setOpacity(fEnergyWidth*255/4);
+		m_pMirrorMidEnergyBar->setScale(fEnergyWidth/40.f);
 	}
 	//m_pMidEnergyBar->setScaleX( fEnergyWidth / m_pMidEnergyBar->getContentSize().width);
 	//m_pRightEnergyBar->setPositionX( m_pMidEnergyBar->getPositionX() + m_pMidEnergyBar->getContentSize().width* m_pMidEnergyBar->getScaleX());

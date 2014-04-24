@@ -181,6 +181,8 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\NewGameBoardManager.cpp" />
     <ClCompile Include="..\Classes\ObstacleProcessManager.cpp" />
     <ClCompile Include="..\Classes\ConnectFacebookConfirm.cpp" />
+    <ClCompile Include="..\Classes\OutOfMovesNode.cpp" />
+    <ClCompile Include="..\Classes\PopupConfirmNode.cpp" />
     <ClCompile Include="..\Classes\ScrollManager.cpp" />
     <ClCompile Include="..\Classes\SettingMenuNode.cpp" />
     <ClCompile Include="..\Classes\Social\FacebookManager.cpp" />
@@ -246,6 +248,8 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\NewGameBoardManager.h" />
     <ClInclude Include="..\Classes\ObstacleProcessManager.h" />
     <ClInclude Include="..\Classes\ConnectFacebookConfirm.h" />
+    <ClInclude Include="..\Classes\OutOfMovesNode.h" />
+    <ClInclude Include="..\Classes\PopupConfirmNode.h" />
     <ClInclude Include="..\Classes\ScrollManager.h" />
     <ClInclude Include="..\Classes\SettingMenuNode.h" />
     <ClInclude Include="..\Classes\Social\FacebookManager.h" />

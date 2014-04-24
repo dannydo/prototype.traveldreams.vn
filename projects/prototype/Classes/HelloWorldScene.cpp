@@ -5,6 +5,7 @@
 #include "Database\UserTable.h"
 #include "Database\GameTracking.h"
 #include "ActionExtension.h"
+#include "OutOfMovesNode.h"
 
 USING_NS_CC;
 
@@ -317,7 +318,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 	// init batchNode for text effect
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("TestEffect.plist");
 	m_pTextEffectBatchNode = CCSpriteBatchNode::create("TestEffect.pvr.ccz");
-	this->addChild(m_pTextEffectBatchNode);
+	this->m_pHUDLayer->addChild(m_pTextEffectBatchNode, 12);
 	
 	// move hint
 	//m_pMoveHintNode = Sprite::createWithSpriteFrameName("Gem_A.png");
@@ -587,7 +588,12 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 					positionOfLettersOfTimeMode[i].m_iColumn), mainWord.m_sWord[i], iGemLetterBlockID);				
 			}
 		}				
+
+
+		// play special begin of stage of time mode
+		PlayBeginTimeModeStageTextEffect();
 	}	
+
 
 	// pre-load hint sprite
 	m_pHintSprite = Sprite::createWithSpriteFrameName( "Hint.png");
@@ -1050,7 +1056,7 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 	{			
 		int iRowNumber = m_GameBoardManager.GetRowNumber();
 		int iColumnNumber= m_GameBoardManager.GetColumnNumber();
-
+		 
 		if ( fabs(fDeltaX) > fabs(fDeltaY) &&  fabs(fDeltaX) > 5.f)
 		{
 			m_eTouchMoveState = _TMS_MOVE_HORIZONTAL_;
@@ -1434,6 +1440,45 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 	}
 }
 
+void HelloWorld::PlayBeginTimeModeStageTextEffect()
+{
+	auto pTextSprite = Sprite::createWithSpriteFrameName("Stage.png");
+	m_pTextEffectBatchNode->addChild(pTextSprite);
+	
+	float fPosX = pTextSprite->getContentSize().width + 10.f;
+
+	char sStageNumber[10];
+	sprintf(sStageNumber, "%d", m_iCurrentTimeModeStage);
+	int iStageNumberLetterCount = strlen(sStageNumber);
+
+	char sSpriteName[40];
+	Sprite* pLetterSprite;
+	for(int i=0; i< iStageNumberLetterCount; i++)
+	{
+		sprintf(sSpriteName, "StageNumber/%c.png", (unsigned char)sStageNumber[0]);
+		pLetterSprite = Sprite::createWithSpriteFrameName(sSpriteName);
+		pLetterSprite->setAnchorPoint(Point(0,0));
+		pLetterSprite->setPosition(Point( fPosX, 0));
+	
+		pTextSprite->addChild(pLetterSprite);
+		fPosX += pLetterSprite->getContentSize().width + 3.f;
+	}
+	
+	pTextSprite->setPosition( Point( Director::getInstance()->getWinSize().width /2.f - 20.f, 450));	
+	pTextSprite->setScale( 0.7f);
+	pTextSprite->runAction(
+		Sequence::create(
+			Spawn::createWithTwoActions(
+				ScaleTo::create(0.25f, 1.f),
+				MoveBy::create( 0.25f, Point( 0, 50.f))),
+			DelayTime::create(0.5f),
+			Spawn::createWithTwoActions(
+				FadeOut::create(0.2f),
+				MoveBy::create( 0.2f, Point( 0, 80.f))),
+			RemoveSelf::create(),
+			NULL));
+}
+
 void HelloWorld::OnStartGame()
 {
 	if (m_GameBoardManager.GetLevelConfig()->m_eGameModeType == _GMT_NORMAL_)
@@ -1491,7 +1536,7 @@ void HelloWorld::OnCompleteComboChain()
 	if (!m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked() && m_GameBoardManager.GetCurrentMove()!=0)
 		m_bIsEffectPlaying = false;
 
-
+	// Play text effect
 	if (m_GameBoardManager.GetPhaseMoveOfComboChain() >3)
 	{
 		Sprite* pTextSprite;
@@ -1679,9 +1724,9 @@ void HelloWorld::ShowFailGamePopup()
 	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
 	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
 
-	EndGameNode* pEndGameNode = EndGameNode::createLayoutLose( m_GameBoardManager.GetCurrentScore(), 
+	OutOfMovesNode* pOutOfMoveNode = OutOfMovesNode::createLayout( m_GameBoardManager.GetCurrentScore(), 
 				m_GameBoardManager.GetGameWordManager()->GetMainWord(), iCurrentLevel, sCurrentChapterID);
-	m_pHUDLayer->addChild( pEndGameNode, 100);
+	m_pHUDLayer->addChild( pOutOfMoveNode, 100);
 
 	//SoundManager::PlaySoundEffect(_SET_FAIL_);
 	UserTable::getInstance()->updateLife(1);
@@ -4815,7 +4860,7 @@ void HelloWorld::OnTimeMode_OutOfTime()
 	m_bIsEffectPlaying = true;
 	//m_bIsEndGamePhase = true;
 	
-	auto label = LabelTTF::create("OUT OF TIME!", "fonts/UTM Cookies.ttf", 70);		
+	/*auto label = LabelTTF::create("OUT OF TIME!", "fonts/UTM Cookies.ttf", 70);		
 	label->setColor(Color3B( 200, 30, 30));
 	label->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));
 	label->disableStroke();
@@ -4824,7 +4869,16 @@ void HelloWorld::OnTimeMode_OutOfTime()
 	label->runAction( 
 		Sequence::createWithTwoActions(
 			DelayTime::create(3.f),
-			Hide::create()));
+			Hide::create()));*/
+	auto pTextSprite = Sprite::createWithSpriteFrameName("Time_Out.png");
+	m_pTextEffectBatchNode->addChild(pTextSprite);
+	pTextSprite->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));	
+	pTextSprite->runAction(
+		Sequence::create(
+			DelayTime::create( 3.f),
+			Hide::create(),				
+			NULL));
+
 
 	//label->setScale( 0.7f);	
 
@@ -4864,8 +4918,8 @@ void HelloWorld::OnTimeMode_StageComplete()
 	// show complete mainword effect
 	float fEffectTime = m_pWordCollectBoardRenderNode->PlayUnlockWordEffect();
 
-	auto label = LabelTTF::create("STAGE COMPLETE!", "fonts/UTM Cookies.ttf", 70);		
-	//label->setColor(Color3B( 100, 100, 100));
+	/*auto label = LabelTTF::create("STAGE COMPLETE!", "fonts/UTM Cookies.ttf", 70);		
+	label->setColor(Color3B( 100, 100, 100));
 	label->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));
 	label->disableStroke();		
 	label->setVisible(false);
@@ -4875,7 +4929,17 @@ void HelloWorld::OnTimeMode_StageComplete()
 		Sequence::create(
 			DelayTime::create( fEffectTime),
 			Show::create(),				
+			NULL));*/
+	auto pTextSprite = Sprite::createWithSpriteFrameName("Stage_Complete.png");
+	m_pTextEffectBatchNode->addChild(pTextSprite);
+	pTextSprite->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));
+	pTextSprite->setVisible(false);
+	pTextSprite->runAction(
+		Sequence::create(
+			DelayTime::create( fEffectTime),
+			Show::create(),				
 			NULL));
+
 
 	this->runAction( CCSequence::create(
 		DelayTime::create(3.f + fEffectTime),

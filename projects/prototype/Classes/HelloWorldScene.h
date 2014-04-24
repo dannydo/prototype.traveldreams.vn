@@ -130,6 +130,7 @@ protected:
 	Sprite* AddLetterToGem(const Cell& cell, const int& iGemID, const unsigned char& iLetter, const int& iGemLetterBlockID, bool bIsMirror=false, bool bIsBonus=false, float fDelayTime=0, bool bPlayEffect=false);
 	void AddNewComboCell(const ComboEffectCell& cell, const float& fDelayTime, const float& fEffectTime, bool bCreateMirror = true);
 
+	void PlayBeginTimeModeStageTextEffect();
 	void OnStartGame();
 	void OnCompleteComboChain();
 
