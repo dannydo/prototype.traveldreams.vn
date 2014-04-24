@@ -28,7 +28,7 @@ bool LifeSystemNode::init()
 
 	ButtonNode* pButtonGetLife = ButtonNode::createButtonSprite(m_pBackgroundClock, CC_CALLBACK_1(LifeSystemNode::clickGetLife, this));
 	pButtonGetLife->setAnchorPoint(Point(0.0f, 0.5f));
-	pButtonGetLife->setPosition(Point(100.0f, 0.0f));
+	pButtonGetLife->setPosition(Point(95.0f, 0.0f));
 
 	ButtonManagerNode* pButtonManageNode = ButtonManagerNode::create();
 	pButtonManageNode->addButtonNode(pButtonGetLife);
@@ -36,37 +36,20 @@ bool LifeSystemNode::init()
 
 	String clock = formatSecondsToDiaplay(m_userInfo.iLifeTimeRemaining);
 	m_pLabelSecondsRemaing = LabelBMFont::create(clock.getCString(), "fonts/font_small_alert.fnt");
-	m_pLabelSecondsRemaing->setAnchorPoint(Point(0.0f, 0.5f));
-	m_pLabelSecondsRemaing->setPosition(Point(78.0f, 29.0f));
-
-	if (m_userInfo.iLifeTimeRemaining == 0)
-	{
-		m_pBackgroundClock->setVisible(false);
-	}
-
+	m_pLabelSecondsRemaing->setAnchorPoint(Point(0.5f, 0.5f));
+	m_pLabelSecondsRemaing->setPosition(Point(120.0f, 29.0f));
 	m_pBackgroundClock->addChild(m_pLabelSecondsRemaing);
-
-	m_pBackgroundLife = Sprite::create("Footer/hearth.png");
-	m_pBackgroundLife->setAnchorPoint(Point(0.0f, 0.5f));
-	m_pBackgroundLife->setPosition(Point(0.0f, 2.0f));
-	this->addChild(m_pBackgroundLife);
 
 	char sLife[2];
 	sprintf(sLife, "%d", m_userInfo.iLife);
 	m_pLabelLife = LabelBMFont::create(sLife, "fonts/Flashcard-bitmap-font-game.fnt");
 	m_pLabelLife->setAnchorPoint(Point(0.0f, 0.5f));
-	m_pLabelLife->setPosition(Point(21.0f, 28.0f));
-	m_pBackgroundLife->addChild(m_pLabelLife);
+	m_pLabelLife->setPosition(Point(28.0f, 35.0f));
+	m_pBackgroundClock->addChild(m_pLabelLife);
 
 	if (m_userInfo.iLife == _MAX_LIFE_)
 	{
-		m_pBackgroundClock->setVisible(false);
-		m_pBackgroundLife->setVisible(true);
-	}
-	else
-	{
-		m_pBackgroundLife->setVisible(false);
-		m_pBackgroundClock->setVisible(true);
+		m_pLabelSecondsRemaing->setString("Full");
 	}
 
 	this->schedule(schedule_selector(LifeSystemNode::updateWhenTimeChange), 1.0f);
@@ -99,22 +82,16 @@ void LifeSystemNode::updateWhenTimeChange(float dt)
 		UserTable::getInstance()->updateUser(m_userInfo);
 	}
 
-	if (m_userInfo.iLife == _MAX_LIFE_)
-	{
-		m_pBackgroundClock->setVisible(false);
-		m_pBackgroundLife->setVisible(true);
-	}
-	else
-	{
-		m_pBackgroundLife->setVisible(false);
-		m_pBackgroundClock->setVisible(true);
-	}
-
 	String clock = formatSecondsToDiaplay(m_userInfo.iLifeTimeRemaining);
 	char sLife[2];
 	sprintf(sLife, "%d", m_userInfo.iLife);
 	m_pLabelSecondsRemaing->setString(clock.getCString());
 	m_pLabelLife->setString(sLife);
+
+	if (m_userInfo.iLife == _MAX_LIFE_)
+	{
+		m_pLabelSecondsRemaing->setString("Full");
+	}
 }
 
 String LifeSystemNode::formatSecondsToDiaplay(const int& iSeconds)
