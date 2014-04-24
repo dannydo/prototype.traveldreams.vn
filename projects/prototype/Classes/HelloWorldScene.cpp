@@ -53,24 +53,15 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,
 	boardLayer->initLevel(eGameModeType, iTimeModeStage, iExistedCombo4Count, iExistedCombo5Count, iExistedCombo6Count);
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
-	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
+	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn_setting.png");
 	boardLayer->m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
-	boardLayer->m_pButtonSettingNode->setPosition(Point(50.0f, 48.0f));
+	boardLayer->m_pButtonSettingNode->setPosition(Point(36.0f, 33.0f));
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(boardLayer->m_pButtonSettingNode);
-	boardLayer->m_pHUDLayer->addChild(pButtonManagerNode);
+	boardLayer->addChild(pButtonManagerNode, 88);
 
-	
-    // create menu, it's an autorelease object
-    //auto menu = Menu::create(closeItem, NULL);
-	auto menu = Menu::create(NULL);
-    menu->setPosition(Point::ZERO);
-    boardLayer->m_pHUDLayer->addChild(menu, 10);
-	//menuLayer->setTouchEnabled(true);
-	//scene->addChild(boardLayer->m_pHUDLayer);
-	boardLayer->addChild(boardLayer->m_pHUDLayer, 1099);
-
+	boardLayer->addChild(boardLayer->m_pHUDLayer);
 
 	// combo count render node
 	ComboCountRenderNode* pComboCountRenderNode = ComboCountRenderNode::create();
@@ -629,7 +620,7 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 	if(m_pSettingNode == NULL)
 	{
 		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-524.0f, 0));
+		m_pSettingNode->setPosition(Point(-505.0f, 0));
 		m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
 		this->addChild(m_pSettingNode, 98);
 	}

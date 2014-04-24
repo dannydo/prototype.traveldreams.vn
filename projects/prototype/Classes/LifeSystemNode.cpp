@@ -1,4 +1,5 @@
 #include "LifeSystemNode.h"
+#include "ButtonManagerNode.h"
 
 USING_NS_CC;
 
@@ -19,26 +20,24 @@ bool LifeSystemNode::init()
 		return false;
 	}	
 
-
 	UserTable::getInstance()->updateLife(0);
 	m_userInfo = UserTable::getInstance()->getUserInfo();
 	UserTable::getInstance()->updateUser(m_userInfo);
 
-	m_pBackgroundClock = Sprite::create("Footer/life-time.png");
-	m_pBackgroundClock->setAnchorPoint(Point(0.0f, 0.5f));
-	m_pBackgroundClock->setPosition(Point(45.0f, 0.0f));
-	this->addChild(m_pBackgroundClock);
+	m_pBackgroundClock = Sprite::create("Footer/btn_lives_section.png");
 
-	Sprite* pAddLifeButton = Sprite::create("Footer/add-life-btn.png");
-	pAddLifeButton->setAnchorPoint(Point(0.0f, 0.5f));
-	pAddLifeButton->setPosition(Point(116.5f, 25.5f));
-	m_pBackgroundClock->addChild(pAddLifeButton);
+	ButtonNode* pButtonGetLife = ButtonNode::createButtonSprite(m_pBackgroundClock, CC_CALLBACK_1(LifeSystemNode::clickGetLife, this));
+	pButtonGetLife->setAnchorPoint(Point(0.0f, 0.5f));
+	pButtonGetLife->setPosition(Point(100.0f, 0.0f));
+
+	ButtonManagerNode* pButtonManageNode = ButtonManagerNode::create();
+	pButtonManageNode->addButtonNode(pButtonGetLife);
+	this->addChild(pButtonManageNode);
 
 	String clock = formatSecondsToDiaplay(m_userInfo.iLifeTimeRemaining);
-	m_pLabelSecondsRemaing = CCLabelTTF::create(clock.getCString(), "fonts/UTM Cookies.ttf", 24);
+	m_pLabelSecondsRemaing = LabelBMFont::create(clock.getCString(), "fonts/font_small_alert.fnt");
 	m_pLabelSecondsRemaing->setAnchorPoint(Point(0.0f, 0.5f));
-	m_pLabelSecondsRemaing->setPosition(Point(42.0f, 29.0f));
-	m_pLabelSecondsRemaing->setColor(ccc3(180, 115, 5));
+	m_pLabelSecondsRemaing->setPosition(Point(78.0f, 29.0f));
 
 	if (m_userInfo.iLifeTimeRemaining == 0)
 	{
@@ -47,21 +46,36 @@ bool LifeSystemNode::init()
 
 	m_pBackgroundClock->addChild(m_pLabelSecondsRemaing);
 
-	Sprite* pBackgroundLife = Sprite::create("Footer/hearth.png");
-	pBackgroundLife->setAnchorPoint(Point(0.0f, 0.5f));
-	pBackgroundLife->setPosition(Point(0.0f, 0.0f));
-	this->addChild(pBackgroundLife);
+	m_pBackgroundLife = Sprite::create("Footer/hearth.png");
+	m_pBackgroundLife->setAnchorPoint(Point(0.0f, 0.5f));
+	m_pBackgroundLife->setPosition(Point(0.0f, 2.0f));
+	this->addChild(m_pBackgroundLife);
 
 	char sLife[2];
 	sprintf(sLife, "%d", m_userInfo.iLife);
 	m_pLabelLife = LabelBMFont::create(sLife, "fonts/Flashcard-bitmap-font-game.fnt");
 	m_pLabelLife->setAnchorPoint(Point(0.0f, 0.5f));
-	m_pLabelLife->setPosition(Point(32.0f, 5.0f));
-	m_pLabelLife->setScale(1.2f);
-	this->addChild(m_pLabelLife);
+	m_pLabelLife->setPosition(Point(21.0f, 28.0f));
+	m_pBackgroundLife->addChild(m_pLabelLife);
+
+	if (m_userInfo.iLife == _MAX_LIFE_)
+	{
+		m_pBackgroundClock->setVisible(false);
+		m_pBackgroundLife->setVisible(true);
+	}
+	else
+	{
+		m_pBackgroundLife->setVisible(false);
+		m_pBackgroundClock->setVisible(true);
+	}
 
 	this->schedule(schedule_selector(LifeSystemNode::updateWhenTimeChange), 1.0f);
 	return true;
+}
+
+void LifeSystemNode::clickGetLife(cocos2d::Object* sender)
+{
+
 }
 
 void LifeSystemNode::updateWhenTimeChange(float dt)
@@ -83,6 +97,17 @@ void LifeSystemNode::updateWhenTimeChange(float dt)
 
 		m_userInfo.ulLifeTimeBeginRemain = getTimeLocalCurrent();
 		UserTable::getInstance()->updateUser(m_userInfo);
+	}
+
+	if (m_userInfo.iLife == _MAX_LIFE_)
+	{
+		m_pBackgroundClock->setVisible(false);
+		m_pBackgroundLife->setVisible(true);
+	}
+	else
+	{
+		m_pBackgroundLife->setVisible(false);
+		m_pBackgroundClock->setVisible(true);
 	}
 
 	String clock = formatSecondsToDiaplay(m_userInfo.iLifeTimeRemaining);

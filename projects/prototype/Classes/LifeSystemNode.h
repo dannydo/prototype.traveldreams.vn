@@ -17,10 +17,12 @@ private:
 	void updateWhenTimeChange(float dt);
 	unsigned long getTimeLocalCurrent();
 	cocos2d::String formatSecondsToDiaplay(const int& iSeconds);
+	void clickGetLife(cocos2d::Object* sender);
 
-	cocos2d::LabelTTF* m_pLabelSecondsRemaing;
+	cocos2d::LabelBMFont* m_pLabelSecondsRemaing;
 	cocos2d::LabelBMFont* m_pLabelLife;
 	cocos2d::Sprite* m_pBackgroundClock;
+	cocos2d::Sprite* m_pBackgroundLife;
 
 	UserInfo m_userInfo;
 };

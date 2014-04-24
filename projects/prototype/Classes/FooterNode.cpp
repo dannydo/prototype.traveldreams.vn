@@ -22,38 +22,23 @@ bool FooterNode::init()
 	this->addChild(pBarBottom);
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
-	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
+	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn_setting.png");
 	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(FooterNode::openSettingMenu, this));
-	m_pButtonSettingNode->setPosition(Point(50.0f, 50.0f));
+	m_pButtonSettingNode->setPosition(Point(36.0f, 33.0f));
 
 	Sprite* pFlashCardSprite = Sprite::create("Footer/btn_flashcard.png");
 	m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
-	m_pButtonFlashCardNode->setPosition(Point(585.0f, 50.0f));
-
-	Sprite* pIntroductionSprite = Sprite::create("Footer/info_icon.png");
-	m_pButtonIntroductionNode = ButtonNode::createButtonSprite(pIntroductionSprite, CC_CALLBACK_1(FooterNode::openIntroduction, this));
-	m_pButtonIntroductionNode->setPosition(Point(280.0f, 25.0f));
+	m_pButtonFlashCardNode->setPosition(Point(609.0f, 33.0f));
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(m_pButtonSettingNode);
 	pButtonManagerNode->addButtonNode(m_pButtonFlashCardNode);
-	//pButtonManagerNode->addButtonNode(m_pButtonIntroductionNode);
 
 	this->addChild(pButtonManagerNode);
-	this->setZOrder(10);
 
 	m_pSettingNode = NULL;
 	
 	return true;
-}
-
-void FooterNode::openIntroduction(Object* sender)
-{
-	if (m_pButtonIntroductionNode->isVisible())
-	{
-		IntroductionScene* pIntroduction = IntroductionScene::create();
-		Director::getInstance()->replaceScene(pIntroduction);
-	}
 }
 
 void FooterNode::openFlashCardCollection(Object* sender)
@@ -88,5 +73,4 @@ void FooterNode::openSettingMenu(Object* sender)
 void FooterNode::disableButtonIntroAndFlashCard()
 {
 	m_pButtonFlashCardNode->setVisible(false);
-	m_pButtonIntroductionNode->setVisible(false);
 }

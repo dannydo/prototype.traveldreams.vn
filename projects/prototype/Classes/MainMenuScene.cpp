@@ -61,9 +61,9 @@ bool MainMenuLayer::init()
 	buttonPlayNode->setPosition(Point(320.0f, 515.0f));
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
-	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn-back-menu.png");
+	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn_setting.png");
 	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(MainMenuLayer::openSettingMenu, this));
-	m_pButtonSettingNode->setPosition(Point(50.0f, 50.0f));
+	m_pButtonSettingNode->setPosition(Point(36.0f, 33.0f));
 	
 	//test time mode
 	Sprite* pButtonTestTimeModeGameSprite = Sprite::create("LoadingAndMainMenu/btn_custom.png");
@@ -75,7 +75,7 @@ bool MainMenuLayer::init()
 	m_pButtonManagerNode->addButtonNode(m_pButtonSettingNode);
 
 	m_pButtonManagerNode->addButtonNode(buttonTestTimeModeNode);
-	this->addChild(m_pButtonManagerNode, 10);
+	this->addChild(m_pButtonManagerNode);
 
 	this->addButtonLoginFacebook();
 

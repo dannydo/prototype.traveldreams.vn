@@ -241,9 +241,9 @@ void LevelMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 	if (m_fYMoved + m_pBackgroundNode->getPosition().y >= 0) {
 		m_fYMoved = -m_pBackgroundNode->getPosition().y;
 	}
-	else if(m_fYMoved + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-960))
+	else if(m_fYMoved + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-890))
 	{
-		m_fYMoved = -(m_maxHeight-960) - m_pBackgroundNode->getPosition().y;
+		m_fYMoved = -(m_maxHeight-890) - m_pBackgroundNode->getPosition().y;
 	}
 	
 	Point point = m_pBackgroundNode->getPosition();
@@ -271,9 +271,9 @@ void LevelMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 		if (distanceY + m_pBackgroundNode->getPosition().y >= 0) {
 			distanceY = -m_pBackgroundNode->getPosition().y;
 		}
-		else if(distanceY + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-960))
+		else if(distanceY + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-890))
 		{
-			distanceY = -(m_maxHeight-960) - m_pBackgroundNode->getPosition().y;
+			distanceY = -(m_maxHeight-890) - m_pBackgroundNode->getPosition().y;
 		}
 
 		auto actionMove = MoveBy::create(fTime, Point(0.0f, distanceY));

@@ -13,6 +13,7 @@ public:
 	CREATE_FUNC(HeaderNode);
 
 private:
+	void clickBuyGold(cocos2d::Object* sender);
 };
 
 #endif;

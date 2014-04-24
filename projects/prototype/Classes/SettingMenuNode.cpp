@@ -399,13 +399,13 @@ void SettingMenuNode::hide()
 bool SettingMenuNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
 {
 	Point touchPosition = pTouch->getLocation();
-
-	if (touchPosition.x > 505.0f)
+	
+	if ((touchPosition.x > 505.0f && touchPosition.y > 104) || touchPosition.x > 610)
 	{
 		m_isClick = true;
 	}
 
-	if (m_iShowSetting)
+	if (m_iShowSetting && m_isClick)
 		return true;
 
 	return false;

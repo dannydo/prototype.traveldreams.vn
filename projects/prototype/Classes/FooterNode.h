@@ -21,7 +21,6 @@ public:
 private:
 	void openSettingMenu(cocos2d::Object* sender);
 	void openFlashCardCollection(cocos2d::Object* sender);
-	void openIntroduction(cocos2d::Object* sender);
 
 	SettingMenuNode* m_pSettingNode	;
 
