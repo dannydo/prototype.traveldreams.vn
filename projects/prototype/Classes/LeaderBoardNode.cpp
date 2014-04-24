@@ -5,6 +5,7 @@
 #include "Database\LevelTable.h"
 #include "LoadingImageNode.h"
 #include "GameConfigManager.h"
+#include "FunctionCommon.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -42,26 +43,16 @@ bool LeaderBoardtNode::init()
 		return false;
 	}
 
-	m_pSpriteBackground = Sprite::create("Target-End-Game/panel-avatar.png");
-	m_pSpriteBackground->setAnchorPoint(Point(0.5f, 0.5f));
-	m_pSpriteBackground->setPosition(Point(0.0f, 0.0f));
+	m_pSpriteBackground = Sprite::create("Target-End-Game/panel_high_score.png");
 	this->addChild(m_pSpriteBackground);
 	this->setContentSize(m_pSpriteBackground->getContentSize());
 
+	LabelBMFont *pLabelHighScore = LabelBMFont::create("HIGH SCORE", "fonts/font_score.fnt");
+	pLabelHighScore->setPosition(Point(12.0f, 60.0f));
+	this->addChild(pLabelHighScore);
+
 	m_pSlideShow = Node::create();
-	m_pSlideShow->setAnchorPoint(Point(0.0f, 0.5f));
-	m_pSlideShow->setPositionX(0.0f);
 	this->addChild(m_pSlideShow);
-
-	Sprite* pSpriteLeft = Sprite::create("Target-End-Game/bleft.png");
-	pSpriteLeft->setAnchorPoint(Point(0.5f, 0.5f));
-	pSpriteLeft->setPosition(Point(-304.0f, 0.0f));
-	this->addChild(pSpriteLeft);
-
-	Sprite* pSpriteRight = Sprite::create("Target-End-Game/bright.png");
-	pSpriteRight->setAnchorPoint(Point(0.5f, 0.5f));
-	pSpriteRight->setPosition(Point(305.0f, 0.0f));
-	this->addChild(pSpriteRight);
 
 	m_pScrollManager = new ScrollManager();
 	m_iLeaderBoardCount = 0;
@@ -85,6 +76,14 @@ bool LeaderBoardtNode::init()
 	}
 #endif
 
+	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
+	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
+	UserService::getInstance()->addCallBackList(this);
+	m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
+	m_iConnectServer++;
+	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
+	UserService::getInstance()->getLeaderBoardLevel(iCalLevel + m_iLevel, m_iConnectServer);
+
 	m_bIsSwipe = false;
 
 	return true;
@@ -94,9 +93,8 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 {
 	Node* pNodeItem = Node::create();
 
-	Sprite* pLoadAvatar = Sprite::create("Target-End-Game/avatar.png");
-	pLoadAvatar->setAnchorPoint(Point(0.5f, 0.0f));
-	pLoadAvatar->setPositionY(30.0f);
+	Sprite* pLoadAvatar = Sprite::create("Target-End-Game/border_avatar.png");
+	pLoadAvatar->setPosition(Point(50.0f, 95.0f));
 	pNodeItem->addChild(pLoadAvatar);
 
 	std::string urlAvatar = "https://graph.facebook.com/";
@@ -104,36 +102,34 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 	urlAvatar.append("/picture");
 
 	LoadingImagetNode* avatar = LoadingImagetNode::createLayout(urlAvatar.c_str());
-	avatar->setAnchorPoint(Point(0.5f, 0.0f));
-	avatar->setPositionY(61.0f);
-	avatar->setScale(1.2f);
+	avatar->setPosition(Point(50.0f, 95.0f));
 	pNodeItem->addChild(avatar);
 
-	Sprite* pBacground = Sprite::create("Target-End-Game/leaderboard_frame.png");
-	pBacground->setAnchorPoint(Point(0.5f, 0.0f));
-	pBacground->setPosition(Point(0.0f, -8.0f));
-	pNodeItem->addChild(pBacground);
+	Sprite* pIconAskLife = Sprite::create("Target-End-Game/btn_ask_life.png");
+	pIconAskLife->setPosition(Point(115.0f, 95.0f));
+	pNodeItem->addChild(pIconAskLife);
 
-	char sScore[10];
-	sprintf( sScore, "%d", iScore);
-	LabelTTF* pLabelScore = LabelTTF::create(sScore, "fonts/UTM Cookies.ttf", 18);
-	pLabelScore->setColor(ccc3(241, 231, 207));
-	pLabelScore->setAnchorPoint(Point(0.5f, 0.0f));
-	pLabelScore->setPositionY(7.0f);
+	LabelBMFont *pLabelScore = LabelBMFont::create(formatNumber(iScore).getCString(), "fonts/font_small_alert.fnt");
+	pLabelScore->setAnchorPoint(Point(0.0f, 0.5f));
+	pLabelScore->setPosition(Point(57.0f, 8.0f));
+	pLabelScore->setScale(0.85);
 	pNodeItem->addChild(pLabelScore);
 
-	char sTitle[50];
-	sprintf(sTitle, "%d.%s", iRank, sName);
-	LabelTTF* pLabelTitle = LabelTTF::create(sTitle, "fonts/UTM Cookies.ttf", 18);
-	pLabelTitle->setColor(ccc3(85, 83, 78));
-	if (iRank == 1)
-		pLabelTitle->setColor(ccc3(238, 41, 16));
-	pLabelTitle->setAnchorPoint(Point(0.5f, 0.0f));
-	pLabelTitle->setPositionY(105.0f);
-	pNodeItem->addChild(pLabelTitle);
-	pNodeItem->setContentSize(Size(150.0f, 150.0f));
+	LabelBMFont *pLabelName = LabelBMFont::create(sName, "fonts/font-small-green-alert.fnt");
+	pLabelName->setScale(0.85f);
+	pLabelName->setAnchorPoint(Point(0.0f, 0.5f));
+	pLabelName->setPosition(Point(57.0f, 45.0f));
+	pNodeItem->addChild(pLabelName);
 
-	pNodeItem->setPosition(Point(-235.0f + iIndex*118, -100.0f));
+	char sRank[10];
+	sprintf(sRank, "%d", iRank);
+	LabelBMFont *pLabelRank = LabelBMFont::create(sRank, "fonts/font-bechic.fnt");
+	pLabelRank->setAnchorPoint(Point(0.0f, 0.5f));
+	pLabelRank->setPosition(Point(25.0f, 23.0f));
+	pNodeItem->addChild(pLabelRank);
+
+	pNodeItem->setContentSize(Size(160.0f, 160.0f));
+	pNodeItem->setPosition(Point(-320.0f + iIndex*160, -100.0f));
 	pNodeItem->setTag(iIndex);
 	m_pSlideShow->addChild(pNodeItem);
 }
@@ -146,7 +142,7 @@ bool LeaderBoardtNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
 	}
 	m_bIsSwipe = true;
 
-	if (m_iLeaderBoardCount > 5)
+	if (m_iLeaderBoardCount > 3)
 	{
 		Point touchPosition = pTouch->getLocation();
 		m_fBeginX = touchPosition.x;
@@ -345,14 +341,14 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 						if (m_iLeaderBoardCount > 6 )
 							m_iLeaderBoardCount = 6;
 			
-						m_fMinPositionLeft = -((m_iLeaderBoardCount-5)*118.0f);
+						m_fMinPositionLeft = -((m_iLeaderBoardCount-4)*160.0f);
 					}
 					else
 					{
 						if (m_iLeaderBoardCount > 6)
 							m_iLeaderBoardCount = 6;
 
-						m_fMinPositionLeft = -((m_iLeaderBoardCount-5)*118.0f);
+						m_fMinPositionLeft = -((m_iLeaderBoardCount-4)*160.0f);
 
 						for(int iIndex=0; iIndex < m_iLeaderBoardCount; iIndex++)
 						{

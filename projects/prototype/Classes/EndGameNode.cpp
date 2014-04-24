@@ -115,7 +115,7 @@ bool EndGameNode::initWin()
 
 	Sprite* pButtonNextGameSprite = Sprite::create("Target-End-Game/btn_next.png");
 	ButtonNode* buttonNextNode = ButtonNode::createButtonSprite(pButtonNextGameSprite, CC_CALLBACK_1(EndGameNode::menuNextLevelCallBack, this));
-	buttonNextNode->setPosition(Point(438.0f, 279.0f));
+	buttonNextNode->setPosition(Point(425.0f, 279.0f));
 
 	Sprite* pButtonReplayGameSprite = Sprite::create("Target-End-Game/btn_replay.png");
 	ButtonNode* buttonReplayNode = ButtonNode::createButtonSprite(pButtonReplayGameSprite, CC_CALLBACK_1(EndGameNode::menuRetryLevelWinCallBack, this));
@@ -287,15 +287,17 @@ void EndGameNode::generateLayoutStartAndBonusQuest()
 {
 	for(int iIndex=0; iIndex<3; iIndex++) 
 	{
-		Sprite* pStarPurpleImage = Sprite::create("Target-End-Game/star_purple.png");
-		pStarPurpleImage->setPosition(Point(210.0f + iIndex*108.0f - m_iTotalBonusQuest*46, 750.0f));
+		Sprite* pStarPurpleImage = Sprite::create("Target-End-Game/star_fail_small.png");
+		pStarPurpleImage->setPosition(Point(220.0f + iIndex*100.0f - m_iTotalBonusQuest*46, 750.0f));
+		if (iIndex == 1)
+				pStarPurpleImage->setScale(1.4f);
 		this->addChild(pStarPurpleImage);
 	}
 
 	for(int iIndex=0; iIndex<m_iTotalBonusQuest; iIndex++) 
 	{
-		Sprite* pMushRoomFail = Sprite::create("Target-End-Game/mushroom-fail.png");
-		pMushRoomFail->setPosition(Point(539.0f + iIndex*98.0f - m_iTotalBonusQuest*50, 750.0f));
+		Sprite* pMushRoomFail = Sprite::create("Target-End-Game/mushroom_fail.png");
+		pMushRoomFail->setPosition(Point(526.0f + iIndex*91.0f - m_iTotalBonusQuest*50, 750.0f));
 		this->addChild(pMushRoomFail);
 	}
 }
@@ -336,8 +338,11 @@ void EndGameNode::sequenceUpdateStar()
 void EndGameNode::updateStar()
 {
 	if (m_iCountYellowStar < m_iYellowStar) {
-		Sprite* pStarYellowImage = Sprite::create("Target-End-Game/star_yellow.png");
-		pStarYellowImage->setPosition(Point(210.0f + m_iCountYellowStar*108.0f - m_iTotalBonusQuest*46, 750.0f));
+		Sprite* pStarYellowImage = Sprite::create("Target-End-Game/star_win_small.png");
+		pStarYellowImage->setPosition(Point(220.0f + m_iCountYellowStar*100.0f - m_iTotalBonusQuest*46, 750.0f));
+		if (m_iCountYellowStar == 1)
+				pStarYellowImage->setScale(1.4f);
+
 		this->addChild(pStarYellowImage);
 		m_iCountYellowStar++;
 		this->sequenceUpdateStar();
@@ -367,8 +372,8 @@ void EndGameNode::updateBonusQuest()
 {
 	if (m_iCountBonusQuest < m_iBonusQuestCompleted && m_iCountBonusQuest < m_iTotalBonusQuest)
 	{
-		Sprite* pMushRoom = Sprite::create("Target-End-Game/mushroom.png");
-		pMushRoom->setPosition(Point(539.0f + m_iCountBonusQuest*98.0f - m_iTotalBonusQuest*50, 750.0f));
+		Sprite* pMushRoom = Sprite::create("Target-End-Game/mushroom_win.png");
+		pMushRoom->setPosition(Point(526.0f + m_iCountBonusQuest*91.0f - m_iTotalBonusQuest*50, 750.0f));
 		this->addChild(pMushRoom);
 		m_iCountBonusQuest++;
 		this->sequenceUpdateBonusQuest();

@@ -94,7 +94,7 @@ void EndGameCustomModeNode::generateLayoutStart()
 	for(int iIndex=0; iIndex<3; iIndex++) 
 	{
 		Sprite* pStarPurpleImage = Sprite::create("Target-End-Game/star_purple.png");
-		pStarPurpleImage->setPosition(Point(210.0f + iIndex*108.0f, 760));
+		pStarPurpleImage->setPosition(Point(220.0f + iIndex*100.0f, 760));
 		this->addChild(pStarPurpleImage);
 	}
 }
