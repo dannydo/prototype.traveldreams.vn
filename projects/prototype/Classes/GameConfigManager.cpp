@@ -652,7 +652,7 @@ void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID)
 	delete[] orginalData;
 }
 
-void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::vector<string>& wordList, std::vector<int>& levelList)
+void GameConfigManager::GenerateWordsForNewChapter(const string& sChapterID, std::vector<string>& outputWordList, std::vector<int>& outputLevelList)
 {
 	ChapterConfig& chapterConfig = GetChapterConfig(sChapterID);	
 	 
@@ -660,6 +660,7 @@ void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::ve
 	int iWordIndex;
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
 	std::vector<int> letterCountList;
+	std::vector<string> wordList;//temporary list store all words 
 	//int iLetterCount;
 	
 	//std::string sDebug;
@@ -683,8 +684,6 @@ void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::ve
 		letterCountList.push_back(word.m_iMaximumLevelLetterRequired); //iLetterCount);
 		
 		wordList.push_back(wordID);
-		levelList.push_back(-1);
-
 
 		/*sprintf(sTextDebug, " - %d", word.m_iMaximumLevelLetterRequired);
 		sDebug += word.m_sWord; //sTextDebug;
@@ -749,7 +748,9 @@ void GameConfigManager::GenerateWordsForLevels(const string& sChapterID, std::ve
 
 		if (letterCountList[sortedWordIndexList[iSortedWordIndex]] >= requiredLetterOfLevelList[sortedLevelIndexList[iSortedLevelIndex]])
 		{
-			levelList[sortedWordIndexList[iSortedWordIndex]] = sortedLevelIndexList[iSortedLevelIndex]+1;
+			outputWordList.push_back( wordList[sortedWordIndexList[iSortedWordIndex]]);
+			outputLevelList.push_back( sortedLevelIndexList[iSortedLevelIndex]+1);
+			//levelList[sortedWordIndexList[iSortedWordIndex]] = sortedLevelIndexList[iSortedLevelIndex]+1;
 			
 			iSortedLevelIndex++;
 			iSortedWordIndex++;

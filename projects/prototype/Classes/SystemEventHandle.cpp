@@ -232,10 +232,10 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 							#endif
 							UserTable::getInstance()->updateUser(userInfoNew);
 
-							// Create data for one chapter
+							// Create data for chapter 1
 							std::vector<std::string> wordList;
 							std::vector<int> mapLevels;
-							GameConfigManager::getInstance()->GenerateWordsForLevels(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
+							GameConfigManager::getInstance()->GenerateWordsForNewChapter(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
 
 							if(InitDatabase::getInstance()->createDataChapterAndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels))
 							{

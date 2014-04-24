@@ -307,7 +307,7 @@ public:
 	const ObstacleLevelDescription& GetObstacleLevelDescription(const int& iObstacleTypeID, const int& iLevel);
 
 
-	void GenerateWordsForLevels(const std::string& sChapterID, std::vector<std::string>& wordList, std::vector<int>& levelList);
+	void GenerateWordsForNewChapter(const std::string& sChapterID, std::vector<std::string>& outputWordList, std::vector<int>& outputLevelList);
 	void UpdateNewWordForLevel(const std::string& sChapterID, const int& iLevel);
 private:
 	void LoadConfigOfLevel(const std::string& sChapterID, const int& iLevelId);

@@ -171,6 +171,7 @@ void CustomPackageDownloaderNode::LoadPackageListFromFile()
 }
 
 bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string& sFolderName);
+void callTrackingURL(const std::string& sTrackingUrl);
 
 void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 {	
@@ -180,15 +181,20 @@ void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 	m_pMenu->setEnabled(false);
 
 	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
-	char sDownloadUrl[256], sVersionUrl[256], sFolderUrl[256];	
+	char sVersionUrl[256], sFolderUrl[256];	
+	string sDownloadUrl;
 	sprintf(sFolderUrl, "%s/folder/%s",sBaseUrl, m_pCodeEditBox->getText());
 
 	std::string sFolderName;
 	if (checkAndGetResultFolderName( string(sFolderUrl), m_sResultFolder) && m_sResultFolder.size()!=0)
 	{		
-		sprintf(sDownloadUrl, "%s/download/%s",sBaseUrl, m_pCodeEditBox->getText());
+		int iSpaceIndex = m_sResultFolder.find(' ');
+		sDownloadUrl = m_sResultFolder.substr(iSpaceIndex+1, m_sResultFolder.size() - iSpaceIndex -1);
+		m_sResultFolder = m_sResultFolder.substr(0, iSpaceIndex);
+
+		//sprintf(sDownloadUrl, "%s/download/%s",sBaseUrl, m_pCodeEditBox->getText());
 		sprintf(sVersionUrl, "%s/version/%s",sBaseUrl, m_pCodeEditBox->getText());
-		m_pAssetManager = new AssetsManager( sDownloadUrl, sVersionUrl, m_sPathToSave.c_str());
+		m_pAssetManager = new AssetsManager( sDownloadUrl.c_str(), sVersionUrl, m_sPathToSave.c_str());
 		m_pAssetManager->setDelegate(this);
 		m_pAssetManager->setConnectionTimeout(3);
 		addChild(m_pAssetManager);
@@ -263,7 +269,10 @@ void CustomPackageDownloaderNode::onError(cocos2d::extension::AssetsManager::Err
     {
         m_pProgressLabel->setString("network error");		
     }
-
+	else if (errorCode == AssetsManager::ErrorCode::UNCOMPRESS)
+    {
+        m_pProgressLabel->setString("Invalid compress file!");		
+    }
 	
 	m_pMenu->setEnabled(true);
 }
@@ -280,6 +289,12 @@ void CustomPackageDownloaderNode::onSuccess()
 	m_pProgressLabel->setString("download completed!");
 
 	m_pMenu->setEnabled(true);
+
+	// notify server for tracking purpose
+	char sTrackingURL[256];
+	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
+	sprintf(sTrackingURL, "%s/track/%s",sBaseUrl, m_pCodeEditBox->getText());
+	callTrackingURL(string(sTrackingURL));
 
 	// add new package to list
 	CustomPackageInfo customPackageInfo;
@@ -360,6 +375,22 @@ static size_t getStringData(void *ptr, size_t size, size_t nmemb, void *userdata
     data->append((char*)ptr, size * nmemb);
     
     return (size * nmemb);
+}
+
+void callTrackingURL(const std::string& sTrackingUrl)
+{
+	void* _curl = curl_easy_init();
+    if (! _curl)
+    {
+        CCLOG("can not init curl");
+        return;
+    }
+        	
+    CURLcode res;
+    curl_easy_setopt(_curl, CURLOPT_URL, sTrackingUrl.c_str());
+    //curl_easy_setopt(_curl, CURLOPT_SSL_VERIFYPEER, 0L);    
+    curl_easy_setopt(_curl, CURLOPT_CONNECTTIMEOUT, 3);
+    res = curl_easy_perform(_curl);
 }
 
 bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string& sFolderName)

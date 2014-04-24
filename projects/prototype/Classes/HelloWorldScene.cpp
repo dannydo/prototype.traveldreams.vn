@@ -39,6 +39,8 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,
 
 	// extra layer for score/stars...	
 	boardLayer->m_pStatusLayer = StatusLayer::create();
+	if (eGameModeType == _GMT_TIME_MODE_)
+		boardLayer->m_pStatusLayer->hiddenLayoutMove();
 	boardLayer->m_pStatusLayer->setScale(0.88f);
 	boardLayer->m_pStatusLayer->setCurrentScore(0);
 	boardLayer->m_pStatusLayer->setCurrentMove(0);
@@ -4834,9 +4836,10 @@ void HelloWorld::OnTimeMode_OutOfTime()
 
 //#include "MainMenuScene.h"
 #include "EndGameCustomModeNode.h"
+#include "APIService\SyncDataGame.h"
 
 void HelloWorld::ShowTimeModeResultPopup()
-{
+{	
 	auto timeModeConfig = (TimeModeLevelConfig*)m_GameBoardManager.GetLevelConfig();
 	//MainMenuScene* pMainMenu = MainMenuScene::create();
 	//Director::getInstance()->replaceScene(pMainMenu);
@@ -4845,6 +4848,9 @@ void HelloWorld::ShowTimeModeResultPopup()
 					GameWordManager::getInstance()->GetTotalPlayTimeOfTimeModeSession());	
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStartsOfTimeMode(m_iCurrentTimeModeStage-1));
 	m_pHUDLayer->addChild(pEndGameNode, 1000);
+
+	// push result of custom mode to server
+	SyncDataGame::getInstance()->pushDataCustomGameMode(timeModeConfig->m_sCustomPackageID);
 }
 
 void HelloWorld::OnTimeMode_StageComplete()
