@@ -6,6 +6,7 @@
 #include "LoadingImageNode.h"
 #include "GameConfigManager.h"
 #include "FunctionCommon.h"
+#include "ButtonManagerNode.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -98,8 +99,12 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 	pNodeItem->addChild(avatar);
 
 	Sprite* pIconAskLife = Sprite::create("Target-End-Game/btn_ask_life.png");
-	pIconAskLife->setPosition(Point(115.0f, 95.0f));
-	pNodeItem->addChild(pIconAskLife);
+	ButtonNode* pButtonAskLife = ButtonNode::createButtonSprite(pIconAskLife, CC_CALLBACK_1(LeaderBoardtNode::clickAskLife, this));
+	pButtonAskLife->setPosition(Point(115.0f, 95.0f));
+	
+	ButtonManagerNode* pButtonManager = ButtonManagerNode::create();
+	pButtonManager->addButtonNode(pButtonAskLife);
+	pNodeItem->addChild(pButtonManager);
 
 	LabelBMFont *pLabelScore = LabelBMFont::create(formatNumber(iScore).getCString(), "fonts/font_small_alert.fnt");
 	pLabelScore->setAnchorPoint(Point(0.0f, 0.5f));
@@ -124,6 +129,11 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 	pNodeItem->setPosition(Point(-320.0f + iIndex*160, -100.0f));
 	pNodeItem->setTag(iIndex);
 	m_pSlideShow->addChild(pNodeItem);
+}
+
+void LeaderBoardtNode::clickAskLife(cocos2d::Object* sender)
+{
+
 }
 
 bool LeaderBoardtNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
@@ -314,13 +324,13 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 								if(iCount > 2)
 									break;
 
-								if (iIndex < iRank-2)
+								if (iIndex < iRank-3)
 								{
 									iCount++;
 									cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
 									this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
 								}
-								else if (iIndex > iRank)
+								else if (iIndex > iRank-1)
 								{
 									iCount++;
 									cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);

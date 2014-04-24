@@ -8,6 +8,11 @@
 
 USING_NS_CC;
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "Social\FacebookManager.h"
+using namespace cocos2d::plugin;
+#endif
+
 PopupConfirmNode::~PopupConfirmNode ()
 {
 }
@@ -67,6 +72,10 @@ bool PopupConfirmNode::init()
 	pButtonManagerNode->addButtonNode(pButtonCloseNode);
 	this->addChild(pButtonManagerNode);
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	FacebookManager::getInstance()->loadPlugin();
+#endif
+
 	return true;
 }
 
@@ -122,9 +131,9 @@ void PopupConfirmNode::runResetGame()
 		UserInfo userInfoNew = UserTable::getInstance()->getUserInfo();
 		userInfoNew.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
 		userInfoNew.iCurrentLevel = 1;
-		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 		userInfoNew.sFacebookToken  = FacebookManager::getInstance()->getAccessToken();
-		#endif
+	#endif
 		UserTable::getInstance()->updateUser(userInfoNew);
 
 		// Create data for one chapter

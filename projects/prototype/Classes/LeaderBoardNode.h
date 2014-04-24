@@ -32,6 +32,7 @@ public:
 private:
 	void addItemToSlide(const int& iScore, const char* sName, const char* sFacebookId, const int& iRank, const int& iIndex);
 	void parseJsonToLeadeBoard(cs::JsonDictionary* pJsonItem, const int& iRank, const int& iIndex);
+	void clickAskLife(cocos2d::Object* sender);
 
 	cocos2d::Node* m_pSlideShow;
 	cocos2d::Sprite* m_pSpriteBackground;

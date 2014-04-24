@@ -153,9 +153,9 @@ void WorldMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 		if (m_fYMoved + m_pBackgroundNode->getPosition().y >= 94) {
 			m_fYMoved = -m_pBackgroundNode->getPosition().y + 94;
 		}
-		else if(m_fYMoved + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-960))
+		else if(m_fYMoved + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-887))
 		{
-			m_fYMoved = -(m_maxHeight-960) - m_pBackgroundNode->getPosition().y;
+			m_fYMoved = -(m_maxHeight-887) - m_pBackgroundNode->getPosition().y;
 		}
 	
 		m_bMoveSlideShow = true;

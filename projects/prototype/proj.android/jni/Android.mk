@@ -65,6 +65,9 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/Database/CSPackageTable.cpp \
 				   ../../Classes/Database/CSWordTable.cpp \
 				   ../../Classes/ConfirmQuitLevelNode.cpp \
+				   ../../Classes/FunctionCommon.cpp \
+				   ../../Classes/OutOfMovesNode.cpp \
+				   ../../Classes/PopupConfirmNode.cpp \
 				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
