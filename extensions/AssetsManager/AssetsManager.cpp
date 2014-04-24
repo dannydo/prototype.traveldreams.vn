@@ -271,6 +271,7 @@ bool AssetsManager::uncompress()
     
     // Loop to extract all files.
     uLong i;
+	string sTempFileName;
     for (i = 0; i < global_info.number_entry; ++i)
     {
         // Get info about current file.
@@ -289,11 +290,32 @@ bool AssetsManager::uncompress()
             unzClose(zipfile);
             return false;
         }
-        
-        string fullPath = _storagePath + fileName;
+		
         
         // Check if this entry is a directory or a file.
-        const size_t filenameLength = strlen(fileName);
+        const size_t filenameLength = strlen(fileName);		
+		string fullPath;
+		// make sure parent directory is created first
+		sTempFileName = fileName ;
+		int iFindPos = sTempFileName.find('/');
+		if (iFindPos >=0 && iFindPos != filenameLength-1)
+		{			
+			while(iFindPos >=0 && iFindPos != filenameLength-1)
+			{
+				fullPath = _storagePath + sTempFileName.substr(0, iFindPos+1);
+				if (!createDirectory(fullPath.c_str()))
+				{
+					CCLOG("can not create directory %s", fullPath.c_str());
+					unzClose(zipfile);
+					return false;
+				}	
+
+				iFindPos = sTempFileName.find('/', iFindPos+1);
+			}
+		}
+        
+        
+		fullPath = _storagePath + fileName;
         if (fileName[filenameLength-1] == '/')
         {
             // Entry is a direcotry, so create it.
@@ -440,22 +462,29 @@ bool AssetsManager::downLoad()
     
     // Download pacakge
     CURLcode res;
+	_curl = curl_easy_init();
     curl_easy_setopt(_curl, CURLOPT_URL, _packageUrl.c_str());
     curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, downLoadPackage);
     curl_easy_setopt(_curl, CURLOPT_WRITEDATA, fp);
     curl_easy_setopt(_curl, CURLOPT_NOPROGRESS, false);
     curl_easy_setopt(_curl, CURLOPT_PROGRESSFUNCTION, assetsManagerProgressFunc);
     curl_easy_setopt(_curl, CURLOPT_PROGRESSDATA, this);
+	curl_easy_setopt(_curl, CURLOPT_HEADER , 0);	
     res = curl_easy_perform(_curl);
     curl_easy_cleanup(_curl);
+
+	long http_code = 0;
+	if (res == 0)
+		curl_easy_getinfo (_curl, CURLINFO_RESPONSE_CODE, &http_code);
+
     if (res != 0)
     {
         sendErrorMessage(ErrorCode::NETWORK);
         CCLOG("error when download package");
         fclose(fp);
         return false;
-    }
-    
+    }    
+
     CCLOG("succeed downloading package %s", _packageUrl.c_str());
     
     fclose(fp);
