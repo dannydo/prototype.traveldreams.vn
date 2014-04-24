@@ -4878,6 +4878,7 @@ void HelloWorld::OnTimeMode_StageComplete()
 }
 
 #include "Database\CSWordTable.h"
+#include "Database\CSPackageTable.h"
 
 void HelloWorld::TimeMode_StartNextStage()
 {
@@ -4894,9 +4895,14 @@ void HelloWorld::TimeMode_StartNextStage()
 			iCollectedCount = timeModeConfig->m_WordCollectedCountList[i]++;
 			break;
 		}
-	}	
+	}
 
 	// update db to increase collect count of main word
+	CSPackageInfo packageInfo;
+	packageInfo.sPackageId = timeModeConfig->m_sCustomPackageID;
+	packageInfo.sPackageName = "";
+	CSPackageTable::getInstance()->updateCSPackage(packageInfo);
+
 	CSWordInfo customWordDB;
 	customWordDB.sCSWordId = GameWordManager::getInstance()->GetMainWord().m_sWordID;
 	customWordDB.sPackageId = timeModeConfig->m_sCustomPackageID;

@@ -106,14 +106,14 @@ bool CSWordTable::updateCSWord(const CSWordInfo& csWordInfo)
 
 	if (nRow > 0)
 	{
-		sql = "update Words Set";
+		sql = "update CSWords Set";
 		sql.appendWithFormat(" CollectedCount=%d", csWordInfo.iCollectedCount);
 		sql.appendWithFormat(" where WordId='%s'", csWordInfo.sCSWordId.c_str());
 		sql.appendWithFormat(" and PackageId='%s'", csWordInfo.sPackageId.c_str());
 	}
 	else
 	{
-		sql = "insert into Words values(";
+		sql = "insert into CSWords values(";
 		sql.appendWithFormat("'%s',", csWordInfo.sCSWordId.c_str());
 		sql.appendWithFormat("'%s',", csWordInfo.sPackageId.c_str());
 		sql.appendWithFormat("%d);", csWordInfo.iCollectedCount);

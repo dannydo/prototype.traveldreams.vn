@@ -64,6 +64,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/EndGameCustomModeNode.cpp \
 				   ../../Classes/Database/CSPackageTable.cpp \
 				   ../../Classes/Database/CSWordTable.cpp \
+				   ../../Classes/ConfirmQuitLevelNode.cpp \
 				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
