@@ -20,7 +20,7 @@ void TimeCountDownNode::init(int iMaximumEnergy, int iEnergyLostPerSecond)
 	m_bIsStarted = false;
 	m_fMaximumEnergy = iMaximumEnergy;
 	m_fEnergyLostPersecond = iEnergyLostPerSecond;
-	m_fCurrentEnergy = m_fMaximumEnergy /4.f;
+	m_fCurrentEnergy = m_fMaximumEnergy /2.f;
 
 	Size winSize = Director::getInstance()->getWinSize();
 	
