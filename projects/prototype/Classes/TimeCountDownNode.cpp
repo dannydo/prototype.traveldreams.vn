@@ -22,6 +22,8 @@ void TimeCountDownNode::init(int iMaximumEnergy, int iEnergyLostPerSecond)
 	m_fEnergyLostPersecond = iEnergyLostPerSecond;
 	m_fCurrentEnergy = m_fMaximumEnergy /2.f;
 
+	m_bIsInNearOutOfEnergyState = false;
+
 	Size winSize = Director::getInstance()->getWinSize();
 	
 	//_contentSize.width = winSize.width - 50.f;
@@ -40,13 +42,13 @@ void TimeCountDownNode::init(int iMaximumEnergy, int iEnergyLostPerSecond)
 	m_pBatchNode = SpriteBatchNode::create("ResourceDemo.pvr.ccz");
 	this->addChild(m_pBatchNode);
 
-	auto pBackground = Sprite::createWithSpriteFrameName("TimeBoard.png");
-	pBackground->setAnchorPoint(Point(0,0));
-	m_pBatchNode->addChild(pBackground);
+	m_pBackground = Sprite::createWithSpriteFrameName("TimeBoard.png");
+	m_pBackground->setAnchorPoint(Point(0,0));
+	m_pBatchNode->addChild(m_pBackground);
 
 	m_pMirrorMidEnergyBar = Sprite::createWithSpriteFrameName("Bar_compact.png");
 	m_pMirrorMidEnergyBar->setAnchorPoint(Point(0, 0.5f));
-	m_pMirrorMidEnergyBar->setPosition(Point(73.f, 108.f));
+	m_pMirrorMidEnergyBar->setPosition(Point(80.f, 108.f));
 	m_pMirrorMidEnergyBar->setVisible(false);
 	m_pBatchNode->addChild(m_pMirrorMidEnergyBar);
 
@@ -76,7 +78,7 @@ void TimeCountDownNode::init(int iMaximumEnergy, int iEnergyLostPerSecond)
 	m_pMidEnergyBar->setScaleX( fEnergyWidth / m_pMidEnergyBar->getContentSize().width);
 	m_pRightEnergyBar->setPositionX( m_pMidEnergyBar->getPositionX() + m_pMidEnergyBar->getContentSize().width* m_pMidEnergyBar->getScaleX());*/
 
-	this->setPositionY( winSize.height - pBackground->getContentSize().height);
+	this->setPositionY( winSize.height - m_pBackground->getContentSize().height);
 }
 
 void TimeCountDownNode::update(float fDeltaTime)
@@ -98,15 +100,32 @@ void TimeCountDownNode::update(float fDeltaTime)
 		m_pMirrorMidEnergyBar->setVisible(false);
 	
 		m_pMidEnergyBar->setContentSize(Size( fEnergyWidth, 34.f));
+
+		if (m_bIsInNearOutOfEnergyState)
+		{
+			m_bIsInNearOutOfEnergyState = false;
+			m_pBackground->stopAllActions();
+			m_pBackground->setColor(Color3B(255.f, 255.f, 255.f));
+		}
 	}
 	else
-	{
+	{		
 		m_pMidEnergyBar->setVisible(false);
 		m_pMirrorMidEnergyBar->setVisible(true);
 
 		//m_pMirrorMidEnergyBar->setScaleX( fEnergyWidth / m_pMidEnergyBar->getContentSize().width);
 		m_pMirrorMidEnergyBar->setOpacity(fEnergyWidth*255/4);
 		m_pMirrorMidEnergyBar->setScale(fEnergyWidth/40.f);
+
+		if (!m_bIsInNearOutOfEnergyState)
+		{
+			m_bIsInNearOutOfEnergyState = true;
+			m_pBackground->runAction(
+				RepeatForever::create(
+				Sequence::createWithTwoActions(					
+						TintTo::create( 0.3f, 255.f, 30.f, 30.f),
+						TintTo::create( 0.3f, 255.f, 255.f, 255.f))));
+		}
 	}
 	//m_pMidEnergyBar->setScaleX( fEnergyWidth / m_pMidEnergyBar->getContentSize().width);
 	//m_pRightEnergyBar->setPositionX( m_pMidEnergyBar->getPositionX() + m_pMidEnergyBar->getContentSize().width* m_pMidEnergyBar->getScaleX());

@@ -32,11 +32,13 @@ private:
 
 	float m_fMaximumEnergy;
 	float m_fEnergyLostPersecond;
+	bool m_bIsInNearOutOfEnergyState;
 
 	std::function<void()> m_OutOfTimeCallback;
 
 
 	SpriteBatchNode* m_pBatchNode;
+	Sprite* m_pBackground;
 	Scale9Sprite* m_pMidEnergyBar;
 	Sprite* m_pMirrorMidEnergyBar;
 };
