@@ -207,6 +207,12 @@
     <ClCompile Include="..\Classes\ConfirmQuitLevelNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\PopupConfirmNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\OutOfMovesNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -396,6 +402,12 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\ConfirmQuitLevelNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\PopupConfirmNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\OutOfMovesNode.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

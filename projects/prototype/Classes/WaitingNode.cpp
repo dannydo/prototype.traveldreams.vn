@@ -29,12 +29,19 @@ bool WaitingNode::init()
 		return false;
 	}
 
-	LayerColor* pBackground = LayerColor::create(ccc4(0, 0, 0, 255), 400.0f, 80.0f);
-	pBackground->setPosition(-pBackground->getContentSize().width/2.0f, -pBackground->getContentSize().height/2.0f);
-	pBackground->setAnchorPoint(Point(0.5f, 0.5f));
+	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 150));
+	pBackground->setContentSize(CCSizeMake(640.0f, 960.0f));
 	this->addChild(pBackground);
+	this->setContentSize(pBackground->getContentSize());
 
-	LabelTTF* pLabelTitle = LabelTTF::create(m_sTitle, "Arial", 30);
+	Sprite* pBackgroundBoard = Sprite::create("popup/panel_popup_waiting.png");
+	pBackgroundBoard->setPosition(Point(320.0f, 480.0f));
+	pBackgroundBoard->setScaleY(0.7f);
+	this->addChild(pBackgroundBoard);
+
+	LabelBMFont *pLabelTitle = LabelBMFont::create(m_sTitle, "fonts/font_title-popup.fnt", 410.0f, TextHAlignment::CENTER);
+	pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
+	pLabelTitle->setPosition(Point(320.0f, 485.0f));
 	this->addChild(pLabelTitle);
 
 	return true;

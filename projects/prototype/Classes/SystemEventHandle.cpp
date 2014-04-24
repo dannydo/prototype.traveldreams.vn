@@ -55,7 +55,6 @@ void SystemEventHandle::onStartSyncGame(const bool& bIsShowSyncError)
 	// Show popup sync game data
 	m_bIsShowSyncError = bIsShowSyncError ;
 	WaitingNode* pWaitingNode = WaitingNode::createLayout("Loading...");
-	pWaitingNode->setPosition(320.0f, 480.0f);
 	pWaitingNode->setTag(1001);
 	Director::getInstance()->getRunningScene()->addChild(pWaitingNode);
 
@@ -70,6 +69,8 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 		{
 		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 			FacebookManager::getInstance()->loginByMode();
+		#else
+			Director::getInstance()->getRunningScene()->removeChildByTag(1000);
 		#endif
 		}
 		else
@@ -113,7 +114,6 @@ void SystemEventHandle::onStartConnectFacebook()
 	*/
 #endif
 	WaitingNode* pWaitingNode = WaitingNode::createLayout("Connecting...");
-	pWaitingNode->setPosition(320.0f, 480.0f);
 	pWaitingNode->setTag(1000);
 	Director::getInstance()->getRunningScene()->addChild(pWaitingNode);
 

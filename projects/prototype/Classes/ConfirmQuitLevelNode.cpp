@@ -33,10 +33,6 @@ bool ConfirmQuitLevelNode::init()
 
 	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 150));
 	pBackground->setContentSize(CCSizeMake(640.0f, 960.0f));
-	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
-	listener->setSwallowTouches(true);
-	listener->onTouchBegan = [this](Touch* touch, Event* event) { return true;  };
-	EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, pBackground);
 	this->addChild(pBackground);
 	this->setContentSize(pBackground->getContentSize());
 

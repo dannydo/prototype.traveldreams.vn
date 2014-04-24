@@ -72,6 +72,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 
 	Sprite* pButtonPlayGameSprite = Sprite::create("Target-End-Game/btn_big_play.png");
 	ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonPlayGameSprite, CC_CALLBACK_1(GameTargetNode::menuPlayLevelCallBack, this));
+	buttonPlayNode->setScale(0.9f);
 	buttonPlayNode->setPosition(Point(320.0f, 293.0f));
 
 	Sprite* pButtonCloseSprite = Sprite::create("Target-End-Game/btn_close.png");
@@ -84,7 +85,7 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	this->addChild(pButtonManagerNode);
 
 	LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel, m_sChapterId);
-	pLeaderBoard->setPosition(Point(320.0f, 114.0f));
+	pLeaderBoard->setPosition(Point(320.0f, 109.0f));
 	this->addChild(pLeaderBoard);
 
 	return true;

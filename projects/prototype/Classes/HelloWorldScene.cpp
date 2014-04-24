@@ -5,6 +5,7 @@
 #include "Database\UserTable.h"
 #include "Database\GameTracking.h"
 #include "ActionExtension.h"
+#include "OutOfMovesNode.h"
 
 USING_NS_CC;
 
@@ -1677,9 +1678,9 @@ void HelloWorld::ShowFailGamePopup()
 	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
 	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
 
-	EndGameNode* pEndGameNode = EndGameNode::createLayoutLose( m_GameBoardManager.GetCurrentScore(), 
+	OutOfMovesNode* pOutOfMoveNode = OutOfMovesNode::createLayout( m_GameBoardManager.GetCurrentScore(), 
 				m_GameBoardManager.GetGameWordManager()->GetMainWord(), iCurrentLevel, sCurrentChapterID);
-	m_pHUDLayer->addChild( pEndGameNode, 100);
+	m_pHUDLayer->addChild( pOutOfMoveNode, 100);
 
 	//SoundManager::PlaySoundEffect(_SET_FAIL_);
 	UserTable::getInstance()->updateLife(1);
