@@ -23,8 +23,6 @@ private:
 
 	cocos2d::String formatSecondsToDiaplay(const int& iSeconds);
 
-	cocos2d::SpriteBatchNode* m_pSpriteBatchNode;
-
 	int m_iStage;
 	int m_iTotalWord;
 	int	m_iDurationSecond;

@@ -37,17 +37,13 @@ bool EndGameCustomModeNode::init()
 	this->addChild(pBackground);
 	this->setContentSize(pBackground->getContentSize());
 
-	//m_pSpriteBatchNode = SpriteBatchNode::create("Target-End-Game/TargetEndgame.pvr.ccz");
-	//SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("Target-End-Game/TargetEndgame.plist");
-	//this->addChild(m_pSpriteBatchNode);
-
 	Sprite* pBackgroundBoard = Sprite::create("Target-End-Game/panel-level_popup.png");
 	pBackgroundBoard->setPosition(Point(320.0f, 610.0f));
 	this->addChild(pBackgroundBoard);
 
 	Sprite* pButtonReplayGameSprite = Sprite::create("Target-End-Game/btn_replay.png");
 	ButtonNode* buttonReplayNode = ButtonNode::createButtonSprite(pButtonReplayGameSprite, CC_CALLBACK_1(EndGameCustomModeNode::menuRetryLevelCallBack, this));
-	buttonReplayNode->setPosition(Point(225.0f, 279.0f));
+	buttonReplayNode->setPosition(Point(320.0f, 279.0f));
 
 	Sprite* pButtonCloseSprite = Sprite::create("Target-End-Game/btn_close.png");
 	ButtonNode* buttonCloseNode = ButtonNode::createButtonSprite(pButtonCloseSprite, CC_CALLBACK_1(EndGameCustomModeNode::menuCloseCallBack, this));
@@ -60,30 +56,30 @@ bool EndGameCustomModeNode::init()
 
 	this->generateLayoutStart();
 
-	LabelTTF *pLabelGameOver = LabelTTF::create("GAME OVER", "fonts/UTM Cookies.ttf", 30.0f);
+	LabelBMFont *pLabelGameOver = LabelBMFont::create("GAME OVER", "fonts/font-bechic.fnt");
 	pLabelGameOver->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelGameOver->setPosition(Point(320.0f, 925.0f));
+	pLabelGameOver->setPosition(Point(320.0f, 870.0f));
 	this->addChild(pLabelGameOver);
 
 	char sStage[20];
 	sprintf(sStage, "STAGE %d", m_iStage);
-	LabelTTF *pLabelStage = LabelTTF::create(sStage, "fonts/UTM Cookies.ttf", 40.0f);
+	LabelBMFont *pLabelStage = LabelBMFont::create(sStage, "fonts/font_title-popup.fnt");
 	pLabelStage->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelStage->setPosition(Point(320.0f, 730.0f));
+	pLabelStage->setPosition(Point(320.0f, 670.0f));
 	this->addChild(pLabelStage);
 
 	char sTotalWord[20];
 	sprintf(sTotalWord, "Total Word: %d", m_iTotalWord);
-	LabelTTF *pLabelTotalWord = LabelTTF::create(sTotalWord, "fonts/UTM Cookies.ttf", 30.0f);
+	LabelBMFont *pLabelTotalWord = LabelBMFont::create(sTotalWord, "fonts/font_score.fnt");
 	pLabelTotalWord->setAnchorPoint(Point(0.0f, 0.0f));
-	pLabelTotalWord->setPosition(Point(120.0f, 600.0f));
+	pLabelTotalWord->setPosition(Point(150.0f, 550.0f));
 	this->addChild(pLabelTotalWord);
 
 	char sDuration[30];
 	sprintf(sDuration, "Game Duration %s", this->formatSecondsToDiaplay(m_iDurationSecond).getCString());
-	LabelTTF *pLabelDuration = LabelTTF::create(sDuration, "fonts/UTM Cookies.ttf", 30.0f);
+	LabelBMFont *pLabelDuration = LabelBMFont::create(sDuration, "fonts/font_score.fnt");
 	pLabelDuration->setAnchorPoint(Point(0.0f, 0.0f));
-	pLabelDuration->setPosition(Point(120.0f, 560.0f));
+	pLabelDuration->setPosition(Point(150.0f, 500.0f));
 	this->addChild(pLabelDuration);
 
 	return true;
