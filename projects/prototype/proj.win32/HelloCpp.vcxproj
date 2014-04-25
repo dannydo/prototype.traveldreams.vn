@@ -160,6 +160,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\DictionaryNode.cpp" />
     <ClCompile Include="..\Classes\EndGameCustomModeNode.cpp" />
     <ClCompile Include="..\Classes\EndGameNode.cpp" />
+    <ClCompile Include="..\Classes\ExtendedNodes\Scale3Sprite.cpp" />
     <ClCompile Include="..\Classes\FlashCardCollection.cpp" />
     <ClCompile Include="..\Classes\FlashCardScene.cpp" />
     <ClCompile Include="..\Classes\FooterNode.cpp" />
@@ -226,6 +227,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\DictionaryNode.h" />
     <ClInclude Include="..\Classes\EndGameCustomModeNode.h" />
     <ClInclude Include="..\Classes\EndGameNode.h" />
+    <ClInclude Include="..\Classes\ExtendedNodes\Scale3Sprite.h" />
     <ClInclude Include="..\Classes\FlashCardCollection.h" />
     <ClInclude Include="..\Classes\FlashCardScene.h" />
     <ClInclude Include="..\Classes\FooterNode.h" />
@@ -250,6 +252,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\ConnectFacebookConfirm.h" />
     <ClInclude Include="..\Classes\OutOfMovesNode.h" />
     <ClInclude Include="..\Classes\PopupConfirmNode.h" />
+    <ClInclude Include="..\Classes\Scale3Sprite.h" />
     <ClInclude Include="..\Classes\ScrollManager.h" />
     <ClInclude Include="..\Classes\SettingMenuNode.h" />
     <ClInclude Include="..\Classes\Social\FacebookManager.h" />

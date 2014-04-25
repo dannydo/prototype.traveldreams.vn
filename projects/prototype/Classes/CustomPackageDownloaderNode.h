@@ -55,9 +55,10 @@ private:
 	std::vector<CustomPackageInfo> m_CustomPackageList;
 	TableView* m_pTableView;
 
+	bool m_bIsDownloadingPackage;
 	std::string m_sResultFolder;
 
-	Menu* m_pMenu;
+	//Menu* m_pMenu;
 	EditBox* m_pCodeEditBox;
 	LabelTTF* m_pProgressLabel;
 };

@@ -45,6 +45,7 @@ public:
 
 	void PlayUnlockLetterEffect(const int& iLetterIndex, const float& fDelayEffectTime, const unsigned char& iLetter, const Point& position);
 	float PlayUnlockWordEffect();
+	float PlayTimeMode_UnlockWordFailEffect();
 private:
 	//void LoadWords();
 	//void GetWordIndex();

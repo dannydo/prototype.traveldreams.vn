@@ -886,7 +886,7 @@ float WordCollectBoardRenderNode::PlayUnlockWordEffect()
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("CompleteMainWord.plist");
 	SpriteBatchNode* pFlareffectBatchNode = CCSpriteBatchNode::create("CompleteMainWord.pvr.ccz");
 	pFlareffectBatchNode->setAnchorPoint(Point(0,0));
-	pFlareffectBatchNode->setShaderProgram(ShaderCache::getInstance()->getProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
+	//pFlareffectBatchNode->setShaderProgram(ShaderCache::getInstance()->getProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
 	//pFlareffectBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);// ADDITIVE);
 	BlendFunc blendFunc;// = new BlendFunc();
 	blendFunc.src = GL_ONE;
@@ -985,7 +985,8 @@ float WordCollectBoardRenderNode::PlayUnlockWordEffect()
 			}
 			else
 			{
-				float fMoveYBy = centerWindow.y - m_LabelList[i]->getPosition().y;
+				float fMoveYBy = centerWindow.y - centerPoint.y;
+					//m_LabelList[i]->getPosition().y;
 				pWordFlare->runAction(
 				Sequence::create(
 					DelayTime::create(fPhase1Time + fPhase2Time + fPhase3_1Time + fPhase3_2Time),
@@ -1081,8 +1082,7 @@ float WordCollectBoardRenderNode::PlayUnlockWordEffect()
 			Show::create(),
 			Repeat::create( RotateBy::create( 1.f, 180.f), 10),			
 			//Hide::create(),
-			NULL));
-
+			NULL)); 
 	pCardFlareSprite->runAction(
 		Sequence::create(
 			DelayTime::create( fPhase1_To_3Time),
@@ -1106,5 +1106,200 @@ float WordCollectBoardRenderNode::PlayUnlockWordEffect()
 				RemoveSelf::create(),
 				NULL));
 	}*/
+	return fPhase1Time + fPhase2Time + fPhase3_1Time + fPhase3_2Time + fPhase4Time;
+}
+
+float WordCollectBoardRenderNode::PlayTimeMode_UnlockWordFailEffect()
+{		
+	//ParticleFire
+	Point centerPoint;
+	float fWindowWidth = Director::getInstance()->getWinSize().width;
+	if (m_pMainWord->m_iLimitLetterCountOfFirstLine <= 0) // only 1 line
+		centerPoint= Point( fWindowWidth/2.f, 875.f);
+	else
+		centerPoint= Point( fWindowWidth/2.f, 860.f);
+
+	Point centerWindow( fWindowWidth/2.f, Director::getInstance()->getWinSize().height/2.f);
+
+	float fPhase1Time = 0.4f;
+	float fPhase2Time = 0.08f * m_pMainWord->m_iWordLength + 1.f;
+	float fPhase3_1Time = 0.2f;
+	float fPhase3_2Time = 0.f;	
+	float fPhase4Time = 4.3f;
+	
+
+	// play unlock main word effect
+	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("CompleteMainWord.plist");
+	SpriteBatchNode* pFlareffectBatchNode = CCSpriteBatchNode::create("CompleteMainWord.pvr.ccz");
+	pFlareffectBatchNode->setAnchorPoint(Point(0,0));
+	//pFlareffectBatchNode->setShaderProgram(ShaderCache::getInstance()->getProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
+	//pFlareffectBatchNode->setBlendFunc( BlendFunc::ALPHA_PREMULTIPLIED);// ADDITIVE);
+	
+	/*BlendFunc blendFunc;// = new BlendFunc();
+	blendFunc.src = GL_ONE;
+	blendFunc.dst = GL_ONE;
+	pFlareffectBatchNode->setBlendFunc(blendFunc);*/
+
+	//m_pBatchNode->setPosition(10.f, 866.f);
+	this->addChild(pFlareffectBatchNode, 11);
+
+	SpriteBatchNode* pLightffectBatchNode = CCSpriteBatchNode::create("CompleteMainWord.pvr.ccz");
+	pLightffectBatchNode->setAnchorPoint(Point(0,0));
+	this->addChild(pLightffectBatchNode, 10);
+
+
+	// phase 1 effect
+	/*auto pBlackSprite = Sprite::createWithSpriteFrameName("BlackRectangle.png");
+	pBlackSprite->setAnchorPoint( Point(0,0));
+	pBlackSprite->setScale(100.f);
+	pBlackSprite->setOpacity(0);
+	pLightffectBatchNode->addChild(pBlackSprite);	
+
+	pBlackSprite->runAction(
+		Sequence::create(
+			FadeTo::create( fPhase1Time - 0.1f, 255*0.6f),
+			DelayTime::create( fPhase2Time + fPhase3_1Time),
+			FadeOut::create( fPhase3_2Time),
+			RemoveSelf::create(),
+			//Hide::create(),
+			NULL));
+			*/
+	// phase 2 + 3 effect
+	/*Sprite* pLight;	
+	for(int i=0; i< 5; i++)
+	{
+		pLight = Sprite::createWithSpriteFrameName( "MainWordLight.png");
+		pLight->setScaleX( 2.f);
+		pLight->setScaleY( 0.f);
+		pLight->setAnchorPoint( Point( 0, 0.5f));
+		pLight->setRotation( i * 72.f);
+		pLight->setColor(Color3B( 0, 0, 0));
+
+		pLightffectBatchNode->addChild(pLight, 1);
+		
+		pLight->setPosition(centerPoint);		
+		pLight->runAction( 
+			Sequence::create(
+				DelayTime::create(fPhase1Time),
+				Spawn::createWithTwoActions(
+						ScaleTo::create( 0.25, 2.f, 0.7f),
+						Repeat::create( RotateBy::create( 1.f, 95.f), 100)),
+				NULL));
+		pLight->runAction(
+			Sequence::create(
+				DelayTime::create(fPhase1Time + fPhase2Time + fPhase3_1Time),
+				FadeOut::create(fPhase3_2Time),
+				RemoveSelf::create(),
+				NULL));
+	}*/
+
+	Sprite* pWordFlare;
+	for(int i = 0; i < m_pMainWord->m_iWordLength; i++)
+	{
+		if (m_pMainWord->m_sWord[i] != ' ')
+		{
+			pWordFlare = Sprite::createWithSpriteFrameName("MainWordFlare.png");
+			pFlareffectBatchNode->addChild(pWordFlare);
+
+			pWordFlare->setPosition( m_LabelList[i]->getPosition());//m_LabelList[2]->getPosition() + Point(30 * i, 0)); 
+			pWordFlare->setScale(0);
+			//pWordFlare->setVisible(false);
+
+			pWordFlare->setColor(Color3B( 20, 20, 20));
+
+			pWordFlare->runAction(
+				Sequence::createWithTwoActions(
+					DelayTime::create(fPhase1Time + 0.08f * i),
+					Spawn::createWithTwoActions(
+						ScaleTo::create( 0.08f, 1.16f),
+						Repeat::create( RotateBy::create( 0.142f, 359.f), 100))));			
+
+			
+			float fMoveYBy = centerWindow.y -  centerPoint.y; //m_LabelList[i]->getPosition().y;
+			pWordFlare->runAction(
+			Sequence::create(
+				DelayTime::create(fPhase1Time + fPhase2Time + fPhase3_1Time + fPhase3_2Time),
+				//MoveTo::create( fPhase3_1Time, centerPoint),
+				DelayTime::create(0.2f),
+				//MoveTo::create( 0.25f, centerWindow),
+				MoveBy::create( 0.25f, Point(0, fMoveYBy)),
+				DelayTime::create( 3.f),					
+				MoveBy::create( 0.1f, Point( 0, 80.f)),
+				MoveBy::create( 0.25f, Point( 0, -centerWindow.y - 160)),
+				RemoveSelf::create(),
+			NULL));
+
+
+			// move letters of main word
+			m_LabelList[i]->runAction(
+				Sequence::create(
+					DelayTime::create(fPhase1Time + fPhase2Time + fPhase3_1Time + fPhase3_2Time),
+					//::create( fPhase3_1Time, centerPoint),	
+					DelayTime::create(0.2f),
+
+					TintTo::create( 0.001f, 255,255,255),
+					FadeTo::create(0.001f, 255),
+
+					//MoveTo::create( 0.25f, centerWindow),
+					MoveBy::create( 0.25f, Point(0, fMoveYBy)),
+					DelayTime::create( 3.f),						
+					MoveBy::create( 0.1f, Point( 0, 80.f)),
+					MoveBy::create( 0.25f, Point( 0, -centerWindow.y - 160)),
+					RemoveSelf::create(),
+				NULL));		
+		}
+	}
+
+
+	auto pWhiteSprite = Sprite::createWithSpriteFrameName("WhiteRectangle.png");
+	pWhiteSprite->setAnchorPoint( Point(0,0));
+	pWhiteSprite->setScale(100.f);
+	pWhiteSprite->setOpacity(0);
+	//pWhiteSprite->setVisible(false);
+	pLightffectBatchNode->addChild(pWhiteSprite);	
+
+	pWhiteSprite->runAction(
+		Sequence::create(
+			DelayTime::create( fPhase1Time + fPhase2Time + fPhase3_1Time),
+			//FadeTo::create( 0.02f, 255*0.8f),			
+			//Show::create(),
+			FadeTo::create( 0.15f, 255),
+			FadeOut::create( fPhase3_2Time - 0.15f),
+			RemoveSelf::create(),
+			//Hide::create(),
+			NULL));
+
+	// phase 4 effect
+	float fPhase1_To_3Time = fPhase1Time + fPhase2Time + fPhase3_1Time + fPhase3_2Time;
+	float fFlashCardHeight = 80.f;
+
+
+	/*auto pCardFlareSprite = Sprite::createWithSpriteFrameName("CardFlare.png");	
+	pCardFlareSprite->setScale(1.5f);
+	pCardFlareSprite->setVisible(false);
+	pCardFlareSprite->setPosition(centerPoint);
+	pFlareffectBatchNode->addChild(pCardFlareSprite);	
+
+	pCardFlareSprite->runAction(
+		Sequence::create(
+			DelayTime::create( fPhase1_To_3Time),			
+			Show::create(),
+			Repeat::create( RotateBy::create( 1.f, 180.f), 10),			
+			//Hide::create(),
+			NULL)); 
+	pCardFlareSprite->runAction(
+		Sequence::create(
+			DelayTime::create( fPhase1_To_3Time),
+			DelayTime::create( 0.2f),
+			Spawn::createWithTwoActions(
+				ScaleTo::create( 0.25f, 2.f, 2.f),
+				MoveTo::create( 0.25f, centerWindow)),
+			DelayTime::create( 3.f),
+			MoveBy::create( 0.1f, Point( 0, 80.f)),
+			MoveTo::create( 0.25f, Point( centerPoint.x, - fFlashCardHeight)),
+			RemoveSelf::create(),
+			NULL));*/
+	
+	
 	return fPhase1Time + fPhase2Time + fPhase3_1Time + fPhase3_2Time + fPhase4Time;
 }

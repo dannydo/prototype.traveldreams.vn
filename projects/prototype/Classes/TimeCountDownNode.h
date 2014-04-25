@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "cocos-ext.h"
+#include "ExtendedNodes\Scale3Sprite.h"
 
 using namespace cocos2d;
 USING_NS_CC_EXT;
@@ -10,7 +11,7 @@ USING_NS_CC_EXT;
 class TimeCountDownNode : public Node
 {
 public:
-	static TimeCountDownNode* create(int iMaximumEnergy, int iEnergyLostPerSecond);
+	static TimeCountDownNode* create(int iStageIndex, int iMaximumEnergy, int iEnergyLostPerSecond);
 
 	inline void SetOutOfTimeCallback( std::function<void()> outOfTimeCallback) { m_OutOfTimeCallback = outOfTimeCallback;}
 	inline int IsEnergyEmpty() { return (m_fCurrentEnergy <=0);}
@@ -23,7 +24,7 @@ public:
 	void update(float fDeltaTime) override;
 	void draw() override;
 private:
-	 void init(int iMaximumEnergy, int iEnergyLostPerSecond);
+	 void init(int iStageIndex, int iMaximumEnergy, int iEnergyLostPerSecond);
 private:
 	bool m_bIsStarted;
 	float m_fCurrentEnergy;
@@ -39,7 +40,8 @@ private:
 
 	SpriteBatchNode* m_pBatchNode;
 	Sprite* m_pBackground;
-	Scale9Sprite* m_pMidEnergyBar;
+	//Scale9Sprite* m_pMidEnergyBar;
+	Scale3Sprite* m_pMidEnergyBar;
 	Sprite* m_pMirrorMidEnergyBar;
 };
 

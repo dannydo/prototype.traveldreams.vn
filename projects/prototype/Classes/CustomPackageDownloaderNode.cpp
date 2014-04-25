@@ -1,5 +1,6 @@
 #include "CustomPackageDownloaderNode.h"
 #include "GameConfigManager.h"
+#include "ButtonManagerNode.h"
 
 CustomPackageDownloaderNode* CustomPackageDownloaderNode::create()
 {
@@ -74,7 +75,20 @@ bool CustomPackageDownloaderNode::init()
     addChild(m_pCodeEditBox);
 
 	
-	auto menu1Item = MenuItemImage::create("CustomModeGUI/OK.png", "CustomModeGUI/OK.png", CC_CALLBACK_1(CustomPackageDownloaderNode::startDownloadCallback, this));
+	auto pMenu1Sprite = Sprite::create("CustomModeGUI/OK.png");
+	auto pButtonMenu1 = ButtonNode::createButtonSprite( pMenu1Sprite, CC_CALLBACK_1(CustomPackageDownloaderNode::startDownloadCallback, this));
+	pButtonMenu1->setPosition( Point(160.f, 100.f));
+
+	auto pMenu2Sprite = Sprite::create("CustomModeGUI/EXIT.png");
+	auto pButtonMenu2 = ButtonNode::createButtonSprite( pMenu2Sprite, CC_CALLBACK_1(CustomPackageDownloaderNode::exitCallback, this));
+	pButtonMenu2->setPosition( Point(420.f, 100.f));
+
+	auto pButtonManagerNode = ButtonManagerNode::create();
+	this->addChild(pButtonManagerNode);
+	pButtonManagerNode->addButtonNode(pButtonMenu1);
+	pButtonManagerNode->addButtonNode(pButtonMenu2);
+
+	/*auto menu1Item = MenuItemImage::create("CustomModeGUI/OK.png", "CustomModeGUI/OK.png", CC_CALLBACK_1(CustomPackageDownloaderNode::startDownloadCallback, this));
 	menu1Item->setPosition( Point(160.f, 100.f));
 
 
@@ -84,7 +98,7 @@ bool CustomPackageDownloaderNode::init()
 	m_pMenu = Menu::create( menu1Item, menu2Item, NULL);
 	m_pMenu->setPosition(Point::ZERO);
 	this->addChild(m_pMenu);
-
+	*/
 
 
 	m_pProgressLabel = LabelTTF::create("", "Arial", 30);	
@@ -106,6 +120,8 @@ bool CustomPackageDownloaderNode::init()
 	LoadPackageListFromFile();
     m_pTableView->reloadData();
 	
+
+	m_bIsDownloadingPackage = false;
 
 	// try to load custom mode config
 	GameConfigManager::getInstance()->GetTimeModeDemoConfig();
@@ -175,10 +191,14 @@ void callTrackingURL(const std::string& sTrackingUrl);
 
 void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 {	
+	if (m_bIsDownloadingPackage)
+		return;
+	m_bIsDownloadingPackage = true;
+
 	if(m_pCodeEditBox->getText()[0] == 0)
 		return;
 
-	m_pMenu->setEnabled(false);
+	//m_pMenu->setEnabled(false);
 
 	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
 	char sVersionUrl[256], sFolderUrl[256];	
@@ -187,10 +207,23 @@ void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 
 	std::string sFolderName;
 	if (checkAndGetResultFolderName( string(sFolderUrl), m_sResultFolder) && m_sResultFolder.size()!=0)
-	{		
+	{	
+		/*
 		int iSpaceIndex = m_sResultFolder.find(' ');
 		sDownloadUrl = m_sResultFolder.substr(iSpaceIndex+1, m_sResultFolder.size() - iSpaceIndex -1);
-		m_sResultFolder = m_sResultFolder.substr(0, iSpaceIndex);
+		m_sResultFolder = m_sResultFolder.substr(0, iSpaceIndex);*/
+
+		std::stringstream ss(m_sResultFolder);
+		std::istream_iterator<std::string> begin(ss);
+		std::istream_iterator<std::string> end;
+		std::vector<std::string> splitList(begin, end);
+		m_sResultFolder = splitList[0];
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+		sDownloadUrl = splitList[2];
+#else	
+		sDownloadUrl = splitList[1];
+#endif
+
 
 		//sprintf(sDownloadUrl, "%s/download/%s",sBaseUrl, m_pCodeEditBox->getText());
 		sprintf(sVersionUrl, "%s/version/%s",sBaseUrl, m_pCodeEditBox->getText());
@@ -205,7 +238,9 @@ void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 	else
 	{
 		m_pProgressLabel->setString("Code is invalid!!");
-		m_pMenu->setEnabled(true);
+		//m_pMenu->setEnabled(true);
+
+		m_bIsDownloadingPackage = false;
 	}
 }
 
@@ -274,7 +309,8 @@ void CustomPackageDownloaderNode::onError(cocos2d::extension::AssetsManager::Err
         m_pProgressLabel->setString("Invalid compress file!");		
     }
 	
-	m_pMenu->setEnabled(true);
+	//m_pMenu->setEnabled(true);
+	m_bIsDownloadingPackage = false;
 }
  
 void CustomPackageDownloaderNode::onProgress(int percent)
@@ -286,9 +322,10 @@ void CustomPackageDownloaderNode::onProgress(int percent)
  
 void CustomPackageDownloaderNode::onSuccess()
 {
+	m_bIsDownloadingPackage = false;
 	m_pProgressLabel->setString("download completed!");
 
-	m_pMenu->setEnabled(true);
+	//m_pMenu->setEnabled(true);
 
 	// notify server for tracking purpose
 	char sTrackingURL[256];

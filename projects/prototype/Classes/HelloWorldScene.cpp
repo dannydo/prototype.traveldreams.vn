@@ -559,7 +559,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 				(100 + pTimeModeLevelConfig->m_iStageConfig_LostRateIncreasePercent * (iTimeModeStage - iTotalManualStageCount))/100.f ;			
 		}		
 
-		m_pTimeCountDownNode = TimeCountDownNode::create( iMaximumEneryOfThisStage, iEnergyLostPersecondOfThisStage);
+		m_pTimeCountDownNode = TimeCountDownNode::create( iTimeModeStage, iMaximumEneryOfThisStage, iEnergyLostPersecondOfThisStage);
 		//m_pTimeCountDownNode->setPositionY( m_fBoardBottomPosition + (iNumberOfRow  - 0.4f )* m_SymbolSize.height);
 		m_pTimeCountDownNode->SetOutOfTimeCallback(std::bind( &HelloWorld::OnTimeMode_OutOfTime, this));
 		this->m_pHUDLayer->addChild( m_pTimeCountDownNode, 100);
@@ -580,6 +580,8 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 			}
 		}				
 
+		// disable user's interaction when playing start game effect
+		m_bIsEffectPlaying = true;
 
 		// play special begin of stage of time mode
 		PlayBeginTimeModeStageTextEffect();
@@ -960,13 +962,14 @@ bool HelloWorld::onTouchBegan(Touch *pTouch, Event *pEvent)
 
 void HelloWorld::onTouchEnded(Touch* pTouch, Event* pEvent)
 {
+	bool bIsBlocked = false;
+	bIsBlocked = m_bIsEndGamePhase; //use this to mark that game is end and all user interaction should be interupted
+
 	if (pTouch == m_pSaveTouch)
 		m_pSaveTouch = NULL;
 
 	if (m_eTouchMoveState == _TMS_NONE_)
-		return;
-
-	bool bIsBlocked = false;
+		return;	
 
 	if ((m_eTouchMoveState == _TMS_MOVE_HORIZONTAL_ && m_GameBoardManager.IsRowLocked(m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn)) || 
 		(m_eTouchMoveState == _TMS_MOVE_VERTICAL_ &&  m_GameBoardManager.IsColumnLocked(m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn)))
@@ -1029,6 +1032,12 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 
 	if (m_eTouchMoveState == _TMS_NONE_)
 		return;
+
+	if (m_bIsEndGamePhase) //end game already???
+	{		
+		onTouchEnded(pTouch, pEvent);
+		return;
+	}
 
 	Point currentPosition = pTouch->getLocation();
 	float fDeltaX = currentPosition.x - m_StartTouchPosition.x;
@@ -1446,13 +1455,13 @@ void HelloWorld::PlayBeginTimeModeStageTextEffect()
 	Sprite* pLetterSprite;
 	for(int i=0; i< iStageNumberLetterCount; i++)
 	{
-		sprintf(sSpriteName, "StageNumber/%c.png", (unsigned char)sStageNumber[0]);
+		sprintf(sSpriteName, "StageNumber/%c.png", (unsigned char)sStageNumber[i]);
 		pLetterSprite = Sprite::createWithSpriteFrameName(sSpriteName);
 		pLetterSprite->setAnchorPoint(Point(0,0));
 		pLetterSprite->setPosition(Point( fPosX, 0));
 	
 		pTextSprite->addChild(pLetterSprite);
-		fPosX += pLetterSprite->getContentSize().width + 3.f;
+		fPosX += pLetterSprite->getContentSize().width - 1.f;
 	}
 	
 	pTextSprite->setPosition( Point( Director::getInstance()->getWinSize().width /2.f - 20.f, 450));	
@@ -1471,7 +1480,8 @@ void HelloWorld::PlayBeginTimeModeStageTextEffect()
 }
 
 void HelloWorld::OnStartGame()
-{
+{	
+
 	if (m_GameBoardManager.GetLevelConfig()->m_eGameModeType == _GMT_NORMAL_)
 	{
 		Sprite* pTextSprite = Sprite::createWithSpriteFrameName("Level_Start.png");
@@ -1495,6 +1505,8 @@ void HelloWorld::OnStartGame()
 	}
 	else
 	{
+		m_bIsEffectPlaying = false;
+
 		m_pTimeCountDownNode->Start();
 
 		/*char sText[20];
@@ -4777,8 +4789,8 @@ void HelloWorld::EndUnlockLetterAnimation()
 
 	if (m_bIsEndGamePhase)
 	{
-		//ShowWinGamePopup();
-		ShowLevelCompleteEffect();
+		if (m_eGameModeType == _GMT_NORMAL_)		//ShowWinGamePopup();
+			ShowLevelCompleteEffect();
 	}
 	else
 	{
@@ -4826,31 +4838,54 @@ void HelloWorld::EndUnlockLetterAnimation()
 					UserTable::getInstance()->updateLife(0);
 				}
 			}
-			else
+			else //time mode
 			{
-				if (m_pTimeCountDownNode != NULL)
+				/*if (m_pTimeCountDownNode != NULL)
 				{
 					//already out of time before!!!!
 					if (m_pTimeCountDownNode->IsEnergyEmpty())
 						return;
 
-					OnTimeMode_StageComplete();				
-				}
+					OnTimeMode_StageComplete();	
+				}*/
+				OnTimeMode_StageComplete();
 			}
 		}
-		else  if (m_GameBoardManager.GetCurrentMove() == 0) // out of move ==> lose
+		else //word is not unlocked yet
 		{
-			m_bIsEndGamePhase = true; 
-			ShowLevelFailEffect();			
+			if (m_eGameModeType == _GMT_NORMAL_)
+			{
+				if (m_GameBoardManager.GetCurrentMove() == 0) // out of move ==> lose
+				{
+					m_bIsEndGamePhase = true; 
+					ShowLevelFailEffect();			
+				}
+			}
+			else //time mode
+			{
+				if (m_pTimeCountDownNode != NULL)
+				{
+					//already out of time before!!!!
+					if (!m_pTimeCountDownNode->IsEnergyEmpty())
+						return;
+
+					OnTimeMode_OutOfTime();				
+				}
+			}
 		}
 	}
 }
 
 void HelloWorld::OnTimeMode_OutOfTime()
 {
-	m_bIsEffectPlaying = true;
+	if (m_bIsEndGamePhase)
+		return;
+
+	m_bIsEndGamePhase = true;
 	//m_bIsEndGamePhase = true;
 	
+	float fFailCollectWordEffectTime = m_pWordCollectBoardRenderNode->PlayTimeMode_UnlockWordFailEffect();
+
 	/*auto label = LabelTTF::create("OUT OF TIME!", "fonts/UTM Cookies.ttf", 70);		
 	label->setColor(Color3B( 200, 30, 30));
 	label->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));
@@ -4864,8 +4899,11 @@ void HelloWorld::OnTimeMode_OutOfTime()
 	auto pTextSprite = Sprite::createWithSpriteFrameName("Time_Out.png");
 	m_pTextEffectBatchNode->addChild(pTextSprite);
 	pTextSprite->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));	
+	pTextSprite->setVisible(false);
 	pTextSprite->runAction(
 		Sequence::create(
+			DelayTime::create( fFailCollectWordEffectTime),
+			Show::create(),
 			DelayTime::create( 3.f),
 			Hide::create(),				
 			NULL));
@@ -4874,7 +4912,7 @@ void HelloWorld::OnTimeMode_OutOfTime()
 	//label->setScale( 0.7f);	
 
 	this->runAction( CCSequence::create(
-		DelayTime::create(3.f),
+		DelayTime::create(fFailCollectWordEffectTime + 3.f),
 		CallFunc::create( this, callfunc_selector( HelloWorld::ShowTimeModeResultPopup)),
 		NULL));
 }
@@ -4900,7 +4938,7 @@ void HelloWorld::ShowTimeModeResultPopup()
 
 void HelloWorld::OnTimeMode_StageComplete()
 {
-	m_bIsEffectPlaying = true;
+	m_bIsEndGamePhase = true;
 	//m_bIsEndGamePhase = true;
 
 	m_pTimeCountDownNode->StopUpdate();
@@ -4908,6 +4946,11 @@ void HelloWorld::OnTimeMode_StageComplete()
 
 	// show complete mainword effect
 	float fEffectTime = m_pWordCollectBoardRenderNode->PlayUnlockWordEffect();
+
+	//float fSpellingTime = 
+	m_pWordCollectBoardRenderNode->PlaySpellingSound() + 0.9f;
+
+	//float fDelayTime = MAX( fSpellingTime, fEffectTime);
 
 	/*auto label = LabelTTF::create("STAGE COMPLETE!", "fonts/UTM Cookies.ttf", 70);		
 	label->setColor(Color3B( 100, 100, 100));

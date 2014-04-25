@@ -1,13 +1,13 @@
 #include "TimeCountDownNode.h"
 
 
-TimeCountDownNode* TimeCountDownNode::create(int iMaximumEnergy, int iEnergyLostPerSecond)
+TimeCountDownNode* TimeCountDownNode::create(int iStageIndex, int iMaximumEnergy, int iEnergyLostPerSecond)
 {
 	TimeCountDownNode* renderNode = new TimeCountDownNode();
 	if( renderNode)
 	{				
 		renderNode->autorelease();
-		renderNode->init( iMaximumEnergy, iEnergyLostPerSecond);
+		renderNode->init( iStageIndex, iMaximumEnergy, iEnergyLostPerSecond);
 		return renderNode;
 	}
 
@@ -15,7 +15,7 @@ TimeCountDownNode* TimeCountDownNode::create(int iMaximumEnergy, int iEnergyLost
 	return NULL;
 }
 
-void TimeCountDownNode::init(int iMaximumEnergy, int iEnergyLostPerSecond)
+void TimeCountDownNode::init(int iStageIndex, int iMaximumEnergy, int iEnergyLostPerSecond)
 {
 	m_bIsStarted = false;
 	m_fMaximumEnergy = iMaximumEnergy;
@@ -44,11 +44,11 @@ void TimeCountDownNode::init(int iMaximumEnergy, int iEnergyLostPerSecond)
 
 	m_pBackground = Sprite::createWithSpriteFrameName("TimeBoard.png");
 	m_pBackground->setAnchorPoint(Point(0,0));
-	m_pBatchNode->addChild(m_pBackground);
+	m_pBatchNode->addChild(m_pBackground, -1);
 
 	m_pMirrorMidEnergyBar = Sprite::createWithSpriteFrameName("Bar_compact.png");
-	m_pMirrorMidEnergyBar->setAnchorPoint(Point(0, 0.5f));
-	m_pMirrorMidEnergyBar->setPosition(Point(80.f, 108.f));
+	m_pMirrorMidEnergyBar->setAnchorPoint(Point(0.2f, 0.5f));
+	m_pMirrorMidEnergyBar->setPosition(Point(85.f, 108.f));
 	m_pMirrorMidEnergyBar->setVisible(false);
 	m_pBatchNode->addChild(m_pMirrorMidEnergyBar);
 
@@ -57,13 +57,19 @@ void TimeCountDownNode::init(int iMaximumEnergy, int iEnergyLostPerSecond)
 	//pLeftBar->setPosition(Point(77.f, 108.f));
 	//m_pBatchNode->addChild(pLeftBar,2);
 
-	m_pMidEnergyBar = Scale9Sprite::createWithSpriteFrameName("Bar.png");
+	/*m_pMidEnergyBar = Scale9Sprite::createWithSpriteFrameName("Bar.png");
 	m_pMidEnergyBar->setInsetLeft(16.f);
 	m_pMidEnergyBar->setInsetRight(20.f);
 	m_pMidEnergyBar->setContentSize(Size( fEnergyWidth, 34.f));
 	m_pMidEnergyBar->setAnchorPoint(Point(0, 0.5f));
 	m_pMidEnergyBar->setPosition(Point(77.f, 108.f));
+	this->addChild(m_pMidEnergyBar);*/
+
+	m_pMidEnergyBar = Scale3Sprite::create( m_pBatchNode, SpriteFrameCache::getInstance()->getSpriteFrameByName("Bar.png"),
+												16.f, 20.f);
 	this->addChild(m_pMidEnergyBar);
+	m_pMidEnergyBar->setPosition(Point(76.5f, 89.5f));
+	m_pMidEnergyBar->setContentSize(Size( fEnergyWidth, 34.f));
 
 	/*Sprite::createWithSpriteFrameName("Bar_mid.png");
 	m_pMidEnergyBar->setAnchorPoint(Point(0, 0.5f));
@@ -79,6 +85,15 @@ void TimeCountDownNode::init(int iMaximumEnergy, int iEnergyLostPerSecond)
 	m_pRightEnergyBar->setPositionX( m_pMidEnergyBar->getPositionX() + m_pMidEnergyBar->getContentSize().width* m_pMidEnergyBar->getScaleX());*/
 
 	this->setPositionY( winSize.height - m_pBackground->getContentSize().height);
+
+	// temporary add stage index label to bar
+	char sText[5];
+	sprintf( sText, "%d", iStageIndex);
+	auto label = LabelTTF::create(sText, "fonts/UTM Cookies.ttf", 35);
+	label->setPosition( Point( 40.f, 86.f));
+	label->disableStroke();		
+	label->setColor(Color3B( 190.f, 190.f, 190.f));
+	this->addChild(label, 2000);
 }
 
 void TimeCountDownNode::update(float fDeltaTime)
@@ -94,7 +109,7 @@ void TimeCountDownNode::update(float fDeltaTime)
 		m_fCurrentEnergy = 0;
 	fEnergyWidth = m_fCurrentEnergy * _contentSize.width / m_fMaximumEnergy;
 	
-	if (fEnergyWidth > 40.f)
+	if (fEnergyWidth > 36.f)
 	{
 		m_pMidEnergyBar->setVisible(true);
 		m_pMirrorMidEnergyBar->setVisible(false);
