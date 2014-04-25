@@ -67,12 +67,14 @@ bool LoadingLayer::init()
 	this->loadData();
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kExitGame);
 
+	m_bIsWaittingSync = true;
+
 	return true;
 }
 
 void LoadingLayer::update(float dt)
 {
-	if (m_bFinishLoad && SyncDataGame::getInstance()->getIsFinishSync())
+	if (m_bFinishLoad && (SyncDataGame::getInstance()->getIsFinishSync() || m_bIsWaittingSync == false))
 	{
 		MainMenuScene* scene = MainMenuScene::create();
 		Director::getInstance()->replaceScene(scene);
@@ -137,10 +139,12 @@ void LoadingLayer::initData()
 			std::vector<int> mapLevels;
 			GameConfigManager::getInstance()->GenerateWordsForNewChapter(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
 
-			if(InitDatabase::getInstance()->createDataChapterAndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels))
+			if(InitDatabase::getInstance()->initDataChapter1AndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels))
 			{
 				UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
 			}
+
+			m_bIsWaittingSync = false;
 		}
 	}
 

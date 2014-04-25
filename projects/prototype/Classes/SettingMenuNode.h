@@ -47,9 +47,6 @@ private:
 	void clickQuitLevel(cocos2d::Object* sender);
 	void clickResume(cocos2d::Object* sender);
 
-	void runResetGame();
-	void finishResetGame();
-
 	void actionBack();
 	void addButtonFacebook();
 

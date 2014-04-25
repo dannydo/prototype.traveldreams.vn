@@ -122,6 +122,7 @@ void PopupConfirmNode::clickNo(cocos2d::Object* pSender)
 void PopupConfirmNode::runResetGame()
 {
 	UserDefault::getInstance()->setIntegerForKey("InitDatabase", 0);
+	UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
 
 	if (InitDatabase::getInstance()->resetDatabase())
 	{

@@ -186,6 +186,60 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 	return bCreateSuccess;
 }
 
+bool InitDatabase::initDataChapter1AndLevel(const std::string& sChapterId, std::vector<std::string>& wordList, std::vector<int>& mapLevels)
+{
+	bool bCreateSuccess = true;
+
+	if(wordList.size() > 0)
+	{
+		String sqlRun = "";
+		int iVersion = VersionTable::getInstance()->getVersionInfo().iVersionSync + 1;
+		char sVersion[10];
+		sprintf(sVersion, "%d", iVersion);
+
+		sqlRun.append("insert into Chapters values('");
+		sqlRun.append(sChapterId.c_str());
+		sqlRun.append("', 0, 0, 1, ");
+		sqlRun.appendWithFormat("%d,", iVersion);
+		sqlRun.append("0, 0,");
+		sqlRun.appendWithFormat("%d);", wordList.size());
+
+		int countCollected;
+		for (int iIndex=0; iIndex<wordList.size(); iIndex++)
+		{
+			countCollected = 0;
+
+			sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version,OrderUnlock,IsNew) values(");
+			sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
+			sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
+			sqlRun.appendWithFormat("%d,", iVersion);
+			sqlRun.append("0, 0);");
+
+			if (mapLevels[iIndex] != -1)
+			{
+				countCollected = 1;
+				sqlRun.append("insert into Levels (ChapterId,Level,WordId,Star,Score,BonusQuest,TotalBonusQuest,IsUnlock,Version) values(");
+				sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
+				sqlRun.appendWithFormat("%d,", mapLevels[iIndex]);
+				sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
+				sqlRun.append("0,0,0,0,0,");
+				sqlRun.appendWithFormat("%d);", iVersion);
+			}
+
+			sqlRun.append("insert into Words (WordId,CountCollected,Version) values(");
+			sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
+			sqlRun.appendWithFormat("%d,", countCollected);
+			sqlRun.appendWithFormat("%d);", iVersion);
+		}
+
+		int iResult = sqlite3_exec(m_DatabaseSqlite, sqlRun.getCString(), NULL, NULL, NULL);
+		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
+			bCreateSuccess = false;
+	}
+
+	return bCreateSuccess;
+}
+
 bool InitDatabase::resetDatabase()
 {
 	char* sql = "Drop Table Chapters; Drop Table Levels; Drop Table MapChapterWords; Drop Table PowerUps; Drop Table Transactions; Drop Table UnlockChapters; Drop Table Users; Drop Table Versions; Drop Table Words; Drop Table CSPackage; Drop Table CSWords;";

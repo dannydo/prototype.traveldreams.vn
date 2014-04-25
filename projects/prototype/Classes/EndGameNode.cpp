@@ -11,6 +11,8 @@
 #include "WorldMapScene.h"
 #include "APIService\SyncDataGame.h"
 #include "FunctionCommon.h"
+#include "GetMoreLifeNode.h"
+#include "FlashCardNode.h"
 
 USING_NS_CC;
 
@@ -83,12 +85,9 @@ bool EndGameNode::initWin()
 	pCompletedImage->setPosition(Point(320.0f, 654.0f));
 	this->addChild(pCompletedImage);
 
-	std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(m_mainWord);;
-	sPath.append("/FlashCard/");
-	sPath.append(m_mainWord.m_sFlashCardImage);
-	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
-	pFlashCardImage->setPosition(Point(240.0f, 495.0f));
-	this->addChild(pFlashCardImage);
+	FlashCardNode* pFlashCard = FlashCardNode::createLayout(m_mainWord);
+	pFlashCard->setPosition(230.0f, 490.0f);
+	this->addChild(pFlashCard);
 
 	char sLevel[20];
 	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
@@ -237,12 +236,9 @@ bool EndGameNode::initLose()
 	pIconBoosterImage->setPosition(Point(320.0f, 437.0f));
 	this->addChild(pIconBoosterImage);
 
-	std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(m_mainWord);;
-	sPath.append("/FlashCard/");
-	sPath.append(m_mainWord.m_sFlashCardImage);
-	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
-	pFlashCardImage->setPosition(Point(240.0f, 600.0f));
-	this->addChild(pFlashCardImage);
+	FlashCardNode* pFlashCard = FlashCardNode::createLayout(m_mainWord);
+	pFlashCard->setPosition(230.0f, 580.0f);
+	this->addChild(pFlashCard);
 
 	char sLevel[20];
 	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
@@ -434,7 +430,9 @@ void EndGameNode::menuRetryLevelLoseCallBack(Object* sender)
 	}
 	else
 	{
-		MessageBox("You have no life!", "Play Level");
+		GetMoreLifeNode* pGetMoreLife = GetMoreLifeNode::create();
+		pGetMoreLife->setGetMoreLifeType(GetMoreLifeType::eGoToMainMenu);
+		this->addChild(pGetMoreLife);
 	}
 }
 

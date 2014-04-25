@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "FooterNode.h"
 #include "GameConfigManager.h"
+#include "ScrollManager.h"
 
 class WorldMapLayer : public cocos2d::CCLayer
 {
@@ -21,15 +22,19 @@ private:
 	void updateScrollSlideShow();
 	void menuPlayChapterCallBack(cocos2d::Object* sender);
 
+	cocos2d::Node* createLayoutLockChapter();
+
 	cocos2d::LayerColor* m_pBackgroundNode;
 
 	float m_fBeginY;
 	float m_fYMoved;
 	float m_maxHeight;
-	bool m_bMoveSlideShow;
+	bool m_bIsSwipe;
 
 	FooterNode* m_pFooterNode;
 	WordlMapConfig m_wordMapConfig;
+
+	ScrollManager* m_pScrollManager;
 };
 
 class WorldMapScene : public cocos2d::CCScene

@@ -91,6 +91,8 @@ void EndGameCustomModeNode::generateLayoutStart()
 	{
 		Sprite* pStarPurpleImage = Sprite::create("Target-End-Game/star_target_small.png");
 		pStarPurpleImage->setPosition(Point(220.0f + iIndex*100.0f, 760));
+		if (iIndex == 1)
+			pStarPurpleImage->setScale(1.4f);
 		this->addChild(pStarPurpleImage);
 	}
 }
@@ -117,6 +119,10 @@ void EndGameCustomModeNode::updateStar()
 	if (m_iCountYellowStar < m_iYellowStar) {
 		Sprite* pStarYellowImage = Sprite::create("Target-End-Game/star_win_small.png");
 		pStarYellowImage->setPosition(Point(210.0f + m_iCountYellowStar*108.0f, 760));
+
+		if (m_iCountYellowStar == 1)
+			pStarYellowImage->setScale(1.4f);
+
 		this->addChild(pStarYellowImage);
 		m_iCountYellowStar++;
 		this->sequenceUpdateStar();
