@@ -224,6 +224,7 @@
     </ClCompile>
     <ClCompile Include="..\Classes\ExtendedNodes\Scale3Sprite.cpp">
       <Filter>ExtendedNodes\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\GetMoreLifeNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
@@ -432,6 +433,7 @@
     </ClInclude>
     <ClInclude Include="..\Classes\ExtendedNodes\Scale3Sprite.h">
       <Filter>ExtendedNodes\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\GetMoreLifeNode.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>

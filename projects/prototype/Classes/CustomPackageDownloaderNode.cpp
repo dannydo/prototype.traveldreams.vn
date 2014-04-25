@@ -1,6 +1,10 @@
 #include "CustomPackageDownloaderNode.h"
 #include "GameConfigManager.h"
 #include "ButtonManagerNode.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iterator>
 
 CustomPackageDownloaderNode* CustomPackageDownloaderNode::create()
 {
@@ -140,9 +144,6 @@ void CustomPackageDownloaderNode::AddNewPackageToList(const CustomPackageInfo& c
 	m_CustomPackageList.push_back( customPackageInfo);
 	m_pTableView->reloadData();
 }
-
-#include <iostream>
-#include <fstream>
 
 void CustomPackageDownloaderNode::SavePackageListToFile()
 {
