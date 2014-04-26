@@ -124,6 +124,10 @@ void PopupConfirmNode::runResetGame()
 	UserDefault::getInstance()->setIntegerForKey("InitDatabase", 0);
 	UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
 
+	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		FacebookManager::getInstance()->logoutByMode();
+	#endif
+
 	if (InitDatabase::getInstance()->resetDatabase())
 	{
 		WordlMapConfig worldMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();

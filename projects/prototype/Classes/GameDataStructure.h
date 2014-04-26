@@ -438,6 +438,26 @@ public:
 	int m_iRemainInactivatedCharacterCount;
 	bool m_AppearedCharacterFlags[_GDS_WORD_MAX_LENGTH_];	
 	int m_iRemainNotAppearedCharacterCount;
+
+	void CopyDataFrom(const Word& other)
+	{
+		m_iPackageIndex = other.m_iPackageIndex;
+		m_sWordID = other.m_sWordID;
+
+		strcpy(m_sWord, other.m_sWord);
+		m_iWordLength = other.m_iWordLength;	
+
+		m_sMeaning = other.m_sMeaning;
+		m_sSoundEnglishFile = other.m_sSoundEnglishFile;
+		m_fSoundEnglishLength = other.m_fSoundEnglishLength;
+		m_sSoundVietnameseFile = other.m_sSoundVietnameseFile;
+		m_fSoundVietnameseLength = other.m_fSoundVietnameseLength;
+		m_sFlashCardImage = other.m_sFlashCardImage;
+		m_sPhonetic = other.m_sPhonetic;
+		m_sSentence = other.m_sSentence;
+		m_sSentenceSoundFile = other.m_sSentenceSoundFile;
+		m_fSentenceSoundLength = other.m_fSentenceSoundLength;
+	}
 };
 
 struct Hint

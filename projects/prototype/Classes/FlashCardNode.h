@@ -14,7 +14,7 @@ public:
 	static FlashCardNode* createLayout(const Word& word);
 
 private:
-	Word m_Word;
+	const Word* m_pWord;
 };
 
 #endif;

@@ -10,7 +10,7 @@ FlashCardNode::~FlashCardNode ()
 FlashCardNode* FlashCardNode::createLayout(const Word& word)
 {
 	FlashCardNode* pFlashCardNode = new FlashCardNode();
-	pFlashCardNode->m_Word = word;
+	pFlashCardNode->m_pWord = &word;
 
 
 	if(pFlashCardNode->init())
@@ -30,9 +30,9 @@ bool FlashCardNode::init()
 		return false;
 	}
 
-	std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(m_Word);;
+	std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(*m_pWord);;
 	sPath.append("/FlashCard/");
-	sPath.append(m_Word.m_sFlashCardImage);
+	sPath.append(m_pWord->m_sFlashCardImage);
 	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
 	pFlashCardImage->setPosition(Point(-6.0f, -20.0f));
 	this->addChild(pFlashCardImage);
