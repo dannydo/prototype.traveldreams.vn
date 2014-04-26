@@ -294,25 +294,7 @@ bool AssetsManager::uncompress()
         
         // Check if this entry is a directory or a file.
         const size_t filenameLength = strlen(fileName);		
-		string fullPath;
-		// make sure parent directory is created first
-		sTempFileName = fileName ;
-		int iFindPos = sTempFileName.find('/');
-		if (iFindPos >=0 && iFindPos != filenameLength-1)
-		{			
-			while(iFindPos >=0 && iFindPos != filenameLength-1)
-			{
-				fullPath = _storagePath + sTempFileName.substr(0, iFindPos+1);
-				if (!createDirectory(fullPath.c_str()))
-				{
-					CCLOG("can not create directory %s", fullPath.c_str());
-					unzClose(zipfile);
-					return false;
-				}	
-
-				iFindPos = sTempFileName.find('/', iFindPos+1);
-			}
-		}
+		string fullPath;		
         
         
 		fullPath = _storagePath + fileName;
