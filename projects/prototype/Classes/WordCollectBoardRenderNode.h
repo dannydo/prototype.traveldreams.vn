@@ -77,6 +77,8 @@ private:
 	DrawNode* m_pColorNode;	
 	//Sprite* m_pLetterPanel;
 
+	Node* m_pHeaderNode;
+
 	unsigned long m_iPreviousMainWordTapTime;
 	//unsigned long m_iUnlockedLetterEffectEndTime;
 

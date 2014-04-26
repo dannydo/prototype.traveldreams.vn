@@ -1,9 +1,9 @@
 #include "Scale3Sprite.h"
 
-Scale3Sprite* Scale3Sprite::create( SpriteBatchNode* pBatchNode, SpriteFrame* pParentSpriteFrame, float fInsetLeft, float fInsetRight)
+Scale3Sprite* Scale3Sprite::create( SpriteBatchNode* pBatchNode, SpriteFrame* pParentSpriteFrame, float fInsetLeft, float fInsetRight, int iZOrder)
 {
 	auto sprite = new Scale3Sprite();
-	if (sprite && sprite->init( pBatchNode, pParentSpriteFrame, fInsetLeft, fInsetRight))
+	if (sprite && sprite->init( pBatchNode, pParentSpriteFrame, fInsetLeft, fInsetRight, iZOrder))
 	{
 		sprite->autorelease();
 
@@ -25,7 +25,7 @@ Scale3Sprite::Scale3Sprite()
 {
 }
 
-bool Scale3Sprite::init(SpriteBatchNode* pBatchNode, SpriteFrame* pParentSpriteFrame, float fInsetLeft, float fInsetRight)
+bool Scale3Sprite::init(SpriteBatchNode* pBatchNode, SpriteFrame* pParentSpriteFrame, float fInsetLeft, float fInsetRight, int iZOrder)
 {
 	m_pBatchNode = pBatchNode;
 	Size totalSize = pParentSpriteFrame->getRect().size;

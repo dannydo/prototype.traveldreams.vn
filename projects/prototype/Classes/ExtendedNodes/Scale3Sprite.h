@@ -9,11 +9,11 @@ using namespace cocos2d;
 class Scale3Sprite : public NodeRGBA
 {
 public:
-	static Scale3Sprite* create( SpriteBatchNode* pBatchNode, SpriteFrame* pParentSpriteFrame, float fInsetLeft, float fInsetRight);
+	static Scale3Sprite* create( SpriteBatchNode* pBatchNode, SpriteFrame* pParentSpriteFrame, float fInsetLeft, float fInsetRight, int iZOrder=0);
 
 	virtual ~Scale3Sprite();
 
-	virtual bool init(SpriteBatchNode* pBatchNode, SpriteFrame* pParentSpriteFrame, float fInsetLeft, float fInsetRight);
+	virtual bool init(SpriteBatchNode* pBatchNode, SpriteFrame* pParentSpriteFrame, float fInsetLeft, float fInsetRight, int iZOrder);
 	virtual void setContentSize(const Size & size) override;
 	virtual void setVisible(bool bIsVisible) override;
 private:

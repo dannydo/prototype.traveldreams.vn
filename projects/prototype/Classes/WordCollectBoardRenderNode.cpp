@@ -3,6 +3,7 @@
 #include "SoundManager.h"
 #include "GameWordManager.h"
 #include "DictionaryNode.h"
+#include "ExtendedNodes\Scale3Sprite.h"
 
 WordCollectBoardRenderNode* WordCollectBoardRenderNode::create()
 {
@@ -386,7 +387,19 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 	float fTextWidth = pMeaningLabel->getContentSize().width;
 
 	// draw background of meaning
-	Point middlePosition( winSize.width/2.f, winSize.height - 60.f);
+	float fHeaderWidth = 259.f;
+	if (fTextWidth > 153.f)
+		fHeaderWidth += fTextWidth - 153.f;
+
+	Point middlePosition( winSize.width/2.f - fHeaderWidth/2.f, winSize.height - 98.f);
+
+	// new header graphic
+	m_pHeaderNode = Scale3Sprite::create( m_pBackgroundBatchNode, SpriteFrameCache::getInstance()->getSpriteFrameByName("Header.png"), 70, 70, -1);
+	m_pHeaderNode->setPosition(middlePosition);
+	m_pHeaderNode->setContentSize( Size( fHeaderWidth, 70.f));
+	this->addChild(m_pHeaderNode);
+
+	/*
 
 	// add header middle
 	auto pHeaderMiddle = Sprite::createWithSpriteFrameName("Header_middle.png");
@@ -403,7 +416,7 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 	auto pHeaderRight = Sprite::createWithSpriteFrameName("Header_right.png");	
 	pHeaderRight->setAnchorPoint(Point( 0.f, 0.5f));
 	pHeaderRight->setPosition( Point( middlePosition.x + headerMiddleSize.width/2.f - 0.28f , middlePosition.y));
-	m_pBackgroundBatchNode->addChild(pHeaderRight, -1);
+	m_pBackgroundBatchNode->addChild(pHeaderRight, -1);*/
 	
 	// reset flags
 	//memset( m_NewUnlockedLetterFlags, 0, sizeof(m_NewUnlockedLetterFlags));
