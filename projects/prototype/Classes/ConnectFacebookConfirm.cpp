@@ -65,8 +65,8 @@ void ConnectFacebookConfirm::clickUseFacebook()
 {
 	this->removeAllChildren();
 	WaitingNode* pWaitingNode = WaitingNode::createLayout("Loading...");
-	pWaitingNode->setTag(100);
-	this->addChild(pWaitingNode);
+	pWaitingNode->setTag(1099);
+	this->getParent()->addChild(pWaitingNode);
 	
 	auto actionRunProcess = CallFunc::create(this, callfunc_selector(ConnectFacebookConfirm::runProcess));
 	auto actionFinishWord = CallFunc::create(this, callfunc_selector(ConnectFacebookConfirm::finishProcess));
@@ -94,5 +94,6 @@ void ConnectFacebookConfirm::runProcess()
 
 void ConnectFacebookConfirm::finishProcess()
 {
+	this->getParent()->removeChildByTag(1099);
 	this->getParent()->removeChild(this);
 }

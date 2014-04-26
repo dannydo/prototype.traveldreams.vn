@@ -307,38 +307,6 @@ void SettingMenuNode::clickFacebook(Object* sender)
 void SettingMenuNode::clickReset(cocos2d::Object* sender)
 {
 	this->hide();
-}
-
-void SettingMenuNode::runResetGame()
-{
-	WaitingNode* pWaitingNode = WaitingNode::createLayout("Loading...");
-	pWaitingNode->setTag(1000);
-	this->getParent()->addChild(pWaitingNode);
-
-	UserDefault::getInstance()->setIntegerForKey("InitDatabase", 0);
-
-	WordlMapConfig worldMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
-	WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[0];
-
-	UserInfo userInfoNew = UserTable::getInstance()->getUserInfo();
-	userInfoNew.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
-	userInfoNew.iCurrentLevel = 1;
-	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	userInfoNew.sFacebookToken  = FacebookManager::getInstance()->getAccessToken();
-	#endif
-	UserTable::getInstance()->updateUser(userInfoNew);
-
-	// Create data for chapter 1
-	std::vector<std::string> wordList;
-	std::vector<int> mapLevels;
-	GameConfigManager::getInstance()->GenerateWordsForNewChapter(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
-
-	if(InitDatabase::getInstance()->createDataChapterAndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels))
-	{
-		UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
-		SystemEventHandle::getInstance()->onStartSyncGame(true);
-	}
-
 	PopupConfirmNode* popupConfirm = PopupConfirmNode::createLayout("DO YOU WANT TO RESET GAME", PopupConfirmType::eResetGame);
 	this->getParent()->addChild(popupConfirm, 10000);
 }

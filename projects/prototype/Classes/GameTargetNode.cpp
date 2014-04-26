@@ -6,6 +6,7 @@
 #include "ButtonManagerNode.h"
 #include "ButtonNode.h"
 #include "FunctionCommon.h"
+#include "FlashCardNode.h"
 
 USING_NS_CC;
 
@@ -52,15 +53,12 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	this->generateLayoutStartAndBonusQuest();
 
 	Sprite* pIconBoosterImage = Sprite::create("Target-End-Game/icon-boosters.png");
-	pIconBoosterImage->setPosition(Point(320.0f, 437.0f));
+	pIconBoosterImage->setPosition(Point(320.0f, 415.0f));
 	this->addChild(pIconBoosterImage);
 
-	std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(pMainWord);;
-	sPath.append("/FlashCard/");
-	sPath.append(pMainWord.m_sFlashCardImage);
-	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
-	pFlashCardImage->setPosition(Point(240.0f, 600.0f));
-	this->addChild(pFlashCardImage);
+	FlashCardNode* pFlashCard = FlashCardNode::createLayout(pMainWord);
+	pFlashCard->setPosition(230.0f, 580.0f);
+	this->addChild(pFlashCard);
 
 	char sLevel[20];
 	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
@@ -70,9 +68,8 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	pLabelLevel->setPosition(Point(320.0f, 870.0f));
 	this->addChild(pLabelLevel);
 
-	Sprite* pButtonPlayGameSprite = Sprite::create("Target-End-Game/btn_big_play.png");
+	Sprite* pButtonPlayGameSprite = Sprite::create("Target-End-Game/btn_play_small.png");
 	ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonPlayGameSprite, CC_CALLBACK_1(GameTargetNode::menuPlayLevelCallBack, this));
-	buttonPlayNode->setScale(0.9f);
 	buttonPlayNode->setPosition(Point(320.0f, 293.0f));
 
 	Sprite* pButtonCloseSprite = Sprite::create("Target-End-Game/btn_close.png");
@@ -105,7 +102,7 @@ void GameTargetNode::menuCloseCallBack(Object* sender)
 void GameTargetNode::generateLayoutStartAndBonusQuest()
 {
 	LevelConfig* pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(m_sChapterId, m_iCurrentLevel);
-	int iTotalBonusQuest = 2;//pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount;
+	int iTotalBonusQuest = pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount;
 
 	LevelInfo levelInfo = LevelTable::getInstance()->getLevel(m_sChapterId, m_iCurrentLevel);
 

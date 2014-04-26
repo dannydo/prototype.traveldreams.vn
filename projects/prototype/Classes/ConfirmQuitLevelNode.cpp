@@ -2,6 +2,7 @@
 #include "ButtonManagerNode.h"
 #include "WorldMapScene.h"
 #include "HelloWorldScene.h"
+#include "GetMoreLifeNode.h"
 
 USING_NS_CC;
 
@@ -110,7 +111,9 @@ void ConfirmQuitLevelNode::clickRetry(cocos2d::Object* pSender)
 	}
 	else
 	{
-		MessageBox("You have no life!", "Play Level");
+		GetMoreLifeNode* pGetMoreLife = GetMoreLifeNode::create();
+		pGetMoreLife->setGetMoreLifeType(GetMoreLifeType::eGoToMainMenu);
+		this->addChild(pGetMoreLife);
 	}
 }
 

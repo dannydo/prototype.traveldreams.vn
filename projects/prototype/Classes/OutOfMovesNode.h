@@ -1,5 +1,5 @@
-#ifndef _END_GAME_NODE_H_
-#define _END_GAME_NODE_H_
+#ifndef _OUT_OF_MOVES_NODE_H_
+#define _OUT_OF_MOVES_NODE_H_
 
 #include "cocos2d.h"
 #include "GameDataStructure.h"

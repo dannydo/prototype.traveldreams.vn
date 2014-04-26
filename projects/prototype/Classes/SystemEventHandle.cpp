@@ -71,6 +71,7 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 			FacebookManager::getInstance()->loginByMode();
 		#else
 			Director::getInstance()->getRunningScene()->removeChildByTag(1000);
+			//this->onLoginFacebookResult(true);
 		#endif
 		}
 		else
@@ -179,8 +180,9 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 					userInfo.ulLifeTimeBeginRemain = this->getTimeLocalCurrent();
 
 					Director::getInstance()->getRunningScene()->removeChildByTag(1000);
-					if (sKey == "USER_NOT_MAP_FACEBOOK")
+					if (sKey == "NOT_MAPPED_NO_FB_AND_FB_LINK_OTHER_USER")
 					{
+						// User have not account facebook and account login facebook has link other user
 						// Show popup
 						if (UserTable::getInstance()->getUserInfo().sFacebookId == "")
 						{
@@ -188,35 +190,40 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 							Director::getInstance()->getRunningScene()->addChild(pConfirm);
 							pConfirm->setPosition(320.0f, 480.0f);
 						}
-						else
+					}
+					else if (sKey == "NOT_MAPPED_HAS_FB_AND_FB_LINK_OTHER_USER")
+					{
+						// User have account facebook and account login facebook has link other user
+						// Load data of user map current facebook from server 
+						// Delete and init data, update user and Sync data
+						if(InitDatabase::getInstance()->resetDatabase())
 						{
-							// Delete and init data, update user and Sync data
-							if(InitDatabase::getInstance()->resetDatabase())
-							{
-								userInfo.iCurrentLevel = 1;
-								userInfo.sCurrentChapterId = "";
-								userInfo.sFirstName = "";
-								userInfo.sLastName = "";
-								userInfo.iMonney = 0;
-								userInfo.iLife = 5;
-								userInfo.iLifeTimeRemaining = 0;
-								userInfo.iVersion = 1;
+							userInfo.iCurrentLevel = 1;
+							userInfo.sCurrentChapterId = "";
+							userInfo.sFirstName = "";
+							userInfo.sLastName = "";
+							userInfo.iMonney = 0;
+							userInfo.iLife = 5;
+							userInfo.iLifeTimeRemaining = 0;
+							userInfo.iVersion = 1;
 
-								UserTable::getInstance()->updateUser(userInfo);
-								this->onStartSyncGame(true);
-								UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
-							}
+							UserTable::getInstance()->updateUser(userInfo);
+							this->onStartSyncGame(true);
+							UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
 						}
 					}
-					else if (sKey == "USER_MAP_FACEBOOK")
+					else if (sKey == "MAPPED_HAS_FB_AND_FB_LINK_THIS_USER" || sKey == "MAPPED_NO_FB_AND_NEW_FB")
 					{
+						// User and current facebook map 
+						// or User have not account facebook and current account login facebook not link other user
 						// Set connect facebook success
 						UserTable::getInstance()->updateUser(userInfo);
 						UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
 					}
-					else if (sKey == "USER_MAP_OTHER_FACEBOOK")
+					else if (sKey == "NOT_MAPPED_HAS_FB_AND_NEW_FB")
 					{
-						// Delete and init data, update user and Sync data
+						// User have account facebook and current account login facebook not link other user
+						// Delete and init data, create new user map with current facebook and Sync data
 						if(InitDatabase::getInstance()->resetDatabase())
 						{
 							UserDefault::getInstance()->setIntegerForKey("InitDatabase", 0);
@@ -227,9 +234,12 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 							UserInfo userInfoNew = UserTable::getInstance()->getUserInfo();
 							userInfoNew.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
 							userInfoNew.iCurrentLevel = 1;
+
+							std::string sFacebookToken = "";
 							#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-							userInfoNew.sFacebookToken  = FacebookManager::getInstance()->getAccessToken();
+								sFacebookToken = FacebookManager::getInstance()->getAccessToken();
 							#endif
+							userInfoNew.sFacebookToken = sFacebookToken;
 							UserTable::getInstance()->updateUser(userInfoNew);
 
 							// Create data for chapter 1

@@ -59,8 +59,8 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(boardLayer->m_pButtonSettingNode);
-	boardLayer->addChild(pButtonManagerNode, 88);
-
+	boardLayer->m_pHUDLayer->addChild(pButtonManagerNode);
+	
 	boardLayer->addChild(boardLayer->m_pHUDLayer);
 
 	// combo count render node

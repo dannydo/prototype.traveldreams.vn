@@ -55,7 +55,7 @@ bool WorldMapLayer::init()
 	m_pBackgroundNode = LayerColor::create(ccc4(255, 255, 255, 0));
 	m_pBackgroundNode->setContentSize(CCSizeMake(640.0f, 960.0f));
 	m_pBackgroundNode->setAnchorPoint(Point(0.5f, 0.0f));
-	m_pBackgroundNode->setPosition(Point(0.0f, 94.0f));
+	m_pBackgroundNode->setPosition(Point(0.0f, 60.0f));
 	this->addChild(m_pBackgroundNode);
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
@@ -88,15 +88,32 @@ bool WorldMapLayer::init()
 			else
 			{
 				Sprite* pButtonLevelSprite = Sprite::create(sPathFile.c_str());
+				pButtonLevelSprite->setColor(ccc3(46, 48, 107));
+				pButtonLevelSprite->setShaderProgram(ShaderCache::getInstance()->getProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_A8_COLOR));
 				pButtonLevelSprite->setPosition(wordMapChapterConfig.m_position);
 				m_pBackgroundNode->addChild(pButtonLevelSprite);
+
+				Node* pNodeLockChapter = this->createLayoutLockChapter();
+				pNodeLockChapter->setPosition(wordMapChapterConfig.m_position);
+				m_pBackgroundNode->addChild(pNodeLockChapter);
 			} 
 		}
 		else
 		{
 			Sprite* pButtonLevelSprite = Sprite::create(sPathFile.c_str());
+			pButtonLevelSprite->setColor(ccc3(46, 48, 107));
+			pButtonLevelSprite->setShaderProgram(ShaderCache::getInstance()->getProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_A8_COLOR));
 			pButtonLevelSprite->setPosition(wordMapChapterConfig.m_position);
 			m_pBackgroundNode->addChild(pButtonLevelSprite);
+
+			Node* pNodeLockChapter = this->createLayoutLockChapter();
+			pNodeLockChapter->setPosition(wordMapChapterConfig.m_position);
+			m_pBackgroundNode->addChild(pNodeLockChapter);
+		}
+
+		if (wordMapChapterConfig.m_position.y > m_maxHeight)
+		{
+			m_maxHeight = wordMapChapterConfig.m_position.y + 250;
 		}
 	}
 
@@ -111,9 +128,29 @@ bool WorldMapLayer::init()
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
-	m_bMoveSlideShow = false;
+
+	m_pScrollManager = new ScrollManager();
+	m_bIsSwipe = false;
 
 	return true;
+}
+
+cocos2d::Node* WorldMapLayer::createLayoutLockChapter()
+{
+	Node* pNodeLock = Node::create();
+
+	Sprite* pBGRight = Sprite::create("World-Map/cloud_rig.png");
+	pBGRight->setPosition(Point(50.0f, 0.0f));
+	pNodeLock->addChild(pBGRight);
+
+	Sprite* pBGLeft = Sprite::create("World-Map/cloud_lef.png");
+	pBGLeft->setPosition(Point(20.0f, 10.0f));
+	pNodeLock->addChild(pBGLeft);
+
+	Sprite* pBGLock = Sprite::create("World-Map/chapter_lock.png");
+	pNodeLock->addChild(pBGLock);
+
+	return pNodeLock;
 }
 
 void WorldMapLayer::menuPlayChapterCallBack(Object* sender)
@@ -132,6 +169,12 @@ void WorldMapLayer::menuPlayChapterCallBack(Object* sender)
 
 bool WorldMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
+	if(m_bIsSwipe)
+	{
+		return false;
+	}
+	m_bIsSwipe = true;
+
 	if(m_pFooterNode->getSettingNode() != NULL && m_pFooterNode->getSettingNode()->getShowSetting())
 	{
 		return false;
@@ -140,38 +183,64 @@ bool WorldMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 	Point touchPosition = pTouch->getLocation();
 	m_fBeginY = touchPosition.y;
 
+	DataTouch dataTouch;
+	dataTouch.point = touchPosition;
+	dataTouch.lTime = 0;
+	dataTouch.fDeltaTime = 0;
+	m_pScrollManager->addDataToQueue(dataTouch);
+
 	return true;
 }
 
 void WorldMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {	 
-	if(m_bMoveSlideShow == false)
-	{
-		Point touchPosition = pTouch->getLocation();
-		m_fYMoved = touchPosition.y - m_fBeginY;
-
-		if (m_fYMoved + m_pBackgroundNode->getPosition().y >= 94) {
-			m_fYMoved = -m_pBackgroundNode->getPosition().y + 94;
-		}
-		else if(m_fYMoved + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-887))
-		{
-			m_fYMoved = -(m_maxHeight-887) - m_pBackgroundNode->getPosition().y;
-		}
 	
-		m_bMoveSlideShow = true;
-		auto actionMove = MoveBy::create(0.0f, Point(0.0f, m_fYMoved));
-		auto actionUpdate = CallFunc::create(this, callfunc_selector(WorldMapLayer::updateScrollSlideShow));
-		m_pBackgroundNode->runAction(Sequence::create(actionMove, actionUpdate, NULL));
-		m_fBeginY = touchPosition.y;
+	Point touchPosition = pTouch->getLocation();
+	m_fYMoved = touchPosition.y - m_fBeginY;
+
+	if (m_fYMoved + m_pBackgroundNode->getPosition().y >= 60.0f) {
+		m_fYMoved = -m_pBackgroundNode->getPosition().y + 60.0f;
 	}
+	else if(m_fYMoved + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-887))
+	{
+		m_fYMoved = -(m_maxHeight-887) - m_pBackgroundNode->getPosition().y;
+	}
+
+	Point point = m_pBackgroundNode->getPosition();
+	m_pBackgroundNode->setPositionY(point.y + m_fYMoved);
+	m_fBeginY = touchPosition.y;
+
+	DataTouch dataTouch;
+	dataTouch.point = touchPosition;
+	dataTouch.lTime = 0;
+	dataTouch.fDeltaTime = 0;
+	m_pScrollManager->addDataToQueue(dataTouch);
 }
 
 void WorldMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
+	DataTouch dataTouch = m_pScrollManager->getDistanceScrollY();
+	float distanceY = dataTouch.point.y;
+	float deltaTime = dataTouch.fDeltaTime;
+	
+	if(distanceY!=0 && deltaTime!=0)
+	{
+		float fTime = 0.2f;
+		distanceY = distanceY * fTime / deltaTime / 10; 
 
-}
+		if (distanceY + m_pBackgroundNode->getPosition().y >= 60.0f) {
+			distanceY = -m_pBackgroundNode->getPosition().y + 60.0f;
+		}
+		else if(distanceY + m_pBackgroundNode->getPosition().y <= -(m_maxHeight-887))
+		{
+			distanceY = -(m_maxHeight-887) - m_pBackgroundNode->getPosition().y;
+		}
 
-void WorldMapLayer::updateScrollSlideShow()
-{
-	m_bMoveSlideShow = false;
+		auto actionMove = MoveBy::create(fTime, Point(0.0f, distanceY));
+		auto actionEaseOut = EaseOut::create(actionMove, 2.5f);
+		m_pBackgroundNode->stopAllActions();
+		m_pBackgroundNode->runAction(Sequence::create(actionEaseOut, NULL));
+	}
+
+	m_bIsSwipe = false;
 }

@@ -1,6 +1,10 @@
 #include "CustomPackageDownloaderNode.h"
 #include "GameConfigManager.h"
 #include "ButtonManagerNode.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iterator>
 
 CustomPackageDownloaderNode* CustomPackageDownloaderNode::create()
 {
@@ -79,7 +83,7 @@ bool CustomPackageDownloaderNode::init()
 	auto pButtonMenu1 = ButtonNode::createButtonSprite( pMenu1Sprite, CC_CALLBACK_1(CustomPackageDownloaderNode::startDownloadCallback, this));
 	pButtonMenu1->setPosition( Point(160.f, 100.f));
 
-	auto pMenu2Sprite = Sprite::create("CustomModeGUI/EXIT.png");
+	auto pMenu2Sprite = Sprite::create("CustomModeGUI/EXIT.PNG");
 	auto pButtonMenu2 = ButtonNode::createButtonSprite( pMenu2Sprite, CC_CALLBACK_1(CustomPackageDownloaderNode::exitCallback, this));
 	pButtonMenu2->setPosition( Point(420.f, 100.f));
 
@@ -140,9 +144,6 @@ void CustomPackageDownloaderNode::AddNewPackageToList(const CustomPackageInfo& c
 	m_CustomPackageList.push_back( customPackageInfo);
 	m_pTableView->reloadData();
 }
-
-#include <iostream>
-#include <fstream>
 
 void CustomPackageDownloaderNode::SavePackageListToFile()
 {

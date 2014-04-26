@@ -14,6 +14,7 @@ public:
 
 private:
 	void clickBuyGold(cocos2d::Object* sender);
+	void clickMail(cocos2d::Object* sender);
 };
 
 #endif;

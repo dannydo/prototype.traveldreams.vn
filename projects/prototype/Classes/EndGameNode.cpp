@@ -11,6 +11,8 @@
 #include "WorldMapScene.h"
 #include "APIService\SyncDataGame.h"
 #include "FunctionCommon.h"
+#include "GetMoreLifeNode.h"
+#include "FlashCardNode.h"
 
 USING_NS_CC;
 
@@ -18,7 +20,7 @@ EndGameNode* EndGameNode::createLayoutLose(const int& iScore, const Word& mainWo
 {
 	EndGameNode* pEndGameNode = new EndGameNode();
 	pEndGameNode->m_iCurrentLevel = iCurrentLevel;
-	pEndGameNode->m_mainWord = mainWord;
+	pEndGameNode->m_mainWord.CopyDataFrom(mainWord);
 	pEndGameNode->m_iScore = iScore;
 	pEndGameNode->m_sChapterId = sChapterId;
 
@@ -36,7 +38,7 @@ EndGameNode* EndGameNode::createLayoutWin(const int& iScore, const Word& mainWor
 {
 	EndGameNode* pEndGameNode = new EndGameNode();
 	pEndGameNode->m_iCurrentLevel = iCurrentLevel;
-	pEndGameNode->m_mainWord = mainWord;
+	pEndGameNode->m_mainWord.CopyDataFrom(mainWord);
 	pEndGameNode->m_iScore = iScore;
 	pEndGameNode->m_sChapterId = sChapterId;
 
@@ -60,8 +62,6 @@ bool EndGameNode::initWin()
 	LevelConfig* pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(m_sChapterId, m_iCurrentLevel);
 	m_iTotalBonusQuest = pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount;
 
-	this->generateLayoutStartAndBonusQuest();
-
 	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 150));
 	pBackground->setContentSize(CCSizeMake(640.0f, 960.0f));
 	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
@@ -79,16 +79,15 @@ bool EndGameNode::initWin()
 	pBackgroundBoard->setPosition(Point(320.0f, 610.0f));
 	this->addChild(pBackgroundBoard);
 
+	this->generateLayoutStartAndBonusQuest();
+
 	Sprite* pCompletedImage = Sprite::create("Target-End-Game/text_level_completed.png");
 	pCompletedImage->setPosition(Point(320.0f, 654.0f));
 	this->addChild(pCompletedImage);
 
-	std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(m_mainWord);;
-	sPath.append("/FlashCard/");
-	sPath.append(m_mainWord.m_sFlashCardImage);
-	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
-	pFlashCardImage->setPosition(Point(240.0f, 495.0f));
-	this->addChild(pFlashCardImage);
+	FlashCardNode* pFlashCard = FlashCardNode::createLayout(m_mainWord);
+	pFlashCard->setPosition(230.0f, 490.0f);
+	this->addChild(pFlashCard);
 
 	char sLevel[20];
 	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
@@ -234,15 +233,12 @@ bool EndGameNode::initLose()
 	this->addChild(pLevelFailImage3);
 
 	Sprite* pIconBoosterImage = Sprite::create("Target-End-Game/icon-boosters.png");
-	pIconBoosterImage->setPosition(Point(320.0f, 437.0f));
+	pIconBoosterImage->setPosition(Point(320.0f, 415.0f));
 	this->addChild(pIconBoosterImage);
 
-	std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(m_mainWord);;
-	sPath.append("/FlashCard/");
-	sPath.append(m_mainWord.m_sFlashCardImage);
-	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
-	pFlashCardImage->setPosition(Point(240.0f, 600.0f));
-	this->addChild(pFlashCardImage);
+	FlashCardNode* pFlashCard = FlashCardNode::createLayout(m_mainWord);
+	pFlashCard->setPosition(230.0f, 580.0f);
+	this->addChild(pFlashCard);
 
 	char sLevel[20];
 	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
@@ -291,6 +287,7 @@ void EndGameNode::generateLayoutStartAndBonusQuest()
 		pStarPurpleImage->setPosition(Point(220.0f + iIndex*100.0f - m_iTotalBonusQuest*46, 750.0f));
 		if (iIndex == 1)
 				pStarPurpleImage->setScale(1.4f);
+
 		this->addChild(pStarPurpleImage);
 	}
 
@@ -339,9 +336,20 @@ void EndGameNode::updateStar()
 {
 	if (m_iCountYellowStar < m_iYellowStar) {
 		Sprite* pStarYellowImage = Sprite::create("Target-End-Game/star_win_small.png");
-		pStarYellowImage->setPosition(Point(220.0f + m_iCountYellowStar*100.0f - m_iTotalBonusQuest*46, 750.0f));
-		if (m_iCountYellowStar == 1)
-				pStarYellowImage->setScale(1.4f);
+		
+		if (m_iCountYellowStar == 0)
+		{
+			pStarYellowImage->setScale(1.4f);
+			pStarYellowImage->setPosition(Point(220.0f + 1*100.0f - m_iTotalBonusQuest*46, 750.0f));
+		}
+		else if(m_iCountYellowStar == 1)
+		{
+			pStarYellowImage->setPosition(Point(220.0f + 0*100.0f - m_iTotalBonusQuest*46, 750.0f));
+		}
+		else if(m_iCountYellowStar == 2)
+		{
+			pStarYellowImage->setPosition(Point(220.0f + 2*100.0f - m_iTotalBonusQuest*46, 750.0f));
+		}
 
 		this->addChild(pStarYellowImage);
 		m_iCountYellowStar++;
@@ -434,7 +442,9 @@ void EndGameNode::menuRetryLevelLoseCallBack(Object* sender)
 	}
 	else
 	{
-		MessageBox("You have no life!", "Play Level");
+		GetMoreLifeNode* pGetMoreLife = GetMoreLifeNode::create();
+		pGetMoreLife->setGetMoreLifeType(GetMoreLifeType::eGoToMainMenu);
+		this->addChild(pGetMoreLife);
 	}
 }
 

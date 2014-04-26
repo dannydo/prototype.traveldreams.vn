@@ -13,6 +13,7 @@
 #include "Config.h"
 #include "GameConfigManager.h"
 #include "Database\WordTable.h"
+#include "GetMoreLifeNode.h"
 
 using namespace cocos2d;
 
@@ -96,11 +97,12 @@ bool LevelMapLayer::init()
 
 		char sLevel[10];
 		sprintf(sLevel, "%d", levelInfo.iLevel + iCalLevel);
-		LabelTTF* pLevelLabel = LabelTTF::create(sLevel, "fonts/UTM Cookies.ttf", 32);
+		LabelBMFont *pLevelLabel = LabelBMFont::create(sLevel, "fonts/font_title-popup.fnt");
+		pLevelLabel->setScale(0.75f);
 		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
-		pLevelLabel->setPosition(Point(point.x-2, point.y+17));
+		pLevelLabel->setPosition(Point(74.0f, 60.0f));
 		
-		if(levelInfo.bIsUnlock || (levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId) || 1) // for test
+		if(levelInfo.bIsUnlock || (levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId)) // for test
 		{
 			Sprite* pButtonLevelSprite;
 			
@@ -115,6 +117,7 @@ bool LevelMapLayer::init()
 				pButtonLevelSprite = Sprite::create("World-Map/pass-level.png");
 
 				WordInfo wordInfo = WordTable::getInstance()->getWordInfoOnChapter(levelInfo.sChapterId, levelInfo.sWordId);
+				/*
 				if(wordInfo.iCountCollected <= 1)
 				{
 					LabelTTF* pLabelNew = LabelTTF::create("New", "Arial", 22);
@@ -123,9 +126,11 @@ bool LevelMapLayer::init()
 					pLabelNew->setPosition(Point(point.x-2, point.y-8));
 					m_pBackgroundNode->addChild(pLabelNew);
 				}
+				*/
 			}
 
 			pButtonLevelSprite->setTag(levelInfo.iLevel);
+			pButtonLevelSprite->addChild(pLevelLabel);
 			ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonLevelSprite, CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
 			buttonPlayNode->setPosition(point);
 			buttonPlayNode->setTag(levelInfo.iLevel);
@@ -134,7 +139,7 @@ bool LevelMapLayer::init()
 			if (levelInfo.bIsUnlock || (levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId))
 			{
 				Node* pStarAndBonusQuestNode = this->generateLayoutStarAndBonusQuest(levelInfo.iStar, levelInfo.iBonusQuest, levelInfo.iTotalBonusQuest);
-				pStarAndBonusQuestNode->setPosition(Point(point.x-2, point.y));
+				pStarAndBonusQuestNode->setPosition(Point(point.x, point.y - 45));
 				m_pBackgroundNode->addChild(pStarAndBonusQuestNode);
 			}
 		}
@@ -144,8 +149,6 @@ bool LevelMapLayer::init()
 			pButtonLevelSprite->setPosition(point);
 			m_pBackgroundNode->addChild(pButtonLevelSprite);
 		}
-
-		m_pBackgroundNode->addChild(pLevelLabel);
 	}
 
 	if (pointScroll.y > 960-94-200 && pointScroll.y < m_maxHeight-960) {
@@ -192,7 +195,9 @@ void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 	}
 	else
 	{
-		MessageBox("You have no life!", "Play Level");
+		GetMoreLifeNode* pGetMoreLife = GetMoreLifeNode::create();
+		pGetMoreLife->setGetMoreLifeType(GetMoreLifeType::eClosePopup);
+		this->addChild(pGetMoreLife);
 	}
 }
 
@@ -288,26 +293,36 @@ void LevelMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 Node* LevelMapLayer::generateLayoutStarAndBonusQuest(const int& iStarCompleted, const int& iBonusQuestCompleted, const int& iTotalBonusQuest)
 {
 	Node* pNode = Node::create();
-	int fRadiusCircle = 60;
-	Point point;
 
 	for(int iCountStar=0; iCountStar<3; iCountStar++)
 	{
 		Sprite* pStarSprite;
 		if(iCountStar < iStarCompleted)
 		{
-			pStarSprite = Sprite::create("World-Map/start-y.png");
+			pStarSprite = Sprite::create("World-Map/star_win_small.png");
 		}
 		else
 		{
-			pStarSprite = Sprite::create("World-Map/star-p.png");
+			pStarSprite = Sprite::create("World-Map/star_target_small.png");
 		}
 
-		float angle = _C_PI_-(58 - 20*iTotalBonusQuest + 37*iCountStar)/180.0f*_C_PI_;
-		point.x = fRadiusCircle*cos(angle);
-		point.y = fRadiusCircle*sin(angle);
+		if (iCountStar == 0)
+		{
+			pStarSprite->setPosition(Point(0.0f, 0.0f));
+			pStarSprite->setZOrder(1);
+			pStarSprite->setScale(0.6f);
+		}
+		else if (iCountStar == 1)
+		{
+			pStarSprite->setPosition(Point(-30.0f, 9.0f));
+			pStarSprite->setScale(0.5f);
+		}
+		else if (iCountStar == 2)
+		{
+			pStarSprite->setPosition(Point(30.0f, 9.0f));
+			pStarSprite->setScale(0.5f);
+		}
 
-		pStarSprite->setPosition(point);
 		pNode->addChild(pStarSprite);
 	}
 
@@ -316,18 +331,15 @@ Node* LevelMapLayer::generateLayoutStarAndBonusQuest(const int& iStarCompleted, 
 		Sprite* pBonusQuestSprite;
 		if(iCountBonusQuest<iBonusQuestCompleted)
 		{
-			pBonusQuestSprite = Sprite::create("World-Map/bonus-y.png");
+			pBonusQuestSprite = Sprite::create("World-Map/mushroom_win.png");
 		}
 		else
 		{
-			pBonusQuestSprite = Sprite::create("World-Map/bonus-p.png");
+			pBonusQuestSprite = Sprite::create("World-Map/mushroom_fail.png");
 		}
+		pBonusQuestSprite->setScale(0.5f);
+		pBonusQuestSprite->setPosition(Point(-15.0f + iCountBonusQuest*27, 90.0f));
 
-		float angle = _C_PI_-(58 - 20*iTotalBonusQuest + 37*(iCountBonusQuest+3))/180.0f*_C_PI_;
-		point.x = fRadiusCircle*cos(angle);
-		point.y = fRadiusCircle*sin(angle);
-
-		pBonusQuestSprite->setPosition(point);
 		pNode->addChild(pBonusQuestSprite);
 	}
 

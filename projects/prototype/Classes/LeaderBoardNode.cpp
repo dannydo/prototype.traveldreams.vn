@@ -324,13 +324,13 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 								if(iCount > 2)
 									break;
 
-								if (iIndex < iRank-3)
+								if (iIndex < iRank-2)
 								{
 									iCount++;
 									cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
 									this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
 								}
-								else if (iIndex > iRank-1)
+								else if (iIndex > iRank)
 								{
 									iCount++;
 									cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);

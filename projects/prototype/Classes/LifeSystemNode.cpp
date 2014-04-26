@@ -1,5 +1,6 @@
 #include "LifeSystemNode.h"
 #include "ButtonManagerNode.h"
+#include "GetMoreLifeNode.h"
 
 USING_NS_CC;
 
@@ -42,9 +43,9 @@ bool LifeSystemNode::init()
 
 	char sLife[2];
 	sprintf(sLife, "%d", m_userInfo.iLife);
-	m_pLabelLife = LabelBMFont::create(sLife, "fonts/Flashcard-bitmap-font-game.fnt");
+	m_pLabelLife = LabelBMFont::create(sLife, "fonts/font_small_alert.fnt");
 	m_pLabelLife->setAnchorPoint(Point(0.0f, 0.5f));
-	m_pLabelLife->setPosition(Point(28.0f, 35.0f));
+	m_pLabelLife->setPosition(Point(30.0f, 28.0f));
 	m_pBackgroundClock->addChild(m_pLabelLife);
 
 	if (m_userInfo.iLife == _MAX_LIFE_)
@@ -58,7 +59,9 @@ bool LifeSystemNode::init()
 
 void LifeSystemNode::clickGetLife(cocos2d::Object* sender)
 {
-
+	GetMoreLifeNode* pGetMoreLife = GetMoreLifeNode::create();
+	pGetMoreLife->setGetMoreLifeType(GetMoreLifeType::eClosePopup);
+	this->getParent()->addChild(pGetMoreLife);
 }
 
 void LifeSystemNode::updateWhenTimeChange(float dt)
@@ -74,7 +77,6 @@ void LifeSystemNode::updateWhenTimeChange(float dt)
 		else
 		{
 			m_userInfo.iLife = _MAX_LIFE_;
-			m_pBackgroundClock->setVisible(false);
 			this->unschedule(schedule_selector(LifeSystemNode::updateWhenTimeChange));
 		}
 

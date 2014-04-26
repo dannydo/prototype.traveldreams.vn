@@ -122,6 +122,11 @@ void PopupConfirmNode::clickNo(cocos2d::Object* pSender)
 void PopupConfirmNode::runResetGame()
 {
 	UserDefault::getInstance()->setIntegerForKey("InitDatabase", 0);
+	UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
+
+	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+		FacebookManager::getInstance()->logoutByMode();
+	#endif
 
 	if (InitDatabase::getInstance()->resetDatabase())
 	{
@@ -131,9 +136,6 @@ void PopupConfirmNode::runResetGame()
 		UserInfo userInfoNew = UserTable::getInstance()->getUserInfo();
 		userInfoNew.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
 		userInfoNew.iCurrentLevel = 1;
-	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-		userInfoNew.sFacebookToken  = FacebookManager::getInstance()->getAccessToken();
-	#endif
 		UserTable::getInstance()->updateUser(userInfoNew);
 
 		// Create data for one chapter

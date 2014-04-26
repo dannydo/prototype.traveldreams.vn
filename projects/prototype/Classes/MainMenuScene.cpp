@@ -171,6 +171,19 @@ void MainMenuLayer::openSettingMenu(Object *sender)
 		this->addChild(m_pSettingNode);
 	}
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	if(FacebookManager::getInstance()->isLogined() && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) == 1)
+	{
+		m_pSettingNode->setStatusButtonFacebook(0);
+		CCLOG("logout");
+	}
+	else if(!FacebookManager::getInstance()->isLogined() &&  UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", -1) == 0)
+	{
+		m_pSettingNode->setStatusButtonFacebook(1);
+		CCLOG("login");
+	}
+#endif
+
 	if (m_pSettingNode->getShowSetting() == false)
 	{
 		m_pSettingNode->show();

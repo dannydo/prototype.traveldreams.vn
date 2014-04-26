@@ -19,6 +19,7 @@ private:
 	void finishLoading();
 
 	bool m_bFinishLoad;
+	bool m_bIsWaittingSync;
 };
 
 class LoadingScene : public cocos2d::Scene
