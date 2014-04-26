@@ -132,9 +132,6 @@ void PopupConfirmNode::runResetGame()
 		UserInfo userInfoNew = UserTable::getInstance()->getUserInfo();
 		userInfoNew.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
 		userInfoNew.iCurrentLevel = 1;
-	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-		userInfoNew.sFacebookToken  = FacebookManager::getInstance()->getAccessToken();
-	#endif
 		UserTable::getInstance()->updateUser(userInfoNew);
 
 		// Create data for one chapter
