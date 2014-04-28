@@ -33,6 +33,8 @@ private:
 
 	std::vector<WordInfo> m_Words;
 	ChapterInfo m_chapterInfo;
+	ButtonNode* m_pButtonRight;
+	ButtonNode* m_pButtonLeft;
 
 
 	bool m_bIsSwipe;

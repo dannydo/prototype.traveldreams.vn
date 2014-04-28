@@ -122,14 +122,15 @@ bool FlashCardLayer::init()
 	this->addChild(pButtonManageNode);
 
 	Sprite* pIconLeft = Sprite::create("FlashCard/left_icon.png");
-	ButtonNode* pButtonLeft = ButtonNode::createButtonSprite(pIconLeft,  CC_CALLBACK_1(FlashCardLayer::clickButtonLeft, this));
-	pButtonLeft->setPosition(Point(50.0f, 565.0f));
-	pButtonManageNode->addButtonNode(pButtonLeft);
+	m_pButtonLeft = ButtonNode::createButtonSprite(pIconLeft,  CC_CALLBACK_1(FlashCardLayer::clickButtonLeft, this));
+	m_pButtonLeft->setPosition(Point(50.0f, 565.0f));
+	pButtonManageNode->addButtonNode(m_pButtonLeft);
+	m_pButtonLeft->setVisible(false);
 
 	Sprite* pIconRight = Sprite::create("FlashCard/right_icon.png");
-	ButtonNode* pButtonRight = ButtonNode::createButtonSprite(pIconRight,  CC_CALLBACK_1(FlashCardLayer::clickButtonRight, this));
-	pButtonRight->setPosition(Point(610.0f, 565.0f));
-	pButtonManageNode->addButtonNode(pButtonRight);
+	m_pButtonRight = ButtonNode::createButtonSprite(pIconRight,  CC_CALLBACK_1(FlashCardLayer::clickButtonRight, this));
+	m_pButtonRight->setPosition(Point(610.0f, 565.0f));
+	pButtonManageNode->addButtonNode(m_pButtonRight);
 
 	m_bMoveLeft = false;
 	m_bMoveRight = false;
@@ -144,25 +145,37 @@ bool FlashCardLayer::init()
 
 void FlashCardLayer::clickButtonLeft(Object* pSender)
 {
-	if (m_iIndexFlashCard < m_iTotalFlashCard && m_bMoveLeft == false && m_bMoveRight == false)
-	{
-		m_iIndexFlashCard++;
-		auto actionCreateSlideShow = CallFunc::create(this, callfunc_selector(FlashCardLayer::createNodeSlideShow));
-		auto actionMove = MoveBy::create(0.2f, Point(-640, 0));
-		m_pSlideShow->runAction(Sequence::create(actionMove, actionCreateSlideShow, NULL));
-		m_bMoveLeft = true;
-	}
-}
-
-void FlashCardLayer::clickButtonRight(Object* pSender)
-{
 	if (m_iIndexFlashCard > 1 && m_bMoveLeft == false && m_bMoveRight == false)
 	{
 		m_iIndexFlashCard--;
 		auto actionCreateSlideShow = CallFunc::create(this, callfunc_selector(FlashCardLayer::createNodeSlideShow));
 		auto actionMove = MoveBy::create(0.2f, Point(640, 0));
 		m_pSlideShow->runAction(Sequence::create(actionMove, actionCreateSlideShow, NULL));
+		m_bMoveLeft = true;
+		m_pButtonRight->setVisible(true);
+	}
+	
+	if (m_iIndexFlashCard == 1)
+	{
+		m_pButtonLeft->setVisible(false);
+	}
+}
+
+void FlashCardLayer::clickButtonRight(Object* pSender)
+{
+	if (m_iIndexFlashCard < m_iTotalFlashCard && m_bMoveLeft == false && m_bMoveRight == false)
+	{
+		m_iIndexFlashCard++;
+		auto actionCreateSlideShow = CallFunc::create(this, callfunc_selector(FlashCardLayer::createNodeSlideShow));
+		auto actionMove = MoveBy::create(0.2f, Point(-640, 0));
+		m_pSlideShow->runAction(Sequence::create(actionMove, actionCreateSlideShow, NULL));
 		m_bMoveRight = true;
+		m_pButtonLeft->setVisible(true);
+	}
+
+	if (m_iIndexFlashCard == m_iTotalFlashCard)
+	{
+		m_pButtonRight->setVisible(false);
 	}
 }
 
