@@ -1,0 +1,29 @@
+;size map
+8	8
+;number of move
+10
+;number of color
+6
+;score of stars
+8000	12000	15000
+;map matrix
+1	0	0	0	0	0	0	1
+0	1	1	1	1	1	1	0
+0	1	1	1	1	1	1	0
+1	1	1	1	1	1	1	1
+1	1	1	1	1	1	1	1
+0	1	1	1	1	1	1	0
+0	1	1	1	1	1	1	0
+1	0	0	0	0	0	0	1
+;main word
+6
+1
+8 1 7 2 6 3 5 4 4 5 3 6 
+;end game bonus type
+1
+;boss
+0
+;obstacle list: count, list
+0
+;bonus quest
+0

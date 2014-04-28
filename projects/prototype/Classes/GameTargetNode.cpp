@@ -57,7 +57,8 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 	this->addChild(pIconBoosterImage);
 
 	FlashCardNode* pFlashCard = FlashCardNode::createLayout(pMainWord);
-	pFlashCard->setPosition(230.0f, 580.0f);
+	pFlashCard->setPosition(70.0f, 285.0f);
+	pFlashCard->setScale(0.52f);
 	this->addChild(pFlashCard);
 
 	char sLevel[20];

@@ -2,9 +2,9 @@
 #include "WorldMapScene.h"
 #include "LevelMapScene.h"
 #include "GameWordManager.h"
-#include "DictionaryNode.h"
 #include "FooterNode.h"
-#include "SoundManager.h"
+#include "FlashCardNode.h"
+#include "HeaderNode.h"
 
 USING_NS_CC;
 
@@ -67,29 +67,38 @@ FlashCardLayer* FlashCardLayer::createLayout(const ChapterInfo& chapterInfo)
 
 bool FlashCardLayer::init()
 {
-	if(!LayerColor::initWithColor(ccc4(255, 255, 255, 255)))
+	if(!Layer::init())
 	{
 		return false;
 	}
 
-	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+	Sprite* pBackground = Sprite::create("FlashCard/background.png");
+	pBackground->setPosition(Point(320.0f, 480.0f));
+	this->addChild(pBackground);
 
-	/*
-	LabelTTF* pLabelTitle = LabelTTF::create(m_chapterInfo.sName.c_str(), "Arial", 40);
-	pLabelTitle->setColor(ccc3(0.0f, 0.0f, 0.0f));
-	pLabelTitle->setPosition(Point(320.0f, 905.0f));
+	HeaderNode* pHeaderNode = HeaderNode::create();
+	this->addChild(pHeaderNode);
+
+	WordlMapConfig worlMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
+	int iIndexChapter = worlMapConfig.m_WorlMapChapterConfigMap[m_chapterInfo.sChapterId];
+
+	LabelBMFont *pLabelTitle = LabelBMFont::create(worlMapConfig.m_WorlMapChapterConfigs[iIndexChapter].m_sChapterName.c_str(), "fonts/font_title-popup.fnt");
+	pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
 	this->addChild(pLabelTitle);
-	*/
 
-	char sTotalLevel[10];
-	sprintf(sTotalLevel, "%d/%d", 1, m_chapterInfo.iTotalFlash);
-	m_pLabelIndex = LabelTTF::create(sTotalLevel, "Arial", 22);
+	char sTotalFlashCard[20];
+	sprintf(sTotalFlashCard, "(%d/%d)", 1, m_chapterInfo.iTotalFlash);
+	m_pLabelIndex = LabelTTF::create(sTotalFlashCard, "Arial", 30);
 	m_pLabelIndex->setColor(ccc3(0.0f, 0.0f, 0.0f));
-	m_pLabelIndex->setPosition(Point(320.0f, 870.0f));
+
+	m_pLabelIndex->setPosition(Point(320.0f + pLabelTitle->getContentSize().width/2.0f -2, 850.0f));
+	pLabelTitle->setPosition(Point(320.0f - m_pLabelIndex->getContentSize().width/2.0f +2, 850.0f));
+
 	this->addChild(m_pLabelIndex);
 
 	m_pFooterNode = FooterNode::create();
-	m_pFooterNode->disableButtonIntroAndFlashCard();
+	m_pFooterNode->removeButtonFlashcard();
+	m_pFooterNode->removeBackground();
 	this->addChild(m_pFooterNode);
 
 	if(m_chapterInfo.iCountFlashCardNew > 0)
@@ -105,27 +114,56 @@ bool FlashCardLayer::init()
 	m_pSlideShow->setContentSize(CCSizeMake(640.0f, 800));
 	m_pSlideShow->setAnchorPoint(Point(0.0f, 0.0f));
 	m_pSlideShow->setPosition(Point(0.0f, 94.0f));
-	m_pSlideShow->setVisible(false);
 
 	this->createNodeSlideShow();
 	this->addChild(m_pSlideShow);
+
+	ButtonManagerNode* pButtonManageNode = ButtonManagerNode::create();
+	this->addChild(pButtonManageNode);
+
+	Sprite* pIconLeft = Sprite::create("FlashCard/left_icon.png");
+	ButtonNode* pButtonLeft = ButtonNode::createButtonSprite(pIconLeft,  CC_CALLBACK_1(FlashCardLayer::clickButtonLeft, this));
+	pButtonLeft->setPosition(Point(50.0f, 565.0f));
+	pButtonManageNode->addButtonNode(pButtonLeft);
+
+	Sprite* pIconRight = Sprite::create("FlashCard/right_icon.png");
+	ButtonNode* pButtonRight = ButtonNode::createButtonSprite(pIconRight,  CC_CALLBACK_1(FlashCardLayer::clickButtonRight, this));
+	pButtonRight->setPosition(Point(610.0f, 565.0f));
+	pButtonManageNode->addButtonNode(pButtonRight);
+
+	m_bMoveLeft = false;
+	m_bMoveRight = false;
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kFlashCard);
-   
-	m_pIconSoundSenetenceSprite = Sprite::create("FlashCard/icon_sound.png");
-	m_pIconSoundSenetenceSprite->setPosition(Point(500.0f, 300.0f));
-	m_pIconSoundSenetenceSprite->setVisible(false);
-	this->addChild(m_pIconSoundSenetenceSprite);
-
-	m_pIconSoundWordSprite = Sprite::create("FlashCard/icon_sound.png");
-	m_pIconSoundWordSprite->setPosition(Point(500.0f, 730.0f));
-	m_pIconSoundWordSprite->setVisible(false);
-	this->addChild(m_pIconSoundWordSprite);
 
 	return true;
+}
+
+void FlashCardLayer::clickButtonLeft(Object* pSender)
+{
+	if (m_iIndexFlashCard < m_iTotalFlashCard && m_bMoveLeft == false && m_bMoveRight == false)
+	{
+		m_iIndexFlashCard++;
+		auto actionCreateSlideShow = CallFunc::create(this, callfunc_selector(FlashCardLayer::createNodeSlideShow));
+		auto actionMove = MoveBy::create(0.2f, Point(-640, 0));
+		m_pSlideShow->runAction(Sequence::create(actionMove, actionCreateSlideShow, NULL));
+		m_bMoveLeft = true;
+	}
+}
+
+void FlashCardLayer::clickButtonRight(Object* pSender)
+{
+	if (m_iIndexFlashCard > 1 && m_bMoveLeft == false && m_bMoveRight == false)
+	{
+		m_iIndexFlashCard--;
+		auto actionCreateSlideShow = CallFunc::create(this, callfunc_selector(FlashCardLayer::createNodeSlideShow));
+		auto actionMove = MoveBy::create(0.2f, Point(640, 0));
+		m_pSlideShow->runAction(Sequence::create(actionMove, actionCreateSlideShow, NULL));
+		m_bMoveRight = true;
+	}
 }
 
 bool FlashCardLayer::onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)
@@ -207,187 +245,64 @@ void FlashCardLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent
 			auto actionMove = MoveBy::create(0.2f, Point(-m_fXMoved, 0));
 			m_pSlideShow->runAction(actionMove);
 		}
-
-		Point touchPosition = pTouch->getLocation();
-		
-		CCRect *pRectButton = new CCRect(m_pIconSoundSenetenceSprite->getOffsetPosition().x, 
-				m_pIconSoundSenetenceSprite->getOffsetPosition().y, 
-				m_pIconSoundSenetenceSprite->getTextureRect().size.width, 
-				m_pIconSoundSenetenceSprite->getTextureRect().size.height);
-		Point touchButton = m_pIconSoundSenetenceSprite->convertToNodeSpace(touchPosition);
-		if(pRectButton->containsPoint(touchButton))
-		{
-			playVoiceSentence();
-		}
-
-		pRectButton = new CCRect(m_pIconSoundWordSprite->getOffsetPosition().x, 
-				m_pIconSoundWordSprite->getOffsetPosition().y, 
-				m_pIconSoundWordSprite->getTextureRect().size.width, 
-				m_pIconSoundWordSprite->getTextureRect().size.height);
-		touchButton = m_pIconSoundWordSprite->convertToNodeSpace(touchPosition);
-		if(pRectButton->containsPoint(touchButton))
-		{
-			playVoiceWord();
-		}
-
-		pRectButton = new CCRect(m_pLabelWord->getOffsetPosition().x, 
-				m_pLabelWord->getOffsetPosition().y, 
-				m_pLabelWord->getTextureRect().size.width, 
-				m_pLabelWord->getTextureRect().size.height);
-		touchButton = m_pLabelWord->convertToNodeSpace(touchPosition);
-		if(pRectButton->containsPoint(touchButton))
-		{
-			openDictionary(m_pLabelWord->getString());
-		}
 	}
-}
-
-void FlashCardLayer::playVoiceWord()
-{
-	SoundManager::PlaySpellingOfWord(this, m_currentWord);
-}
-
-void FlashCardLayer::playVoiceSentence()
-{
-	SoundManager::PlaySentenceOfWord(this, m_currentWord);
-}
-
-void FlashCardLayer::openDictionary(const char* sWord)
-{
-	DictionaryNode* pDictionary = DictionaryNode::createLayout(sWord);
-	pDictionary->setPosition(Point(320.0f, 680.0f));
-	this->getParent()->addChild(pDictionary, 20);
 }
 
 void FlashCardLayer::createNodeSlideShow()
 {
-	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
-	Node* pLastCardLeft = this->createLayoutFlashCard(m_iIndexFlashCard - 1);
-	Node* pLastCardCurrent = this->createLayoutFlashCard(m_iIndexFlashCard);
-	Node* pLastCardRight = this->createLayoutFlashCard(m_iIndexFlashCard + 1);
-
 	m_pSlideShow->removeAllChildren();
-	char sTotaFlashCard[10];
-	sprintf(sTotaFlashCard, "%d/%d", m_iIndexFlashCard, m_chapterInfo.iTotalFlash);
-	m_pLabelIndex->setString(sTotaFlashCard);
-
-	Node* pNodeDisplay = this->createLayoutFlashCard(m_iIndexFlashCard);
-	pNodeDisplay->setAnchorPoint(Point(0.0f, 0.0f));
-	pNodeDisplay->setPosition(Point(0.0f, 0.0f));
-
-	m_pSlideShow->setAnchorPoint(Point(0.0f, 0.0f));
-	m_pSlideShow->setPosition(Point(0.0f, 94.0f));
-	m_pSlideShow->setVisible(true);
-	
-	if(pLastCardLeft != NULL)
+ 
+	// Left
+	if (m_iIndexFlashCard-2 >= 0)
 	{
-		pLastCardLeft->setAnchorPoint(Point(0.0f, 0.0f));
+		WordInfo wordInfo = m_Words[m_iIndexFlashCard-2];
+		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordInfo.sWordId);
+		auto& word = GameWordManager::getInstance()->GetWord(iIndex);
+
+		FlashCardNode* pLastCardLeft = FlashCardNode::createLayout(word);
 		pLastCardLeft->setPosition(Point(-640.0f, 0.0f));
+		pLastCardLeft->addButtonPlaySoundWord();
+		pLastCardLeft->addLayoutDescriptionWord();
 		m_pSlideShow->addChild(pLastCardLeft);
 	}
 
-	if(pLastCardCurrent != NULL)
+	
+	// Mid
+	if (m_iIndexFlashCard - 1 >= 0)
 	{
-		pLastCardCurrent->setAnchorPoint(Point(0.0f, 0.0f));
+		WordInfo wordInfo = m_Words[m_iIndexFlashCard-1];
+		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordInfo.sWordId);
+		auto& word = GameWordManager::getInstance()->GetWord(iIndex);
+
+		FlashCardNode* pLastCardCurrent = FlashCardNode::createLayout(word);
 		pLastCardCurrent->setPosition(Point(0.0f, 0.0f));
+		pLastCardCurrent->addButtonPlaySoundWord();
+		pLastCardCurrent->addLayoutDescriptionWord();
 		m_pSlideShow->addChild(pLastCardCurrent);
 	}
 
-	if(pLastCardRight != NULL)
+	
+	// Right
+	if (m_iIndexFlashCard <= m_iTotalFlashCard)
 	{
-		pLastCardRight->setAnchorPoint(Point(0.0f, 0.0f));
+		WordInfo wordInfo = m_Words[m_iIndexFlashCard];
+		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordInfo.sWordId);
+		auto& word = GameWordManager::getInstance()->GetWord(iIndex);
+
+		FlashCardNode* pLastCardRight = FlashCardNode::createLayout(word);
 		pLastCardRight->setPosition(Point(640.0f, 0.0f));
+		pLastCardRight->addButtonPlaySoundWord();
+		pLastCardRight->addLayoutDescriptionWord();
 		m_pSlideShow->addChild(pLastCardRight);
 	}
 
-	m_currentWordInfo = m_Words[m_iIndexFlashCard-1];
-	m_pLabelWord = LabelTTF::create(m_currentWordInfo.sWordId.c_str(), "Arial", 32.0f);
-	m_pLabelWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
-	m_pLabelWord->setPosition(Point(320.0f, 650.0f));
-	m_pLabelWord->setVisible(false);
-	m_pSlideShow->addChild(m_pLabelWord);
+	char sTotaFlashCard[10];
+	sprintf(sTotaFlashCard, "(%d/%d)", m_iIndexFlashCard, m_chapterInfo.iTotalFlash);
+	m_pLabelIndex->setString(sTotaFlashCard);
 
-	if(m_currentWordInfo.sWordId != "")
-	{
-		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(m_currentWordInfo.sWordId); //GetWordIndexFromContent(m_currentLevelInfo.sWordKey);
-		m_currentWord = GameWordManager::getInstance()->GetWord(iIndex);
+	m_pSlideShow->setAnchorPoint(Point(0.0f, 0.0f));
+	m_pSlideShow->setPosition(Point(0.0f, 0.0f));
 
-		// Update data when user view flash card new
-		if (m_currentWordInfo.bIsNew == true)
-		{
-			m_currentWordInfo.bIsNew = false;
-			m_chapterInfo.iCountFlashCardNew--;
-
-			WordTable::getInstance()->updateWord(m_currentWordInfo);
-			ChapterTable::getInstance()->updateChapter(m_chapterInfo);
-			m_Words = WordTable::getInstance()->getAllWordsForChapter(m_chapterInfo.sChapterId);
-		}
-	}
-}
-
-Node* FlashCardLayer::createLayoutFlashCard(const int& iIndexFlashCard)
-{
-	if (iIndexFlashCard < 1 || iIndexFlashCard > m_iTotalFlashCard)
-	{
-		return NULL;
-	}
-
-	Node* pNode = Node::create();
-
-	Sprite* pBackgroundBorder = Sprite::create("FlashCard/backgroundborder.png");
-	pBackgroundBorder->setPosition(Point(320.0f, 400.0f));
-	pNode->addChild(pBackgroundBorder);
-
-	WordInfo wordInfo = m_Words[iIndexFlashCard-1];
-	if(wordInfo.iCountCollected > 1)
-	{	
-		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordInfo.sWordId);
-		Word word = GameWordManager::getInstance()->GetWord(iIndex);
-
-		Sprite* pBackgroundFlashCardBorder = Sprite::create("FlashCard/flashcardbackgroundborder.png");
-		pBackgroundFlashCardBorder->setPosition(Point(320.0f, 400.0f));
-		pNode->addChild(pBackgroundFlashCardBorder);
-
-		std::string sPath = GameWordManager::getInstance()->GetPackagePathFromWord(word);;
-		sPath.append("/FlashCard/");
-		sPath.append(word.m_sFlashCardImage);
-		Sprite* pImageFlashcard = Sprite::create(sPath.c_str());
-		pImageFlashcard->setPosition(Point(320.0f, 430.0f));
-		pNode->addChild(pImageFlashcard);
-
-		LabelTTF* pLabelWord = LabelTTF::create(word.m_sWord, "Arial", 32.0f);
-		pLabelWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
-		pLabelWord->setPosition(Point(320.0f, 650.0f));
-		pNode->addChild(pLabelWord);
-
-		LabelTTF* pLabelWordPhonetic = LabelTTF::create(word.m_sPhonetic.c_str(), "Arial", 20.0f);
-		pLabelWordPhonetic->setColor(ccc3(0.0f, 0.0f, 0.0f));
-		pLabelWordPhonetic->setPosition(Point(320.0f, 620.0f));
-		pNode->addChild(pLabelWordPhonetic);
-
-		LabelTTF* pLabelWordMean = LabelTTF::create(word.m_sMeaning.c_str(), "Arial", 25.0f);
-		pLabelWordMean->setColor(ccc3(0.0f, 0.0f, 0.0f));
-		pLabelWordMean->setPosition(Point(320.0f, 310.0f));
-		pNode->addChild(pLabelWordMean);
-
-		LabelTTF* pLabelWordSentence = LabelTTF::create(word.m_sSentence.c_str(), "Arial", 25.0f, Size(300.0f, 135.0f), TextHAlignment::CENTER, TextVAlignment::TOP);
-		pLabelWordSentence->setColor(ccc3(0.0f, 0.0f, 0.0f));
-		pLabelWordSentence->setAnchorPoint(Point(0.5, 1.0f));
-		pLabelWordSentence->setPosition(Point(320.0f, 235.0f));
-		pNode->addChild(pLabelWordSentence);
-
-		Sprite* pIconSoundSenetenceSprite = Sprite::create("FlashCard/icon_sound.png");
-		pIconSoundSenetenceSprite->setPosition(Point(500.0f, 636.0f));
-		pNode->addChild(pIconSoundSenetenceSprite);
-
-		Sprite* pIconSoundWordSprite = Sprite::create("FlashCard/icon_sound.png");
-		pIconSoundWordSprite->setPosition(Point(500.0f, 206.0f));
-		pNode->addChild(pIconSoundWordSprite);
-	}
-	else
-	{
-		return NULL;
-	}
-
-	return pNode;
+	m_bMoveRight = false;
+	m_bMoveLeft = false;
 }

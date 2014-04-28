@@ -14,6 +14,8 @@
 #include "GameConfigManager.h"
 #include "Database\WordTable.h"
 #include "GetMoreLifeNode.h"
+#include "EndGameNode.h"
+#include "QuitLevelFailedNode.h"
 
 using namespace cocos2d;
 
@@ -201,16 +203,23 @@ void LevelMapLayer::menuLevelSelected(CCObject* pSender)
 	}
 }
 
-void LevelMapLayer::showPopupTargetGame(const std::string& sChapterID, const int& iLevel)
+void LevelMapLayer::showPopupEndGameLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId)
 {
-	m_sChapterId = sChapterID;
+	EndGameNode* pEndGameLose = EndGameNode::createLayoutLose(iScore, mainWord, iCurrentLevel, sChapterId);
+	this->addChild(pEndGameLose, 10);
+}
 
-	GameWordManager* pGameWordManager = GameWordManager::getInstance();
-	pGameWordManager->GenerateWordForNewLevel(m_sChapterId, iLevel);
+void LevelMapLayer::showPopupEndGameWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId, const int& iYellowStar)
+{
+	EndGameNode* pEndGameLose = EndGameNode::createLayoutWin(iScore, mainWord, iCurrentLevel, sChapterId);
+	pEndGameLose->addYellowStar(iYellowStar);
+	this->addChild(pEndGameLose, 10);
+}
 
-	
-	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), iLevel, m_sChapterId);
-	this->addChild(pGameTargetNode, 10);
+void LevelMapLayer::showPopupQuitLevelFailed( const int& iCurrentLevel, const std::string sChapterId)
+{
+	QuitLevelFailedNode* pQuitLevelFailed = QuitLevelFailedNode::createLayout(iCurrentLevel, sChapterId);
+	this->addChild(pQuitLevelFailed, 10);
 }
 
 bool LevelMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)

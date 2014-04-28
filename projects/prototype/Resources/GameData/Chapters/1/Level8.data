@@ -5,7 +5,7 @@
 ;number of color
 6
 ;score of stars
-8000	12000	16000
+16000	18000	20000
 ;map matrix
 1	0	1	1	1	1	0	1
 0	0	1	1	1	1	0	0
@@ -27,10 +27,6 @@
 ;boss
 0
 ;obstacle list: count, list
-1
-SHIELD 2
-2
-4 4 4 5
 0
 ;bonus quest
 0

@@ -1720,13 +1720,12 @@ void HelloWorld::ShowWinGamePopup()
 	// extra, regenerate word for current level
 	GameConfigManager::getInstance()->UpdateNewWordForLevel( sCurrentChapterID, iCurrentLevel);
 
-
 	// show win popup	
-	std::vector<Word> subWordList;	
-	EndGameNode* pEndGameNode = EndGameNode::createLayoutWin( m_GameBoardManager.GetCurrentScore(),
-		m_GameBoardManager.GetGameWordManager()->GetMainWord(), iCurrentLevel, sCurrentChapterID);
-	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStars());
-	m_pHUDLayer->addChild( pEndGameNode, 100);
+	Breadcrumb::getInstance()->getSceneModePopBack();
+	LevelMapScene* pLevelMap =  LevelMapScene::create();
+	pLevelMap->getLayer()->showPopupEndGameWin(m_GameBoardManager.GetCurrentScore(),
+		m_GameBoardManager.GetGameWordManager()->GetMainWord(), iCurrentLevel, sCurrentChapterID, m_GameBoardManager.GetEarnedStars());
+	Director::getInstance()->replaceScene(pLevelMap);
 	
 }
 

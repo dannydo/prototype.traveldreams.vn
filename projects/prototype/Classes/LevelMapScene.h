@@ -2,10 +2,11 @@
 #define _LEVEL MAP_H_
 
 #include "cocos2d.h"
-#include "SimpleAudioEngine.h" 
-#include "SettingMenuNode.h" 
-#include "FooterNode.h"	   
+#include "SimpleAudioEngine.h"
+#include "SettingMenuNode.h"
+#include "FooterNode.h"
 #include "ScrollManager.h"
+#include "GameDataStructure.h"
 
 class LevelMapLayer : public cocos2d::CCLayer
 {
@@ -15,7 +16,9 @@ public:
 	bool init();
 	CREATE_FUNC(LevelMapLayer);
 
-	void showPopupTargetGame(const std::string& sChapterID, const int& iLevel);
+	void showPopupEndGameLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId);
+	void showPopupEndGameWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId, const int& iYellowStar);
+	void showPopupQuitLevelFailed( const int& iCurrentLevel, const std::string sChapterId);
 
 private:
 	bool onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;

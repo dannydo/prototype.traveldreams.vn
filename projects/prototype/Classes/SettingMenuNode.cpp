@@ -333,8 +333,8 @@ void SettingMenuNode::clickQuitLevel(cocos2d::Object* sender)
 	{
 		int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
 		std::string sChapterId = GameConfigManager::getInstance()->GetCurrentChapterID();
-		int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(sChapterId) + iCurrentLevel;
-		ConfirmQuitLevelNode* confirmQuitLevel = ConfirmQuitLevelNode::createLayout(iCalLevel);
+
+		ConfirmQuitLevelNode* confirmQuitLevel = ConfirmQuitLevelNode::createLayout(iCurrentLevel, sChapterId);
 		this->getParent()->addChild(confirmQuitLevel, 10000);
 	}
 }

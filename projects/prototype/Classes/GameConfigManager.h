@@ -178,6 +178,7 @@ public:
 	struct WordMapChapterConfig  {
 	public:
 		std::string m_sChapterId;
+		std::string m_sChapterName;
 		std::string m_sPathData;
 		Point m_position;
 		int m_iTotalevel;

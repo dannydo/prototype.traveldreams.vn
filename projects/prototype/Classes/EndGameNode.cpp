@@ -13,6 +13,7 @@
 #include "FunctionCommon.h"
 #include "GetMoreLifeNode.h"
 #include "FlashCardNode.h"
+#include "GameTargetNode.h"
 
 USING_NS_CC;
 
@@ -86,7 +87,8 @@ bool EndGameNode::initWin()
 	this->addChild(pCompletedImage);
 
 	FlashCardNode* pFlashCard = FlashCardNode::createLayout(m_mainWord);
-	pFlashCard->setPosition(230.0f, 490.0f);
+	pFlashCard->setPosition(70.0f, 200.0f);
+	pFlashCard->setScale(0.52f);
 	this->addChild(pFlashCard);
 
 	char sLevel[20];
@@ -237,7 +239,8 @@ bool EndGameNode::initLose()
 	this->addChild(pIconBoosterImage);
 
 	FlashCardNode* pFlashCard = FlashCardNode::createLayout(m_mainWord);
-	pFlashCard->setPosition(230.0f, 580.0f);
+	pFlashCard->setPosition(70.0f, 285.0f);
+	pFlashCard->setScale(0.52f);
 	this->addChild(pFlashCard);
 
 	char sLevel[20];
@@ -390,7 +393,6 @@ void EndGameNode::updateBonusQuest()
 
 void EndGameNode::menuNextLevelCallBack(Object* sender)
 {
-	Breadcrumb::getInstance()->getSceneModePopBack();
 	if ( m_iCurrentLevel >= _MAX_GAME_LEVEL_)
 		m_iCurrentLevel = 0;
 
@@ -411,7 +413,8 @@ void EndGameNode::menuNextLevelCallBack(Object* sender)
 		}
 		else // all level/chapter is finished
 		{
-			Breadcrumb::getInstance()->getSceneModePopBack();
+			Breadcrumb::getInstance()->resetSceneNodeToMainMenu();
+			Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
 			WorldMapScene* pWorldMap = WorldMapScene::create();
 			CCDirector::getInstance()->replaceScene(pWorldMap);
 			return;
@@ -424,9 +427,12 @@ void EndGameNode::menuNextLevelCallBack(Object* sender)
 	//GameWordManager* pGameWordManager = GameWordManager::getInstance();
 	//pGameWordManager->GenerateWordForNewLevel(m_sChapterId, m_iCurrentLevel);
 
-	LevelMapScene* pLevelMap = LevelMapScene::create();
-	pLevelMap->getLayer()->showPopupTargetGame(m_sChapterId, m_iCurrentLevel);
-	CCDirector::getInstance()->replaceScene(pLevelMap);
+	GameWordManager* pGameWordManager = GameWordManager::getInstance();
+	pGameWordManager->GenerateWordForNewLevel(m_sChapterId, m_iCurrentLevel);
+
+	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), m_iCurrentLevel, m_sChapterId);
+	this->getParent()->addChild(pGameTargetNode, 10);
+	this->getParent()->removeChild(this);
 }
 
 void EndGameNode::menuRetryLevelLoseCallBack(Object* sender)
@@ -435,35 +441,33 @@ void EndGameNode::menuRetryLevelLoseCallBack(Object* sender)
 	if(UserTable::getInstance()->getUserInfo().iLife > 0)
 	{
 		GameWordManager* pGameWordManager = GameWordManager::getInstance();
-		pGameWordManager->RetryCurrentLevel();
+		pGameWordManager->GenerateWordForNewLevel(m_sChapterId, m_iCurrentLevel);
 
-		CCScene *pGameScene = HelloWorld::createScene();
-		CCDirector::getInstance()->replaceScene(pGameScene);
+		GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), m_iCurrentLevel, m_sChapterId);
+		this->getParent()->addChild(pGameTargetNode, 10);
+		this->getParent()->removeChild(this);
 	}
 	else
 	{
 		GetMoreLifeNode* pGetMoreLife = GetMoreLifeNode::create();
-		pGetMoreLife->setGetMoreLifeType(GetMoreLifeType::eGoToMainMenu);
-		this->addChild(pGetMoreLife);
+		pGetMoreLife->setGetMoreLifeType(GetMoreLifeType::eClosePopup);
+		this->getParent()->addChild(pGetMoreLife);
+		this->getParent()->removeChild(this);
 	}
 }
 
 void EndGameNode::menuRetryLevelWinCallBack(Object* sender)
 {
-	// make sure we already cache correct current chapter/level 
-	GameConfigManager::getInstance()->GetLevelConfig( m_sChapterId, m_iCurrentLevel);
-	
-
+	// make sure we already cache correct current chapter/level
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
-	pGameWordManager->GenerateWordForNewLevel( m_sChapterId, m_iCurrentLevel);
+	pGameWordManager->GenerateWordForNewLevel(m_sChapterId, m_iCurrentLevel);
 
-	CCScene *pGameScene = HelloWorld::createScene();
-	CCDirector::getInstance()->replaceScene(pGameScene);
+	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), m_iCurrentLevel, m_sChapterId);
+	this->getParent()->addChild(pGameTargetNode, 10);
+	this->getParent()->removeChild(this);
 }
 
 void EndGameNode::menuCloseCallBack(Object* sender)
 {
-	Breadcrumb::getInstance()->getSceneModePopBack();
-	LevelMapScene* pLevelMap =  LevelMapScene::create();
-	Director::getInstance()->replaceScene(pLevelMap);
+	this->getParent()->removeChild(this);
 }

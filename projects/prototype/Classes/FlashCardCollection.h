@@ -6,8 +6,10 @@
 #include "Database\ChapterTable.h"
 #include "SettingMenuNode.h"
 #include "FooterNode.h"
+#include "ButtonManagerNode.h"	 
+#include "ScrollManager.h"
 
-class FlashCardCollectionLayer : public cocos2d::LayerColor
+class FlashCardCollectionLayer : public cocos2d::Layer
 {
 public:
 	FlashCardCollectionLayer() {};
@@ -20,26 +22,18 @@ private:
 	void onTouchMoved(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 	void onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 	
-	void openFlashCard(const int& iIndexButton);
+	void clickOpenFlashCard(Object* sender);
+	void clickPlayMiniGame(Object* sender);
 
-	cocos2d::Node* m_pSlideShow;
-	cocos2d::Sprite* m_pButton1;
-	cocos2d::Sprite* m_pButton2;
-	cocos2d::Sprite* m_pButton3;
-	cocos2d::Sprite* m_pButton4;  
-	cocos2d::Point m_touchPositionMoved;
-
+	ButtonManagerNode* m_pSlideShow;
 	std::vector<ChapterInfo> m_chapters;
-
-	int m_iMoveLeftOrRight;
-	float m_fXMoved;
-	float m_fBeginX;
-	int m_iTotalPage;
-	int m_iCurrentPage;
-	bool m_bIsSwipe;
-
-	const char* m_sNameClassParent;
 	FooterNode* m_pFooterNode;
+	ScrollManager* m_pScrollManager;
+
+	float m_fBeginY;
+	float m_fYMoved;
+	float m_maxHeight;
+	bool m_bIsSwipe;
 };
 
 class FlashCardCollectionScene : public cocos2d::CCScene
@@ -50,7 +44,7 @@ public:
 	bool init();
 	CREATE_FUNC(FlashCardCollectionScene);
 
-	CC_SYNTHESIZE_READONLY(FlashCardCollectionLayer*, _layer, LayerColor);	
+	CC_SYNTHESIZE_READONLY(FlashCardCollectionLayer*, _layer, Layer);
 };
 
 #endif;

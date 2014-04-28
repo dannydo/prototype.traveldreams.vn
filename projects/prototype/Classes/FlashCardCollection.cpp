@@ -2,6 +2,8 @@
 #include "FlashCardScene.h"
 #include "FooterNode.h"
 #include "GameConfigManager.h"
+#include "HeaderNode.h"
+#include "ClipMaskNode.h"
 
 USING_NS_CC;
 
@@ -36,24 +38,70 @@ FlashCardCollectionLayer::~FlashCardCollectionLayer()
 
 bool FlashCardCollectionLayer::init()
 {
-	if(!LayerColor::initWithColor(ccc4(255, 255, 255, 255)))
+	if(!Layer::init())
 	{
 		return false;
 	}
 
-	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+	Sprite* pBackground = Sprite::create("FlashCard/background.png");
+	pBackground->setPosition(Point(320.0f, 480.0f));
+	this->addChild(pBackground);
 
-	LabelTTF* pLabelTitle = LabelTTF::create("Flashcard Collection", "Arial", 32);
-	pLabelTitle->setColor(ccc3(0.0f, 0.0f, 0.0f));
-	pLabelTitle->setPosition(Point(320.0f, 900.0f));
+	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
+	this->addChild(pButtonManagerNode);
+
+	Sprite* pIconFlashCard = Sprite::create("FlashCard/flashcard_icon_btn.png");
+	pIconFlashCard->setPosition(Point(-140.0f, 55.0f));
+
+	Sprite* pButtonMiniGameSprite = Sprite::create("FlashCard/btn_minigame.png");
+	pButtonMiniGameSprite->addChild(pIconFlashCard);
+	pButtonMiniGameSprite->setPosition(Point(154.0f, 0.0f));
+
+	ButtonNode* pButtonMiniGame = ButtonNode::createButtonSprite(pButtonMiniGameSprite, CC_CALLBACK_1(FlashCardCollectionLayer::clickPlayMiniGame, this));
+	pButtonMiniGame->setPosition(Point(320.0f, 817.0f));
+	pButtonManagerNode->addButtonNode(pButtonMiniGame);
+
+	int iNumberNew = 5;
+	if (iNumberNew > 0)
+	{
+		Sprite* pIconNew = Sprite::create("FlashCard/noitify_msg.png");
+		pIconNew->setPosition(Point(247.0f, 105.0f));
+		pButtonMiniGameSprite->addChild(pIconNew);
+
+		char sNumberNew[10];
+		sprintf(sNumberNew, "%d", iNumberNew);
+		LabelTTF* pLabelNumber = LabelTTF::create(sNumberNew, "Arial", 25);
+		pLabelNumber->setColor(ccc3(255.0f, 255.0f, 255.0f));
+		pLabelNumber->setPosition(Point(22.0f, 20.0f));
+		pIconNew->addChild(pLabelNumber);
+	}
+
+	Sprite* pBackgroundFlashcard = Sprite::create("FlashCard/panel-level_popup.png");
+	pBackgroundFlashcard->setPosition(Point(320.0f, 415.0f));
+	this->addChild(pBackgroundFlashcard);
+
+	LabelBMFont *pLabelTitle = LabelBMFont::create("Flashcard Collection", "fonts/font-bechic.fnt");
+	pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
+	pLabelTitle->setPosition(Point(320.0f, 673.0f));
 	this->addChild(pLabelTitle);
-
+	
 	m_pFooterNode = FooterNode::create();
-	m_pFooterNode->disableButtonIntroAndFlashCard();
+	m_pFooterNode->changeStatusButtonFlashcard(StatusButtonFlashcard::eNoClick);
+	m_pFooterNode->removeBackground();
 	this->addChild(m_pFooterNode);
 
-	m_pSlideShow = Node::create();
-	m_pSlideShow->setContentSize(CCSizeMake(640.0f, 800));
+	HeaderNode* pHeaderNode = HeaderNode::create();
+	this->addChild(pHeaderNode);
+
+	m_pSlideShow = ButtonManagerNode::create();
+	m_pSlideShow->setPosition(Point(245.0f, 300.0f));
+
+	ClipMaskNode* pClipMaskNode = ClipMaskNode::create();
+	pClipMaskNode->setPosition(Point(75.0f, 155.0f));
+	pClipMaskNode->setContentSize(Size(560.0f, 460.0f));
+	pClipMaskNode->addChild(m_pSlideShow);
+	pBackgroundFlashcard->addChild(pClipMaskNode);
+
 	m_chapters = ChapterTable::getInstance()->getChaptersInfo();
 
 	WordlMapConfig worlMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
@@ -63,105 +111,74 @@ bool FlashCardCollectionLayer::init()
 		ChapterInfo chapterInfo = m_chapters[iIndex];
 		if(chapterInfo.bIsUnlock && chapterInfo.iTotalFlashCardUnlock > 0)
 		{
-			Node* pNodeChapter = Node::create();
-			int iIndex = worlMapConfig.m_WorlMapChapterConfigMap[chapterInfo.sChapterId];
-			std::string sPath = worlMapConfig.m_WorlMapChapterConfigs[iIndex].m_sPathData;
-			sPath.append("/Flash-Card-icon.png");
+			Sprite* pBackgroundItem = Sprite::create("FlashCard/panel_flashcard_chapter.png");
+			pBackgroundItem->setPosition(Point(0.0f, -iIndex*190));
+			m_pSlideShow->addChild(pBackgroundItem);
 
-			Sprite* pChapterImageSprite = Sprite::create(sPath.c_str());
-			pNodeChapter->addChild(pChapterImageSprite);
+			int iIndexChapter = worlMapConfig.m_WorlMapChapterConfigMap[chapterInfo.sChapterId];
+
+			std::string sPath = worlMapConfig.m_WorlMapChapterConfigs[iIndexChapter].m_sPathData;
+			sPath.append("/Flash-Card-icon.png");
+			Sprite* pIconChapter = Sprite::create(sPath.c_str());
+
+			ButtonNode* pButtonItem = ButtonNode::createButtonSprite(pIconChapter, CC_CALLBACK_1(FlashCardCollectionLayer::clickOpenFlashCard, this));
+			pButtonItem->setTag(iIndex);
+			pButtonItem->setPosition(Point(-140.0f, -15 -iIndex*190));
+			m_pSlideShow->addButtonNode(pButtonItem);
+
+			LabelBMFont* pLabelChapterName = LabelBMFont::create(worlMapConfig.m_WorlMapChapterConfigs[iIndexChapter].m_sChapterName.c_str(), "fonts/font_small_alert.fnt");
+			pLabelChapterName->setPosition(Point(110.0f, 18 -iIndex*190));
+			m_pSlideShow->addChild(pLabelChapterName);
 
 			char sTotalFlashCard[10];
-			sprintf(sTotalFlashCard, "%d/%d", chapterInfo.iTotalFlashCardUnlock, chapterInfo.iTotalFlash);
-			LabelTTF* pLabelTotalFlashCard = LabelTTF::create(sTotalFlashCard, "Arial", 22);
+			sprintf(sTotalFlashCard, "(%d/%d)", chapterInfo.iTotalFlashCardUnlock, chapterInfo.iTotalFlash);
+			LabelTTF* pLabelTotalFlashCard = LabelTTF::create(sTotalFlashCard, "Arial", 25);
 			pLabelTotalFlashCard->setColor(ccc3(0.0f, 0.0f, 0.0f));
-			pLabelTotalFlashCard->setPositionY(-pChapterImageSprite->getContentSize().height/2.0f-12);
-			pNodeChapter->addChild(pLabelTotalFlashCard);
+			pLabelTotalFlashCard->setPosition(Point(110.0f, -18 -iIndex*190));
+			m_pSlideShow->addChild(pLabelTotalFlashCard);
 
-			// Show icon new
-			if(chapterInfo.iCountFlashCardNew > 0)
-			{
-				LabelTTF* pLabelNew = LabelTTF::create("New", "Arial", 22);
-				pLabelNew->setColor(ccc3(255.0f, 0.0f, 0.0f));
-				pLabelNew->setPositionY(pChapterImageSprite->getContentSize().height/2.0f-30);
-				pNodeChapter->addChild(pLabelNew);
-			}
-		
-			pNodeChapter->setAnchorPoint(Point(0.0f, 0.0f));
-			switch(iIndex%4)
-			{
-			case 0:
-				pNodeChapter->setPosition(Point(iIndex/4*640 + 170, 550.0f));
-				break;
-			case 1:
-				pNodeChapter->setPosition(Point(iIndex/4*640 + 470, 550.0f));
-				break;
-			case 2:
-				pNodeChapter->setPosition(Point(iIndex/4*640 + 170, 250.0f));
-				break;
-			case 3:
-				pNodeChapter->setPosition(Point(iIndex/4*640 + 470, 250.0f));
-				break;
-			}
-			m_pSlideShow->addChild(pNodeChapter);
+			m_maxHeight = (iIndex + 1)*190;
 		}
 	}
 
-	m_pSlideShow->setPosition(Point(0.0f, 94.0f));
-	this->addChild(m_pSlideShow);
-
-	m_pButton1 = Sprite::create("FlashCard/chapter/mask.png");
-	m_pButton1->setAnchorPoint(Point(0.5f, 0.0f));
-	m_pButton1->setPosition(Point(170.0f, 530.0f));
-	this->addChild(m_pButton1);  
-
-	m_pButton2 = Sprite::create("FlashCard/chapter/mask.png");
-	m_pButton2->setAnchorPoint(Point(0.5f, 0.0f));
-	m_pButton2->setPosition(Point(470.0f, 530.0f));
-	this->addChild(m_pButton2);
-
-	m_pButton3 = Sprite::create("FlashCard/chapter/mask.png");
-	m_pButton3->setAnchorPoint(Point(0.5f, 0.0f));
-	m_pButton3->setPosition(Point(170.0f, 230.0f));
-	this->addChild(m_pButton3);
-
-	m_pButton4 = Sprite::create("FlashCard/chapter/mask.png");
-	m_pButton4->setAnchorPoint(Point(0.5f, 0.0f));
-	m_pButton4->setPosition(Point(470.0f, 230.0f));
-	this->addChild(m_pButton4);
+	m_bIsSwipe = false;	
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kFlashCardCollection);
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 
-	if (m_chapters.size()%4 == 0)
-	{
-		m_iTotalPage = m_chapters.size()/4;
-	}
-	else
-	{
-		m_iTotalPage = m_chapters.size()/4 + 1;
-	}
-	
-	m_iCurrentPage = 1;
-	m_bIsSwipe = false;	
-	Breadcrumb::getInstance()->addSceneMode(SceneMode::kFlashCardCollection);
+	m_pScrollManager = new ScrollManager();
+	m_bIsSwipe = false;
 
 	return true;
 }
 
+void FlashCardCollectionLayer::clickPlayMiniGame(Object* sender)
+{
+
+}
+
 bool FlashCardCollectionLayer::onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)
 {
-	if(m_pFooterNode->getSettingNode() != NULL && m_pFooterNode->getSettingNode()->getShowSetting())
+	if(m_bIsSwipe)
+	{
+		return false;
+	}
+	m_bIsSwipe = true;
+
+	if(m_pFooterNode->getSettingNode() != NULL && m_pFooterNode->getSettingNode()->getShowSetting() || m_maxHeight < 460)
 	{
 		return false;
 	}
 
-	m_fXMoved = 0;
 	Point touchPosition = pTouch->getLocation();
-	m_fBeginX = touchPosition.x;
-	m_touchPositionMoved = touchPosition;
-	m_bIsSwipe = false;
-	m_iMoveLeftOrRight = 0;
+	m_fBeginY = touchPosition.y;
+
+	DataTouch dataTouch;
+	dataTouch.point = touchPosition;
+	dataTouch.lTime = 0;
+	dataTouch.fDeltaTime = 0;
+	m_pScrollManager->addDataToQueue(dataTouch);
 
 	return true;
 }
@@ -169,115 +186,64 @@ bool FlashCardCollectionLayer::onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Eve
 void FlashCardCollectionLayer::onTouchMoved(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)
 {
 	Point touchPosition = pTouch->getLocation();
-	m_fXMoved += touchPosition.x - m_fBeginX;
-	if ((m_fXMoved > 0 && m_iCurrentPage == 1) || (m_fXMoved < 0 && m_iCurrentPage == m_iTotalPage))
+	m_fYMoved = touchPosition.y - m_fBeginY;
+
+	if (m_fYMoved + m_pSlideShow->getPosition().y <= 300.0f) {
+		m_fYMoved = 300.0f - m_pSlideShow->getPosition().y;
+	}
+	else if(m_fYMoved + m_pSlideShow->getPosition().y >= m_maxHeight + 300 - 460)
 	{
-		return;
+		m_fYMoved = m_maxHeight + 300 - 460 - m_pSlideShow->getPosition().y;
 	}
 
-	if (m_touchPositionMoved.x > touchPosition.x)
-		m_iMoveLeftOrRight = -1;
-	else if (m_touchPositionMoved.x < touchPosition.x)
-		m_iMoveLeftOrRight = 1;
-	m_touchPositionMoved = touchPosition;
+	Point point = m_pSlideShow->getPosition();
+	m_pSlideShow->setPositionY(point.y + m_fYMoved);
+	m_fBeginY = touchPosition.y;
 
-	auto actionMove = MoveBy::create(0.0f, Point(touchPosition.x - m_fBeginX, 0));
-	m_pSlideShow->runAction(actionMove);
-	m_fBeginX = touchPosition.x;
-
-	if (m_fXMoved > 20 || m_fXMoved < -20)
-	{
-		m_bIsSwipe = true;
-	}
+	DataTouch dataTouch;
+	dataTouch.point = touchPosition;
+	dataTouch.lTime = 0;
+	dataTouch.fDeltaTime = 0;
+	m_pScrollManager->addDataToQueue(dataTouch);
 }
 
 void FlashCardCollectionLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)
 {
-	if (m_bIsSwipe)
+	DataTouch dataTouch = m_pScrollManager->getDistanceScrollY();
+	float distanceY = dataTouch.point.y;
+	float deltaTime = dataTouch.fDeltaTime;
+	
+	if(distanceY!=0 && deltaTime!=0)
 	{
-		if ((m_fXMoved > 0 && m_iCurrentPage == 1) || (m_fXMoved < 0 && m_iCurrentPage == m_iTotalPage))
-		{
-			return;
-		}
+		float fTime = 0.2f;
+		distanceY = distanceY * fTime / deltaTime / 10; 
 
-		if (m_iMoveLeftOrRight == 1 && m_fXMoved > 0)
-		{
-			auto actionMove = MoveBy::create(0.3f, Point(640 - m_fXMoved, 0));
-			m_pSlideShow->runAction(actionMove);
-			m_iCurrentPage--;
-		}
-		else if (m_iMoveLeftOrRight == -1 && m_fXMoved < 0)
-		{
-			auto actionMove = MoveBy::create(0.3f, Point(-640 - m_fXMoved, 0));
-			m_pSlideShow->runAction(actionMove);
-			m_iCurrentPage++;
 		
+		if (distanceY + m_pSlideShow->getPosition().y <= 300.0f) {
+			distanceY = 300.0f - m_pSlideShow->getPosition().y;
 		}
-		else
+		else if(distanceY + m_pSlideShow->getPosition().y >= m_maxHeight + 300 - 460)
 		{
-			auto actionMove = MoveBy::create(0.2f, Point(-m_fXMoved, 0));
-			m_pSlideShow->runAction(actionMove);
+			distanceY = m_maxHeight + 300 - 460 - m_pSlideShow->getPosition().y;
 		}
+
+		auto actionMove = MoveBy::create(fTime, Point(0.0f, distanceY));
+		auto actionEaseOut = EaseOut::create(actionMove, 2.5f);
+		m_pSlideShow->stopAllActions();
+		m_pSlideShow->runAction(Sequence::create(actionEaseOut, NULL));
 	}
-	else
-	{
-		if ((m_fXMoved > 0 && m_iCurrentPage != 1) || (m_fXMoved < 0 && m_iCurrentPage != m_iTotalPage))
-		{
-			auto actionMove = MoveBy::create(0.2f, Point(-m_fXMoved, 0));
-			m_pSlideShow->runAction(actionMove);
-		}
 
-		Point touchPosition = pTouch->getLocation();
-		
-		CCRect *pRectButton = new CCRect(m_pButton1->getOffsetPosition().x, 
-			 m_pButton1->getOffsetPosition().y, 
-			 m_pButton1->getTextureRect().size.width, 
-			 m_pButton1->getTextureRect().size.height);
-		Point touchButton = m_pButton1->convertToNodeSpace(touchPosition);
-		if(pRectButton->containsPoint(touchButton))
-		{
-			openFlashCard(1);
-		}
-
-		pRectButton = new CCRect(m_pButton1->getOffsetPosition().x, 
-			 m_pButton2->getOffsetPosition().y, 
-			 m_pButton2->getTextureRect().size.width, 
-			 m_pButton2->getTextureRect().size.height);
-		touchButton = m_pButton2->convertToNodeSpace(touchPosition);
-		if(pRectButton->containsPoint(touchButton))
-		{
-			openFlashCard(2);
-		}
-
-		pRectButton = new CCRect(m_pButton1->getOffsetPosition().x, 
-			 m_pButton3->getOffsetPosition().y, 
-			 m_pButton3->getTextureRect().size.width, 
-			 m_pButton3->getTextureRect().size.height);
-		touchButton = m_pButton3->convertToNodeSpace(touchPosition);
-		if(pRectButton->containsPoint(touchButton))
-		{
-			openFlashCard(3);
-		}
-
-		pRectButton = new CCRect(m_pButton1->getOffsetPosition().x, 
-			 m_pButton4->getOffsetPosition().y, 
-			 m_pButton4->getTextureRect().size.width, 
-			 m_pButton4->getTextureRect().size.height);
-		touchButton = m_pButton4->convertToNodeSpace(touchPosition);
-		if(pRectButton->containsPoint(touchButton))
-		{
-			openFlashCard(4);
-		}
-	}
 	m_bIsSwipe = false;
 }
 
-void FlashCardCollectionLayer::openFlashCard(const int& iIndexButton)
+void FlashCardCollectionLayer::clickOpenFlashCard(Object* sender)
 {
-	int iChapter = (m_iCurrentPage - 1)*4 + iIndexButton;
-	if (iChapter <= m_chapters.size())
+	ButtonNode* pSprite = (ButtonNode*)sender;
+	int iChapter = pSprite->getTag();
+
+	if (iChapter < m_chapters.size())
 	{
-		ChapterInfo chapterInfo = m_chapters[iChapter-1];
+		ChapterInfo chapterInfo = m_chapters[iChapter];
 		if (chapterInfo.bIsUnlock)
 		{
 			FlashCardScene* pFlashCard = FlashCardScene::createScene(chapterInfo);
