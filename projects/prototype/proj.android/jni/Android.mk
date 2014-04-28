@@ -71,6 +71,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/GetMoreLifeNode.cpp \
 				   ../../Classes/FlashCardNode.cpp \
 				   ../../Classes/ExtendedNodes/Scale3Sprite.cpp \
+				   ../../Classes/ClipMaskNode.cpp \
+				   ../../Classes/QuitLevelFailedNode.cpp \
 				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \

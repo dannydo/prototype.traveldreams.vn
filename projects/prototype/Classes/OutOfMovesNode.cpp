@@ -1,6 +1,7 @@
 #include "OutOfMovesNode.h"
 #include "GameConfigManager.h"
-#include "EndGameNode.h"
+#include "SettingMenuNode.h"
+#include "LevelMapScene.h"
 
 USING_NS_CC;
 
@@ -96,7 +97,8 @@ void OutOfMovesNode::clickBuy(Object* sender)
 
 void OutOfMovesNode::clickGiveUp(Object* sender)
 {
-	EndGameNode* pEndGame = EndGameNode::createLayoutLose(m_iScore, m_mainWord, m_iCurrentLevel, m_sChapterId);
-	this->getParent()->addChild(pEndGame, 100);
-	this->getParent()->removeChild(this);
+	Breadcrumb::getInstance()->getSceneModePopBack();
+	LevelMapScene* pLevelMap =  LevelMapScene::create();
+	pLevelMap->getLayer()->showPopupEndGameLose(m_iScore, m_mainWord, m_iCurrentLevel, m_sChapterId);
+	Director::getInstance()->replaceScene(pLevelMap);
 }

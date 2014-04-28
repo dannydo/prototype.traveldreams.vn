@@ -7,8 +7,9 @@
 #include "SettingMenuNode.h"
 #include "Database\WordTable.h"
 #include "FooterNode.h"
+#include "ButtonManagerNode.h"
 
-class FlashCardLayer : public cocos2d::LayerColor
+class FlashCardLayer : public cocos2d::Layer
 {
 public:
 	FlashCardLayer() {};
@@ -22,30 +23,21 @@ private:
 	void onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 
 	void createNodeSlideShow();
-	void showSlideShowFlashCard();
-
-	void playVoiceWord();
-	void playVoiceSentence();
-	void openDictionary(const char* sWord);
-
-
-	cocos2d::Node* createLayoutFlashCard(const int& iIndexFlashCard);
+	void clickButtonLeft(cocos2d::Object* pSender);
+	void clickButtonRight(cocos2d::Object* pSender);
 
 	cocos2d::Node* m_pSlideShow;
 	cocos2d::LabelTTF* m_pLabelIndex;
 	cocos2d::Point m_touchPositionMoved;
-
 	cocos2d::LabelTTF* m_pLabelWord;
-	cocos2d::Sprite* m_pIconSoundWordSprite;
-	cocos2d::Sprite* m_pIconSoundSenetenceSprite;
 
 	std::vector<WordInfo> m_Words;
 	ChapterInfo m_chapterInfo;
-	Word m_currentWord;
-	WordInfo m_currentWordInfo;
 
 
 	bool m_bIsSwipe;
+	bool m_bMoveLeft;
+	bool m_bMoveRight;
 
 	float m_fXMoved;
 	float m_fBeginX;
@@ -65,7 +57,7 @@ public:
 	bool init();
 	static FlashCardScene* createScene(const ChapterInfo& chapterInfo);
 
-	CC_SYNTHESIZE_READONLY(FlashCardLayer*, _layer, LayerColor);
+	CC_SYNTHESIZE_READONLY(FlashCardLayer*, _layer, Layer);
 
 private:
 	ChapterInfo m_chapterInfo;

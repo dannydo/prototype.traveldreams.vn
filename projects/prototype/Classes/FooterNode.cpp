@@ -16,10 +16,10 @@ bool FooterNode::init()
 		return false;
 	}
 
-	Sprite* pBarBottom = Sprite::create("Footer/Footer.png");
-	pBarBottom->setAnchorPoint(Point(0.0f, 0.0f));
-	pBarBottom->setPosition(Point(0.0f, 0.0f));
-	this->addChild(pBarBottom);
+	m_pBackground = Sprite::create("Footer/Footer.png");
+	m_pBackground->setAnchorPoint(Point(0.0f, 0.0f));
+	m_pBackground->setPosition(Point(0.0f, 0.0f));
+	this->addChild(m_pBackground);
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
 	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn_setting.png");
@@ -30,11 +30,11 @@ bool FooterNode::init()
 	m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
 	m_pButtonFlashCardNode->setPosition(Point(609.0f, 33.0f));
 
-	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
-	pButtonManagerNode->addButtonNode(m_pButtonSettingNode);
-	pButtonManagerNode->addButtonNode(m_pButtonFlashCardNode);
+	m_pButtonManagerNode = ButtonManagerNode::create();
+	m_pButtonManagerNode->addButtonNode(m_pButtonSettingNode);
+	m_pButtonManagerNode->addButtonNode(m_pButtonFlashCardNode);
 
-	this->addChild(pButtonManagerNode);
+	this->addChild(m_pButtonManagerNode);
 
 	m_pSettingNode = NULL;
 	
@@ -70,7 +70,42 @@ void FooterNode::openSettingMenu(Object* sender)
 	}
 }
 
-void FooterNode::disableButtonIntroAndFlashCard()
+void FooterNode::removeButtonFlashcard()
 {
-	m_pButtonFlashCardNode->setVisible(false);
+	m_pButtonManagerNode->removeButtonNode(m_pButtonFlashCardNode);
+}
+
+void FooterNode::removeBackground()
+{
+	this->removeChild(m_pBackground);
+}
+
+void FooterNode::changeStatusButtonFlashcard(StatusButtonFlashcard statusButtonFlashcard)
+{
+	m_pButtonManagerNode->removeButtonNode(m_pButtonFlashCardNode);
+
+	Sprite* pFlashCardSprite = Sprite::create("Footer/btn_flashcard.png");
+	switch (statusButtonFlashcard)
+	{
+		case StatusButtonFlashcard::eNoClick :
+		{
+			pFlashCardSprite->setPosition(Point(609.0f, 33.0f));
+			this->addChild(pFlashCardSprite);
+			break;
+		}
+		case StatusButtonFlashcard::eClickShowFlashcardCollection:
+		{
+			m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
+			m_pButtonFlashCardNode->setPosition(Point(609.0f, 33.0f));
+			m_pButtonManagerNode->addButtonNode(m_pButtonFlashCardNode);
+			break;
+		}
+		default:
+		{
+			m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
+			m_pButtonFlashCardNode->setPosition(Point(609.0f, 33.0f));
+			m_pButtonManagerNode->addButtonNode(m_pButtonFlashCardNode);
+			break;
+		}
+	}
 }

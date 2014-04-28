@@ -570,6 +570,11 @@ void GameConfigManager::LoadWordMapConfig()
 	{
 		WordlMapConfig::WordMapChapterConfig wordMapChapterConfig;
 		inputStream >> wordMapChapterConfig.m_sChapterId;
+
+		std::getline( inputStream, sTemp);//read /r
+		std::getline( inputStream, sTemp);
+		wordMapChapterConfig.m_sChapterName = sTemp.substr( 0, sTemp.size()-1);
+
 		inputStream >> wordMapChapterConfig.m_sPathData;
 
 		float fX, fY;

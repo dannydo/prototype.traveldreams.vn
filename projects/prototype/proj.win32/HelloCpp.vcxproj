@@ -139,6 +139,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\BonusQuestManager.cpp" />
     <ClCompile Include="..\Classes\ButtonManagerNode.cpp" />
     <ClCompile Include="..\Classes\ButtonNode.cpp" />
+    <ClCompile Include="..\Classes\ClipMaskNode.cpp" />
     <ClCompile Include="..\Classes\ComboCountRenderNode.cpp" />
     <ClCompile Include="..\Classes\ConfirmQuitLevelNode.cpp" />
     <ClCompile Include="..\Classes\CustomNode.cpp" />
@@ -186,6 +187,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\ConnectFacebookConfirm.cpp" />
     <ClCompile Include="..\Classes\OutOfMovesNode.cpp" />
     <ClCompile Include="..\Classes\PopupConfirmNode.cpp" />
+    <ClCompile Include="..\Classes\QuitLevelFailedNode.cpp" />
     <ClCompile Include="..\Classes\ScrollManager.cpp" />
     <ClCompile Include="..\Classes\SettingMenuNode.cpp" />
     <ClCompile Include="..\Classes\Social\FacebookManager.cpp" />
@@ -208,6 +210,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\BonusQuestManager.h" />
     <ClInclude Include="..\Classes\ButtonManagerNode.h" />
     <ClInclude Include="..\Classes\ButtonNode.h" />
+    <ClInclude Include="..\Classes\ClipMaskNode.h" />
     <ClInclude Include="..\Classes\ComboCountRenderNode.h" />
     <ClInclude Include="..\Classes\ConfirmQuitLevelNode.h" />
     <ClInclude Include="..\Classes\CustomNode.h" />
@@ -256,6 +259,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\ConnectFacebookConfirm.h" />
     <ClInclude Include="..\Classes\OutOfMovesNode.h" />
     <ClInclude Include="..\Classes\PopupConfirmNode.h" />
+    <ClInclude Include="..\Classes\QuitLevelFailedNode.h" />
     <ClInclude Include="..\Classes\Scale3Sprite.h" />
     <ClInclude Include="..\Classes\ScrollManager.h" />
     <ClInclude Include="..\Classes\SettingMenuNode.h" />

@@ -3,6 +3,7 @@
 #include "WorldMapScene.h"
 #include "HelloWorldScene.h"
 #include "GetMoreLifeNode.h"
+#include "LevelMapScene.h"
 
 USING_NS_CC;
 
@@ -10,10 +11,11 @@ ConfirmQuitLevelNode::~ConfirmQuitLevelNode ()
 {
 }
 
-ConfirmQuitLevelNode* ConfirmQuitLevelNode::createLayout(const int& iLevel)
+ConfirmQuitLevelNode* ConfirmQuitLevelNode::createLayout(const int& iCurrentLevelId, const std::string& sChapterId)
 {
 	ConfirmQuitLevelNode* pConfirmQuitLevel = new ConfirmQuitLevelNode();
-	pConfirmQuitLevel->m_iLevel = iLevel;
+	pConfirmQuitLevel->m_iCurrentLevelId = iCurrentLevelId;
+	pConfirmQuitLevel->m_sChapterId = sChapterId;
 
 	if(pConfirmQuitLevel->init())
 	{
@@ -56,7 +58,8 @@ bool ConfirmQuitLevelNode::init()
 	this->addChild(pLabelDecription);
 
 	char sLevel[20];
-	sprintf(sLevel, "Level %d", m_iLevel);
+	int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId) + m_iCurrentLevelId;
+	sprintf(sLevel, "Level %d", iCalLevel);
 	LabelBMFont *pLabelLevel = LabelBMFont::create(sLevel, "fonts/font-bechic.fnt");
 	pLabelLevel->setAnchorPoint(Point(0.5f, 0.5f));
 	pLabelLevel->setPosition(Point(320.0f, 870.0f));
@@ -90,100 +93,15 @@ bool ConfirmQuitLevelNode::onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos
 
 void ConfirmQuitLevelNode::clickYes(cocos2d::Object* pSender)
 {
-	this->createLayoutLevelFail();
+	UserTable::getInstance()->updateLife(1);
+
+	Breadcrumb::getInstance()->getSceneModePopBack();
+	LevelMapScene* pLevelMap =  LevelMapScene::create();
+	pLevelMap->getLayer()->showPopupQuitLevelFailed(m_iCurrentLevelId, m_sChapterId);
+	Director::getInstance()->replaceScene(pLevelMap);
 }
 
 void ConfirmQuitLevelNode::clickNo(cocos2d::Object* pSender)
 {
 	this->getParent()->removeChild(this);
-}
-
-void ConfirmQuitLevelNode::clickRetry(cocos2d::Object* pSender)
-{
-	UserTable::getInstance()->updateLife(0);
-	if(UserTable::getInstance()->getUserInfo().iLife > 0)
-	{
-		GameWordManager* pGameWordManager = GameWordManager::getInstance();
-		pGameWordManager->RetryCurrentLevel();
-
-		CCScene *pGameScene = HelloWorld::createScene();
-		CCDirector::getInstance()->replaceScene(pGameScene);
-	}
-	else
-	{
-		GetMoreLifeNode* pGetMoreLife = GetMoreLifeNode::create();
-		pGetMoreLife->setGetMoreLifeType(GetMoreLifeType::eGoToMainMenu);
-		this->addChild(pGetMoreLife);
-	}
-}
-
-void ConfirmQuitLevelNode::clickWordMap(cocos2d::Object* pSender)
-{
-	Breadcrumb::getInstance()->resetSceneNodeToMainMenu();
-	Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
-
-	WorldMapScene* wordMap = WorldMapScene::create();
-	Director::getInstance()->replaceScene(wordMap);
-}
-
-void ConfirmQuitLevelNode::createLayoutLevelFail()
-{
-	UserTable::getInstance()->updateLife(1);
-
-	this->removeAllChildren();
-	
-	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 150));
-	pBackground->setContentSize(CCSizeMake(640.0f, 960.0f));
-	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
-	listener->setSwallowTouches(true);
-	listener->onTouchBegan = [this](Touch* touch, Event* event) { return true;  };
-	EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, pBackground);
-	this->addChild(pBackground);
-	this->setContentSize(pBackground->getContentSize());
-
-	Sprite* pBackgroundBoard = Sprite::create("Target-End-Game/panel-level_popup.png");
-	pBackgroundBoard->setPosition(Point(320.0f, 610.0f));
-	this->addChild(pBackgroundBoard);
-
-	Sprite* pLevelFailImage3 = Sprite::create("Target-End-Game/text_level_fail.png");
-	pLevelFailImage3->setPosition(Point(320.0f, 747.0f));
-	pLevelFailImage3->setScale(0.85);
-	this->addChild(pLevelFailImage3);
-
-	LabelBMFont *pLabelDecription = LabelBMFont::create("You pressed", "fonts/font_small_alert.fnt");
-	pLabelDecription->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelDecription->setPosition(Point(320.0f, 650.0f));
-	pLabelDecription->setScale(1.2f);
-	this->addChild(pLabelDecription);
-
-	LabelBMFont *pLabelDecription1 = LabelBMFont::create("the quit button", "fonts/font_small_alert.fnt");
-	pLabelDecription1->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelDecription1->setPosition(Point(320.0f, 600.0f));
-	pLabelDecription1->setScale(1.2f);
-	this->addChild(pLabelDecription1);
-
-	char sLevel[20];
-	sprintf(sLevel, "Level %d", m_iLevel);
-	LabelBMFont *pLabelLevel = LabelBMFont::create(sLevel, "fonts/font-bechic.fnt");
-	pLabelLevel->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelLevel->setPosition(Point(320.0f, 870.0f));
-	this->addChild(pLabelLevel);
-
-	Sprite* pButtonRetrySprite = Sprite::create("Target-End-Game/btn_retry.png");
-	ButtonNode* pButtonRetryNode = ButtonNode::createButtonSprite(pButtonRetrySprite, CC_CALLBACK_1(ConfirmQuitLevelNode::clickRetry, this));
-	pButtonRetryNode->setPosition(Point(320.0f, 490.0f));
-
-	Sprite* pButtonWordMapSprite = Sprite::create("Target-End-Game/btn_world_map.png");
-	ButtonNode* pButtonWordMapNode = ButtonNode::createButtonSprite(pButtonWordMapSprite, CC_CALLBACK_1(ConfirmQuitLevelNode::clickWordMap, this));
-	pButtonWordMapNode->setPosition(Point(320.0f, 382.0f));
-
-	Sprite* pButtonCloseSprite = Sprite::create("Target-End-Game/btn_close.png");
-	ButtonNode* pButtonCloseNode = ButtonNode::createButtonSprite(pButtonCloseSprite, CC_CALLBACK_1(ConfirmQuitLevelNode::clickWordMap, this));
-	pButtonCloseNode->setPosition(Point(572.0f, 894.0f));
-
-	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
-	pButtonManagerNode->addButtonNode(pButtonRetryNode);
-	pButtonManagerNode->addButtonNode(pButtonWordMapNode);
-	pButtonManagerNode->addButtonNode(pButtonCloseNode);
-	this->addChild(pButtonManagerNode);
 }

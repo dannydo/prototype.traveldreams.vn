@@ -11,19 +11,17 @@ public:
 	ConfirmQuitLevelNode() {};
 	virtual ~ConfirmQuitLevelNode();
 	bool init() override;
-	static ConfirmQuitLevelNode* createLayout(const int& iLevel);
+	static ConfirmQuitLevelNode* createLayout(const int& iCurrentLevelId, const std::string& sChapterId);
 
 	bool onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
 
 private:
-	void createLayoutLevelFail();
 
 	void clickYes(cocos2d::Object* pSender);
 	void clickNo(cocos2d::Object* pSender);
-	void clickRetry(cocos2d::Object* pSender);
-	void clickWordMap(cocos2d::Object* pSender);
 
-	int m_iLevel;
+	int m_iCurrentLevelId;
+	std::string m_sChapterId;
 };
 
 #endif;
