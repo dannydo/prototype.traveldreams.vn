@@ -259,6 +259,24 @@ void FlashCardLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent
 			m_pSlideShow->runAction(actionMove);
 		}
 	}
+
+	if (m_iIndexFlashCard == 1)
+	{
+		m_pButtonLeft->setVisible(false);
+	}
+	else
+	{
+		m_pButtonLeft->setVisible(true);
+	}
+
+	if (m_iIndexFlashCard == m_iTotalFlashCard)
+	{
+		m_pButtonRight->setVisible(false);
+	}
+	else
+	{
+		m_pButtonRight->setVisible(true);
+	}
 }
 
 void FlashCardLayer::createNodeSlideShow()
