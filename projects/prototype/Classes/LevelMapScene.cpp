@@ -102,7 +102,7 @@ bool LevelMapLayer::init()
 		pLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
 		pLevelLabel->setPosition(Point(74.0f, 60.0f));
 		
-		if(levelInfo.bIsUnlock || (levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId)) // for test
+		if(1 || levelInfo.bIsUnlock || (levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId)) // for test
 		{
 			Sprite* pButtonLevelSprite;
 			

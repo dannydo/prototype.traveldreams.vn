@@ -69,7 +69,7 @@ bool Scale3Sprite::init(SpriteBatchNode* pBatchNode, SpriteFrame* pParentSpriteF
 
 		m_pRightSprite = new Sprite();
 		m_pRightSprite->initWithTexture( pBatchNode->getTexture(), rightBounds);
-		m_pCenterSprite->setAnchorPoint(Point(0,0));
+		m_pRightSprite->setAnchorPoint(Point(0,0));
 		pBatchNode->addChild( m_pRightSprite);	
 	}
 	else

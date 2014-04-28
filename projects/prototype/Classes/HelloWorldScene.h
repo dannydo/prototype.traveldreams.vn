@@ -210,6 +210,7 @@ private:
 	//cocos2d::Sprite* m_pMoveHintNode;
 	cocos2d::CCSpriteBatchNode* m_pComboEffectBatchNode; 
 	cocos2d::CCSpriteBatchNode* m_pTextEffectBatchNode; 
+	cocos2d::CCSpriteBatchNode* m_pBonusTimeEffectBatchNode; 
 	cocos2d::Sprite* m_pBossSprite;
 
 

@@ -161,6 +161,10 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 			sFileName = "SoundEffectPC/Popup_sfx.wav";
 			break;	
 
+		case _SET_LETS_FIND_:
+			sFileName = "SoundEffectPC/Encouragement/LetsFind.wav";
+			break;		
+
 		case _SET_ENCOURAGE_NICE_:
 			sFileName = "SoundEffectPC/Encouragement/Nice.wav";
 			break;		
@@ -256,7 +260,11 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 			sFileName = "SoundEffect/Popup_sfx.ogg";
 			break;	
 
-		
+		case _SET_LETS_FIND_:
+			sFileName = "SoundEffect/Encouragement/LetsFind.ogg";
+			break;		
+
+
 		case _SET_ENCOURAGE_NICE_:
 			sFileName = "SoundEffect/Encouragement/Nice.ogg";
 			break;		

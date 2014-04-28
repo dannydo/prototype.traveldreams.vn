@@ -321,6 +321,10 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 	m_pComboEffectBatchNode = CCSpriteBatchNode::create("ComboEffect/combo.pvr.ccz");
 	this->m_pHUDLayer->addChild(m_pComboEffectBatchNode, 20);
 
+	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("BonusTime.plist");
+	m_pBonusTimeEffectBatchNode = CCSpriteBatchNode::create("BonusTime.pvr.ccz");
+	this->m_pHUDLayer->addChild(m_pBonusTimeEffectBatchNode, 19);
+
 	// cache anim
 	auto animCache = AnimationCache::getInstance();    
     animCache->addAnimationsWithFile("ComboEffect/combo4Animations.plist");
@@ -328,6 +332,8 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 	animCache->addAnimationsWithFile("ComboEffect/combo5AnimationsNew.plist");
 
 	animCache->addAnimationsWithFile("ComboEffect/DestroyShieldAnimations.plist"); 
+
+	animCache->addAnimationsWithFile("ComboEffect/BonusTimeAnimations.plist"); 
 
 	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/AnimationDetach/Animation detach.ExportJson");		
 
@@ -1502,6 +1508,8 @@ void HelloWorld::OnStartGame()
 					FadeOut::create( 1.f)),
 				RemoveSelf::create(),
 				NULL));
+
+		SoundManager::PlaySoundEffect(_SET_LETS_FIND_);
 	}
 	else
 	{
@@ -2378,35 +2386,42 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			{
 				Point pos(m_fBoardLeftPosition + cell.m_iColumn  * m_SymbolSize.width, m_fBoardBottomPosition + cell.m_iRow * m_SymbolSize.height);
 
+				Sprite* pSprite;
+
 				if (convertedToComboCells[0].m_eGemComboType != _GCT_BONUS_END_GAME_CRAZY_PET_)
-				{
-					BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, iIndex * fDelayPerConvertedCell, _TME_BASIC_DESTROY_CELL_TIME_);
-
+				{					
 					// create combo cell
-					Sprite* pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(cell.m_iGemID, cell.m_eGemComboType).c_str());
-					//pSprite->setAnchorPoint(ccp(0,0));					
-					pSprite->setPosition(pos);
-
-					//pSprite->setScale(0.65f);
-					m_pBoardBatchNode->addChild(pSprite, GetZOrder( cell.m_iRow, cell.m_iColumn, false));
-
-					m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
-
-					pSprite->setOpacity(0);
-					pSprite->setScale(2.f);//1.5f);
-
-					pSprite->runAction( 
-						Sequence::create( 
-							DelayTime::create( iIndex * fDelayPerConvertedCell),
-							Spawn::createWithTwoActions(
-								FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_/2.f),
-								ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_/2.f, 1.f, 1.f)),
-											//EaseIn::create( FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_/3.f), 2.f),
-											//EaseIn::create(ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_/3.f, 1.f, 1.f), 2.f),
-							NULL));				
+					pSprite = Sprite::createWithSpriteFrameName( GetImageFileFromGemID(cell.m_iGemID, cell.m_eGemComboType).c_str());
 				}
 				else
-					PlayChangeColorEffectOnSprite( m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite, iIndex * fDelayPerConvertedCell );
+				{
+					//PlayChangeColorEffectOnSprite( m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite, iIndex * fDelayPerConvertedCell );
+					pSprite = Sprite::createWithSpriteFrameName( "Bonus_Rocket.png");
+				}
+
+				// play effect convert cell
+				BasicDestroyCellUlti( cell.m_iRow, cell.m_iColumn, iIndex * fDelayPerConvertedCell, _TME_BASIC_DESTROY_CELL_TIME_);
+				pSprite->setPosition(pos);
+
+				//pSprite->setScale(0.65f);
+				m_pBoardBatchNode->addChild(pSprite, GetZOrder( cell.m_iRow, cell.m_iColumn, false) + 100);
+
+				m_BoardViewMatrix[cell.m_iRow][cell.m_iColumn].m_pSprite = pSprite;
+
+				pSprite->setOpacity(0);
+				pSprite->setScale(2.f);//1.5f);
+
+				pSprite->runAction( 
+					Sequence::create( 
+						DelayTime::create( iIndex * fDelayPerConvertedCell),
+						Spawn::createWithTwoActions(
+							FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_/2.f),
+							ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_/2.f, 1.f, 1.f)),
+										//EaseIn::create( FadeIn::create(_TME_BASIC_DESTROY_CELL_TIME_/3.f), 2.f),
+										//EaseIn::create(ScaleTo::create(_TME_BASIC_DESTROY_CELL_TIME_/3.f, 1.f, 1.f), 2.f),
+						NULL));				
+
+				
 
 				// bolt effect
 				Point vector( pos.x - rootEffect.x, pos.y - rootEffect.y);
@@ -4112,27 +4127,60 @@ void HelloWorld::PlayCombo4HelperEffect(ComboEffectBundle* pComboEffect, float f
 
 void HelloWorld::PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, float fDelayTime, float fDisplayTime)
 {
-	auto pComboEffectSprite = Sprite::createWithSpriteFrameName("bonus_effect.png");
-	pComboEffectSprite->setAnchorPoint( Point( 0.5f, 0));
-	pComboEffectSprite->setPosition( Point(m_fBoardLeftPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn  * m_SymbolSize.width, 
-				m_fBoardBottomPosition + pComboEffect->m_ComboEffectDescription.m_Position.m_iRow * m_SymbolSize.height));
-	pComboEffectSprite->setOpacity(0);
-	m_pComboEffectBatchNode->addChild(pComboEffectSprite);	
+	auto* pOriginalSprite = m_BoardViewMatrix[pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite;
+	if (pOriginalSprite)
+	{	
+		Point position = pOriginalSprite->getPosition();
+		float fTargetPosY = m_fBoardBottomPosition + (_BOARD_MAX_ROW_NUMBER_) * m_SymbolSize.height;
 
-	pComboEffectSprite->runAction(
-		Sequence::create(
-			DelayTime::create(fDelayTime),
-			Spawn::create(
-				ScaleTo::create( fDisplayTime, 1.f, 4.f),
-				MoveBy::create( fDisplayTime, Point( 0, 300.f)),
-				Sequence::create(									
-					FadeIn::create(0.02f),
-					FadeOut::create(fDisplayTime + 0.05f),					
-					NULL),
-				NULL),
-			RemoveSelf::create(),
-			NULL));		
+		auto* pNewRocketSprite = Sprite::createWithSpriteFrameName("Rocket.png"); 
+		pNewRocketSprite->setPosition(position);
+		m_pBonusTimeEffectBatchNode->addChild(pNewRocketSprite);
 
+		pNewRocketSprite->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime),
+				MoveTo::create( fDisplayTime, Point( position.x, fTargetPosY)),
+				RemoveSelf::create(),
+				NULL));
+
+		auto pFireAnim = AnimationCache::getInstance()->getAnimation("BonusTimeFire");
+		auto pFireSprite = Sprite::createWithSpriteFrameName("LightFire/Light_01.png"); 
+		pFireSprite->setAnchorPoint(Point( 1.f, 0.5f));
+		pFireSprite->setRotation(270.f);
+		pFireSprite->setPosition( Point( 0 +20.f, 5.f ));
+		//pFireSprite->setVisible(false);
+		pNewRocketSprite->addChild(pFireSprite);
+
+		pFireSprite->runAction( RepeatForever::create(Animate::create( pFireAnim)));
+		pFireSprite->setScale(0);
+		pFireSprite->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime),
+				ScaleTo::create( 0.04f, 1.f, 1.f),
+				ScaleTo::create( 0.26f, 1.5f, 1.5f),
+				ScaleTo::create( 0.1f, 0, 0),
+				NULL));
+
+
+
+		auto pExplosionAnim = AnimationCache::getInstance()->getAnimation("BonusTimeExplosion");
+		auto pExplosionSprite = Sprite::createWithSpriteFrameName( "Explosion/explosion_00000.png");
+		pExplosionSprite->setPosition(Point( position.x, fTargetPosY));
+		pExplosionSprite->setVisible(false);
+		m_pBonusTimeEffectBatchNode->addChild(pExplosionSprite);
+
+		pExplosionSprite->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime + fDisplayTime),
+				Show::create(),
+				Animate::create( pExplosionAnim),				
+				RemoveSelf::create(),
+				NULL));		
+
+		pOriginalSprite->removeFromParentAndCleanup(true);
+
+	}
 	// sound effect
 	SoundManager::PlaySoundEffect(_SET_ACTIVATE_COMBO_4_, fDelayTime);
 }
