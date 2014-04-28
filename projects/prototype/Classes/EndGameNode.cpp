@@ -393,7 +393,6 @@ void EndGameNode::updateBonusQuest()
 
 void EndGameNode::menuNextLevelCallBack(Object* sender)
 {
-	Breadcrumb::getInstance()->getSceneModePopBack();
 	if ( m_iCurrentLevel >= _MAX_GAME_LEVEL_)
 		m_iCurrentLevel = 0;
 
@@ -414,7 +413,8 @@ void EndGameNode::menuNextLevelCallBack(Object* sender)
 		}
 		else // all level/chapter is finished
 		{
-			Breadcrumb::getInstance()->getSceneModePopBack();
+			Breadcrumb::getInstance()->resetSceneNodeToMainMenu();
+			Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
 			WorldMapScene* pWorldMap = WorldMapScene::create();
 			CCDirector::getInstance()->replaceScene(pWorldMap);
 			return;
