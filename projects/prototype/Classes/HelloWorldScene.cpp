@@ -430,15 +430,19 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 					if (pNormalLevelConfig->m_bIsMainWordExistedOnBoard)
 					{
 						const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+						int iPositionIndex = 0;
 
 						for(int i=0; i< mainWord.m_iWordLength; i++)
 						{			
 							if (!mainWord.m_ActivatedCharacterFlags[i])
-								if(pNormalLevelConfig->m_MainWordLetterPosition[i].m_iRow == iRow && pNormalLevelConfig->m_MainWordLetterPosition[i].m_iColumn == iColumn)
+							{
+								if(pNormalLevelConfig->m_MainWordLetterPosition[iPositionIndex].m_iRow == iRow && pNormalLevelConfig->m_MainWordLetterPosition[iPositionIndex].m_iColumn == iColumn)
 								{
 									bIsGemContainLetter = true;
 									break;
 								}
+								iPositionIndex++;
+							}
 						}
 					}
 				}
@@ -1214,6 +1218,8 @@ void HelloWorld::update(float fDeltaTime)
 
 			}
 		}
+		else
+			m_fIdleTime = 0;
 	}
 }
 
@@ -1509,7 +1515,8 @@ void HelloWorld::OnStartGame()
 				RemoveSelf::create(),
 				NULL));
 
-		SoundManager::PlaySoundEffect(_SET_LETS_FIND_);
+		SoundManager::PlaySoundEffect(_SET_LETS_FIND_);		
+		SoundManager::PlaySpellingOfWord( this, m_GameBoardManager.GetGameWordManager()->GetMainWord(), 2.f, false);
 	}
 	else
 	{
@@ -1686,6 +1693,7 @@ void HelloWorld::CheckHintAfterMove()
 {
 	if (!m_GameBoardManager.findHintForGame())
 	{
+		m_GameBoardManager.Shuffle();
 		MessageBox("Notice", "No more move! SHUFFLE!!!... Sorry, not implemented yet!");
 	}
 }
@@ -2378,7 +2386,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		{
 			float fDelayPerConvertedCell = 0.05f;
 			auto pCombo5AnimBolt = AnimationCache::getInstance()->getAnimation("effectCombo6_Light");		
-			Point rootEffect( 530.f, 820.f);
+			Point rootEffect( 595.f, 30.f);
 			int iIndex = 0;
 
 			for(auto cell: convertedToComboCells)
@@ -4129,6 +4137,12 @@ void HelloWorld::PlayComboEndGameBonusEffect(ComboEffectBundle* pComboEffect, fl
 	auto* pOriginalSprite = m_BoardViewMatrix[pComboEffect->m_ComboEffectDescription.m_Position.m_iRow][pComboEffect->m_ComboEffectDescription.m_Position.m_iColumn].m_pSprite;
 	if (pOriginalSprite)
 	{	
+		//BlendFunc blendFunc;// = new BlendFunc();
+		//blendFunc.src = GL_ONE;
+		//blendFunc.dst = GL_ONE;
+		//m_pBonusTimeEffectBatchNode->setBlendFunc(blendFunc);
+
+
 		Point position = pOriginalSprite->getPosition();
 		float fTargetPosY = m_fBoardBottomPosition + (_BOARD_MAX_ROW_NUMBER_) * m_SymbolSize.height;
 

@@ -252,6 +252,33 @@ protected:
 	ComboEffectType GetComboEffectTypeOfAdvanceCombo(ComboEffectCell (&linkCellList)[3], const int& iLinkCellCount, const int& iSelectedRow, const int& iSelectedColumn);
 
 	void TriggerAdvanceComboList(const std::vector<ComboEffectDescription>& advanceComboList, std::vector<ComboEffectBundle*>& nextComboChainList, std::vector<ComboEffectBundle*>& outputComboChainList, const bool& bIsTriggerComboSecondTimeList);		
+
+private:
+	// utility methods to find hint on temporary matrix
+	bool haveCellMatch3(const Cell& cell);
+	bool canActivatedAsSpecialComboHorizontal(const Cell& cell); //can be activate as combo 6 or double/tripple combo	
+	bool canActivatedAsSpecialComboVertical(const Cell& cell);
+
+	bool haveMatch3WHenMoveCellHorizontal(const int& iRow, const int& iColumn, Hint& outputHint);    
+	bool haveMatch3WHenMoveCellVertical(const int& iRow, const int& iColumn, Hint& outputHint);
+
+	inline bool IsCellShufflable(const int& iRow, const int& iColumn);
+	inline bool IsColorCell(const int& iRow, const int& iColumn);
+	bool tryShuffleInRegionOfRow(const int& iRow, const int& iColumn);
+	bool tryShuffleInRegionOfColumn(const int& iRow, const int& iColumn);
+
+	struct ShuffleSolution
+	{
+	public:
+		Cell  m_CellList[3];	
+		int m_iGemID;
+	};
+public:
+	bool Shuffle();
+
+	bool findHintForGame(); 
+	inline const Hint& GetHint() { return m_Hint;}
+
 protected:
 	GameWordManager* m_pGameWordManager;	
 	ObstacleProcessManager* m_pObstacleProcessManager;
@@ -273,17 +300,11 @@ protected:
 	std::vector<ComboEffectDescription> m_WaitingTriggerSecondTimeComboList; //combo 5, combo 5-5, combo 6-6-6, this include waiting combo 6 too!!!!
 	std::vector<NewCellInfo> m_UnlockedGemLetterCellList;
 	std::vector<DestroyedByComboCell> m_DestroyBonusQuestGemList;
-private:
-	// utility methods to find hint on temporary matrix
-	bool haveCellMatch3(const Cell& cell);
-	bool canActivatedAsSpecialComboHorizontal(const Cell& cell); //can be activate as combo 6 or double/tripple combo	
-	bool canActivatedAsSpecialComboVertical(const Cell& cell);
 
-	bool haveMatch3WHenMoveCellHorizontal(const int& iRow, const int& iColumn, Hint& outputHint);    
-	bool haveMatch3WHenMoveCellVertical(const int& iRow, const int& iColumn, Hint& outputHint);
-public:
-	bool findHintForGame(); 
-	inline const Hint& GetHint() { return m_Hint;}
+	// used for shuffle only
+	int m_TotalCountPerGemIDList[ _MAX_GEM_ID_];
+	int m_ShufflableCountPerGemIDList[ _MAX_GEM_ID_];
+	std::vector<ShuffleSolution> m_ShuffleSoutionList;
 };
 
 

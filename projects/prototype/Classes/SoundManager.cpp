@@ -307,7 +307,7 @@ void SoundManager::PlaySoundEffectUtil(Node* pNode, void* data)
 }
 
 
-float SoundManager::PlaySpellingOfWord(Node* pPlayingNode, const Word& word)
+float SoundManager::PlaySpellingOfWord(Node* pPlayingNode, const Word& word, float fDelayTime, bool bPlayMeaningFile)
 {
 	char sSoundFile[150];
 	
@@ -321,27 +321,40 @@ float SoundManager::PlaySpellingOfWord(Node* pPlayingNode, const Word& word)
 			sprintf(sSoundFile, "%s/EN_Sound/Words/%s.ogg", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundEnglishFile.c_str());
 		#endif
 
-		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);	
+		if (fDelayTime == 0)
+			CocosDenshion::SimpleAudioEngine::getInstance()->playEffect( sSoundFile);	
+		else
+		{
+			auto playEnglishSound = std::bind(&SoundManager::PlayVietnameseSpelling, m_InternalSoundManager, std::string(sSoundFile));
 
-
-		// play vietnamese sound file
-		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-			sprintf(sSoundFile, "%s/EN_SoundPC/Words/%s.wav", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundVietnameseFile.c_str());
-		#else
-			sprintf(sSoundFile, "%s/EN_Sound/Words/%s.ogg", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundVietnameseFile.c_str());
-		#endif
-
-		std::string sSoundVietnameseFile = sSoundFile;
-
-		auto playVietnameseSound = std::bind(&SoundManager::PlayVietnameseSpelling, m_InternalSoundManager, sSoundVietnameseFile);
-
-		pPlayingNode->runAction(
+			pPlayingNode->runAction(
 			Sequence::create( 
-				DelayTime::create(word.m_fSoundEnglishLength),
-				CallFunc::create(playVietnameseSound),
+				DelayTime::create(fDelayTime),
+				CallFunc::create(playEnglishSound),
 				NULL));
+		}
 
-		return word.m_fSoundEnglishLength + word.m_fSoundVietnameseLength;
+		if (bPlayMeaningFile)
+		{
+			// play vietnamese sound file
+			#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+				sprintf(sSoundFile, "%s/EN_SoundPC/Words/%s.wav", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundVietnameseFile.c_str());
+			#else
+				sprintf(sSoundFile, "%s/EN_Sound/Words/%s.ogg", GameWordManager::getInstance()->GetPackagePathFromWord(word).c_str(), word.m_sSoundVietnameseFile.c_str());
+			#endif
+
+			std::string sSoundVietnameseFile = sSoundFile;
+
+			auto playVietnameseSound = std::bind(&SoundManager::PlayVietnameseSpelling, m_InternalSoundManager, sSoundVietnameseFile);
+
+			pPlayingNode->runAction(
+				Sequence::create( 
+					DelayTime::create(word.m_fSoundEnglishLength),
+					CallFunc::create(playVietnameseSound),
+					NULL));
+
+			return word.m_fSoundEnglishLength + word.m_fSoundVietnameseLength;
+		}
 	}
 
 	return 0;

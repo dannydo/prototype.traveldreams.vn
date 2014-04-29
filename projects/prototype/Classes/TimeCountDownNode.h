@@ -18,7 +18,14 @@ public:
 
 	inline void Start() { m_bIsStarted = true;}
 
-	void AddEnergy(int iIncrementEnergy) { if (m_fCurrentEnergy<=0) return; m_fCurrentEnergy += iIncrementEnergy;}
+	void AddEnergy(int iIncrementEnergy) { 
+		if (m_fCurrentEnergy<=0) 
+			return; 
+		m_fCurrentEnergy += iIncrementEnergy; 
+		if (m_fCurrentEnergy> m_fMaximumEnergy) 
+			m_fCurrentEnergy = m_fMaximumEnergy;
+	}
+
 	void StopUpdate() { this->unscheduleUpdate();}
 
 	void update(float fDeltaTime) override;

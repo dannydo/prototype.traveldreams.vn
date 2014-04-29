@@ -77,7 +77,7 @@ public:
 
 	static void PlaySoundEffect(const SoundEffectType& eSoundEffectType, float fDelayTime = 0.f);	
 
-	static float PlaySpellingOfWord(Node* pPlayingNode, const Word& word);
+	static float PlaySpellingOfWord(Node* pPlayingNode, const Word& word, float fDelayTime=0, bool bPlayMeaningFile=true);
 	static float PlaySentenceOfWord(Node* pPlayingNode, const Word& word);
 
 private:
