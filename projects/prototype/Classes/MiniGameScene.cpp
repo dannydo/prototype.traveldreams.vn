@@ -152,7 +152,7 @@ void MiniGameLayer::createLayout()
 
 		m_pFlashCard = FlashCardNode::createLayout(wordMain);
 		m_pFlashCard->addButtonPlaySoundWord();
-		m_pFlashCard->setScale(0.5f);
+		m_pFlashCard->setScale(0.7f);
 		m_pFlashCard->addLayoutQuestion();
 		m_pFlashCard->setPosition(Point(100.0f, 260.0f));
 		this->addChild(m_pFlashCard);
@@ -220,7 +220,7 @@ ButtonNode* MiniGameLayer::createButtonPictureFlashcard(const WordInfo& wordInfo
 	sPath.append(word3.m_sFlashCardImage);
 
 	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
-	pFlashCardImage->setScale(0.8f);
+	pFlashCardImage->setScale(0.6f);
 	pFlashCardImage->setPosition(Point(109.0f, 78.5f));
 
 	Sprite* pBackground = Sprite::create("FlashCard/answer.png");
