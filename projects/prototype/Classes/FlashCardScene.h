@@ -31,7 +31,7 @@ private:
 	cocos2d::Point m_touchPositionMoved;
 	cocos2d::LabelTTF* m_pLabelWord;
 
-	std::vector<WordInfo> m_Words;
+	std::vector<WordInfo> m_WordsCollected;
 	ChapterInfo m_chapterInfo;
 	ButtonNode* m_pButtonRight;
 	ButtonNode* m_pButtonLeft;

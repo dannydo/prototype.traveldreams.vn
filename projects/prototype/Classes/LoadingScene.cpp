@@ -162,7 +162,7 @@ void LoadingLayer::initData()
 	}
 
 	// Sync Data Game
-	//SyncDataGame::getInstance()->runSyncDataGame();
+	SyncDataGame::getInstance()->runSyncDataGame();
 }
 
 void LoadingLayer::finishLoading()

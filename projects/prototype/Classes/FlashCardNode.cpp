@@ -49,7 +49,7 @@ bool FlashCardNode::init()
 
 	LabelTTF* pLabelWordMean = LabelTTF::create(m_pWord->m_sMeaning.c_str(), "Arial", 30.0f);
 	pLabelWordMean->setColor(ccc3(0.0f, 0.0f, 0.0f));
-	pLabelWordMean->setPosition(Point(320.0f, 399.0f));
+	pLabelWordMean->setPosition(Point(320.0f, 390.0f));
 	m_pFlashCardContent->addChild(pLabelWordMean);
 
 	Sprite* pFlashCardBG = Sprite::create("FlashCard/flashcard_frame.png");

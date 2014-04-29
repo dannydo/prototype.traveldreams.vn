@@ -49,6 +49,9 @@ public:
 	int getNumberWordPlayMiniGame(const unsigned long& iTimeCurrent);
 	std::vector<WordInfo> getAllWordNew(const unsigned long& iTimeCurrent);
 
+	std::vector<WordInfo> getWordInfoCollectedForChapter(const std::string& sChapterId);
+	int getTotalWordInfoCollectedForChapter(const std::string& sChapterId);
+
 private:
 	void fetchWordsForChapter(const std::string& sChapterId);
 

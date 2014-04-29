@@ -283,7 +283,7 @@ void MiniGameLayer::clickChoosePicture(Object* sender)
 
 		auto actionPlayEffectLose = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectLose));
 		auto actionplayEffectAddLayout = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddLayout));
-		this->runAction(Sequence::create(DelayTime::create(0.3f), actionPlayEffectLose, DelayTime::create(0.15f), actionplayEffectAddLayout, NULL));
+		this->runAction(Sequence::create(DelayTime::create(0.3f), actionPlayEffectLose, DelayTime::create(0.25f), actionplayEffectAddLayout, NULL));
 	}
 }
 
@@ -311,6 +311,9 @@ void MiniGameLayer::playEffectLose()
 
 	m_pFlashCard->runAction(actionFlashcardMoveLeft);
 	m_pChooseImageNode->runAction(actionChooseImageMoveLeft);
+
+	m_MaintWordInfo.uTimeBeginPlayMiniGame = getTimeLocalCurrent();
+	WordTable::getInstance()->updateWord(m_MaintWordInfo);
 }
 
 void MiniGameLayer::playEffectWin()
@@ -321,14 +324,6 @@ void MiniGameLayer::playEffectWin()
 
 	m_MaintWordInfo.bIsCollected = true;
 	WordTable::getInstance()->updateWord(m_MaintWordInfo);
-
-	ChapterInfo chapterInfo = ChapterTable::getInstance()->getChapterInfo(m_MaintWordInfo.sChapterId);
-	chapterInfo.iTotalFlashCardUnlock++;
-	if (chapterInfo.iTotalFlashCardUnlock == chapterInfo.iTotalFlashCard)
-	{
-		chapterInfo.iTotalFlashCardUnlock = chapterInfo.iTotalFlashCard;
-	}
-	ChapterTable::getInstance()->updateChapter(chapterInfo);
 
 	m_pFlashCard->removeButtonManageQuestion();
 

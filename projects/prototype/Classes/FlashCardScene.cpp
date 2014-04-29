@@ -101,10 +101,9 @@ bool FlashCardLayer::init()
 	m_pFooterNode->removeBackground();
 	this->addChild(m_pFooterNode);
 
-	WordTable::getInstance()->refreshWordsForChapter(m_chapterInfo.sChapterId);
 	
-	m_Words = WordTable::getInstance()->getAllWordsForChapter(m_chapterInfo.sChapterId);
-	m_iTotalFlashCardUnlock = m_chapterInfo.iTotalFlashCardUnlock;
+	m_WordsCollected = WordTable::getInstance()->getWordInfoCollectedForChapter(m_chapterInfo.sChapterId);
+	m_iTotalFlashCardUnlock = m_WordsCollected.size();
 	m_iIndexFlashCard = 1;
 
 	m_pSlideShow = Node::create();
@@ -283,7 +282,7 @@ void FlashCardLayer::createNodeSlideShow()
 	// Left
 	if (m_iIndexFlashCard-2 >= 0)
 	{
-		WordInfo wordInfo = m_Words[m_iIndexFlashCard-2];
+		WordInfo wordInfo = m_WordsCollected[m_iIndexFlashCard-2];
 		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordInfo.sWordId);
 		auto& word = GameWordManager::getInstance()->GetWord(iIndex);
 
@@ -298,7 +297,7 @@ void FlashCardLayer::createNodeSlideShow()
 	// Mid
 	if (m_iIndexFlashCard - 1 >= 0)
 	{
-		WordInfo wordInfo = m_Words[m_iIndexFlashCard-1];
+		WordInfo wordInfo = m_WordsCollected[m_iIndexFlashCard-1];
 		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordInfo.sWordId);
 		auto& word = GameWordManager::getInstance()->GetWord(iIndex);
 
@@ -311,9 +310,9 @@ void FlashCardLayer::createNodeSlideShow()
 
 	
 	// Right
-	if (m_iIndexFlashCard <= m_iTotalFlashCardUnlock)
+	if (m_iIndexFlashCard < m_iTotalFlashCardUnlock)
 	{
-		WordInfo wordInfo = m_Words[m_iIndexFlashCard];
+		WordInfo wordInfo = m_WordsCollected[m_iIndexFlashCard];
 		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordInfo.sWordId);
 		auto& word = GameWordManager::getInstance()->GetWord(iIndex);
 

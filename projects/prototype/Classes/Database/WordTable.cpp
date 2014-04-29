@@ -62,6 +62,49 @@ int WordTable::getNumberWordPlayMiniGame(const unsigned long& iTimeCurrent)
 	return nRow;
 }
 
+int WordTable::getTotalWordInfoCollectedForChapter(const std::string& sChapterId)
+{
+	char **re;
+	int nRow, nColumn;
+
+	String sql = "select * from Words inner join MapChapterWords on MapChapterWords.WordId = Words.WordId where IsCollected=1 and MapChapterWords.ChapterId=";
+	sql.appendWithFormat("'%s'", sChapterId.c_str());
+
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	return nRow;
+}
+
+std::vector<WordInfo> WordTable::getWordInfoCollectedForChapter(const std::string& sChapterId)
+{
+	char **re;
+	int nRow, nColumn;
+
+	String sql = "select * from Words inner join MapChapterWords on MapChapterWords.WordId = Words.WordId where IsCollected=1 and MapChapterWords.ChapterId=";
+	sql.appendWithFormat("'%s'", sChapterId.c_str());
+
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	std::vector<WordInfo> wordsCollected;
+	for (int iRow=1; iRow<=nRow; iRow++)
+	{
+		WordInfo wordInfo;
+		wordInfo.sWordId = re[iRow*nColumn+0];
+		wordInfo.iCountCollected = int(strtod(re[iRow*nColumn+1], 0));
+		wordInfo.iVersion = int(strtod(re[iRow*nColumn+2], 0));
+		wordInfo.bIsCollected = int(strtod(re[iRow*nColumn+3], 0));
+		wordInfo.uTimeBeginPlayMiniGame = long(strtod(re[iRow*nColumn+4], 0));
+		wordInfo.iMapChapterWordId = int(strtod(re[iRow*nColumn+5], 0));
+		wordInfo.sChapterId = re[iRow*nColumn+6];
+
+		wordsCollected.push_back(wordInfo);
+	}
+
+	sqlite3_free_table(re);
+
+	return wordsCollected;
+}
+
 std::vector<WordInfo> WordTable::getAllWordNew(const unsigned long& iTimeCurrent)
 {
 	char **re;
