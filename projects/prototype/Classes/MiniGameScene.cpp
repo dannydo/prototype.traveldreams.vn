@@ -121,11 +121,12 @@ void MiniGameLayer::randownIndexWords()
 		int iIndexWord = rand() % (m_ChapterWords.size());
 		for(int iIndex=0; iIndex<m_arrIndexWord.size(); iIndex++)
 		{
-			if (m_arrIndexWord[iIndex] == iIndexWord || iIndexWord == m_iIndexWordNew)
+			if (m_arrIndexWord[iIndex] == iIndexWord || m_ChapterWords[iIndexWord].sWordId == m_WordsNew[m_iIndexWordNew].sWordId)
 			{
 				bBreakWhile = false;
 			}
 		}
+
 
 		if (bBreakWhile)
 		{
@@ -151,7 +152,7 @@ void MiniGameLayer::createLayout()
 
 		m_pFlashCard = FlashCardNode::createLayout(wordMain);
 		m_pFlashCard->addButtonPlaySoundWord();
-		m_pFlashCard->setScale(0.7f);
+		m_pFlashCard->setScale(0.5f);
 		m_pFlashCard->addLayoutQuestion();
 		m_pFlashCard->setPosition(Point(100.0f, 260.0f));
 		this->addChild(m_pFlashCard);
