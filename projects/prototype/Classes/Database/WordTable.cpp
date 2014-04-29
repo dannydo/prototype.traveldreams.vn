@@ -385,7 +385,7 @@ bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iV
 			// Update Words
 			sqlRun.append("update Words Set");
 			sqlRun.appendWithFormat(" CountCollected=%s,", pJsonWord->getItemStringValue("CountCollected"));
-			sqlRun.appendWithFormat(" Version=%d,", iVersion);
+			sqlRun.appendWithFormat(" Version=%d", iVersion);
 			//sqlRun.appendWithFormat(" IsCollected=%s", pJsonWord->getItemStringValue("IsCollected"));
 			sqlRun.appendWithFormat(" where WordId='%s';", sWordId.c_str());
 		}

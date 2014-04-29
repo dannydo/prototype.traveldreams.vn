@@ -119,11 +119,17 @@ void MiniGameLayer::randownIndexWords()
 	{
 		int bBreakWhile = true;
 		int iIndexWord = rand() % (m_ChapterWords.size());
-		for(int iIndex=0; iIndex<m_arrIndexWord.size(); iIndex++)
+		if (m_ChapterWords[iIndexWord].sWordId.compare(m_WordsNew[m_iIndexWordNew].sWordId) == 0)
+			bBreakWhile = false;
+
+		if (bBreakWhile)
 		{
-			if (m_arrIndexWord[iIndex] == iIndexWord || m_ChapterWords[iIndexWord].sWordId == m_WordsNew[m_iIndexWordNew].sWordId)
+			for(int iIndex=0; iIndex<m_arrIndexWord.size(); iIndex++)
 			{
-				bBreakWhile = false;
+				if (m_arrIndexWord[iIndex] == iIndexWord)
+				{
+					bBreakWhile = false;
+				}
 			}
 		}
 
