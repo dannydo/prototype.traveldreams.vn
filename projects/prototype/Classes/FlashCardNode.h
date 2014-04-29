@@ -18,6 +18,9 @@ public:
 	void addButtonPlaySoundWord();
 	void addLayoutQuestion();
 
+	cocos2d::Node* getNodeDescription() { return m_pNodeDescription; };
+	void removeButtonManageQuestion();
+
 private:
 
 	void playVoiceWord(cocos2d::Object* pSender);

@@ -31,7 +31,7 @@ private:
 	cocos2d::Point m_touchPositionMoved;
 	cocos2d::LabelTTF* m_pLabelWord;
 
-	std::vector<WordInfo> m_Words;
+	std::vector<WordInfo> m_WordsCollected;
 	ChapterInfo m_chapterInfo;
 	ButtonNode* m_pButtonRight;
 	ButtonNode* m_pButtonLeft;
@@ -45,7 +45,7 @@ private:
 	float m_fBeginX;
 
 	int m_iMoveLeftOrRight;
-	int m_iTotalFlashCard;
+	int m_iTotalFlashCardUnlock;
 	int m_iIndexFlashCard;
   
 	FooterNode* m_pFooterNode;

@@ -209,10 +209,11 @@ void LevelMapLayer::showPopupEndGameLose(const int& iScore, const Word& mainWord
 	this->addChild(pEndGameLose, 10);
 }
 
-void LevelMapLayer::showPopupEndGameWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId, const int& iYellowStar)
+void LevelMapLayer::showPopupEndGameWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId, const int& iYellowStar, const int& iBonusQuestCompleted)
 {
 	EndGameNode* pEndGameLose = EndGameNode::createLayoutWin(iScore, mainWord, iCurrentLevel, sChapterId);
 	pEndGameLose->addYellowStar(iYellowStar);
+	pEndGameLose->addBonusQuestCompleted(iBonusQuestCompleted);
 	this->addChild(pEndGameLose, 10);
 }
 

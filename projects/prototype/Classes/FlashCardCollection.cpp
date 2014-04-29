@@ -4,6 +4,9 @@
 #include "GameConfigManager.h"
 #include "HeaderNode.h"
 #include "ClipMaskNode.h"
+#include "Database\WordTable.h"
+#include "FunctionCommon.h"
+#include "MiniGameScene.h"
 
 USING_NS_CC;
 
@@ -61,15 +64,18 @@ bool FlashCardCollectionLayer::init()
 	pButtonMiniGame->setPosition(Point(320.0f, 817.0f));
 	pButtonManagerNode->addButtonNode(pButtonMiniGame);
 
-	int iNumberNew = 5;
-	if (iNumberNew > 0)
+
+	int iWordNew = WordTable::getInstance()->getNumberWordNew();
+	m_iWordPlayMiniGame = WordTable::getInstance()->getNumberWordPlayMiniGame(getTimeLocalCurrent());
+
+	if (iWordNew > 0)
 	{
 		Sprite* pIconNew = Sprite::create("FlashCard/noitify_msg.png");
 		pIconNew->setPosition(Point(247.0f, 105.0f));
 		pButtonMiniGameSprite->addChild(pIconNew);
 
 		char sNumberNew[10];
-		sprintf(sNumberNew, "%d", iNumberNew);
+		sprintf(sNumberNew, "%d", iWordNew);
 		LabelTTF* pLabelNumber = LabelTTF::create(sNumberNew, "Arial", 25);
 		pLabelNumber->setColor(ccc3(255.0f, 255.0f, 255.0f));
 		pLabelNumber->setPosition(Point(22.0f, 20.0f));
@@ -102,42 +108,49 @@ bool FlashCardCollectionLayer::init()
 	pClipMaskNode->addChild(m_pSlideShow);
 	pBackgroundFlashcard->addChild(pClipMaskNode);
 
+	ChapterTable::getInstance()->refreshChapters();
 	m_chapters = ChapterTable::getInstance()->getChaptersInfo();
 
 	WordlMapConfig worlMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
 	
+	int iCountIndex=0;
 	for (int iIndex=0; iIndex<m_chapters.size(); iIndex++)
 	{
 		ChapterInfo chapterInfo = m_chapters[iIndex];
-		if(chapterInfo.bIsUnlock && chapterInfo.iTotalFlashCardUnlock > 0)
+		if(chapterInfo.bIsUnlock)
 		{
-			Sprite* pBackgroundItem = Sprite::create("FlashCard/panel_flashcard_chapter.png");
-			pBackgroundItem->setPosition(Point(0.0f, -iIndex*190));
-			m_pSlideShow->addChild(pBackgroundItem);
+			int iTotalFlashcardUnlock = WordTable::getInstance()->getTotalWordInfoCollectedForChapter(chapterInfo.sChapterId);
+			if (iTotalFlashcardUnlock > 0)
+			{
+				Sprite* pBackgroundItem = Sprite::create("FlashCard/panel_flashcard_chapter.png");
+				pBackgroundItem->setPosition(Point(0.0f, -iIndex*190));
+				m_pSlideShow->addChild(pBackgroundItem);
 
-			int iIndexChapter = worlMapConfig.m_WorlMapChapterConfigMap[chapterInfo.sChapterId];
+				int iIndexChapter = worlMapConfig.m_WorlMapChapterConfigMap[chapterInfo.sChapterId];
 
-			std::string sPath = worlMapConfig.m_WorlMapChapterConfigs[iIndexChapter].m_sPathData;
-			sPath.append("/Flash-Card-icon.png");
-			Sprite* pIconChapter = Sprite::create(sPath.c_str());
+				std::string sPath = worlMapConfig.m_WorlMapChapterConfigs[iIndexChapter].m_sPathData;
+				sPath.append("/Flash-Card-icon.png");
+				Sprite* pIconChapter = Sprite::create(sPath.c_str());
 
-			ButtonNode* pButtonItem = ButtonNode::createButtonSprite(pIconChapter, CC_CALLBACK_1(FlashCardCollectionLayer::clickOpenFlashCard, this));
-			pButtonItem->setTag(iIndex);
-			pButtonItem->setPosition(Point(-140.0f, -15 -iIndex*190));
-			m_pSlideShow->addButtonNode(pButtonItem);
+				ButtonNode* pButtonItem = ButtonNode::createButtonSprite(pIconChapter, CC_CALLBACK_1(FlashCardCollectionLayer::clickOpenFlashCard, this));
+				pButtonItem->setTag(iIndex);
+				pButtonItem->setPosition(Point(-140.0f, -15 -iIndex*190));
+				m_pSlideShow->addButtonNode(pButtonItem);
 
-			LabelBMFont* pLabelChapterName = LabelBMFont::create(worlMapConfig.m_WorlMapChapterConfigs[iIndexChapter].m_sChapterName.c_str(), "fonts/font_small_alert.fnt");
-			pLabelChapterName->setPosition(Point(110.0f, 18 -iIndex*190));
-			m_pSlideShow->addChild(pLabelChapterName);
+				LabelBMFont* pLabelChapterName = LabelBMFont::create(worlMapConfig.m_WorlMapChapterConfigs[iIndexChapter].m_sChapterName.c_str(), "fonts/font_small_alert.fnt");
+				pLabelChapterName->setPosition(Point(110.0f, 18 -iIndex*190));
+				m_pSlideShow->addChild(pLabelChapterName);
 
-			char sTotalFlashCard[10];
-			sprintf(sTotalFlashCard, "(%d/%d)", chapterInfo.iTotalFlashCardUnlock, chapterInfo.iTotalFlash);
-			LabelTTF* pLabelTotalFlashCard = LabelTTF::create(sTotalFlashCard, "Arial", 25);
-			pLabelTotalFlashCard->setColor(ccc3(0.0f, 0.0f, 0.0f));
-			pLabelTotalFlashCard->setPosition(Point(110.0f, -18 -iIndex*190));
-			m_pSlideShow->addChild(pLabelTotalFlashCard);
+				char sTotalFlashCard[10];
+				sprintf(sTotalFlashCard, "(%d/%d)", iTotalFlashcardUnlock, chapterInfo.iTotalFlashCard);
+				LabelTTF* pLabelTotalFlashCard = LabelTTF::create(sTotalFlashCard, "Arial", 25);
+				pLabelTotalFlashCard->setColor(ccc3(0.0f, 0.0f, 0.0f));
+				pLabelTotalFlashCard->setPosition(Point(110.0f, -18 -iIndex*190));
+				m_pSlideShow->addChild(pLabelTotalFlashCard);
 
-			m_maxHeight = (iIndex + 1)*190;
+				iCountIndex++;
+				m_maxHeight = iCountIndex*190;
+			}
 		}
 	}
 
@@ -155,7 +168,15 @@ bool FlashCardCollectionLayer::init()
 
 void FlashCardCollectionLayer::clickPlayMiniGame(Object* sender)
 {
-
+	if (m_iWordPlayMiniGame > 0)
+	{
+		MiniGameScene* pMiniGame = MiniGameScene::create();
+		Director::getInstance()->replaceScene(pMiniGame);
+	}
+	else
+	{
+		MessageBox("No word for play game", "");
+	}
 }
 
 bool FlashCardCollectionLayer::onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)

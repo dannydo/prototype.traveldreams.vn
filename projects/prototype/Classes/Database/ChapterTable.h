@@ -12,8 +12,7 @@ struct ChapterInfo
 	bool bIsUnlock;
 	int iVersion;
 	int iTotalFlashCardUnlock;
-	int iCountFlashCardNew;
-	int iTotalFlash;
+	int iTotalFlashCard;
 
 	ChapterInfo()
 	{
@@ -23,8 +22,7 @@ struct ChapterInfo
 		bIsUnlock = false;
 		iVersion = 0;
 		iTotalFlashCardUnlock = 0;
-		iCountFlashCardNew = 0;
-		iTotalFlash = 0;
+		iTotalFlashCard = 0;
 	}
 };
 

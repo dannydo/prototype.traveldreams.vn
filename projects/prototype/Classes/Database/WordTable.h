@@ -9,16 +9,20 @@ struct WordInfo
 	std::string sWordId;
 	int iCountCollected;
 	int iVersion;
-	int iOrderUnlock;
-	bool bIsNew;
+	bool bIsCollected;
+	unsigned long uTimeBeginPlayMiniGame;
 	int iMapChapterWordId;
 	std::string sChapterId;
 
 	WordInfo()
 	{
 		sWordId = "";
-		iCountCollected = -1;
-		iVersion = -1;
+		sChapterId = "";
+		iMapChapterWordId = 0;
+		iCountCollected = 0;
+		iVersion = 0;
+		bIsCollected = 0;
+		uTimeBeginPlayMiniGame = 0;
 	}
 };
 
@@ -40,6 +44,13 @@ public:
 	std::string	syncGetMapChapterWords();
 	bool updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iVersion);
 	bool updateDataSyncMapChapterWords(cs::JsonDictionary* pJsonSync, const int& iVersion);
+
+	int getNumberWordNew();
+	int getNumberWordPlayMiniGame(const unsigned long& iTimeCurrent);
+	std::vector<WordInfo> getAllWordNew(const unsigned long& iTimeCurrent);
+
+	std::vector<WordInfo> getWordInfoCollectedForChapter(const std::string& sChapterId);
+	int getTotalWordInfoCollectedForChapter(const std::string& sChapterId);
 
 private:
 	void fetchWordsForChapter(const std::string& sChapterId);

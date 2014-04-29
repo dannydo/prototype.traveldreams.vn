@@ -182,6 +182,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\LoadingImageNode.cpp" />
     <ClCompile Include="..\Classes\LoadingScene.cpp" />
     <ClCompile Include="..\Classes\MainMenuScene.cpp" />
+    <ClCompile Include="..\Classes\MiniGameScene.cpp" />
     <ClCompile Include="..\Classes\NewGameBoardManager.cpp" />
     <ClCompile Include="..\Classes\ObstacleProcessManager.cpp" />
     <ClCompile Include="..\Classes\ConnectFacebookConfirm.cpp" />
@@ -254,6 +255,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\LoadingImageNode.h" />
     <ClInclude Include="..\Classes\LoadingScene.h" />
     <ClInclude Include="..\Classes\MainMenuScene.h" />
+    <ClInclude Include="..\Classes\MiniGameScene.h" />
     <ClInclude Include="..\Classes\NewGameBoardManager.h" />
     <ClInclude Include="..\Classes\ObstacleProcessManager.h" />
     <ClInclude Include="..\Classes\ConnectFacebookConfirm.h" />

@@ -237,6 +237,9 @@
     <ClCompile Include="..\Classes\QuitLevelFailedNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\MiniGameScene.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -450,6 +453,9 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\QuitLevelFailedNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\MiniGameScene.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
