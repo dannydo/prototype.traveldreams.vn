@@ -87,14 +87,14 @@ bool InitDatabase::createDatabase()
 
 	std::string sqlRun = "";
 	sqlRun.append("CREATE TABLE if not exists Users (UserIdentifier TEXT PRIMARY KEY  NOT NULL, FacebookId TEXT, FacebookToken TEXT, FirstName TEXT, LastName TEXT, CurrentChapter TEXT, CurrentLevel INTEGER, Life INTEGER, LifeTimeRemaining INTEGER, LifeTImeBeginRemain INTEGER, Monney INTEGER, Version INTEGER, UserToken TEXT, DeviceId TEXT);");
-	sqlRun.append("CREATE TABLE if not exists Chapters (ChapterId TEXT PRIMARY KEY NOT NULL, TotalLevelUnlock INTEGER, TotalStar INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER, TotalFlashCardUnlock INTEGER, CountFlashCardNew INTEGER, TotalFlashCard INTEGER);");
+	sqlRun.append("CREATE TABLE if not exists Chapters (ChapterId TEXT PRIMARY KEY NOT NULL, TotalLevelUnlock INTEGER, TotalStar INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER, TotalFlashCardUnlock INTEGER, TotalFlashCard INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Levels (LevelId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ChapterId TEXT, Level INTEGER, WordId TEXT, Star INTEGER, Score INTEGER, BonusQuest INTEGER, TotalBonusQuest INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists UnlockChapters (UnlockChapterId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ChapterId TEXT, Request INTEGER, Type TEXT, BeginTime INTEGER, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists PowerUps (PowerUpId TEXT PRIMARY KEY NOT NULL, Quantity INTEGER, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Transactions (TransactionsId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, PowerUpId TEXT, Quantity INTEGER, TotalAmount INTEGER, DateTime INTEGER, Version INTEGER, Type TEXT);");
 	sqlRun.append("CREATE TABLE if not exists Versions (VersionId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, VersionSync INTEGER, VersionDatabase INTEGER);");
-	sqlRun.append("CREATE TABLE if not exists Words (WordId TEXT PRIMARY KEY NOT NULL, CountCollected INTEGER, Version INTEGER);");
-	sqlRun.append("CREATE TABLE if not exists MapChapterWords (MapChapterWordId INTEGER PRIMARY KEY NOT NULL, ChapterId TEXT, WordId TEXT, Version INTEGER, OrderUnlock INTEGER, IsNew INTEGER);");
+	sqlRun.append("CREATE TABLE if not exists Words (WordId TEXT PRIMARY KEY NOT NULL, CountCollected INTEGER, Version INTEGER, IsCollected INTEGER, TimeBeginPlayMiniGame INTEGER);");
+	sqlRun.append("CREATE TABLE if not exists MapChapterWords (MapChapterWordId INTEGER PRIMARY KEY NOT NULL, ChapterId TEXT, WordId TEXT, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists CSPackage (PackageId TEXT PRIMARY KEY NOT NULL, PackageName TEXT);");
 	sqlRun.append("CREATE TABLE if not exists CSWords (WordId TEXT, PackageId TEXT, CollectedCount INTEGER);");
 	sqlRun.append("insert into Versions values(1, 0, 1);");
@@ -139,7 +139,7 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 			sqlRun.append(sChapterId.c_str());
 			sqlRun.append("', 0, 0, 1, ");
 			sqlRun.appendWithFormat("%d,", iVersion);
-			sqlRun.append("0, 0,");
+			sqlRun.append("0,");
 			sqlRun.appendWithFormat("%d);", wordList.size());
 
 			int countCollected;
@@ -147,11 +147,10 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 			{
 				countCollected = 0;
 
-				sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version,OrderUnlock,IsNew) values(");
+				sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version) values(");
 				sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
 				sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
-				sqlRun.appendWithFormat("%d,", iVersion);
-				sqlRun.append("0, 0);");
+				sqlRun.appendWithFormat("%d);", iVersion);
 
 				if (mapLevels[iIndex] != -1)
 				{
@@ -170,10 +169,10 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 				sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
 				if(nRow < 1)
 				{
-					sqlRun.append("insert into Words (WordId,CountCollected,Version) values(");
+					sqlRun.append("insert into Words (WordId,CountCollected,Version,IsCollected,TimeBeginPlayMiniGame) values(");
 					sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
 					sqlRun.appendWithFormat("%d,", countCollected);
-					sqlRun.appendWithFormat("%d);", iVersion);
+					sqlRun.appendWithFormat("%d,0,0);", iVersion);
 				}
 			}
 
@@ -201,7 +200,7 @@ bool InitDatabase::initDataChapter1AndLevel(const std::string& sChapterId, std::
 		sqlRun.append(sChapterId.c_str());
 		sqlRun.append("', 0, 0, 1, ");
 		sqlRun.appendWithFormat("%d,", iVersion);
-		sqlRun.append("0, 0,");
+		sqlRun.append("0,");
 		sqlRun.appendWithFormat("%d);", wordList.size());
 
 		int countCollected;
@@ -209,11 +208,10 @@ bool InitDatabase::initDataChapter1AndLevel(const std::string& sChapterId, std::
 		{
 			countCollected = 0;
 
-			sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version,OrderUnlock,IsNew) values(");
+			sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version) values(");
 			sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
 			sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
-			sqlRun.appendWithFormat("%d,", iVersion);
-			sqlRun.append("0, 0);");
+			sqlRun.appendWithFormat("%d);", iVersion);
 
 			if (mapLevels[iIndex] != -1)
 			{
@@ -226,10 +224,10 @@ bool InitDatabase::initDataChapter1AndLevel(const std::string& sChapterId, std::
 				sqlRun.appendWithFormat("%d);", iVersion);
 			}
 
-			sqlRun.append("insert into Words (WordId,CountCollected,Version) values(");
+			sqlRun.append("insert into Words (WordId,CountCollected,Version,IsCollected,TimeBeginPlayMiniGame) values(");
 			sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
 			sqlRun.appendWithFormat("%d,", countCollected);
-			sqlRun.appendWithFormat("%d);", iVersion);
+			sqlRun.appendWithFormat("%d,0,0);", iVersion);
 		}
 
 		int iResult = sqlite3_exec(m_DatabaseSqlite, sqlRun.getCString(), NULL, NULL, NULL);

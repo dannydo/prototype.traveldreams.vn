@@ -4,6 +4,9 @@
 #include "GameConfigManager.h"
 #include "HeaderNode.h"
 #include "ClipMaskNode.h"
+#include "Database\WordTable.h"
+#include "FunctionCommon.h"
+#include "MiniGameScene.h"
 
 USING_NS_CC;
 
@@ -61,15 +64,18 @@ bool FlashCardCollectionLayer::init()
 	pButtonMiniGame->setPosition(Point(320.0f, 817.0f));
 	pButtonManagerNode->addButtonNode(pButtonMiniGame);
 
-	int iNumberNew = 5;
-	if (iNumberNew > 0)
+
+	int iWordNew = WordTable::getInstance()->getNumberWordNew();
+	m_iWordPlayMiniGame = WordTable::getInstance()->getNumberWordPlayMiniGame(getTimeLocalCurrent());
+
+	if (iWordNew > 0)
 	{
 		Sprite* pIconNew = Sprite::create("FlashCard/noitify_msg.png");
 		pIconNew->setPosition(Point(247.0f, 105.0f));
 		pButtonMiniGameSprite->addChild(pIconNew);
 
 		char sNumberNew[10];
-		sprintf(sNumberNew, "%d", iNumberNew);
+		sprintf(sNumberNew, "%d", iWordNew);
 		LabelTTF* pLabelNumber = LabelTTF::create(sNumberNew, "Arial", 25);
 		pLabelNumber->setColor(ccc3(255.0f, 255.0f, 255.0f));
 		pLabelNumber->setPosition(Point(22.0f, 20.0f));
@@ -102,6 +108,7 @@ bool FlashCardCollectionLayer::init()
 	pClipMaskNode->addChild(m_pSlideShow);
 	pBackgroundFlashcard->addChild(pClipMaskNode);
 
+	ChapterTable::getInstance()->refreshChapters();
 	m_chapters = ChapterTable::getInstance()->getChaptersInfo();
 
 	WordlMapConfig worlMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
@@ -131,7 +138,7 @@ bool FlashCardCollectionLayer::init()
 			m_pSlideShow->addChild(pLabelChapterName);
 
 			char sTotalFlashCard[10];
-			sprintf(sTotalFlashCard, "(%d/%d)", chapterInfo.iTotalFlashCardUnlock, chapterInfo.iTotalFlash);
+			sprintf(sTotalFlashCard, "(%d/%d)", chapterInfo.iTotalFlashCardUnlock, chapterInfo.iTotalFlashCard);
 			LabelTTF* pLabelTotalFlashCard = LabelTTF::create(sTotalFlashCard, "Arial", 25);
 			pLabelTotalFlashCard->setColor(ccc3(0.0f, 0.0f, 0.0f));
 			pLabelTotalFlashCard->setPosition(Point(110.0f, -18 -iIndex*190));
@@ -155,7 +162,15 @@ bool FlashCardCollectionLayer::init()
 
 void FlashCardCollectionLayer::clickPlayMiniGame(Object* sender)
 {
-
+	if (m_iWordPlayMiniGame > 0)
+	{
+		MiniGameScene* pMiniGame = MiniGameScene::create();
+		Director::getInstance()->replaceScene(pMiniGame);
+	}
+	else
+	{
+		MessageBox("No word for play game", "");
+	}
 }
 
 bool FlashCardCollectionLayer::onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)

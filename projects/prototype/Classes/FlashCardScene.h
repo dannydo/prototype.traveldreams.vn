@@ -45,7 +45,7 @@ private:
 	float m_fBeginX;
 
 	int m_iMoveLeftOrRight;
-	int m_iTotalFlashCard;
+	int m_iTotalFlashCardUnlock;
 	int m_iIndexFlashCard;
   
 	FooterNode* m_pFooterNode;

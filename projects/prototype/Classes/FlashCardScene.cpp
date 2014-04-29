@@ -87,7 +87,7 @@ bool FlashCardLayer::init()
 	this->addChild(pLabelTitle);
 
 	char sTotalFlashCard[20];
-	sprintf(sTotalFlashCard, "(%d/%d)", 1, m_chapterInfo.iTotalFlash);
+	sprintf(sTotalFlashCard, "(%d/%d)", 1, m_chapterInfo.iTotalFlashCard);
 	m_pLabelIndex = LabelTTF::create(sTotalFlashCard, "Arial", 30);
 	m_pLabelIndex->setColor(ccc3(0.0f, 0.0f, 0.0f));
 
@@ -101,13 +101,10 @@ bool FlashCardLayer::init()
 	m_pFooterNode->removeBackground();
 	this->addChild(m_pFooterNode);
 
-	if(m_chapterInfo.iCountFlashCardNew > 0)
-	{
-		WordTable::getInstance()->refreshWordsForChapter(m_chapterInfo.sChapterId);
-	}
-
+	WordTable::getInstance()->refreshWordsForChapter(m_chapterInfo.sChapterId);
+	
 	m_Words = WordTable::getInstance()->getAllWordsForChapter(m_chapterInfo.sChapterId);
-	m_iTotalFlashCard = m_chapterInfo.iTotalFlashCardUnlock;
+	m_iTotalFlashCardUnlock = m_chapterInfo.iTotalFlashCardUnlock;
 	m_iIndexFlashCard = 1;
 
 	m_pSlideShow = Node::create();
@@ -163,7 +160,7 @@ void FlashCardLayer::clickButtonLeft(Object* pSender)
 
 void FlashCardLayer::clickButtonRight(Object* pSender)
 {
-	if (m_iIndexFlashCard < m_iTotalFlashCard && m_bMoveLeft == false && m_bMoveRight == false)
+	if (m_iIndexFlashCard < m_iTotalFlashCardUnlock && m_bMoveLeft == false && m_bMoveRight == false)
 	{
 		m_iIndexFlashCard++;
 		auto actionCreateSlideShow = CallFunc::create(this, callfunc_selector(FlashCardLayer::createNodeSlideShow));
@@ -173,7 +170,7 @@ void FlashCardLayer::clickButtonRight(Object* pSender)
 		m_pButtonLeft->setVisible(true);
 	}
 
-	if (m_iIndexFlashCard == m_iTotalFlashCard)
+	if (m_iIndexFlashCard == m_iTotalFlashCardUnlock)
 	{
 		m_pButtonRight->setVisible(false);
 	}
@@ -201,7 +198,7 @@ void FlashCardLayer::onTouchMoved(cocos2d::Touch* pTouch, cocos2d::Event* pEvent
 	Point touchPosition = pTouch->getLocation();
 	m_fXMoved += touchPosition.x - m_fBeginX;
 
-	if ((m_fXMoved > 0 && m_iIndexFlashCard == 1) || (m_fXMoved < 0 && m_iIndexFlashCard == m_iTotalFlashCard))
+	if ((m_fXMoved > 0 && m_iIndexFlashCard == 1) || (m_fXMoved < 0 && m_iIndexFlashCard == m_iTotalFlashCardUnlock))
 	{
 		return;
 	}
@@ -226,7 +223,7 @@ void FlashCardLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent
 {
 	if (m_bIsSwipe)
 	{
-		if ((m_fXMoved > 0 && m_iIndexFlashCard == 1) || (m_fXMoved < 0 && m_iIndexFlashCard == m_iTotalFlashCard))
+		if ((m_fXMoved > 0 && m_iIndexFlashCard == 1) || (m_fXMoved < 0 && m_iIndexFlashCard == m_iTotalFlashCardUnlock))
 		{
 			return;
 		}
@@ -253,7 +250,7 @@ void FlashCardLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent
 	}
 	else
 	{
-		if ((m_fXMoved > 0 && m_iIndexFlashCard != 1) || (m_fXMoved < 0 && m_iIndexFlashCard != m_iTotalFlashCard))
+		if ((m_fXMoved > 0 && m_iIndexFlashCard != 1) || (m_fXMoved < 0 && m_iIndexFlashCard != m_iTotalFlashCardUnlock))
 		{
 			auto actionMove = MoveBy::create(0.2f, Point(-m_fXMoved, 0));
 			m_pSlideShow->runAction(actionMove);
@@ -269,7 +266,7 @@ void FlashCardLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Event* pEvent
 		m_pButtonLeft->setVisible(true);
 	}
 
-	if (m_iIndexFlashCard == m_iTotalFlashCard)
+	if (m_iIndexFlashCard == m_iTotalFlashCardUnlock)
 	{
 		m_pButtonRight->setVisible(false);
 	}
@@ -314,7 +311,7 @@ void FlashCardLayer::createNodeSlideShow()
 
 	
 	// Right
-	if (m_iIndexFlashCard <= m_iTotalFlashCard)
+	if (m_iIndexFlashCard <= m_iTotalFlashCardUnlock)
 	{
 		WordInfo wordInfo = m_Words[m_iIndexFlashCard];
 		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordInfo.sWordId);
@@ -328,7 +325,7 @@ void FlashCardLayer::createNodeSlideShow()
 	}
 
 	char sTotaFlashCard[10];
-	sprintf(sTotaFlashCard, "(%d/%d)", m_iIndexFlashCard, m_chapterInfo.iTotalFlash);
+	sprintf(sTotaFlashCard, "(%d/%d)", m_iIndexFlashCard, m_chapterInfo.iTotalFlashCard);
 	m_pLabelIndex->setString(sTotaFlashCard);
 
 	m_pSlideShow->setAnchorPoint(Point(0.0f, 0.0f));

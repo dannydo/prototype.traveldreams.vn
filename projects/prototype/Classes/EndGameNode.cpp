@@ -191,15 +191,6 @@ bool EndGameNode::initWin()
 	const std::string sWordId = GameWordManager::getInstance()->GetWordIdFromWord(m_mainWord);
 	WordInfo wordInfo = WordTable::getInstance()->getWordInfoOnChapter(m_levelInfo.sChapterId, sWordId);
 
-	if (wordInfo.bIsNew == false && wordInfo.iCountCollected <= 1)
-	{
-		m_chapterInfo.iCountFlashCardNew++;
-		m_chapterInfo.iTotalFlashCardUnlock++;
-
-		wordInfo.bIsNew = true;
-		wordInfo.iOrderUnlock = m_chapterInfo.iTotalFlashCardUnlock;
-	}
-
 	wordInfo.iCountCollected++;
 	WordTable::getInstance()->updateWord(wordInfo);
 	ChapterTable::getInstance()->updateChapter(m_chapterInfo);
@@ -332,10 +323,7 @@ void EndGameNode::sequenceUpdateStar()
 	}
 	else
 	{
-		if (m_iBonusQuestCompleted > 0 && m_iTotalBonusQuest > 0)
-		{
-			this->sequenceUpdateBonusQuest();
-		}
+		this->sequenceUpdateBonusQuest();
 	}
 }
 

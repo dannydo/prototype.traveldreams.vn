@@ -129,8 +129,8 @@ bool LevelTable::updateLevel(const LevelInfo& levelInfo)
 	wordInfo.sChapterId = wordInfo.sChapterId;
 	wordInfo.iCountCollected = 1;
 	wordInfo.iMapChapterWordId = 0;
-	wordInfo.iOrderUnlock = 0;
-	wordInfo.bIsNew = 0;
+	wordInfo.bIsCollected = 0;
+	wordInfo.uTimeBeginPlayMiniGame = 0;
 	WordTable::getInstance()->insertWord(wordInfo);
 
 	return true;

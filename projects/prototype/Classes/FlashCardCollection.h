@@ -34,6 +34,7 @@ private:
 	float m_fYMoved;
 	float m_maxHeight;
 	bool m_bIsSwipe;
+	int m_iWordPlayMiniGame;
 };
 
 class FlashCardCollectionScene : public cocos2d::CCScene

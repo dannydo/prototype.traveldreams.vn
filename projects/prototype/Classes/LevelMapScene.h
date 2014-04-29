@@ -17,7 +17,7 @@ public:
 	CREATE_FUNC(LevelMapLayer);
 
 	void showPopupEndGameLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId);
-	void showPopupEndGameWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId, const int& iYellowStar);
+	void showPopupEndGameWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId, const int& iYellowStar, const int& iBonusQuestCompleted);
 	void showPopupQuitLevelFailed( const int& iCurrentLevel, const std::string sChapterId);
 
 private:
