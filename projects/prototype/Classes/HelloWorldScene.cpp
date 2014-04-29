@@ -1693,7 +1693,7 @@ void HelloWorld::CheckHintAfterMove()
 {
 	if (!m_GameBoardManager.findHintForGame())
 	{
-		m_GameBoardManager.Shuffle();
+		//m_GameBoardManager.Shuffle();
 		MessageBox("Notice", "No more move! SHUFFLE!!!... Sorry, not implemented yet!");
 	}
 }

@@ -3943,6 +3943,9 @@ bool NewGameBoardManager::Shuffle()
 			else if (m_BoardValueMatrix[iRow][iColumn].m_bIsDragLocalWall)
 				bNewBlock = true;
 		}
+
+		if (bIsSuccessful)
+			break;
 	}
 
 
@@ -3965,7 +3968,10 @@ bool NewGameBoardManager::Shuffle()
 				else if (m_BoardValueMatrix[iRow][iColumn].m_bIsDragLocalWall)
 					bNewBlock = true;
 			}
-		}		
+		}	
+
+		if (bIsSuccessful)
+			break;
 	}
 
 	return bIsSuccessful;
