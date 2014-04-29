@@ -220,7 +220,7 @@ ButtonNode* MiniGameLayer::createButtonPictureFlashcard(const WordInfo& wordInfo
 	sPath.append(word3.m_sFlashCardImage);
 
 	Sprite* pFlashCardImage = Sprite::create(sPath.c_str());
-	pFlashCardImage->setScale(0.6f);
+	pFlashCardImage->setScale(0.5f);
 	pFlashCardImage->setPosition(Point(109.0f, 78.5f));
 
 	Sprite* pBackground = Sprite::create("FlashCard/answer.png");
