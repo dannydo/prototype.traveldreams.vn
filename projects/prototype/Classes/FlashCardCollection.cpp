@@ -119,7 +119,7 @@ bool FlashCardCollectionLayer::init()
 		ChapterInfo chapterInfo = m_chapters[iIndex];
 		if(chapterInfo.bIsUnlock)
 		{
-			int iTotalFlashcardUnlock = WordTable::getInstance()->getTotalWordInfoCollectedForChapter(chapterInfo.sChapterId);
+			int iTotalFlashcardUnlock = chapterInfo.iTotalFlashCardUnlock;
 			if (iTotalFlashcardUnlock > 0)
 			{
 				Sprite* pBackgroundItem = Sprite::create("FlashCard/panel_flashcard_chapter.png");

@@ -8,6 +8,7 @@
 #include "ButtonNode.h"
 #include "GameDataStructure.h"
 #include "Database\WordTable.h"
+#include "HeaderNode.h"
 
 #define _GIFT_COIN_ 100
 
@@ -42,6 +43,8 @@ private:
 
 	cocos2d::Node* m_pChooseImageNode;
 	WordInfo m_MaintWordInfo;
+
+	HeaderNode* m_pHeaderNode;
 
 	int m_iIndexWordNewCount;
 	int m_iIndexWordNew;

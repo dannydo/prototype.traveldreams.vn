@@ -129,8 +129,7 @@ std::string	ChapterTable::syncGetChapters()
 		sJsonData.appendWithFormat("\"IsUnlock\": %s,", re[iRow*nColumn+3]);
 		sJsonData.appendWithFormat("\"Version\": %s,", re[iRow*nColumn+4]);
 		sJsonData.appendWithFormat("\"TotalFlashCardUnlock\": %s,", re[iRow*nColumn+5]);
-		sJsonData.appendWithFormat("\"TotalFlashCard\": %s,", re[iRow*nColumn+6]);
-		sJsonData.appendWithFormat("\"CountFlashCardNew\": %s", "0");
+		sJsonData.appendWithFormat("\"TotalFlashCard\": %s", re[iRow*nColumn+6]);
 
 		if (iRow == nRow)
 			sJsonData.append("}");

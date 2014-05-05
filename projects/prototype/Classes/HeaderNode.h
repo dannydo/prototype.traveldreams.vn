@@ -12,9 +12,13 @@ public:
 	bool init() override; 
 	CREATE_FUNC(HeaderNode);
 
+	void updateLayoutMonney(const int& iMonney);
+
 private:
 	void clickBuyGold(cocos2d::Object* sender);
 	void clickMail(cocos2d::Object* sender);
+
+	cocos2d::LabelBMFont* m_pLabelGold;
 };
 
 #endif;

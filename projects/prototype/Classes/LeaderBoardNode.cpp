@@ -68,14 +68,21 @@ bool LeaderBoardtNode::init()
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
 	if (userInfo.sFacebookId != "" && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) == 1 && FacebookManager::getInstance()->isLogined())
 	{
-		int iCalLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
 		UserService::getInstance()->addCallBackList(this);
 		m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
 		m_iConnectServer++;
 		UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
-		UserService::getInstance()->getLeaderBoardLevel(iCalLevel + m_iLevel, m_iConnectServer);
+		UserService::getInstance()->getLeaderBoardLevel(m_sChapterId ,m_iLevel, m_iConnectServer);
 	}
 #endif
+
+	/*
+	UserService::getInstance()->addCallBackList(this);
+	m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
+	m_iConnectServer++;
+	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
+	UserService::getInstance()->getLeaderBoardLevel(m_sChapterId ,m_iLevel, m_iConnectServer);
+	*/
 
 	m_bIsSwipe = false;
 

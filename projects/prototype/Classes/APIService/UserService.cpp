@@ -63,13 +63,14 @@ void UserService::checkUserFacebook(const std::string strAccessToken, const int&
 	m_pRequest = NULL;
 }
 
-void UserService::getLeaderBoardLevel(const int& iLevel, const int& iTag)
+void UserService::getLeaderBoardLevel(const std::string& sChapterId, const int& iLevel, const int& iTag)
 {
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
 	String strURL = _CONSTANT_URL_;
-	strURL.append("api/getLeaderBoardLevel/");
+	strURL.append("api/getLeaderBoard/");
+	strURL.appendWithFormat("%s/", sChapterId.c_str());
 	strURL.appendWithFormat("%d/", iLevel);
-	strURL.append(userInfo.sFacebookToken);
+	strURL.append(userInfo.sFacebookId);
 
 	m_pRequest = new HttpRequest();
 	m_pRequest->setUrl(strURL.getCString());

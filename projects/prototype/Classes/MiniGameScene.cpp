@@ -1,6 +1,5 @@
 #include "MiniGameScene.h"
 #include "FooterNode.h"
-#include "HeaderNode.h"
 #include "SettingMenuNode.h"
 #include "FunctionCommon.h"
 #include "GameWordManager.h"
@@ -68,8 +67,8 @@ bool MiniGameLayer::init()
 	pFooterNode->removeBackground();
 	this->addChild(pFooterNode);
 
-	HeaderNode* pHeaderNode = HeaderNode::create();
-	this->addChild(pHeaderNode);
+	m_pHeaderNode = HeaderNode::create();
+	this->addChild(m_pHeaderNode);
 
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kFlashCard);
 
@@ -296,6 +295,8 @@ void MiniGameLayer::clickChoosePicture(Object* sender)
 
 void MiniGameLayer::clickCollect(Object* sender)
 {
+	m_pHeaderNode->updateLayoutMonney(UserTable::getInstance()->getUserInfo().iMonney);
+
 	auto actionplayEffectAddLayout = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddLayout));
 	auto actionplayEffectCollect = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectCollect));
 
@@ -331,6 +332,14 @@ void MiniGameLayer::playEffectWin()
 
 	m_MaintWordInfo.bIsCollected = true;
 	WordTable::getInstance()->updateWord(m_MaintWordInfo);
+
+	ChapterInfo chapterInfo = ChapterTable::getInstance()->getChapterInfo(m_MaintWordInfo.sChapterId);
+	chapterInfo.iTotalFlashCardUnlock++;
+	if (chapterInfo.iTotalFlashCardUnlock > chapterInfo.iTotalFlashCard)
+	{
+		chapterInfo.iTotalFlashCardUnlock = chapterInfo.iTotalFlashCard;
+	}
+	ChapterTable::getInstance()->updateChapter(chapterInfo);
 
 	m_pFlashCard->removeButtonManageQuestion();
 

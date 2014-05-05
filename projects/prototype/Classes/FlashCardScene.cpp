@@ -106,6 +106,9 @@ bool FlashCardLayer::init()
 	m_iTotalFlashCardUnlock = m_WordsCollected.size();
 	m_iIndexFlashCard = 1;
 
+	m_chapterInfo.iTotalFlashCardUnlock = m_iTotalFlashCardUnlock;
+	ChapterTable::getInstance()->updateChapter(m_chapterInfo);
+
 	m_pSlideShow = Node::create();
 	m_pSlideShow->setContentSize(CCSizeMake(640.0f, 800));
 	m_pSlideShow->setAnchorPoint(Point(0.0f, 0.0f));

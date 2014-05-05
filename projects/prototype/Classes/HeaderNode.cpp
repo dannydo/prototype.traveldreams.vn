@@ -38,9 +38,9 @@ bool HeaderNode::init()
 
 	char sGold[10];
 	sprintf(sGold, "%d", userInfo.iMonney);
-	LabelBMFont* pLabelGold = LabelBMFont::create(sGold, "fonts/font_small_alert.fnt");
-	pLabelGold->setPosition(Point(130.0f, 29.0f));
-	pGoldSprite->addChild(pLabelGold);
+	m_pLabelGold = LabelBMFont::create(sGold, "fonts/font_small_alert.fnt");
+	m_pLabelGold->setPosition(Point(130.0f, 29.0f));
+	pGoldSprite->addChild(m_pLabelGold);
 
 	Sprite* pMailSprite = Sprite::create("Footer/icon_mail.png");
 	ButtonNode* pButtonMail = ButtonNode::createButtonSprite(pMailSprite, CC_CALLBACK_1(HeaderNode::clickMail, this));
@@ -82,4 +82,11 @@ void HeaderNode::clickBuyGold(cocos2d::Object* sender)
 void HeaderNode::clickMail(cocos2d::Object* sender)
 {
 
+}
+
+void HeaderNode::updateLayoutMonney(const int& iMonney)
+{
+	char sGold[10];
+	sprintf(sGold, "%d", iMonney);
+	m_pLabelGold->setString(sGold);
 }
