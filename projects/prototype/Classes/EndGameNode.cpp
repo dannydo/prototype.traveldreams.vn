@@ -443,6 +443,9 @@ void EndGameNode::menuRetryLevelWinCallBack(Object* sender)
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
 	pGameWordManager->GenerateWordForNewLevel(m_sChapterId, m_iCurrentLevel);
 
+	LevelMapScene* pLevelMapScene = (LevelMapScene*)Director::getInstance()->getRunningScene();
+	pLevelMapScene->getLayer()->updateLayoutWordMapWhenRetryLevelWin(m_iCurrentLevel, m_sChapterId);
+	
 	GameTargetNode* pGameTargetNode = GameTargetNode::createLayout(pGameWordManager->GetMainWord(), m_iCurrentLevel, m_sChapterId);
 	this->getParent()->addChild(pGameTargetNode, 10);
 	this->getParent()->removeChild(this);

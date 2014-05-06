@@ -23,6 +23,7 @@ public:
 	void showPopupQuitLevelFailed( const int& iCurrentLevel, const std::string sChapterId);
 
 	void playEffectUnlockLevel(const bool& bPlayNextLevelGame, const int& iCurrentLevel, const std::string sChapterId);
+	void updateLayoutWordMapWhenRetryLevelWin(const int& iCurrentLevel, const std::string sChapterId);
 
 private:
 	bool onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
