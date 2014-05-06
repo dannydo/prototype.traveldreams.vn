@@ -5,7 +5,7 @@
 ;number of color
 6
 ;score of stars
-16000	18000	20000
+12000	14000	16000
 ;map matrix
 1	0	1	1	1	1	0	1
 0	0	1	1	1	1	0	0

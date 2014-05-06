@@ -3886,12 +3886,13 @@ bool NewGameBoardManager::IsColorCell(const int& iRow, const int& iColumn)
 	return false;
 }
 
-bool NewGameBoardManager::Shuffle()
+bool NewGameBoardManager::Shuffle(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells)
 {
 	memset( m_TotalCountPerGemIDList, 0, sizeof(m_TotalCountPerGemIDList));
 	memset( m_ShufflableCountPerGemIDList, 0, sizeof(m_ShufflableCountPerGemIDList));
 
-	m_ShuffleSoutionList.clear();
+	m_ShuffleSolutionList.clear();
+	m_NotGoodShuffleSolutionList.clear();
 
 	int iRow, iColumn;
 	for(iRow =0; iRow < m_iRowNumber; iRow++)
@@ -3910,13 +3911,20 @@ bool NewGameBoardManager::Shuffle()
 	// check whether there's at least 1 color that have at leat 3 gems
 	bool bGemsPerColorAllNotEnough = true;
 	int iGemID;
+	m_iOneGemIDHasAtLeast3Gems = -1;
 	for(iGemID=0; iGemID < _MAX_GEM_ID_; iGemID++)
 	{
 		if (m_TotalCountPerGemIDList[iGemID] >=3)
 		{
-			bGemsPerColorAllNotEnough = false;
-			break;
-		}
+			bGemsPerColorAllNotEnough = false;			
+			//break;
+
+			if (m_ShufflableCountPerGemIDList[iGemID] >= 3)
+			{
+				m_iOneGemIDHasAtLeast3Gems = iGemID;
+				break;
+			}
+		}		
 	}
 
 	if (bGemsPerColorAllNotEnough) //all gems per color < 3 ==> cant shuffle
@@ -3924,7 +3932,7 @@ bool NewGameBoardManager::Shuffle()
 
 	// start find shuffle solution horizontal
 	bool bNewBlock;
-	bool bIsSuccessful = false;
+	bool bIsSuccessful = false, bIsEndSearching = false;
 
 	for(iRow= 0; iRow < m_iRowNumber; iRow++)
 	{
@@ -3938,18 +3946,23 @@ bool NewGameBoardManager::Shuffle()
 				bNewBlock = false;
 
 				if (bIsSuccessful)
-					break;
+					if (m_NotGoodShuffleSolutionList.size() + m_ShuffleSolutionList.size() >= 3)
+						break;
 			}
 			else if (m_BoardValueMatrix[iRow][iColumn].m_bIsDragLocalWall)
 				bNewBlock = true;
 		}
 
 		if (bIsSuccessful)
-			break;
+			if (m_NotGoodShuffleSolutionList.size() + m_ShuffleSolutionList.size() >= 3)
+			{
+				bIsEndSearching = true;
+				break;
+			}
 	}
 
 
-	if (!bIsSuccessful)
+	if (!bIsEndSearching)
 	{
 		for(iColumn =0; iColumn < m_iColumnNumber; iColumn++)
 		{
@@ -3963,15 +3976,140 @@ bool NewGameBoardManager::Shuffle()
 					bNewBlock = false;
 
 					if (bIsSuccessful)
-					break;
+						if (m_NotGoodShuffleSolutionList.size() + m_ShuffleSolutionList.size() >= 3)
+							break;
 				}
 				else if (m_BoardValueMatrix[iRow][iColumn].m_bIsDragLocalWall)
 					bNewBlock = true;
 			}
-		}	
 
-		if (bIsSuccessful)
-			break;
+			if (bIsSuccessful)
+				if (m_NotGoodShuffleSolutionList.size() + m_ShuffleSolutionList.size() >= 3)
+				{
+					bIsEndSearching = true;
+					break;
+				}
+		}	
+		
+	}
+
+	bIsSuccessful = false;
+
+	if (m_NotGoodShuffleSolutionList.size() + m_ShuffleSolutionList.size() > 0)
+	{
+		bIsSuccessful = true;
+
+		originalMovedCells.clear();
+		targetMovedCells.clear();
+
+		ShuffleSolution chosenSolution;
+		std::vector<Cell> originalSolutionCells, targetSolutionCells;
+
+		if ( m_ShuffleSolutionList.size() > 0)
+			chosenSolution = m_ShuffleSolutionList[rand() % m_ShuffleSolutionList.size()];
+		else if (m_NotGoodShuffleSolutionList.size() > 0)
+			chosenSolution = m_NotGoodShuffleSolutionList[rand() % m_NotGoodShuffleSolutionList.size()];
+
+
+		int iCountOfMovableSolutionCells = 0; 
+		for(int i=0; i < 3; i++)
+			if (IsCellShufflable(chosenSolution.m_CellList[i].m_iRow, chosenSolution.m_CellList[i].m_iColumn))
+			{
+				iCountOfMovableSolutionCells++;
+				targetSolutionCells.push_back( chosenSolution.m_CellList[i]);
+			}
+
+		// now, after we have the solution, we should try the real shuffle
+		// first, extract cells + their colors ==> priority for solution's color		
+		int iCountOfMovableSolutionCellsRemain = iCountOfMovableSolutionCells;
+		
+		int iIndex;
+		bool bIsInSolutionCells;
+		for(iRow= 0; iRow < m_iRowNumber; iRow++)		
+			for(iColumn =0; iColumn < m_iColumnNumber; iColumn++)
+			{
+				if (IsCellShufflable(iRow, iColumn))
+				{										
+					if (m_BoardValueMatrix[iRow][iColumn].m_iGemID == chosenSolution.m_iGemID && iCountOfMovableSolutionCellsRemain>0)
+					{
+						originalSolutionCells.push_back( Cell(iRow, iColumn));
+						iCountOfMovableSolutionCellsRemain--;
+					}
+					else
+					{
+						bIsInSolutionCells = false;
+						for(int iIndex=0; iIndex < 3; iIndex++)
+							if (chosenSolution.m_CellList[iIndex].m_iRow == iRow &&  chosenSolution.m_CellList[iIndex].m_iColumn == iColumn)
+							{
+								bIsInSolutionCells = true;
+								break;
+							}
+						if (bIsInSolutionCells)
+						continue;
+
+						originalMovedCells.push_back( Cell(iRow, iColumn));
+					}
+				}
+			}
+
+		std::vector<int> shuffleIndexList;
+		int iListSize  = originalMovedCells.size(), iRandomIndex, iTemp;
+		for(iIndex =0; iIndex < iListSize; iIndex++)
+			shuffleIndexList.push_back(iIndex);
+
+		for(iIndex =0; iIndex < iListSize; iIndex++)
+		{
+			iRandomIndex = iIndex + (rand() % (iListSize-iIndex));
+			iTemp = shuffleIndexList[iRandomIndex];
+			shuffleIndexList[iRandomIndex] = shuffleIndexList[iIndex];
+			shuffleIndexList[iIndex] = iTemp;
+		}
+
+		for(iIndex =0; iIndex < iListSize; iIndex++)
+			targetMovedCells.push_back( originalMovedCells[shuffleIndexList[iIndex]]);
+		
+		//check whether there's cells appear in both originalSolutionCells and targetSolutionCells		
+		while(true)
+		{
+			int i,j, iDuplicateIndex1 = -1, iDuplicateIndex2 = -1;
+			for(i=0; i< originalSolutionCells.size(); i++)
+				for(j=0; j< targetSolutionCells.size(); j++)
+					if (originalSolutionCells[i] == targetSolutionCells[j])
+					{
+						iDuplicateIndex1 = i;
+						iDuplicateIndex2 = j;
+					}
+			if (iDuplicateIndex1 >=0)
+			{
+				originalSolutionCells[iDuplicateIndex1] = originalSolutionCells[originalSolutionCells.size()-1];
+				originalSolutionCells.pop_back();
+				targetSolutionCells[iDuplicateIndex2] = targetSolutionCells[targetSolutionCells.size()-1];
+				targetSolutionCells.pop_back();
+			}
+			else
+				break;
+		}
+
+		// add soluton cells to list		
+		originalMovedCells.insert(originalMovedCells.end(), originalSolutionCells.begin(), originalSolutionCells.end());
+		targetMovedCells.insert(targetMovedCells.end(), targetSolutionCells.begin(), targetSolutionCells.end());
+
+		originalMovedCells.insert(originalMovedCells.end(), targetSolutionCells.begin(), targetSolutionCells.end());
+		targetMovedCells.insert(targetMovedCells.end(), originalSolutionCells.begin(), originalSolutionCells.end());
+		
+
+		// update board value
+		iListSize = originalMovedCells.size();
+
+		for(iIndex =0; iIndex < iListSize; iIndex++)
+		{
+			m_TemporaryValueMatrix[originalMovedCells[iIndex].m_iRow][originalMovedCells[iIndex].m_iColumn] = m_BoardValueMatrix[originalMovedCells[iIndex].m_iRow][originalMovedCells[iIndex].m_iColumn];
+		}
+
+		for(iIndex =0; iIndex < iListSize; iIndex++)
+		{
+			m_BoardValueMatrix[targetMovedCells[iIndex].m_iRow][targetMovedCells[iIndex].m_iColumn] = m_TemporaryValueMatrix[originalMovedCells[iIndex].m_iRow][originalMovedCells[iIndex].m_iColumn];
+		}
 	}
 
 	return bIsSuccessful;
@@ -4076,22 +4214,17 @@ bool NewGameBoardManager::tryShuffleInRegionOfRow(const int& iRow, const int& iC
 						solution.m_CellList[2] = Cell(iRow2, iColumnIndex);
 						solution.m_iGemID = iRestrictedGemID;
 						
-						m_ShuffleSoutionList.push_back(solution);
+						if (candidateCell.m_iColumn == iColumnIndex)
+							m_NotGoodShuffleSolutionList.push_back(solution);
+						else
+							m_ShuffleSolutionList.push_back(solution);
 
 						bIsValidSolution = true;
 					}
 			}
 			else
-			{	
-				bool bExistAColorHas3FreeGem =false;
-				int iGemID = -1;
-				for(int iTemp=0; iTemp < _MAX_GEM_ID_; iTemp++)
-					if (m_ShufflableCountPerGemIDList[iTemp] >= 3)
-					{
-						iGemID = iTemp;
-						bExistAColorHas3FreeGem = true;
-						break;
-					}
+			{					
+				int iCandidateGemID = m_iOneGemIDHasAtLeast3Gems;				
 
 				bool bHasMatchColorCell=false, bFoundFreeCell =false;
 				Cell candidateCell;
@@ -4103,10 +4236,10 @@ bool NewGameBoardManager::tryShuffleInRegionOfRow(const int& iRow, const int& iC
 						{
 							bHasMatchColorCell = true;
 							candidateCell = Cell(iRow, iCheckColumn);
-							iGemID = m_BoardValueMatrix[iRow][iCheckColumn].m_iGemID;
+							iCandidateGemID = m_BoardValueMatrix[iRow][iCheckColumn].m_iGemID;
 							break;							
 						}
-						else if (bExistAColorHas3FreeGem)//free cell
+						else if (iCandidateGemID >=0) //bExistAColorHas3FreeGem)//free cell
 						{						
 							//iFreeCellCount++;
 							bFoundFreeCell = true;
@@ -4121,9 +4254,12 @@ bool NewGameBoardManager::tryShuffleInRegionOfRow(const int& iRow, const int& iC
 					solution.m_CellList[0] = candidateCell;
 					solution.m_CellList[1] = Cell(iRow1, iColumnIndex);
 					solution.m_CellList[2] = Cell(iRow2, iColumnIndex);
-					solution.m_iGemID = iGemID;
+					solution.m_iGemID = iCandidateGemID;
 						
-					m_ShuffleSoutionList.push_back(solution);
+					if (candidateCell.m_iColumn == iColumnIndex)
+						m_NotGoodShuffleSolutionList.push_back(solution);
+					else
+						m_ShuffleSolutionList.push_back(solution);
 
 					bIsValidSolution = true;
 				}
@@ -4134,7 +4270,112 @@ bool NewGameBoardManager::tryShuffleInRegionOfRow(const int& iRow, const int& iC
 				break;
 
 		}
+
+		if (m_NotGoodShuffleSolutionList.size() + m_ShuffleSolutionList.size() >= 3)
+			break;
 	}
+
+	// if no solution was found yet ==> try special method on column/row region ==> when we drag, we can move separate cells (divided by wall) to make them connect if there's enough free block
+	if (m_NotGoodShuffleSolutionList.size() + m_ShuffleSolutionList.size() == 0)
+	{		
+		int iColumnIndex, iCurrentBlockLength = 0, iFirstBlockLength, iLastBlockLength;
+		for( iColumnIndex = iMinColumn; iColumnIndex <= iMaxColumn; iColumnIndex++)
+		{
+			if (m_BoardValueMatrix[iRow][iColumnIndex].m_bIsBlankCell)
+			{
+				iCurrentBlockLength = 0;				
+			}
+			else {
+				iCurrentBlockLength++;
+				if (iCurrentBlockLength >= 3)
+				{					
+					break;
+				}
+			}
+		}		
+		
+		if (iCurrentBlockLength >= 3)
+		{
+			// now we should find position to place solution cells
+			// that's begin a can-be-fragment-by-wall-but-not-shufflable-gems continuous cells (even shufflable gems is valid if there'e enough gems have the same color
+			int iPreviousColorGemColumn, iNextColorGemColumn; // on current checked row region
+			for( iColumnIndex = iMinColumn; iColumnIndex <= iMaxColumn; iColumnIndex++)
+			{
+				if (IsColorCell( iRow, iColumnIndex))				
+				{
+					// find previous color cell
+					iPreviousColorGemColumn = iMinColumn + (iColumnIndex -1 - iMinColumn + iBlockLength) % iBlockLength ;
+					while(!IsColorCell( iRow, iPreviousColorGemColumn))
+					{
+						iPreviousColorGemColumn = iMinColumn + (iPreviousColorGemColumn -1 - iMinColumn + iBlockLength) % iBlockLength ;
+					}
+
+					if (iPreviousColorGemColumn == iColumnIndex)
+						continue;
+
+					// find next color cell					
+					iNextColorGemColumn = iMinColumn + (iColumnIndex +1 - iMinColumn + iBlockLength) % iBlockLength ;
+					while(!IsColorCell( iRow, iNextColorGemColumn))
+					{
+						iNextColorGemColumn = iMinColumn + (iNextColorGemColumn +1 - iMinColumn + iBlockLength) % iBlockLength ;
+					}
+
+					if (iNextColorGemColumn == iColumnIndex)
+						continue;
+
+					// if 2 of 3 of these cells are unshufflable but color are not matched ==> fail
+					bool bHasRestrictColor = false;
+					int iRestrictedGemID = -1;
+					int iRestrictedGemCount = 0;
+					bool bIsSolutionSuccess = true;
+
+					ShuffleSolution solution;
+					solution.m_CellList[0] = Cell(iRow, iColumnIndex);
+					solution.m_CellList[1] = Cell(iRow, iPreviousColorGemColumn);
+					solution.m_CellList[2] = Cell(iRow, iNextColorGemColumn);
+
+					for(int i=0; i< 3; i++)
+						if (!IsCellShufflable( solution.m_CellList[i].m_iRow, solution.m_CellList[i].m_iColumn))
+						{
+							if (!bHasRestrictColor)
+							{
+								bHasRestrictColor = true;
+								iRestrictedGemID = m_BoardValueMatrix[solution.m_CellList[i].m_iRow][ solution.m_CellList[i].m_iColumn].m_iGemID;
+								iRestrictedGemCount = 1;
+							}
+							else if ( iRestrictedGemID == m_BoardValueMatrix[solution.m_CellList[i].m_iRow][ solution.m_CellList[i].m_iColumn].m_iGemID)
+							{
+								iRestrictedGemCount++;
+							}
+							else //this solution is failed
+							{
+								bIsSolutionSuccess = false;
+							}
+						}
+
+					if (bIsSolutionSuccess)
+					{						
+						if (m_ShufflableCountPerGemIDList[iRestrictedGemID] + iRestrictedGemCount < 3)
+							bIsSolutionSuccess = false;
+					}
+
+					if (bIsSolutionSuccess)
+					{
+						if (bHasRestrictColor)
+							solution.m_iGemID = iRestrictedGemID;
+						else
+							solution.m_iGemID = m_iOneGemIDHasAtLeast3Gems;
+
+						if (iPreviousColorGemColumn== iColumnIndex-1 && iNextColorGemColumn== iColumnIndex+1)
+							m_NotGoodShuffleSolutionList.push_back(solution);
+						else
+							m_ShuffleSolutionList.push_back(solution);
+					}
+				}
+			}
+		}
+	}
+
 
 	return false;
 }
@@ -4240,23 +4481,18 @@ bool NewGameBoardManager::tryShuffleInRegionOfColumn(const int& iRowX, const int
 						solution.m_CellList[2] = Cell(iRowIndex, iColumn2);
 						solution.m_iGemID = iRestrictedGemID;
 						
-						m_ShuffleSoutionList.push_back(solution);
+						if (candidateCell.m_iRow == iRowIndex)
+							m_NotGoodShuffleSolutionList.push_back(solution);
+						else
+							m_ShuffleSolutionList.push_back(solution);
 
 						bIsValidSolution = true;
 					}
 			}
 			else
-			{	
-				bool bExistAColorHas3FreeGem =false;
-				int iGemID = -1;
-				for(int iTemp=0; iTemp < _MAX_GEM_ID_; iTemp++)
-					if (m_ShufflableCountPerGemIDList[iTemp] >= 3)
-					{
-						iGemID = iTemp;
-						bExistAColorHas3FreeGem = true;
-						break;
-					}
-
+			{					
+				int iCandidateGemID = m_iOneGemIDHasAtLeast3Gems;
+				
 				bool bHasMatchColorCell=false, bFoundFreeCell =false;
 				Cell candidateCell;
 				
@@ -4267,10 +4503,10 @@ bool NewGameBoardManager::tryShuffleInRegionOfColumn(const int& iRowX, const int
 						{
 							bHasMatchColorCell = true;
 							candidateCell = Cell(iRowIndex, iCheckRow);
-							iGemID = m_BoardValueMatrix[iCheckRow][iColumn].m_iGemID;
+							iCandidateGemID = m_BoardValueMatrix[iCheckRow][iColumn].m_iGemID;
 							break;							
 						}
-						else if (bExistAColorHas3FreeGem)//free cell
+						else if (iCandidateGemID >=0) //bExistAColorHas3FreeGem)//free cell
 						{						
 							//iFreeCellCount++;
 							bFoundFreeCell = true;
@@ -4285,9 +4521,12 @@ bool NewGameBoardManager::tryShuffleInRegionOfColumn(const int& iRowX, const int
 					solution.m_CellList[0] = candidateCell;
 					solution.m_CellList[1] = Cell(iRowIndex, iColumn1);
 					solution.m_CellList[2] = Cell(iRowIndex, iColumn2);
-					solution.m_iGemID = iGemID;
+					solution.m_iGemID = iCandidateGemID;
 						
-					m_ShuffleSoutionList.push_back(solution);
+					if (candidateCell.m_iRow == iRowIndex)
+						m_NotGoodShuffleSolutionList.push_back(solution);
+					else
+						m_ShuffleSolutionList.push_back(solution);
 
 					bIsValidSolution = true;
 				}
@@ -4297,7 +4536,113 @@ bool NewGameBoardManager::tryShuffleInRegionOfColumn(const int& iRowX, const int
 			if (bIsValidSolution)
 				break;
 		}
+
+		if (m_NotGoodShuffleSolutionList.size() + m_ShuffleSolutionList.size() >= 3)
+			break;
 	}
+	
+
+	// if no solution was found yet ==> try special method on column/row region ==> when we drag, we can move separate cells (divided by wall) to make them connect if there's enough free block
+	if (m_NotGoodShuffleSolutionList.size() + m_ShuffleSolutionList.size() == 0)
+	{		
+		int iRowIndex, iCurrentBlockLength = 0, iFirstBlockLength, iLastBlockLength;
+		for( iRowIndex = iMinRow; iRowIndex <= iMaxRow; iRowIndex++)
+		{
+			if (m_BoardValueMatrix[iRowIndex][iColumn].m_bIsBlankCell)
+			{
+				iCurrentBlockLength = 0;				
+			}
+			else {
+				iCurrentBlockLength++;
+				if (iCurrentBlockLength >= 3)
+				{					
+					break;
+				}
+			}
+		}		
+		
+		if (iCurrentBlockLength >= 3)
+		{			
+			// now we should find position to place solution cells
+			// that's begin a can-be-fragment-by-wall-but-not-shufflable-gems continuous cells (even shufflable gems is valid if there'e enough gems have the same color
+			int iPreviousColorGemRow, iNextColorGemRow; // on current checked row region
+			for( iRowIndex = iMinRow; iRowIndex <= iMaxRow; iRowIndex++)
+			{
+				if (IsColorCell( iRowIndex, iColumn))				
+				{
+					// find previous color cell
+					iPreviousColorGemRow = iMinRow + (iRowIndex -1 - iMinRow + iBlockLength) % iBlockLength ;
+					while(!IsColorCell( iPreviousColorGemRow, iColumn))
+					{
+						iPreviousColorGemRow = iMinRow + (iPreviousColorGemRow -1 - iMinRow + iBlockLength) % iBlockLength ;
+					}
+
+					if (iPreviousColorGemRow == iRowIndex)
+						continue;
+
+					// find next color cell					
+					iNextColorGemRow = iMinRow + (iRowIndex +1 - iMinRow + iBlockLength) % iBlockLength ;
+					while(!IsColorCell( iNextColorGemRow , iColumn))
+					{
+						iNextColorGemRow = iMinRow + (iNextColorGemRow +1 - iMinRow + iBlockLength) % iBlockLength ;
+					}
+
+					if (iNextColorGemRow == iRowIndex)
+						continue;
+
+					// if 2 of 3 of these cells are unshufflable but color are not matched ==> fail
+					bool bHasRestrictColor = false;
+					int iRestrictedGemID = -1;
+					int iRestrictedGemCount = 0;
+					bool bIsSolutionSuccess = true;
+
+					ShuffleSolution solution;
+					solution.m_CellList[0] = Cell( iRowIndex, iColumn);
+					solution.m_CellList[1] = Cell( iPreviousColorGemRow, iColumn);
+					solution.m_CellList[2] = Cell( iNextColorGemRow, iColumn);
+
+					for(int i=0; i< 3; i++)
+						if (!IsCellShufflable( solution.m_CellList[i].m_iRow, solution.m_CellList[i].m_iColumn))
+						{
+							if (!bHasRestrictColor)
+							{
+								bHasRestrictColor = true;
+								iRestrictedGemID = m_BoardValueMatrix[solution.m_CellList[i].m_iRow][ solution.m_CellList[i].m_iColumn].m_iGemID;
+								iRestrictedGemCount = 1;
+							}
+							else if ( iRestrictedGemID == m_BoardValueMatrix[solution.m_CellList[i].m_iRow][ solution.m_CellList[i].m_iColumn].m_iGemID)
+							{
+								iRestrictedGemCount++;
+							}
+							else //this solution is failed
+							{
+								bIsSolutionSuccess = false;
+							}
+						}
+
+					if (bIsSolutionSuccess)
+					{						
+						if (m_ShufflableCountPerGemIDList[iRestrictedGemID] + iRestrictedGemCount < 3)
+							bIsSolutionSuccess = false;
+					}
+
+					if (bIsSolutionSuccess)
+					{
+						if (bHasRestrictColor)
+							solution.m_iGemID = iRestrictedGemID;
+						else
+							solution.m_iGemID = m_iOneGemIDHasAtLeast3Gems;
+
+						if (iPreviousColorGemRow== iRowIndex-1 && iNextColorGemRow == iRowIndex+1)
+							m_NotGoodShuffleSolutionList.push_back(solution);
+						else
+							m_ShuffleSolutionList.push_back(solution);
+					}
+				}
+			}
+		}
+	}
+
 
 	return false;
 }

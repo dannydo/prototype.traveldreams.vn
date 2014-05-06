@@ -793,10 +793,13 @@ void GameConfigManager::UpdateNewWordForLevel(const std::string& sChapterID, con
 	{
 		iWordIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(sWordID);
 
-		const Word& word = GameWordManager::getInstance()->GetWord(iWordIndex);
-		if (levelConfig.m_iNumberLetterOfMainWord <=  word.m_iMaximumLevelLetterRequired &&  levelConfig.m_iNumberLetterOfMainWord >= word.m_iMinimumLevelLetterRequired) //CountLetterOfWord(word.m_iWordLength, word.m_sWord))
-		{		
-			candidate0IndexList.push_back(iWordIndex);
+		if (iWordIndex >= 0)
+		{
+			const Word& word = GameWordManager::getInstance()->GetWord(iWordIndex);
+			if (levelConfig.m_iNumberLetterOfMainWord <=  word.m_iMaximumLevelLetterRequired &&  levelConfig.m_iNumberLetterOfMainWord >= word.m_iMinimumLevelLetterRequired) //CountLetterOfWord(word.m_iWordLength, word.m_sWord))
+			{		
+				candidate0IndexList.push_back(iWordIndex);
+			}
 		}
 	}	
 
@@ -805,19 +808,22 @@ void GameConfigManager::UpdateNewWordForLevel(const std::string& sChapterID, con
 	{
 		iWordIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(wordDBList[iIndex].sWordId);
 		
-		for(int i=0; i< candidate0IndexList.size(); i++)
-			if (candidate0IndexList[i] == iWordIndex)
-			{
-				if (wordDBList[iIndex].iCountCollected > 0)
+		if (iWordIndex >=0)
+		{
+			for(int i=0; i< candidate0IndexList.size(); i++)
+				if (candidate0IndexList[i] == iWordIndex)
 				{
-					candidate2IndexList.push_back( iWordIndex);
+					if (wordDBList[iIndex].iCountCollected > 0)
+					{
+						candidate2IndexList.push_back( iWordIndex);
 
-					candidate0IndexList[i] = candidate0IndexList[candidate0IndexList.size()-1];
-					candidate0IndexList.pop_back();
-				}
+						candidate0IndexList[i] = candidate0IndexList[candidate0IndexList.size()-1];
+						candidate0IndexList.pop_back();
+					}
 
-				break;
-			}	
+					break;
+				}	
+		}
 	}
 	
 	if (candidate0IndexList.size() > 0)

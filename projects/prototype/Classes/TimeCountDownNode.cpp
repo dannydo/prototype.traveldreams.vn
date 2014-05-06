@@ -18,9 +18,11 @@ TimeCountDownNode* TimeCountDownNode::create(int iStageIndex, int iMaximumEnergy
 void TimeCountDownNode::init(int iStageIndex, int iMaximumEnergy, int iEnergyLostPerSecond)
 {
 	m_bIsStarted = false;
+	m_bIsSuspendingDecreaseEnergy = false;
 	m_fMaximumEnergy = iMaximumEnergy;
 	m_fEnergyLostPersecond = iEnergyLostPerSecond;
 	m_fCurrentEnergy = m_fMaximumEnergy /2.f;
+	m_fStoredEnergyIncrement = 0;
 
 	m_bIsInNearOutOfEnergyState = false;
 
@@ -104,9 +106,30 @@ void TimeCountDownNode::update(float fDeltaTime)
 	if (m_fCurrentEnergy <=0 )
 		return;
 
-	m_fCurrentEnergy -= fDeltaTime * m_fEnergyLostPersecond;
-	if (m_fCurrentEnergy < 0)
-		m_fCurrentEnergy = 0;
+	if (m_fStoredEnergyIncrement > 0)
+	{
+		if (m_fIncrementTimeRemain <= 0)
+			m_fIncrementTimeRemain = fDeltaTime;
+
+		float fDeltaIncrement = fDeltaTime/m_fIncrementTimeRemain * m_fStoredEnergyIncrement;
+		if (fDeltaIncrement >= m_fStoredEnergyIncrement)
+			fDeltaIncrement = m_fStoredEnergyIncrement;
+
+		m_fStoredEnergyIncrement -= fDeltaIncrement;		
+		m_fIncrementTimeRemain -= fDeltaTime;
+
+		m_fCurrentEnergy += fDeltaIncrement;
+		if (m_fCurrentEnergy > m_fMaximumEnergy)
+			m_fCurrentEnergy = m_fMaximumEnergy;		
+	}
+	else if (!m_bIsSuspendingDecreaseEnergy)
+	{
+		m_fCurrentEnergy -= fDeltaTime * m_fEnergyLostPersecond;
+		if (m_fCurrentEnergy < 0)
+			m_fCurrentEnergy = 0;
+	}	
+
+
 	fEnergyWidth = m_fCurrentEnergy * _contentSize.width / m_fMaximumEnergy;
 	
 	if (fEnergyWidth > 36.f)

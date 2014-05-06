@@ -15,15 +15,18 @@ public:
 
 	inline void SetOutOfTimeCallback( std::function<void()> outOfTimeCallback) { m_OutOfTimeCallback = outOfTimeCallback;}
 	inline int IsEnergyEmpty() { return (m_fCurrentEnergy <=0);}
+	inline void SetSuspendingState(bool bIsSuspending) { m_bIsSuspendingDecreaseEnergy = bIsSuspending;}
 
 	inline void Start() { m_bIsStarted = true;}
 
 	void AddEnergy(int iIncrementEnergy) { 
-		if (m_fCurrentEnergy<=0) 
+		m_fStoredEnergyIncrement += iIncrementEnergy;
+		m_fIncrementTimeRemain = 0.4f;
+		/*if (m_fCurrentEnergy<=0) 
 			return; 
 		m_fCurrentEnergy += iIncrementEnergy; 
 		if (m_fCurrentEnergy> m_fMaximumEnergy) 
-			m_fCurrentEnergy = m_fMaximumEnergy;
+			m_fCurrentEnergy = m_fMaximumEnergy;*/
 	}
 
 	void StopUpdate() { this->unscheduleUpdate();}
@@ -40,7 +43,9 @@ private:
 
 	float m_fMaximumEnergy;
 	float m_fEnergyLostPersecond;
+	float m_fStoredEnergyIncrement, m_fIncrementTimeRemain;
 	bool m_bIsInNearOutOfEnergyState;
+	bool m_bIsSuspendingDecreaseEnergy;
 
 	std::function<void()> m_OutOfTimeCallback;
 

@@ -147,7 +147,7 @@ void CustomPackageDownloaderNode::AddNewPackageToList(const CustomPackageInfo& c
 
 void CustomPackageDownloaderNode::SavePackageListToFile()
 {
-	string sConfigFile = m_sPathToSave + "/packageList.data";
+	string sConfigFile = m_sPathToSave + "/packageList.data";	
 	ofstream ostream(sConfigFile);
 	if (ostream.is_open())
 	{
@@ -168,6 +168,7 @@ void CustomPackageDownloaderNode::SavePackageListToFile()
 void CustomPackageDownloaderNode::LoadPackageListFromFile()
 {
 	string sConfigFile = m_sPathToSave + "/packageList.data";
+	CCLOG("%s", sConfigFile.c_str());
 	ifstream istream(sConfigFile);
 	if (istream.is_open())
 	{

@@ -1441,6 +1441,9 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 	// now play effect to destroy/move old cells, and generate new cells
 	if (bMoveIsValid)
 	{				 
+		if (m_pTimeCountDownNode != NULL)
+			 m_pTimeCountDownNode->SetSuspendingState(true);
+
 		// play sound
 		SoundManager::PlaySoundEffect(_SET_DRAG_SUCCESS_);
 
@@ -1552,7 +1555,12 @@ void HelloWorld::OnStartGame()
 void HelloWorld::OnCompleteComboChain()
 {
 	if (!m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked() && m_GameBoardManager.GetCurrentMove()!=0)
+	{
 		m_bIsEffectPlaying = false;
+
+		if (m_pTimeCountDownNode != NULL)
+			 m_pTimeCountDownNode->SetSuspendingState(false);
+	}
 
 	// Play text effect
 	if (m_GameBoardManager.GetPhaseMoveOfComboChain() >3)
@@ -1691,10 +1699,65 @@ void HelloWorld::CheckBoardStateAfterMove()
 // if this called when user move row/column can cause error/lag???
 void HelloWorld::CheckHintAfterMove()
 {
-	if (!m_GameBoardManager.findHintForGame())
-	{
-		//m_GameBoardManager.Shuffle();
-		MessageBox("Notice", "No more move! SHUFFLE!!!... Sorry, not implemented yet!");
+	if (!m_GameBoardManager.findHintForGame())	
+	{	
+		if	(m_GameBoardManager.Shuffle(m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells))
+		{
+			//MessageBox("Notice", "SHUFFLE!!!");
+
+			auto& originalMovedCells = m_ComputeMoveResult.m_OriginalMovedCells;
+			auto& targetMovedCells = m_ComputeMoveResult.m_TargetMovedCells;
+			int iUpdatedZOrder;
+			CellView tempViewMatrix[_BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
+			CellView tempMirrorViewMatrix[_BOARD_MAX_ROW_NUMBER_][ _BOARD_MAX_COLUMN_NUMBER_];
+			
+			Point centerPos( m_fBoardLeftPosition + m_GameBoardManager.GetColumnNumber()/2.f * m_SymbolSize.width, 
+							m_fBoardBottomPosition + m_GameBoardManager.GetRowNumber()/2.f * m_SymbolSize.height);
+
+
+			for (int i=0; i < originalMovedCells.size(); i++)
+			{				
+				Point pos(m_fBoardLeftPosition + targetMovedCells[i].m_iColumn * m_SymbolSize.width, 
+							m_fBoardBottomPosition + targetMovedCells[i].m_iRow * m_SymbolSize.height);
+
+				m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->runAction(
+					Sequence::create( 
+						DelayTime::create( 0.3f), // + 0.01f * (targetMovedCells[i].m_iRow - originalMovedCells[i].m_iRow ),
+						
+						EaseOut::create( MoveTo::create( _TME_MOVE_CELL_TIME_, centerPos),			3.f ),
+						EaseOut::create( MoveTo::create( _TME_MOVE_CELL_TIME_, pos),			3.f ),
+						NULL));				
+				m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->setPosition(pos);
+
+				tempViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn] = m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];
+				tempMirrorViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn] = m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];
+			}
+
+			for (int i=0; i < originalMovedCells.size(); i++)
+			{
+				m_BoardViewMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn] = tempViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];
+				m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn] = tempMirrorViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];
+
+				iUpdatedZOrder = GetZOrder(targetMovedCells[i].m_iRow, targetMovedCells[i].m_iColumn, false);
+
+				m_BoardViewMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setZOrder( iUpdatedZOrder);		
+				if (m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite != NULL)
+					m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setZOrder(iUpdatedZOrder);
+			}	
+
+			m_bIsEffectPlaying = true;
+			if (m_pTimeCountDownNode != NULL)
+				 m_pTimeCountDownNode->SetSuspendingState(true);
+
+			this->runAction( CCSequence::create(
+				CCDelayTime::create(1.2f),
+				CCCallFunc::create( this, callfunc_selector( HelloWorld::CheckBoardStateAfterMove)),
+				NULL));		
+		}		
+		else
+			MessageBox("Notice", "Sorry, game is over!!!");
+
+		
 	}
 }
 

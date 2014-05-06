@@ -274,7 +274,7 @@ private:
 		int m_iGemID;
 	};
 public:
-	bool Shuffle();
+	bool Shuffle(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells);
 
 	bool findHintForGame(); 
 	inline const Hint& GetHint() { return m_Hint;}
@@ -304,7 +304,9 @@ protected:
 	// used for shuffle only
 	int m_TotalCountPerGemIDList[ _MAX_GEM_ID_];
 	int m_ShufflableCountPerGemIDList[ _MAX_GEM_ID_];
-	std::vector<ShuffleSolution> m_ShuffleSoutionList;
+	int m_iOneGemIDHasAtLeast3Gems;
+	std::vector<ShuffleSolution> m_ShuffleSolutionList;
+	std::vector<ShuffleSolution> m_NotGoodShuffleSolutionList;
 };
 
 
