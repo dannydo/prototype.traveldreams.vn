@@ -7,6 +7,8 @@
 #include "FooterNode.h"
 #include "ScrollManager.h"
 #include "GameDataStructure.h"
+#include "ButtonManagerNode.h"
+#include "Database\LevelTable.h"
 
 class LevelMapLayer : public cocos2d::CCLayer
 {
@@ -19,6 +21,8 @@ public:
 	void showPopupEndGameLose(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId);
 	void showPopupEndGameWin(const int& iScore, const Word& mainWord, const int& iCurrentLevel, const std::string sChapterId, const int& iYellowStar, const int& iBonusQuestCompleted);
 	void showPopupQuitLevelFailed( const int& iCurrentLevel, const std::string sChapterId);
+
+	void playEffectUnlockLevel(const bool& bPlayNextLevelGame, const int& iCurrentLevel, const std::string sChapterId);
 
 private:
 	bool onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
@@ -38,10 +42,45 @@ private:
 	float m_maxHeight;
 	bool m_bIsSwipe;
 
+	int m_iCalculatorLevel;
+
 	std::string m_sChapterId;
+	std::vector<LevelInfo> m_levels;
 
 	FooterNode* m_pFooterNode;
 	ScrollManager* m_pScrollManager;
+
+
+
+
+
+
+	void loopUpdateStar();
+	void sequenceUpdateStar();
+	void updateStar();
+
+	void loopUpdateBonusQuest();
+	void sequenceUpdateBonusQuest();
+	void updateBonusQuest();
+
+	void effectChangeCurrentLevel();
+	void showPopupTargetGame();
+
+	void removeButtonNodeCurrentLevel();
+
+	ButtonNode* m_buttonPlayPassLevel;
+	ButtonManagerNode* m_pButtonManagerNode;
+	ButtonNode* m_pButtonNodeCurrentLevel;
+	cocos2d::Sprite* m_ButtonNextLevelSprite;
+
+	int m_iYellowStar;
+	int m_iCountYellowStar;
+	int m_iTotalBonusQuest;
+	int m_iBonusQuestCompleted;
+	int m_iCountBonusQuest;
+	int m_iCurrentLevel;
+
+	cocos2d::Node* m_pNodeStarAndBonusQuestEffect;
 };
 
 class LevelMapScene : public cocos2d::CCScene
