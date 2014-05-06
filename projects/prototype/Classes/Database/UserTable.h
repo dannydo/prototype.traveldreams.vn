@@ -44,7 +44,6 @@ public:
 
 private:
 	void fetchhUser();
-	unsigned long getTimeLocalCurrent();
 
 	static UserTable* m_UserTable;
 	UserInfo m_userInfo;

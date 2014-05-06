@@ -20,7 +20,6 @@ public:
 	void onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict, std::string sKey);
 
 private:
-	unsigned long getTimeLocalCurrent();
 
 	static SystemEventHandle* m_SystemEventHandle;
 	bool m_bIsConnectFacebook;

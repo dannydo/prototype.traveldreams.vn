@@ -1,6 +1,7 @@
 #include "UnlockChapterTable.h"
 #include "InitDatabase.h"
 #include "VersionTable.h"
+#include "FunctionCommon.h"
 
 USING_NS_CC; 
 
@@ -67,7 +68,7 @@ bool UnlockChapterTable::updateUnlockChapter(const UnlockChapterInfo& unlockChap
 {
 	String sql = "update UnlockChapters Set";
 	sql.appendWithFormat(" Request=%d,", unlockChapterInfo.iRequest);
-	sql.appendWithFormat(" BeginTime=%s,", this->getTimeLocalCurrent());
+	sql.appendWithFormat(" BeginTime=%s,", getTimeLocalCurrent());
 	sql.appendWithFormat(" Version=%d", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 	sql.appendWithFormat(" where UnlockChapterId=%d", unlockChapterInfo.iUnlockChapterId);
 
@@ -84,7 +85,7 @@ bool UnlockChapterTable::insertUnlockChapter(const UnlockChapterInfo& unlockChap
 	sql.appendWithFormat(" '%s',", unlockChapterInfo.sChapterId.c_str());
 	sql.appendWithFormat(" %d,", unlockChapterInfo.iRequest);
 	sql.appendWithFormat(" '%s',", unlockChapterInfo.sType.c_str());
-	sql.appendWithFormat(" %u,", this->getTimeLocalCurrent());
+	sql.appendWithFormat(" %u,", getTimeLocalCurrent());
 	sql.appendWithFormat(" %d)", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
@@ -92,14 +93,6 @@ bool UnlockChapterTable::insertUnlockChapter(const UnlockChapterInfo& unlockChap
 		return false;
 
 	return true;
-}
-
-unsigned long UnlockChapterTable::getTimeLocalCurrent()
-{
-	timeval now;
-	gettimeofday(&now, NULL);
-	unsigned long iCurrentTime = now.tv_sec + now.tv_usec/1000000 ; //seconds
-	return iCurrentTime;
 }
 
 std::string	UnlockChapterTable::syncGetUnlockChapters()

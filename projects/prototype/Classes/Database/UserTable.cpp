@@ -1,6 +1,7 @@
 #include "UserTable.h"
 #include "InitDatabase.h"
 #include "VersionTable.h"
+#include "FunctionCommon.h"
 
 USING_NS_CC; 
 USING_NS_CC_EXT;
@@ -162,14 +163,6 @@ bool UserTable::updateLife(const unsigned int& iLoseLife)
 	return true;
 }
 
-unsigned long UserTable::getTimeLocalCurrent()
-{
-	timeval now;
-	gettimeofday(&now, NULL);
-	unsigned long iCurrentTime = now.tv_sec + now.tv_usec/1000000 ; //seconds
-	return iCurrentTime;
-}
-
 std::string UserTable::syncGetUser()
 {
 	char **re;
@@ -220,7 +213,7 @@ bool UserTable::updateDataSyncUser(cs::JsonDictionary* pJsonSync, const int& iVe
 		sql.appendWithFormat(" CurrentLevel=%s,", pJsonUser->getItemStringValue("CurrentLevel"));
 		sql.appendWithFormat(" Life=%s,", pJsonUser->getItemStringValue("Life"));
 		sql.appendWithFormat(" LifeTimeRemaining=%d,", pJsonUser->getItemIntValue("LifeTimeRemaining", 0));
-		sql.appendWithFormat(" LifeTimeBeginRemain=%u,", this->getTimeLocalCurrent());
+		sql.appendWithFormat(" LifeTimeBeginRemain=%u,", getTimeLocalCurrent());
 		sql.appendWithFormat(" Monney=%s,", pJsonUser->getItemStringValue("Money"));
 		sql.appendWithFormat(" Version=%d,", iVersion);
 		sql.appendWithFormat(" UserIdentifier='%s',", pJsonUser->getItemStringValue("UserId"));

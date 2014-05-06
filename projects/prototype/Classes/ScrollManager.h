@@ -28,8 +28,6 @@ public:
 	DataTouch getDistanceScrollX();
 
 private:
-	unsigned long getTimeLocalCurrent();
-
 	DataTouch m_Datatouchs[5];
 	int m_iTotalDataTouch;
 };

@@ -59,10 +59,6 @@ bool MiniGameLayer::init()
 	m_pLabelIndex->setPosition(Point(320.0f, 850.0f));
 	this->addChild(m_pLabelIndex);
 
-	m_iIndexWordNewCount = 0;
-	m_iIndexWordNew = 0;
-	this->createLayout();
-
 	FooterNode* pFooterNode = FooterNode::create();
 	pFooterNode->changeStatusButtonFlashcard(StatusButtonFlashcard::eNoClick);
 	pFooterNode->removeBackground();
@@ -70,6 +66,10 @@ bool MiniGameLayer::init()
 
 	m_pHeaderNode = HeaderNode::create();
 	this->addChild(m_pHeaderNode);
+
+	m_iIndexWordNewCount = 0;
+	m_iIndexWordNew = 0;
+	this->createLayout();
 
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kFlashCard);
 
@@ -278,7 +278,8 @@ void MiniGameLayer::clickChoosePicture(Object* sender)
 
 		auto actionPlayEffectWin = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectWin));
 		auto actionplayEffectAddDescription = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddDescription));
-		this->runAction(Sequence::create(DelayTime::create(0.3f), actionPlayEffectWin, DelayTime::create(0.3f), actionplayEffectAddDescription, NULL));
+		auto actionplayEffectAddButtonCollect = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddButtonCollect));
+		this->runAction(Sequence::create(DelayTime::create(0.3f), actionPlayEffectWin, DelayTime::create(0.3f), actionplayEffectAddDescription, DelayTime::create(0.3f), actionplayEffectAddButtonCollect, NULL));
 	}
 	else
 	{
@@ -306,7 +307,7 @@ void MiniGameLayer::clickCollect(Object* sender)
 void MiniGameLayer::playEffectCollect()
 {
 	auto actionFlashcardScaleOut = ScaleTo::create(0.3f, 0.2f);
-	auto actionFlashcardMove = MoveTo::create(0.3f, Point(640.0f, 0.0f));
+	auto actionFlashcardMove = MoveTo::create(0.3f, Point(640.0f, -40.0f));
 
 	auto actionplayEffectAddLayout = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddLayout));
 	m_pFlashCard->runAction(Spawn::create(actionFlashcardScaleOut, actionFlashcardMove, NULL));
@@ -321,7 +322,16 @@ void MiniGameLayer::playEffectLose()
 	m_pChooseImageNode->runAction(actionChooseImageMoveLeft);
 
 	m_MaintWordInfo.uTimeBeginPlayMiniGame = getTimeLocalCurrent();
+	m_MaintWordInfo.bIsCollected = false;
 	WordTable::getInstance()->updateWord(m_MaintWordInfo);
+
+	for(int iIndex=0; iIndex<m_WordsNew.size(); iIndex++)
+	{
+		if(m_WordsNew[iIndex].sWordId == m_MaintWordInfo.sWordId && m_WordsNew[iIndex].sChapterId != m_MaintWordInfo.sChapterId)
+		{
+			m_arrIndexWordNew.push_back(iIndex);
+		}
+	}
 }
 
 void MiniGameLayer::playEffectWin()
@@ -331,6 +341,7 @@ void MiniGameLayer::playEffectWin()
 	UserTable::getInstance()->updateUser(userInfo);
 
 	m_MaintWordInfo.bIsCollected = true;
+	m_MaintWordInfo.uTimeBeginPlayMiniGame = 0;
 	WordTable::getInstance()->updateWord(m_MaintWordInfo);
 
 	// Update chapter
@@ -374,16 +385,25 @@ void MiniGameLayer::playEffectAddDescription()
 	m_pFlashCard->addLayoutDescriptionWord();
 	m_pFlashCard->getNodeDescription()->setPosition(Point(0.0f, -320.0f));
 
+	auto actionDescriptionMove = MoveBy::create(0.3f, Point(0.0f, 320.0f));
+	m_pFlashCard->getNodeDescription()->runAction(actionDescriptionMove);
+}
+
+void MiniGameLayer::playEffectAddButtonCollect()
+{
 	Sprite* pBtnCollect = Sprite::create("FlashCard/btn_collect.png");
 	ButtonNode* pButtonNode = ButtonNode::createButtonSprite(pBtnCollect, CC_CALLBACK_1(MiniGameLayer::clickCollect, this));
 	pButtonNode->setPosition(Point(320.0f, 30.0f));
-
+	pButtonNode->setScale(0.5f);
+	
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(pButtonNode);
-	m_pFlashCard->getNodeDescription()->addChild(pButtonManagerNode);
+	m_pFlashCard->addChild(pButtonManagerNode);
 
-	auto actionDescriptionMove = MoveBy::create(0.3f, Point(0.0f, 320.0f));
-	m_pFlashCard->getNodeDescription()->runAction(actionDescriptionMove);
+	auto actionScaleOut = ScaleTo::create(0.2f, 1.2f);
+	auto actionScaleIn = ScaleTo::create(0.1f, 1.0f);
+
+	pButtonNode->runAction(Sequence::create(actionScaleOut, actionScaleIn, NULL));
 }
 
 void MiniGameLayer::playEffectAddLayout()

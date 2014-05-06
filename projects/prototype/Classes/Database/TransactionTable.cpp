@@ -1,6 +1,7 @@
 #include "TransactionTable.h"
 #include "InitDatabase.h"
 #include "VersionTable.h"
+#include "FunctionCommon.h"
 
 USING_NS_CC; 
 
@@ -42,7 +43,7 @@ bool TransactionTable::insertTransaction(const TransactionInfo& transactionInfo)
 	sql.appendWithFormat(" '%s',", transactionInfo.sPowerUpId.c_str());
 	sql.appendWithFormat(" %d,", transactionInfo.iQuantity);
 	sql.appendWithFormat(" %d,", transactionInfo.iTotalAmount);
-	sql.appendWithFormat(" %u,", this->getTimeLocalCurrent());
+	sql.appendWithFormat(" %u,", getTimeLocalCurrent());
 	sql.appendWithFormat(" %d,)", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 	sql.appendWithFormat(" '%s'", transactionInfo.sType.c_str());
 
@@ -51,14 +52,6 @@ bool TransactionTable::insertTransaction(const TransactionInfo& transactionInfo)
 		return false;
 
 	return true;
-}
-
-unsigned long TransactionTable::getTimeLocalCurrent()
-{
-	timeval now;
-	gettimeofday(&now, NULL);
-	unsigned long iCurrentTime = now.tv_sec + now.tv_usec/1000000 ; //seconds
-	return iCurrentTime;
 }
 
 std::string	TransactionTable::syncGetTransactions()

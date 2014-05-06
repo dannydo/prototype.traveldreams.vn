@@ -35,6 +35,7 @@ private:
 	void playEffectLose();
 	void playEffectAddLayout();
 	void playEffectCollect();
+	void playEffectAddButtonCollect();
 
 	std::vector<WordInfo> m_ChapterWords;
 	std::vector<WordInfo> m_WordsNew;

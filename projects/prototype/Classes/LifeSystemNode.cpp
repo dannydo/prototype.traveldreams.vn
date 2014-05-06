@@ -1,6 +1,7 @@
 #include "LifeSystemNode.h"
 #include "ButtonManagerNode.h"
 #include "GetMoreLifeNode.h"
+#include "FunctionCommon.h"
 
 USING_NS_CC;
 
@@ -110,12 +111,4 @@ String LifeSystemNode::formatSecondsToDiaplay(const int& iSeconds)
 	str.appendWithFormat("%d", iSeconds%60);
 
 	return str;
-}
-
-unsigned long LifeSystemNode::getTimeLocalCurrent()
-{
-	timeval now;
-	gettimeofday(&now, NULL);
-	unsigned long iCurrentTime = now.tv_sec + now.tv_usec/1000000 ; //seconds
-	return iCurrentTime;
 }

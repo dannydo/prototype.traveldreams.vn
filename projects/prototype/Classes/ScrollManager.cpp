@@ -1,4 +1,5 @@
 #include "ScrollManager.h"
+#include "FunctionCommon.h"
 
 USING_NS_CC;
 
@@ -98,12 +99,4 @@ DataTouch ScrollManager::getDistanceScrollX()
 	}
 
 	return DataTouch();
-}
-
-unsigned long ScrollManager::getTimeLocalCurrent()
-{
-	timeval now;
-	gettimeofday(&now, NULL);
-	unsigned long iCurrentTime = now.tv_sec*1000 + now.tv_usec/1000 ; //miliseconds
-	return iCurrentTime;
 }
