@@ -48,6 +48,7 @@ private:
 
 	int m_iIndexWordNewCount;
 	int m_iIndexWordNew;
+	int m_iTotalWordNew;
 
 	std::vector<int> m_arrIndexWordNew;
 	std::vector<int> m_arrIndexWord;

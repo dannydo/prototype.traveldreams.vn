@@ -46,13 +46,14 @@ bool MiniGameLayer::init()
 	}
 
 	m_WordsNew = WordTable::getInstance()->getAllWordNew(getTimeLocalCurrent());
+	m_iTotalWordNew = WordTable::getInstance()->getNumberWordPlayMiniGame(getTimeLocalCurrent());
 
 	Sprite* pBackground = Sprite::create("FlashCard/background.png");
 	pBackground->setPosition(Point(320.0f, 480.0f));
 	this->addChild(pBackground);
 
 	char sTotalWordNew[20];
-	sprintf(sTotalWordNew, "(%d/%d)", 1, m_WordsNew.size());
+	sprintf(sTotalWordNew, "(%d/%d)", 1, m_iTotalWordNew);
 	m_pLabelIndex = LabelTTF::create(sTotalWordNew, "Arial", 30);
 	m_pLabelIndex->setColor(ccc3(0.0f, 0.0f, 0.0f));
 	m_pLabelIndex->setPosition(Point(320.0f, 850.0f));
@@ -118,7 +119,7 @@ void MiniGameLayer::randownIndexWords()
 	{
 		int bBreakWhile = true;
 		int iIndexWord = rand() % (m_ChapterWords.size());
-		if (m_ChapterWords[iIndexWord].sWordId.compare(m_WordsNew[m_iIndexWordNew].sWordId) == 0)
+		if (m_ChapterWords[iIndexWord].sWordId == m_WordsNew[m_iIndexWordNew].sWordId)
 			bBreakWhile = false;
 
 		if (bBreakWhile)
@@ -147,7 +148,7 @@ void MiniGameLayer::randownIndexWords()
 
 void MiniGameLayer::createLayout()
 {
-	if (m_iIndexWordNewCount < m_WordsNew.size())
+	if (m_iIndexWordNewCount < m_iTotalWordNew)
 	{
 		this->randownIndexWordNew();
 
@@ -202,7 +203,7 @@ void MiniGameLayer::createLayout()
 		}
 
 		char sTotalWordNew[20];
-		sprintf(sTotalWordNew, "(%d/%d)", m_iIndexWordNewCount+1, m_WordsNew.size());
+		sprintf(sTotalWordNew, "(%d/%d)", m_iIndexWordNewCount+1, m_iTotalWordNew);
 		m_pLabelIndex->setString(sTotalWordNew);
 	}
 	else
@@ -232,7 +233,6 @@ ButtonNode* MiniGameLayer::createButtonPictureFlashcard(const WordInfo& wordInfo
 	pBackground->setTag(10);
 	pBackground->addChild(pFlashCardImage);
 	ButtonNode* pButtonNode = ButtonNode::createButtonSprite(pBackground, CC_CALLBACK_1(MiniGameLayer::clickChoosePicture, this));
-
 
 	if (iIndexPicture == 0)
 	{
@@ -333,6 +333,7 @@ void MiniGameLayer::playEffectWin()
 	m_MaintWordInfo.bIsCollected = true;
 	WordTable::getInstance()->updateWord(m_MaintWordInfo);
 
+	// Update chapter
 	ChapterInfo chapterInfo = ChapterTable::getInstance()->getChapterInfo(m_MaintWordInfo.sChapterId);
 	chapterInfo.iTotalFlashCardUnlock++;
 	if (chapterInfo.iTotalFlashCardUnlock > chapterInfo.iTotalFlashCard)
@@ -340,6 +341,22 @@ void MiniGameLayer::playEffectWin()
 		chapterInfo.iTotalFlashCardUnlock = chapterInfo.iTotalFlashCard;
 	}
 	ChapterTable::getInstance()->updateChapter(chapterInfo);
+
+	for(int iIndex=0; iIndex<m_WordsNew.size(); iIndex++)
+	{
+		if(m_WordsNew[iIndex].sWordId == m_MaintWordInfo.sWordId && m_WordsNew[iIndex].sChapterId != m_MaintWordInfo.sChapterId)
+		{
+			chapterInfo = ChapterTable::getInstance()->getChapterInfo(m_WordsNew[iIndex].sChapterId);
+			chapterInfo.iTotalFlashCardUnlock++;
+			if (chapterInfo.iTotalFlashCardUnlock > chapterInfo.iTotalFlashCard)
+			{
+				chapterInfo.iTotalFlashCardUnlock = chapterInfo.iTotalFlashCard;
+			}
+			ChapterTable::getInstance()->updateChapter(chapterInfo);
+
+			m_arrIndexWordNew.push_back(iIndex);
+		}
+	}
 
 	m_pFlashCard->removeButtonManageQuestion();
 
@@ -375,7 +392,7 @@ void MiniGameLayer::playEffectAddLayout()
 	this->removeChild(m_pChooseImageNode);
 	this->createLayout();
 
-	if (m_iIndexWordNewCount <= m_WordsNew.size())
+	if (m_iIndexWordNewCount <= m_iTotalWordNew)
 	{
 		m_pFlashCard->setScale(0);
 		m_pChooseImageNode->setScale(0);
