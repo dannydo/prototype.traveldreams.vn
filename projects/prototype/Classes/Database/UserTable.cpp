@@ -196,7 +196,7 @@ std::string UserTable::syncGetUser()
 		sJsonData.appendWithFormat("\"Life\":%s,", re[nColumn+7]);
 		sJsonData.appendWithFormat("\"LifeTimeRemaining\":%s,", re[nColumn+8]);
 		sJsonData.appendWithFormat("\"lLifeTimeBeginRemain\":%s,", re[nColumn+9]);
-		sJsonData.appendWithFormat("\"Monney\":%s,", re[nColumn+10]);
+		sJsonData.appendWithFormat("\"Money\":%s,", re[nColumn+10]);
 		sJsonData.appendWithFormat("\"Version\":%s,", re[nColumn+11]);
 		sJsonData.appendWithFormat("\"UserToken\":\"%s\"", re[nColumn+12]);
 	}
