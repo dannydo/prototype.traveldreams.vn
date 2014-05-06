@@ -1,6 +1,5 @@
 #include "MiniGameScene.h"
 #include "FooterNode.h"
-#include "HeaderNode.h"
 #include "SettingMenuNode.h"
 #include "FunctionCommon.h"
 #include "GameWordManager.h"
@@ -47,29 +46,30 @@ bool MiniGameLayer::init()
 	}
 
 	m_WordsNew = WordTable::getInstance()->getAllWordNew(getTimeLocalCurrent());
+	m_iTotalWordNew = WordTable::getInstance()->getNumberWordPlayMiniGame(getTimeLocalCurrent());
 
 	Sprite* pBackground = Sprite::create("FlashCard/background.png");
 	pBackground->setPosition(Point(320.0f, 480.0f));
 	this->addChild(pBackground);
 
 	char sTotalWordNew[20];
-	sprintf(sTotalWordNew, "(%d/%d)", 1, m_WordsNew.size());
+	sprintf(sTotalWordNew, "(%d/%d)", 1, m_iTotalWordNew);
 	m_pLabelIndex = LabelTTF::create(sTotalWordNew, "Arial", 30);
 	m_pLabelIndex->setColor(ccc3(0.0f, 0.0f, 0.0f));
 	m_pLabelIndex->setPosition(Point(320.0f, 850.0f));
 	this->addChild(m_pLabelIndex);
-
-	m_iIndexWordNewCount = 0;
-	m_iIndexWordNew = 0;
-	this->createLayout();
 
 	FooterNode* pFooterNode = FooterNode::create();
 	pFooterNode->changeStatusButtonFlashcard(StatusButtonFlashcard::eNoClick);
 	pFooterNode->removeBackground();
 	this->addChild(pFooterNode);
 
-	HeaderNode* pHeaderNode = HeaderNode::create();
-	this->addChild(pHeaderNode);
+	m_pHeaderNode = HeaderNode::create();
+	this->addChild(m_pHeaderNode);
+
+	m_iIndexWordNewCount = 0;
+	m_iIndexWordNew = 0;
+	this->createLayout();
 
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kFlashCard);
 
@@ -119,7 +119,7 @@ void MiniGameLayer::randownIndexWords()
 	{
 		int bBreakWhile = true;
 		int iIndexWord = rand() % (m_ChapterWords.size());
-		if (m_ChapterWords[iIndexWord].sWordId.compare(m_WordsNew[m_iIndexWordNew].sWordId) == 0)
+		if (m_ChapterWords[iIndexWord].sWordId == m_WordsNew[m_iIndexWordNew].sWordId)
 			bBreakWhile = false;
 
 		if (bBreakWhile)
@@ -148,7 +148,7 @@ void MiniGameLayer::randownIndexWords()
 
 void MiniGameLayer::createLayout()
 {
-	if (m_iIndexWordNewCount < m_WordsNew.size())
+	if (m_iIndexWordNewCount < m_iTotalWordNew)
 	{
 		this->randownIndexWordNew();
 
@@ -203,7 +203,7 @@ void MiniGameLayer::createLayout()
 		}
 
 		char sTotalWordNew[20];
-		sprintf(sTotalWordNew, "(%d/%d)", m_iIndexWordNewCount+1, m_WordsNew.size());
+		sprintf(sTotalWordNew, "(%d/%d)", m_iIndexWordNewCount+1, m_iTotalWordNew);
 		m_pLabelIndex->setString(sTotalWordNew);
 	}
 	else
@@ -233,7 +233,6 @@ ButtonNode* MiniGameLayer::createButtonPictureFlashcard(const WordInfo& wordInfo
 	pBackground->setTag(10);
 	pBackground->addChild(pFlashCardImage);
 	ButtonNode* pButtonNode = ButtonNode::createButtonSprite(pBackground, CC_CALLBACK_1(MiniGameLayer::clickChoosePicture, this));
-
 
 	if (iIndexPicture == 0)
 	{
@@ -279,7 +278,8 @@ void MiniGameLayer::clickChoosePicture(Object* sender)
 
 		auto actionPlayEffectWin = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectWin));
 		auto actionplayEffectAddDescription = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddDescription));
-		this->runAction(Sequence::create(DelayTime::create(0.3f), actionPlayEffectWin, DelayTime::create(0.3f), actionplayEffectAddDescription, NULL));
+		auto actionplayEffectAddButtonCollect = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddButtonCollect));
+		this->runAction(Sequence::create(DelayTime::create(0.3f), actionPlayEffectWin, DelayTime::create(0.3f), actionplayEffectAddDescription, DelayTime::create(0.3f), actionplayEffectAddButtonCollect, NULL));
 	}
 	else
 	{
@@ -296,6 +296,8 @@ void MiniGameLayer::clickChoosePicture(Object* sender)
 
 void MiniGameLayer::clickCollect(Object* sender)
 {
+	m_pHeaderNode->updateLayoutMonney(UserTable::getInstance()->getUserInfo().iMonney);
+
 	auto actionplayEffectAddLayout = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddLayout));
 	auto actionplayEffectCollect = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectCollect));
 
@@ -305,7 +307,7 @@ void MiniGameLayer::clickCollect(Object* sender)
 void MiniGameLayer::playEffectCollect()
 {
 	auto actionFlashcardScaleOut = ScaleTo::create(0.3f, 0.2f);
-	auto actionFlashcardMove = MoveTo::create(0.3f, Point(640.0f, 0.0f));
+	auto actionFlashcardMove = MoveTo::create(0.3f, Point(640.0f, -40.0f));
 
 	auto actionplayEffectAddLayout = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddLayout));
 	m_pFlashCard->runAction(Spawn::create(actionFlashcardScaleOut, actionFlashcardMove, NULL));
@@ -320,7 +322,16 @@ void MiniGameLayer::playEffectLose()
 	m_pChooseImageNode->runAction(actionChooseImageMoveLeft);
 
 	m_MaintWordInfo.uTimeBeginPlayMiniGame = getTimeLocalCurrent();
+	m_MaintWordInfo.bIsCollected = false;
 	WordTable::getInstance()->updateWord(m_MaintWordInfo);
+
+	for(int iIndex=0; iIndex<m_WordsNew.size(); iIndex++)
+	{
+		if(m_WordsNew[iIndex].sWordId == m_MaintWordInfo.sWordId && m_WordsNew[iIndex].sChapterId != m_MaintWordInfo.sChapterId)
+		{
+			m_arrIndexWordNew.push_back(iIndex);
+		}
+	}
 }
 
 void MiniGameLayer::playEffectWin()
@@ -330,7 +341,33 @@ void MiniGameLayer::playEffectWin()
 	UserTable::getInstance()->updateUser(userInfo);
 
 	m_MaintWordInfo.bIsCollected = true;
+	m_MaintWordInfo.uTimeBeginPlayMiniGame = 0;
 	WordTable::getInstance()->updateWord(m_MaintWordInfo);
+
+	// Update chapter
+	ChapterInfo chapterInfo = ChapterTable::getInstance()->getChapterInfo(m_MaintWordInfo.sChapterId);
+	chapterInfo.iTotalFlashCardUnlock++;
+	if (chapterInfo.iTotalFlashCardUnlock > chapterInfo.iTotalFlashCard)
+	{
+		chapterInfo.iTotalFlashCardUnlock = chapterInfo.iTotalFlashCard;
+	}
+	ChapterTable::getInstance()->updateChapter(chapterInfo);
+
+	for(int iIndex=0; iIndex<m_WordsNew.size(); iIndex++)
+	{
+		if(m_WordsNew[iIndex].sWordId == m_MaintWordInfo.sWordId && m_WordsNew[iIndex].sChapterId != m_MaintWordInfo.sChapterId)
+		{
+			chapterInfo = ChapterTable::getInstance()->getChapterInfo(m_WordsNew[iIndex].sChapterId);
+			chapterInfo.iTotalFlashCardUnlock++;
+			if (chapterInfo.iTotalFlashCardUnlock > chapterInfo.iTotalFlashCard)
+			{
+				chapterInfo.iTotalFlashCardUnlock = chapterInfo.iTotalFlashCard;
+			}
+			ChapterTable::getInstance()->updateChapter(chapterInfo);
+
+			m_arrIndexWordNew.push_back(iIndex);
+		}
+	}
 
 	m_pFlashCard->removeButtonManageQuestion();
 
@@ -348,16 +385,25 @@ void MiniGameLayer::playEffectAddDescription()
 	m_pFlashCard->addLayoutDescriptionWord();
 	m_pFlashCard->getNodeDescription()->setPosition(Point(0.0f, -320.0f));
 
+	auto actionDescriptionMove = MoveBy::create(0.3f, Point(0.0f, 320.0f));
+	m_pFlashCard->getNodeDescription()->runAction(actionDescriptionMove);
+}
+
+void MiniGameLayer::playEffectAddButtonCollect()
+{
 	Sprite* pBtnCollect = Sprite::create("FlashCard/btn_collect.png");
 	ButtonNode* pButtonNode = ButtonNode::createButtonSprite(pBtnCollect, CC_CALLBACK_1(MiniGameLayer::clickCollect, this));
 	pButtonNode->setPosition(Point(320.0f, 30.0f));
-
+	pButtonNode->setScale(0.5f);
+	
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(pButtonNode);
-	m_pFlashCard->getNodeDescription()->addChild(pButtonManagerNode);
+	m_pFlashCard->addChild(pButtonManagerNode);
 
-	auto actionDescriptionMove = MoveBy::create(0.3f, Point(0.0f, 320.0f));
-	m_pFlashCard->getNodeDescription()->runAction(actionDescriptionMove);
+	auto actionScaleOut = ScaleTo::create(0.2f, 1.2f);
+	auto actionScaleIn = ScaleTo::create(0.1f, 1.0f);
+
+	pButtonNode->runAction(Sequence::create(actionScaleOut, actionScaleIn, NULL));
 }
 
 void MiniGameLayer::playEffectAddLayout()
@@ -366,7 +412,7 @@ void MiniGameLayer::playEffectAddLayout()
 	this->removeChild(m_pChooseImageNode);
 	this->createLayout();
 
-	if (m_iIndexWordNewCount <= m_WordsNew.size())
+	if (m_iIndexWordNewCount <= m_iTotalWordNew)
 	{
 		m_pFlashCard->setScale(0);
 		m_pChooseImageNode->setScale(0);

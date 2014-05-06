@@ -28,7 +28,6 @@ public:
 	std::string	syncGetUnlockChapters();
 	
 private:
-	unsigned long getTimeLocalCurrent();
 
 	static UnlockChapterTable* m_UnlockChapterTable;
 };

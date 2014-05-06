@@ -27,7 +27,6 @@ public:
 	std::string	syncGetTransactions();
 
 private:
-	unsigned long getTimeLocalCurrent();
 
 	static TransactionTable* m_TransactionTable;
 };

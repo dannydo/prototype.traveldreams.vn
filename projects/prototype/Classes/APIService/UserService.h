@@ -14,7 +14,7 @@ public:
 	static void releaseInstance();
 
 	void checkUserFacebook(const std::string strAccessToken, const int& iUserId, const int& iTag);
-	void getLeaderBoardLevel(const int& iLevel, const int& iTag);
+	void getLeaderBoardLevel(const std::string& sChapterId, const int& iLevel, const int& iTag);
 	void addCallBackList(InterfaceService* callBack);
 	void removeCallBackList(InterfaceService *callBack);
 

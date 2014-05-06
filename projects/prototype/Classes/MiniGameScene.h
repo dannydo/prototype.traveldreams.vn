@@ -8,6 +8,7 @@
 #include "ButtonNode.h"
 #include "GameDataStructure.h"
 #include "Database\WordTable.h"
+#include "HeaderNode.h"
 
 #define _GIFT_COIN_ 100
 
@@ -34,6 +35,7 @@ private:
 	void playEffectLose();
 	void playEffectAddLayout();
 	void playEffectCollect();
+	void playEffectAddButtonCollect();
 
 	std::vector<WordInfo> m_ChapterWords;
 	std::vector<WordInfo> m_WordsNew;
@@ -43,8 +45,11 @@ private:
 	cocos2d::Node* m_pChooseImageNode;
 	WordInfo m_MaintWordInfo;
 
+	HeaderNode* m_pHeaderNode;
+
 	int m_iIndexWordNewCount;
 	int m_iIndexWordNew;
+	int m_iTotalWordNew;
 
 	std::vector<int> m_arrIndexWordNew;
 	std::vector<int> m_arrIndexWord;

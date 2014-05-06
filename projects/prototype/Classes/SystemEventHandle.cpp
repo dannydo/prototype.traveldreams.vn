@@ -6,6 +6,7 @@
 #include "APIService\UserService.h"
 #include "WaitingNode.h"
 #include "GameConfigManager.h"
+#include "FunctionCommon.h"
 
 USING_NS_CC; 
 
@@ -177,7 +178,7 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 					userInfo.sFacebookId = pJsonUser->getItemStringValue("FacebookId");
 					userInfo.sFacebookToken = pJsonUser->getItemStringValue("FacebookToken");
 					userInfo.sUserToken = pJsonUser->getItemStringValue("UserToken");
-					userInfo.ulLifeTimeBeginRemain = this->getTimeLocalCurrent();
+					userInfo.ulLifeTimeBeginRemain = getTimeLocalCurrent();
 
 					Director::getInstance()->getRunningScene()->removeChildByTag(1000);
 					if (sKey == "NOT_MAPPED_NO_FB_AND_FB_LINK_OTHER_USER")
@@ -260,12 +261,4 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 			}
 		}
 	}
-}
-
-unsigned long SystemEventHandle::getTimeLocalCurrent()
-{
-	timeval now;
-	gettimeofday(&now, NULL);
-	unsigned long iCurrentTime = now.tv_sec + now.tv_usec/1000000 ; //seconds
-	return iCurrentTime;
 }

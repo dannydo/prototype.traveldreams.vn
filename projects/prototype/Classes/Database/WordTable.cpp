@@ -260,7 +260,7 @@ bool WordTable::insertWord(const WordInfo& wordInfo)
 	sqlRun.appendWithFormat("%u);", wordInfo.uTimeBeginPlayMiniGame);
 
 	// Insert Words
-	sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version,OrderUnlock,IsNew) values(");
+	sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version) values(");
 	sqlRun.appendWithFormat("'%s',", wordInfo.sChapterId.c_str());
 	sqlRun.appendWithFormat("'%s',", wordInfo.sWordId.c_str());
 	sqlRun.appendWithFormat("%d);", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
@@ -317,9 +317,7 @@ std::string	WordTable::syncGetMapChapterWords()
 		sJsonData.append("{");
 		sJsonData.appendWithFormat("\"ChapterId\": \"%s\",", re[iRow*nColumn+1]);
 		sJsonData.appendWithFormat("\"WordId\": \"%s\",", re[iRow*nColumn+2]);
-		sJsonData.appendWithFormat("\"Version\": %s,", re[iRow*nColumn+3]);
-		sJsonData.appendWithFormat("\"IsNew\": %s,", "0");
-		sJsonData.appendWithFormat("\"OrderUnlock\": %s", "0");
+		sJsonData.appendWithFormat("\"Version\": %s", re[iRow*nColumn+3]);
 
 		if (iRow == nRow)
 			sJsonData.append("}");
@@ -377,7 +375,7 @@ bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iV
 			sqlRun.appendWithFormat("'%s',", sWordId.c_str());
 			sqlRun.appendWithFormat("%s,", pJsonWord->getItemStringValue("CountCollected"));
 			sqlRun.appendWithFormat("%d,", iVersion);
-			//sqlRun.appendWithFormat("%s,", pJsonWord->getItemStringValue("IsCollected"));
+			sqlRun.appendWithFormat("%s,", pJsonWord->getItemStringValue("IsCollected"));
 			sqlRun.appendWithFormat("%d);", 0);
 		}
 		else
@@ -385,8 +383,8 @@ bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iV
 			// Update Words
 			sqlRun.append("update Words Set");
 			sqlRun.appendWithFormat(" CountCollected=%s,", pJsonWord->getItemStringValue("CountCollected"));
-			sqlRun.appendWithFormat(" Version=%d", iVersion);
-			//sqlRun.appendWithFormat(" IsCollected=%s", pJsonWord->getItemStringValue("IsCollected"));
+			sqlRun.appendWithFormat(" Version=%d,", iVersion);
+			sqlRun.appendWithFormat(" IsCollected=%s", pJsonWord->getItemStringValue("IsCollected"));
 			sqlRun.appendWithFormat(" where WordId='%s';", sWordId.c_str());
 		}
 	}
@@ -444,7 +442,7 @@ bool WordTable::updateDataSyncMapChapterWords(cs::JsonDictionary* pJsonSync, con
 		if (isInsert)
 		{
 			// Insert Words
-			sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version,OrderUnlock,IsNew) values(");
+			sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version) values(");
 			sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
 			sqlRun.appendWithFormat("'%s',", sWordId.c_str());
 			sqlRun.appendWithFormat("%d);", iVersion);

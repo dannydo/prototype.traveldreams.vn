@@ -79,6 +79,7 @@ std::vector<LevelInfo>& LevelTable::getAllLevelsForChapter(std::string& sChapter
 	if(m_sCurrentChapterId != sChapterId)
 	{
 		this->fetchLevelsForChapter(sChapterId);
+		m_sCurrentChapterId = sChapterId;
 	}
 
 	return m_ChapterLevels;

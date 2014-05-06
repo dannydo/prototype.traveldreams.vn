@@ -15,7 +15,6 @@ public:
 
 private:
 	void updateWhenTimeChange(float dt);
-	unsigned long getTimeLocalCurrent();
 	cocos2d::String formatSecondsToDiaplay(const int& iSeconds);
 	void clickGetLife(cocos2d::Object* sender);
 

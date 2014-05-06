@@ -49,7 +49,7 @@ bool FlashCardNode::init()
 
 	LabelTTF* pLabelWordMean = LabelTTF::create(m_pWord->m_sMeaning.c_str(), "Arial", 30.0f);
 	pLabelWordMean->setColor(ccc3(0.0f, 0.0f, 0.0f));
-	pLabelWordMean->setPosition(Point(320.0f, 390.0f));
+	pLabelWordMean->setPosition(Point(320.0f, 395.0f));
 	m_pFlashCardContent->addChild(pLabelWordMean);
 
 	Sprite* pFlashCardBG = Sprite::create("FlashCard/flashcard_frame.png");
@@ -58,12 +58,12 @@ bool FlashCardNode::init()
 	
 	LabelBMFont *pLabelWord = LabelBMFont::create(m_pWord->m_sWord, "fonts/font-bechic.fnt");
 	pLabelWord->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelWord->setPosition(Point(320.0f, 730.0f));
+	pLabelWord->setPosition(Point(320.0f, 740.0f));
 	this->addChild(pLabelWord);
 
 	LabelTTF* pLabelWordPhonetic = LabelTTF::create(m_pWord->m_sPhonetic.c_str(), "Arial", 28.0f);
 	pLabelWordPhonetic->setColor(ccc3(0.0f, 0.0f, 0.0f));
-	pLabelWordPhonetic->setPosition(Point(320.0f, 679.0f));
+	pLabelWordPhonetic->setPosition(Point(320.0f, 675.0f));
 	this->addChild(pLabelWordPhonetic);
 
 	return true;
