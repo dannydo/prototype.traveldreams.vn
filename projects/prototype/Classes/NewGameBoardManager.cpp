@@ -2171,11 +2171,12 @@ void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bo
 	int iRow, iColumn;	
 	
 	// generate new gems
+	int iTestGenerateGemID = 0;
 	for(iRow = 0; iRow < m_iRowNumber; iRow++)
 		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
 			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
 			{
-				m_BoardValueMatrix[iRow][iColumn].m_iGemID = rand() % m_pLevelConfig->m_iNumberOfColor;
+				m_BoardValueMatrix[iRow][iColumn].m_iGemID =  (iTestGenerateGemID++) % m_pLevelConfig->m_iNumberOfColor; //rand() % m_pLevelConfig->m_iNumberOfColor;
 				newCells.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemID));
 			}
 
@@ -4191,6 +4192,7 @@ bool NewGameBoardManager::tryShuffleInRegionOfRow(const int& iRow, const int& iC
 						{
 							if (m_BoardValueMatrix[iRow][iCheckColumn].m_iGemID == iRestrictedGemID)
 							{
+								iRestrictedGemCount++;
 								bHasMatchColorCell = true;
 								candidateCell = Cell(iRow, iCheckColumn);
 								break;
@@ -4458,6 +4460,7 @@ bool NewGameBoardManager::tryShuffleInRegionOfColumn(const int& iRowX, const int
 						{
 							if (m_BoardValueMatrix[iCheckRow][iColumn].m_iGemID == iRestrictedGemID)
 							{
+								iRestrictedGemCount++;
 								bHasMatchColorCell = true;
 								candidateCell = Cell( iCheckRow, iColumn);
 								break;
