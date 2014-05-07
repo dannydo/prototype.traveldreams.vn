@@ -173,8 +173,11 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 				cs::JsonDictionary* pJsonUser = pJsonData->getSubDictionary("User");
 				if (pJsonUser != NULL)
 				{
+					char sUserId[20];
+					sprintf(sUserId, "%d", pJsonUser->getItemIntValue("UserId", 0));
+
 					UserInfo userInfo = UserTable::getInstance()->getUserInfo();
-					userInfo.sUserIdentifier = pJsonUser->getItemStringValue("UserId");
+					userInfo.sUserIdentifier = sUserId;
 					userInfo.sFacebookId = pJsonUser->getItemStringValue("FacebookId");
 					userInfo.sFacebookToken = pJsonUser->getItemStringValue("FacebookToken");
 					userInfo.sUserToken = pJsonUser->getItemStringValue("UserToken");

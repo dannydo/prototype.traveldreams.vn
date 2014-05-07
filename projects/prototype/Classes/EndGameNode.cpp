@@ -64,7 +64,6 @@ bool EndGameNode::initWin()
 
 	LevelConfig* pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(m_sChapterId, m_iCurrentLevel);
 	m_iTotalBonusQuest = pLevelConfig->m_BonusQuestConfig.m_iBonusQuestCount;
-	m_iBonusQuestCompleted = 0;
 
 	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 150));
 	pBackground->setContentSize(CCSizeMake(640.0f, 960.0f));

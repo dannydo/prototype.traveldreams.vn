@@ -1794,7 +1794,7 @@ void HelloWorld::ShowWinGamePopup()
 	// show win popup	
 	Breadcrumb::getInstance()->getSceneModePopBack();
 	LevelMapScene* pLevelMap =  LevelMapScene::create();
-	int iBonusQuestCompleted = 0;
+	int iBonusQuestCompleted = m_GameBoardManager.GetBonusQuestManager()->CountBonusQuestCompleted();
 	pLevelMap->getLayer()->showPopupEndGameWin(m_GameBoardManager.GetCurrentScore(),
 		m_GameBoardManager.GetGameWordManager()->GetMainWord(), iCurrentLevel, sCurrentChapterID, m_GameBoardManager.GetEarnedStars(), iBonusQuestCompleted);
 	Director::getInstance()->replaceScene(pLevelMap);

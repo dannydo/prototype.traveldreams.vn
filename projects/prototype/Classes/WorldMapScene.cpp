@@ -5,7 +5,6 @@
 #include "MainMenuScene.h"
 #include "SoundManager.h"
 #include "Database\ChapterTable.h"
-#include "ButtonManagerNode.h"
 #include "HeaderNode.h"
 
 USING_NS_CC;
@@ -58,8 +57,9 @@ bool WorldMapLayer::init()
 	m_pBackgroundNode->setPosition(Point(0.0f, 60.0f));
 	this->addChild(m_pBackgroundNode);
 
-	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
-	m_pBackgroundNode->addChild(pButtonManagerNode);
+	m_pButtonManagerNode = ButtonManagerNode::create();
+	m_pButtonManagerNode->AllowSwipingBackground(true);
+	m_pBackgroundNode->addChild(m_pButtonManagerNode);
 
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
 	std::vector<ChapterInfo> chapters = ChapterTable::getInstance()->getChaptersInfo();
@@ -83,7 +83,7 @@ bool WorldMapLayer::init()
 				ButtonNode* buttonPlayNode = ButtonNode::createButtonSprite(pButtonLevelSprite, CC_CALLBACK_1(WorldMapLayer::menuPlayChapterCallBack, this));
 				buttonPlayNode->setPosition(wordMapChapterConfig.m_position);
 				buttonPlayNode->setTag(iIndex);
-				pButtonManagerNode->addButtonNode(buttonPlayNode);
+				m_pButtonManagerNode->addButtonNode(buttonPlayNode);
 			}
 			else
 			{
@@ -193,8 +193,10 @@ bool WorldMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 }
 
 void WorldMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
-{	 
-	
+{
+	if (m_pButtonManagerNode->IsInTapMode())
+		return;
+
 	Point touchPosition = pTouch->getLocation();
 	m_fYMoved = touchPosition.y - m_fBeginY;
 
@@ -219,6 +221,9 @@ void WorldMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 
 void WorldMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
+	if (m_pButtonManagerNode->IsInTapMode())
+		return;
+
 	DataTouch dataTouch = m_pScrollManager->getDistanceScrollY();
 	float distanceY = dataTouch.point.y;
 	float deltaTime = dataTouch.fDeltaTime;

@@ -5,6 +5,7 @@
 #include "CustomNode.h"
 #include "APIService\InterfaceService.h" 
 #include "ScrollManager.h"
+#include "ButtonManagerNode.h"
 
 struct LeaderBoardInfo
 {
@@ -48,6 +49,8 @@ private:
 	std::string m_sChapterId;
 	
 	ScrollManager* m_pScrollManager;
+	ButtonManagerNode* m_pButtonManagerNode;
+
 	bool m_bIsSwipe;
 	int m_iConnectServer;
 };
