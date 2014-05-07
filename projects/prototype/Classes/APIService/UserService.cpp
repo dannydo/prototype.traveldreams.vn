@@ -70,7 +70,7 @@ void UserService::getLeaderBoardLevel(const std::string& sChapterId, const int& 
 	strURL.append("api/getLeaderBoard/");
 	strURL.appendWithFormat("%s/", sChapterId.c_str());
 	strURL.appendWithFormat("%d/", iLevel);
-	strURL.append("1000000903936281");
+	strURL.append(userInfo.sFacebookId);
 
 	m_pRequest = new HttpRequest();
 	m_pRequest->setUrl(strURL.getCString());

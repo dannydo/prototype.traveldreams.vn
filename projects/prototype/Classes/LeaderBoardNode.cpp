@@ -79,12 +79,13 @@ bool LeaderBoardtNode::init()
 	}
 #endif
 
+	/*
 	UserService::getInstance()->addCallBackList(this);
 	m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
 	m_iConnectServer++;
 	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
 	UserService::getInstance()->getLeaderBoardLevel(m_sChapterId ,m_iLevel, m_iConnectServer);
-	
+	*/
 
 	m_bIsSwipe = false;
 
