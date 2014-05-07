@@ -475,12 +475,11 @@ void LevelMapLayer::playEffectUnlockLevel(const bool& bPlayNextLevelGame, const 
 
 		this->sequenceUpdateStar();
 
-		auto actionScaleInButtonCurrent = ScaleTo::create(0.3f, 0.4);
+		auto actionScaleInButtonCurrent = ScaleTo::create(0.3f, 0.5);
 		auto actioneremoveButtonNodeCurrentLevel = CallFunc::create(this, callfunc_selector(LevelMapLayer::removeButtonNodeCurrentLevel));
 		m_pButtonNodeCurrentLevel->runAction(Sequence::create(actionScaleInButtonCurrent, DelayTime::create(0.3f), actioneremoveButtonNodeCurrentLevel, NULL));
 
 		m_buttonPlayPassLevel->setScale(0.4);
-		m_buttonPlayPassLevel->setVisible(true);
 		auto actionScaleOut = ScaleTo::create(0.3f, 1.1f);
 		auto actionScaleIn = ScaleTo::create(0.1f, 1.0f);
 		auto actioneffectChangeCurrentLevel = CallFunc::create(this, callfunc_selector(LevelMapLayer::effectChangeCurrentLevel));
@@ -626,5 +625,4 @@ void LevelMapLayer::showPopupTargetGame()
 void LevelMapLayer::removeButtonNodeCurrentLevel()
 {
 	m_pButtonManagerNode->removeButtonNode(m_pButtonNodeCurrentLevel);
-	m_buttonPlayPassLevel->setVisible(false);
 }
