@@ -43,7 +43,7 @@ LevelMapScene::~LevelMapScene()
 
 LevelMapLayer::~LevelMapLayer()
 {
-	
+	m_pButtonManagerNode = NULL;	
 }
 
 bool LevelMapLayer::init()
@@ -83,6 +83,7 @@ bool LevelMapLayer::init()
 	}
 
 	m_pButtonManagerNode = ButtonManagerNode::create();
+	m_pButtonManagerNode->AllowSwipingBackground(true);
 	m_pBackgroundNode->addChild(m_pButtonManagerNode);
 
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
@@ -261,6 +262,9 @@ bool LevelMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 
 void LevelMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {	 
+	if (m_pButtonManagerNode->IsInTapMode())
+		return;
+
 	Point touchPosition = pTouch->getLocation();
 	m_fYMoved = touchPosition.y - m_fBeginY;
 
@@ -285,6 +289,9 @@ void LevelMapLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 
 void LevelMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
+	if (m_pButtonManagerNode->IsInTapMode())
+		return;
+
 	DataTouch dataTouch = m_pScrollManager->getDistanceScrollY();
 	float distanceY = dataTouch.point.y;
 	float deltaTime = dataTouch.fDeltaTime;
@@ -314,7 +321,7 @@ void LevelMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 Node* LevelMapLayer::generateLayoutStarAndBonusQuest(const int& iStarCompleted, const int& iBonusQuestCompleted, const int& iTotalBonusQuest)
 {
 	Node* pNode = Node::create();
-
+	
 	for(int iCountStar=0; iCountStar<3; iCountStar++)
 	{
 		Sprite* pStarSprite;
@@ -359,7 +366,7 @@ Node* LevelMapLayer::generateLayoutStarAndBonusQuest(const int& iStarCompleted, 
 			pBonusQuestSprite = Sprite::create("World-Map/mushroom_fail.png");
 		}
 		pBonusQuestSprite->setScale(0.5f);
-		pBonusQuestSprite->setPosition(Point(-15.0f + iCountBonusQuest*27, 90.0f));
+		pBonusQuestSprite->setPosition(Point(-15.0f*(iTotalBonusQuest-1) + iCountBonusQuest*27, 90.0f));
 
 		pNode->addChild(pBonusQuestSprite);
 	}
@@ -469,7 +476,8 @@ void LevelMapLayer::playEffectUnlockLevel(const bool& bPlayNextLevelGame, const 
 		this->sequenceUpdateStar();
 
 		auto actionScaleInButtonCurrent = ScaleTo::create(0.3f, 0.4);
-		m_pButtonNodeCurrentLevel->runAction(actionScaleInButtonCurrent);
+		auto actioneremoveButtonNodeCurrentLevel = CallFunc::create(this, callfunc_selector(LevelMapLayer::removeButtonNodeCurrentLevel));
+		m_pButtonNodeCurrentLevel->runAction(Sequence::create(actionScaleInButtonCurrent, DelayTime::create(0.3f), actioneremoveButtonNodeCurrentLevel, NULL));
 
 		m_buttonPlayPassLevel->setScale(0.4);
 		m_buttonPlayPassLevel->setVisible(true);

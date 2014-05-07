@@ -180,7 +180,7 @@ bool LevelTable::updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& 
 	if (pJsonUser != NULL)
 	{
 		iIndexCurrentChapter = worldMapConfig.m_WorlMapChapterConfigMap[pJsonUser->getItemStringValue("CurrentChapter")];
-		iCurrentLevel = int(strtod(pJsonUser->getItemStringValue("CurrentLevel"), 0));
+		iCurrentLevel = pJsonUser->getItemIntValue("CurrentLevel", 1);
 	}
 
 	String sqlRun = "";
@@ -233,12 +233,12 @@ bool LevelTable::updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& 
 			// Insert Level
 			sqlRun.append("insert into Levels (ChapterId,Level,WordId,Star,Score,BonusQuest,TotalBonusQuest,IsUnlock,Version) values(");
 			sqlRun.appendWithFormat("'%s',", pJsonLevel->getItemStringValue("ChapterId"));
-			sqlRun.appendWithFormat("%s,", pJsonLevel->getItemStringValue("Level"));
+			sqlRun.appendWithFormat("%d,", pJsonLevel->getItemIntValue("Level", 1));
 			sqlRun.appendWithFormat("'%s',", pJsonLevel->getItemStringValue("WordId"));
-			sqlRun.appendWithFormat("%s,", pJsonLevel->getItemStringValue("Stars"));
-			sqlRun.appendWithFormat("%s,", pJsonLevel->getItemStringValue("Score"));
-			sqlRun.appendWithFormat("%s,", pJsonLevel->getItemStringValue("BonusQuest"));
-			sqlRun.appendWithFormat("%s,", pJsonLevel->getItemStringValue("TotalBonusQuest"));
+			sqlRun.appendWithFormat("%d,", pJsonLevel->getItemIntValue("Stars", 0));
+			sqlRun.appendWithFormat("%d,", pJsonLevel->getItemIntValue("Score", 0));
+			sqlRun.appendWithFormat("%d,", pJsonLevel->getItemIntValue("BonusQuest", 0));
+			sqlRun.appendWithFormat("%d,", pJsonLevel->getItemIntValue("TotalBonusQuest", 0));
 			sqlRun.appendWithFormat("%d,", isUnlock);
 			sqlRun.appendWithFormat("%d);", iVersion);
 		}
@@ -247,14 +247,14 @@ bool LevelTable::updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& 
 			// Update Level
 			sqlRun.append("update Levels Set");
 			sqlRun.appendWithFormat(" WordId='%s',", pJsonLevel->getItemStringValue("WordId"));
-			sqlRun.appendWithFormat(" Star=%s,", pJsonLevel->getItemStringValue("Stars"));
-			sqlRun.appendWithFormat(" Score=%s,", pJsonLevel->getItemStringValue("Score"));
-			sqlRun.appendWithFormat(" BonusQuest=%s,", pJsonLevel->getItemStringValue("BonusQuest"));
-			sqlRun.appendWithFormat(" TotalBonusQuest=%s,", pJsonLevel->getItemStringValue("TotalBonusQuest"));
+			sqlRun.appendWithFormat(" Star=%d,", pJsonLevel->getItemIntValue("Stars", 0));
+			sqlRun.appendWithFormat(" Score=%d,", pJsonLevel->getItemIntValue("Score", 0));
+			sqlRun.appendWithFormat(" BonusQuest=%d,", pJsonLevel->getItemIntValue("BonusQuest", 0));
+			sqlRun.appendWithFormat(" TotalBonusQuest=%d,", pJsonLevel->getItemIntValue("TotalBonusQuest", 0));
 			sqlRun.appendWithFormat(" IsUnlock=%d,", isUnlock);
 			sqlRun.appendWithFormat(" Version=%d", iVersion);
 			sqlRun.appendWithFormat(" where ChapterId='%s'", pJsonLevel->getItemStringValue("ChapterId"));
-			sqlRun.appendWithFormat(" and Level=%s;", pJsonLevel->getItemStringValue("Level"));
+			sqlRun.appendWithFormat(" and Level=%d;", pJsonLevel->getItemIntValue("Level", 0));
 		}
 	}
 

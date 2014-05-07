@@ -5,6 +5,7 @@
 #include "FooterNode.h"
 #include "GameConfigManager.h"
 #include "ScrollManager.h"
+#include "ButtonManagerNode.h"
 
 class WorldMapLayer : public cocos2d::CCLayer
 {
@@ -35,6 +36,7 @@ private:
 	WordlMapConfig m_wordMapConfig;
 
 	ScrollManager* m_pScrollManager;
+	ButtonManagerNode* m_pButtonManagerNode;
 };
 
 class WorldMapScene : public cocos2d::CCScene

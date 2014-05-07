@@ -14,6 +14,9 @@ public:
 	bool init() override;
 	CREATE_FUNC(ButtonManagerNode);
 
+	inline bool IsInTapMode() { return m_bIsInTapMode;}
+	void AllowSwipingBackground(bool bAllowSwipingBackground);
+
 	virtual bool onTouchButtonBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
 	virtual void onTouchButtonMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
 	virtual void onTouchButtonEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent);
@@ -29,6 +32,10 @@ private:
 	std::vector<ButtonNode*> m_buttonNodes;
 
 	int m_iIndexButtonActive;
+
+	bool m_bIsInTapMode;
+	bool m_bAllowSwipingBackground;
+	cocos2d::EventListenerTouch*  m_pEventListener;
 
 	bool m_isClickButton;
 };

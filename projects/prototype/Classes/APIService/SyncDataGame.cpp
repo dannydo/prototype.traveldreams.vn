@@ -154,7 +154,7 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 						cs::JsonDictionary *pJsonSync = pJsonData->getSubDictionary("sync");
 						if (pJsonSync != NULL)
 						{
-							int iVersion = int(strtod(pJsonSync->getItemStringValue("Version"), 0));
+							int iVersion = pJsonSync->getItemIntValue("Version", 0);
 							if (!UserTable::getInstance()->updateDataSyncUser(pJsonSync, iVersion))
 								bResult = false;
 				

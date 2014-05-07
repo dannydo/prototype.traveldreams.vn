@@ -155,3 +155,17 @@ void BonusQuestManager::GetLettersOfCollectBonusWordQuest(std::vector<char>& let
 		iBufferLenght--;
 	}
 }
+
+int BonusQuestManager::CountBonusQuestCompleted()
+{
+	int iCountBonusQuestCompleted = 0;
+	for(int iIndex=0; iIndex<BonusQuestType::_BQT_TYPE_COUNT_; iIndex++)
+	{
+		if(IsQuestCompleted((BonusQuestType)iIndex))
+		{
+			iCountBonusQuestCompleted++;
+		}
+	}
+
+	return iCountBonusQuestCompleted;
+}

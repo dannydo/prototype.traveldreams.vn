@@ -373,18 +373,18 @@ bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iV
 			// Insert Words
 			sqlRun.append("insert into Words values(");
 			sqlRun.appendWithFormat("'%s',", sWordId.c_str());
-			sqlRun.appendWithFormat("%s,", pJsonWord->getItemStringValue("CountCollected"));
+			sqlRun.appendWithFormat("%d,", pJsonWord->getItemIntValue("CountCollected", 0));
 			sqlRun.appendWithFormat("%d,", iVersion);
-			sqlRun.appendWithFormat("%s,", pJsonWord->getItemStringValue("IsCollected"));
+			sqlRun.appendWithFormat("%d,", pJsonWord->getItemIntValue("IsCollected", 0));
 			sqlRun.appendWithFormat("%d);", 0);
 		}
 		else
 		{
 			// Update Words
 			sqlRun.append("update Words Set");
-			sqlRun.appendWithFormat(" CountCollected=%s,", pJsonWord->getItemStringValue("CountCollected"));
+			sqlRun.appendWithFormat(" CountCollected=%d,", pJsonWord->getItemIntValue("CountCollected", 0));
 			sqlRun.appendWithFormat(" Version=%d,", iVersion);
-			sqlRun.appendWithFormat(" IsCollected=%s", pJsonWord->getItemStringValue("IsCollected"));
+			sqlRun.appendWithFormat(" IsCollected=%d", pJsonWord->getItemIntValue("IsCollected", 0));
 			sqlRun.appendWithFormat(" where WordId='%s';", sWordId.c_str());
 		}
 	}

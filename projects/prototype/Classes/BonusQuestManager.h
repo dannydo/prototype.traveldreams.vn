@@ -76,6 +76,9 @@ public:
 	inline const BonusQuestCollectBonusParam& GetCollectBonusWordParam() { return m_CollectBonusWordParam;}
 
 	void GetLettersOfCollectBonusWordQuest(std::vector<char>& letterList, const int& iMaxLetterCount);
+
+	int CountBonusQuestCompleted();
+
 private:
 	friend class NewGameBoardManager;
 	NewGameBoardManager* m_pGameBoardManager;

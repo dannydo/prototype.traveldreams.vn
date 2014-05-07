@@ -6,7 +6,6 @@
 #include "LoadingImageNode.h"
 #include "GameConfigManager.h"
 #include "FunctionCommon.h"
-#include "ButtonManagerNode.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -55,6 +54,10 @@ bool LeaderBoardtNode::init()
 	m_pSlideShow = Node::create();
 	this->addChild(m_pSlideShow);
 
+	m_pButtonManagerNode = ButtonManagerNode::create();
+	m_pButtonManagerNode->AllowSwipingBackground(true);
+	m_pSlideShow->addChild(m_pButtonManagerNode);
+
 	m_pScrollManager = new ScrollManager();
 	m_iLeaderBoardCount = 0;
 
@@ -76,13 +79,12 @@ bool LeaderBoardtNode::init()
 	}
 #endif
 
-	/*
 	UserService::getInstance()->addCallBackList(this);
 	m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
 	m_iConnectServer++;
 	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
 	UserService::getInstance()->getLeaderBoardLevel(m_sChapterId ,m_iLevel, m_iConnectServer);
-	*/
+	
 
 	m_bIsSwipe = false;
 
@@ -104,14 +106,6 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 	LoadingImagetNode* avatar = LoadingImagetNode::createLayout(urlAvatar.c_str());
 	avatar->setPosition(Point(50.0f, 95.0f));
 	pNodeItem->addChild(avatar);
-
-	Sprite* pIconAskLife = Sprite::create("Target-End-Game/btn_ask_life.png");
-	ButtonNode* pButtonAskLife = ButtonNode::createButtonSprite(pIconAskLife, CC_CALLBACK_1(LeaderBoardtNode::clickAskLife, this));
-	pButtonAskLife->setPosition(Point(115.0f, 95.0f));
-	
-	ButtonManagerNode* pButtonManager = ButtonManagerNode::create();
-	pButtonManager->addButtonNode(pButtonAskLife);
-	pNodeItem->addChild(pButtonManager);
 
 	LabelBMFont *pLabelScore = LabelBMFont::create(formatNumber(iScore).getCString(), "fonts/font_small_alert.fnt");
 	pLabelScore->setAnchorPoint(Point(0.0f, 0.5f));
@@ -136,6 +130,11 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 	pNodeItem->setPosition(Point(-320.0f + iIndex*160, -100.0f));
 	pNodeItem->setTag(iIndex);
 	m_pSlideShow->addChild(pNodeItem);
+
+	Sprite* pIconAskLife = Sprite::create("Target-End-Game/btn_ask_life.png");
+	ButtonNode* pButtonAskLife = ButtonNode::createButtonSprite(pIconAskLife, CC_CALLBACK_1(LeaderBoardtNode::clickAskLife, this));
+	pButtonAskLife->setPosition(Point(-205.0f + iIndex*160, -5.0f));
+	m_pButtonManagerNode->addButtonNode(pButtonAskLife);
 }
 
 void LeaderBoardtNode::clickAskLife(cocos2d::Object* sender)
@@ -179,6 +178,9 @@ bool LeaderBoardtNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
 
 void LeaderBoardtNode::onTouchCustomNodeMoved(Touch* pTouch,  Event* pEvent)
 {
+	if (m_pButtonManagerNode->IsInTapMode())
+		return;
+
 	Point touchPosition = pTouch->getLocation();
 	m_fXMoved = touchPosition.x - m_fBeginX;
 	
@@ -203,6 +205,9 @@ void LeaderBoardtNode::onTouchCustomNodeMoved(Touch* pTouch,  Event* pEvent)
 
 void LeaderBoardtNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
 {
+	if (m_pButtonManagerNode->IsInTapMode())
+		return;
+
 	DataTouch dataTouch = m_pScrollManager->getDistanceScrollX();
 	float distanceX = dataTouch.point.x;
 	float deltaTime = dataTouch.fDeltaTime;
@@ -254,7 +259,7 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 						for(int iIndex=0; iIndex < m_iLeaderBoardCount; iIndex++)
 						{
 							cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
-							int iScore = int(strtod(pJsonItem->getItemStringValue("Score"), 0));
+							int iScore = pJsonItem->getItemIntValue("Score", 0);
 
 							if (iScore > levelInfo.iScore)
 								iRank++;
@@ -379,7 +384,7 @@ void LeaderBoardtNode::parseJsonToLeadeBoard(cs::JsonDictionary* pJsonItem, cons
 {
 	if(iRank > 0 && iIndex >= 0)
 	{
-		int iScore = int(strtod(pJsonItem->getItemStringValue("Score"), 0));
+		int iScore = pJsonItem->getItemIntValue("Score", 0);
 		const char* sName = pJsonItem->getItemStringValue("FirstName");
 		const char* sFacebookId = pJsonItem->getItemStringValue("FacebookId");
 

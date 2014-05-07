@@ -185,23 +185,23 @@ bool ChapterTable::updateDataSyncChapters(cs::JsonDictionary* pJsonSync, const i
 			// Insert Chapter
 			sqlRun.append("insert into Chapters values(");
 			sqlRun.appendWithFormat("'%s',", pJsonChapter->getItemStringValue("ChapterId"));
-			sqlRun.appendWithFormat("%s,", pJsonChapter->getItemStringValue("TotalLevelUnlock"));
-			sqlRun.appendWithFormat("%s,", pJsonChapter->getItemStringValue("TotalStar"));
+			sqlRun.appendWithFormat(" TotalLevelUnlock=%d,", pJsonChapter->getItemIntValue("TotalLevelUnlock", 0));
+			sqlRun.appendWithFormat(" TotalStar=%d,", pJsonChapter->getItemIntValue("TotalStar", 0));
 			sqlRun.appendWithFormat("%d,", 1);//pJsonChapter->getItemIntValue("IsUnlock", 0));
 			sqlRun.appendWithFormat("%d,", iVersion);
-			sqlRun.appendWithFormat("%s,", pJsonChapter->getItemStringValue("TotalFlashCardUnlock"));
-			sqlRun.appendWithFormat("%s);", pJsonChapter->getItemStringValue("TotalFlashCard"));
+			sqlRun.appendWithFormat(" TotalFlashCardUnlock=%d,", pJsonChapter->getItemIntValue("TotalFlashCardUnlock", 0));
+			sqlRun.appendWithFormat(" TotalFlashCard=%d,", pJsonChapter->getItemIntValue("TotalFlashCard", 0));
 		}
 		else
 		{
 			// Update Chapter
 			sqlRun.append("update Chapters Set");
-			sqlRun.appendWithFormat(" TotalLevelUnlock=%s,", pJsonChapter->getItemStringValue("TotalLevelUnlock"));
-			sqlRun.appendWithFormat(" TotalStar=%s,", pJsonChapter->getItemStringValue("TotalStar"));
+			sqlRun.appendWithFormat(" TotalLevelUnlock=%d,", pJsonChapter->getItemIntValue("TotalLevelUnlock", 0));
+			sqlRun.appendWithFormat(" TotalStar=%d,", pJsonChapter->getItemIntValue("TotalStar", 0));
 			sqlRun.appendWithFormat(" IsUnlock=%d,", 1);//pJsonChapter->getItemIntValue("IsUnlock", 0));
 			sqlRun.appendWithFormat(" Version=%d,", iVersion);
-			sqlRun.appendWithFormat(" TotalFlashCardUnlock=%s,", pJsonChapter->getItemStringValue("TotalFlashCardUnlock"));
-			sqlRun.appendWithFormat(" TotalFlashCard=%s", pJsonChapter->getItemStringValue("TotalFlashCard"));
+			sqlRun.appendWithFormat(" TotalFlashCardUnlock=%d,", pJsonChapter->getItemIntValue("TotalFlashCardUnlock", 0));
+			sqlRun.appendWithFormat(" TotalFlashCard=%d", pJsonChapter->getItemIntValue("TotalFlashCard", 0));
 			sqlRun.appendWithFormat(" where ChapterId='%s';", pJsonChapter->getItemStringValue("ChapterId"));
 		}
 	}
