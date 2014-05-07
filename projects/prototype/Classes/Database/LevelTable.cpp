@@ -211,7 +211,7 @@ bool LevelTable::updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& 
 		bool isInsert = true;
 
 		std::string sChapterId = pJsonLevel->getItemStringValue("ChapterId");
-		int iLevel = int(strtod(pJsonLevel->getItemStringValue("Level"), 0));
+		int iLevel = pJsonLevel->getItemIntValue("Level", 1);
 		for(int iIndexLevel=0; iIndexLevel<levels.size(); iIndexLevel++)
 		{
 			if (sChapterId == levels[iIndexLevel].sChapterId && iLevel == levels[iIndexLevel].iLevel)
@@ -261,6 +261,8 @@ bool LevelTable::updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sqlRun.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
 		return false;
+
+	CCLOG("sync Level true");
 
 	if (m_sCurrentChapterId != "")
 		this->fetchLevelsForChapter(m_sCurrentChapterId);

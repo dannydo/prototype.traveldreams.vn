@@ -185,12 +185,12 @@ bool ChapterTable::updateDataSyncChapters(cs::JsonDictionary* pJsonSync, const i
 			// Insert Chapter
 			sqlRun.append("insert into Chapters values(");
 			sqlRun.appendWithFormat("'%s',", pJsonChapter->getItemStringValue("ChapterId"));
-			sqlRun.appendWithFormat(" TotalLevelUnlock=%d,", pJsonChapter->getItemIntValue("TotalLevelUnlock", 0));
-			sqlRun.appendWithFormat(" TotalStar=%d,", pJsonChapter->getItemIntValue("TotalStar", 0));
+			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("TotalLevelUnlock", 0));
+			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("TotalStar", 0));
 			sqlRun.appendWithFormat("%d,", 1);//pJsonChapter->getItemIntValue("IsUnlock", 0));
 			sqlRun.appendWithFormat("%d,", iVersion);
-			sqlRun.appendWithFormat(" TotalFlashCardUnlock=%d,", pJsonChapter->getItemIntValue("TotalFlashCardUnlock", 0));
-			sqlRun.appendWithFormat(" TotalFlashCard=%d,", pJsonChapter->getItemIntValue("TotalFlashCard", 0));
+			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("TotalFlashCardUnlock", 0));
+			sqlRun.appendWithFormat("%d);", pJsonChapter->getItemIntValue("TotalFlashCard", 0));
 		}
 		else
 		{
@@ -210,6 +210,7 @@ bool ChapterTable::updateDataSyncChapters(cs::JsonDictionary* pJsonSync, const i
 	if(iResult != SQLITE_OK)
 		return false;
 
+	CCLOG("sync Chapter true");
 	this->fetchAllChapter();
 
 	return true;

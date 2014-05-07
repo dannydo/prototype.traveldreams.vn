@@ -228,6 +228,7 @@ bool UserTable::updateDataSyncUser(cs::JsonDictionary* pJsonSync, const int& iVe
 			return false;
 	}
 
+	CCLOG("sync User true");
 	this->fetchhUser();
 	return true;
 }

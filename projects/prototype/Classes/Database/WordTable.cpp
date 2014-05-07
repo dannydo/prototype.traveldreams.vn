@@ -393,6 +393,8 @@ bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iV
 	if(iResult != SQLITE_OK)
 		return false;
 
+	CCLOG("sync Word true");
+
 	if (m_sCurrentChapterId != "")
 		this->fetchWordsForChapter(m_sCurrentChapterId);
 	return true;
@@ -452,6 +454,8 @@ bool WordTable::updateDataSyncMapChapterWords(cs::JsonDictionary* pJsonSync, con
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sqlRun.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
 		return false;
+
+	CCLOG("sync Map Chapter true");
 
 	if (m_sCurrentChapterId != "")
 		this->fetchWordsForChapter(m_sCurrentChapterId);
