@@ -27,12 +27,16 @@ bool ButtonManagerNode::init()
 
 	m_bIsInTapMode = false;
 	m_bAllowSwipingBackground = false;
+	m_isFinishProcessButton = true;
 		 
 	return true;
 }
 
 bool ButtonManagerNode::onTouchButtonBegan(Touch* pTouch,  Event* pEvent)
 {
+	if (m_isFinishProcessButton == false)
+		return false;
+
 	m_pointClickBegin = pTouch->getLocation();
 
 	for (int iIndex=0; iIndex<m_buttonNodes.size(); iIndex++)
@@ -53,6 +57,7 @@ bool ButtonManagerNode::onTouchButtonBegan(Touch* pTouch,  Event* pEvent)
 		if(pRectButton->containsPoint(touchButton))
 		{
 			m_isClickButton = true;
+			m_isFinishProcessButton = false;
 			auto scaleAction = ScaleTo::create(0.05f, 0.9f);
 			auto scaleAction1 = ScaleTo::create(0.08f, 0.93f);
 			auto scaleAction2 = ScaleTo::create(0.1f, 0.9f);
@@ -78,6 +83,7 @@ void ButtonManagerNode::onTouchButtonMoved(Touch* pTouch,  Event* pEvent)
 	if (fabsf(m_pointClickBegin.x - touchPosition.x) > 30 || fabsf(m_pointClickBegin.y - touchPosition.y) > 30)
 	{
 		m_bIsInTapMode = false;
+		m_isFinishProcessButton = true;
 	}
 }
 
@@ -123,6 +129,8 @@ void ButtonManagerNode::onTouchButtonEnded(Touch* pTouch,  Event* pEvent)
 
 void ButtonManagerNode::buttonCallBack()
 {
+	m_isFinishProcessButton = true;
+
 	ButtonNode* pButtonSprite = m_buttonNodes[m_iIndexButtonActive];
 	pButtonSprite->setStateActive(!pButtonSprite->getStateActive());
 

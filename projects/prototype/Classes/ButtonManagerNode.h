@@ -38,6 +38,7 @@ private:
 	cocos2d::EventListenerTouch*  m_pEventListener;
 
 	bool m_isClickButton;
+	bool m_isFinishProcessButton;
 };
 
 #endif;
