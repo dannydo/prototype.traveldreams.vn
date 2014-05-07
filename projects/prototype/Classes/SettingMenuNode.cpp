@@ -88,6 +88,29 @@ bool SettingMenuNode::init()
 			pButtonReset->setPosition(Point(252.5f, 278.0f));
 			m_pButtonManagerNode->addButtonNode(pButtonReset);
 
+			// Van Dao
+			m_pUnlockLabel = LabelBMFont::create("Unlock Levels", "fonts/font_score.fnt");
+			m_pUnlockLabel->setAnchorPoint(Point(0.5f, 0.5f));
+			m_pUnlockLabel->setPosition(Point(230.0f, 52.0f));
+
+			/*
+			if(UserDefault::getInstance()->getIntegerForKey("IsUnlockALlLevel", 0) == 1)
+			{
+				m_pUnlockLabel->setString("Not Unlock Levels");
+			}
+			else
+			{
+				m_pUnlockLabel->setString("Unlock Levels");
+			}
+			*/
+
+			Sprite* pUnlockSprite = Sprite::create("PanelSetting/btn_unlock_all_level.png");
+			pUnlockSprite->addChild(m_pUnlockLabel);
+
+			ButtonNode* pButtonUnlock = ButtonNode::createButtonSprite(pUnlockSprite, CC_CALLBACK_1(SettingMenuNode::clickUnlockAllLevel, this));
+			pButtonUnlock->setPosition(Point(252.5f, 170.0f));
+			m_pButtonManagerNode->addButtonNode(pButtonUnlock);
+
 			break;
 		}
 		case SceneMode::kMainMenu : 
@@ -401,6 +424,27 @@ void SettingMenuNode::addButtonSetting(ButtonNode* pSettingButton)
 {
 	m_pSettingButton = pSettingButton;
 }
+
+void SettingMenuNode::clickUnlockAllLevel(cocos2d::Object* sender)
+{
+	// Van Dao
+	UserDefault::getInstance()->setIntegerForKey("IsUnlockALlLevel", 1);
+	/*
+	if(UserDefault::getInstance()->getIntegerForKey("IsUnlockALlLevel", 0) == 1)
+	{
+		m_pUnlockLabel->setString("Unlock Levels");
+		UserDefault::getInstance()->setIntegerForKey("IsUnlockALlLevel", 0);
+	}
+	else
+	{
+		m_pUnlockLabel->setString("Not Unlock Levels");
+		UserDefault::getInstance()->setIntegerForKey("IsUnlockALlLevel", 1);
+	}
+	*/
+}
+
+
+
 
 
 

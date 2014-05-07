@@ -205,7 +205,11 @@ bool UserTable::updateDataSyncUser(cs::JsonDictionary* pJsonSync, const int& iVe
 	if (pJsonUser != NULL)
 	{
 		String sql = "update Users Set";
-		sql.appendWithFormat(" FacebookId='%s',", pJsonUser->getItemStringValue("FacebookId"));
+
+		std::string sFacebookId = pJsonUser->getItemStringValue("FacebookId");
+		sFacebookId.pop_back();
+
+		sql.appendWithFormat(" FacebookId='%s',", sFacebookId.c_str());
 		sql.appendWithFormat(" FacebookToken='%s',", pJsonUser->getItemStringValue("FacebookToken"));
 		sql.appendWithFormat(" FirstName='%s',", pJsonUser->getItemStringValue("FirstName"));
 		sql.appendWithFormat(" LastName='%s',", pJsonUser->getItemStringValue("LastName"));

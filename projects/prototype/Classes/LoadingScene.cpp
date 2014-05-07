@@ -117,6 +117,11 @@ void LoadingLayer::initData()
 		UserDefault::getInstance()->setIntegerForKey("SettingTurnOnVoice", 1);
 	}
 
+	if(UserDefault::getInstance()->getIntegerForKey("IsUnlockALlLevel", -1) == -1)
+	{
+		UserDefault::getInstance()->setIntegerForKey("IsUnlockALlLevel", 0);
+	}
+
 	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", 0);
 
 	InitDatabase::getInstance();
