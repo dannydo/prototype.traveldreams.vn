@@ -176,9 +176,12 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 					char sUserId[20];
 					sprintf(sUserId, "%d", pJsonUser->getItemIntValue("UserId", 0));
 
+					std::string sFacebookId = pJsonUser->getItemStringValue("FacebookId");
+					sFacebookId.pop_back();
+
 					UserInfo userInfo = UserTable::getInstance()->getUserInfo();
 					userInfo.sUserIdentifier = sUserId;
-					userInfo.sFacebookId = pJsonUser->getItemStringValue("FacebookId");
+					userInfo.sFacebookId = sFacebookId;
 					userInfo.sFacebookToken = pJsonUser->getItemStringValue("FacebookToken");
 					userInfo.sUserToken = pJsonUser->getItemStringValue("UserToken");
 					userInfo.ulLifeTimeBeginRemain = getTimeLocalCurrent();

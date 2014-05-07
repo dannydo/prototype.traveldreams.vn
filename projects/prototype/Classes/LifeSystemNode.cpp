@@ -24,7 +24,6 @@ bool LifeSystemNode::init()
 
 	UserTable::getInstance()->updateLife(0);
 	m_userInfo = UserTable::getInstance()->getUserInfo();
-	UserTable::getInstance()->updateUser(m_userInfo);
 
 	m_pBackgroundClock = Sprite::create("Footer/btn_lives_section.png");
 

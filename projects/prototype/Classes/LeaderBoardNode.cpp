@@ -100,7 +100,6 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 	pLoadAvatar->setPosition(Point(50.0f, 95.0f));
 	pNodeItem->addChild(pLoadAvatar);
 
-	/*
 	std::string urlAvatar = "https://graph.facebook.com/";
 	urlAvatar.append(sFacebookId);
 	urlAvatar.append("/picture");
@@ -108,7 +107,6 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 	LoadingImagetNode* avatar = LoadingImagetNode::createLayout(urlAvatar.c_str());
 	avatar->setPosition(Point(50.0f, 95.0f));
 	pNodeItem->addChild(avatar);
-	*/
 
 	LabelBMFont *pLabelScore = LabelBMFont::create(formatNumber(iScore).getCString(), "fonts/font_small_alert.fnt");
 	pLabelScore->setAnchorPoint(Point(0.0f, 0.5f));
@@ -389,8 +387,9 @@ void LeaderBoardtNode::parseJsonToLeadeBoard(cs::JsonDictionary* pJsonItem, cons
 	{
 		int iScore = pJsonItem->getItemIntValue("Score", 0);
 		const char* sName = pJsonItem->getItemStringValue("FirstName");
-		const char* sFacebookId = pJsonItem->getItemStringValue("FacebookId");
+		std::string sFacebookId = pJsonItem->getItemStringValue("FacebookId");
+		sFacebookId.pop_back();
 
-		this->addItemToSlide(iScore, sName, sFacebookId, iRank, iIndex);
+		this->addItemToSlide(iScore, sName, sFacebookId.c_str(), iRank, iIndex);
 	}
 }

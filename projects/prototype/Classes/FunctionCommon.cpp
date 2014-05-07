@@ -40,3 +40,19 @@ unsigned long getTimeLocalCurrent()
 
 	return timev;  //seconds
 }
+
+unsigned long getSecondsTimeLocalOfDay()
+{
+	timeval now;
+	gettimeofday(&now, NULL);
+	unsigned long iCurrentTime = now.tv_sec + now.tv_usec/1000000 ; //seconds
+	return iCurrentTime;
+}
+
+unsigned long getMilisecondsTimeLocalOfDay()
+{
+	timeval now;
+	gettimeofday(&now, NULL);
+	unsigned long iCurrentTime = now.tv_sec*1000 + now.tv_usec/1000 ; //miliseconds
+	return iCurrentTime;
+}

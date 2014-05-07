@@ -16,12 +16,12 @@ void ScrollManager::addDataToQueue(DataTouch dataTouch)
 		{
 			m_Datatouchs[iIndex] = m_Datatouchs[iIndex+1];
 		}
-		dataTouch.lTime = getTimeLocalCurrent();
+		dataTouch.lTime = getMilisecondsTimeLocalOfDay();
 		m_Datatouchs[m_iTotalDataTouch-1] = dataTouch;
 	}
 	else
 	{
-		dataTouch.lTime = getTimeLocalCurrent();
+		dataTouch.lTime = getMilisecondsTimeLocalOfDay();
 		m_Datatouchs[m_iTotalDataTouch] = dataTouch;
 		m_iTotalDataTouch++;
 	}

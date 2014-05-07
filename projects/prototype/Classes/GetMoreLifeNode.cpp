@@ -14,7 +14,6 @@ bool GetMoreLifeNode::init()
 
 	UserTable::getInstance()->updateLife(0);
 	m_userInfo = UserTable::getInstance()->getUserInfo();
-	UserTable::getInstance()->updateUser(m_userInfo);
 	
 	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 150));
 	pBackground->setContentSize(CCSizeMake(640.0f, 960.0f));

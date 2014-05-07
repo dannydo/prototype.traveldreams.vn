@@ -46,6 +46,7 @@ private:
 	void clickMainMenu(cocos2d::Object* sender);
 	void clickQuitLevel(cocos2d::Object* sender);
 	void clickResume(cocos2d::Object* sender);
+	void clickUnlockAllLevel(cocos2d::Object* sender);
 
 	void actionBack();
 	void addButtonFacebook();
@@ -62,6 +63,8 @@ private:
 	bool m_iShowSetting;
 	bool m_isClick;
 	int m_iStatusButtonFacebook;
+
+	cocos2d::LabelBMFont *m_pUnlockLabel;
 };
 
 class Breadcrumb
