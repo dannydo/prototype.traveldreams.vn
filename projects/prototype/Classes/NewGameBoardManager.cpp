@@ -2176,61 +2176,61 @@ void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bo
 	+ Level 4: new gems has color # their regarded-wall neighbours ( 4- directions).
 	*/
 
-	// generate new gems
-	int iTestGenerateGemID = 0;
-	int neighbourDeltaRow[4] = { 1, 0, -1, 0};
-	int neighbourDeltaColumn[4] = { 0, 1, 0, -1};
-	int iGemID;
-
+	// generate new gems	
 	int iGenerateGemMode = 3;
 
 	if (iGenerateGemMode == 1)
 	{
 		for(iRow = 0; iRow < m_iRowNumber; iRow++)
-		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
-			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
-			{				
-				m_BoardValueMatrix[iRow][iColumn].m_iGemID =  rand() % m_pLevelConfig->m_iNumberOfColor;
-				newCells.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemID));	
-			}
+			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+				if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
+				{				
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID =  rand() % m_pLevelConfig->m_iNumberOfColor;
+					newCells.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemID));	
+				}
 	}
 	else if (iGenerateGemMode == 2)
 	{
-		for(iRow = 0; iRow < m_iRowNumber; iRow++)
-		for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
-			if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
-			{				
-				m_BoardValueMatrix[iRow][iColumn].m_iGemID =  (iTestGenerateGemID++) % m_pLevelConfig->m_iNumberOfColor; 
-				newCells.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemID));	
-			}
-	}
-	else // 3
-	{
+		int iTestGenerateGemID = 0;
 		for(iRow = 0; iRow < m_iRowNumber; iRow++)
 			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
 				if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
 				{				
-						iTestGenerateGemID++;
-						for(iGemID=iTestGenerateGemID; iGemID < iTestGenerateGemID+ m_pLevelConfig->m_iNumberOfColor; iGemID++)
-						{
-							bool bIsNoNeighbourMatchColor = true;
-							int i;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID =  (iTestGenerateGemID++) % m_pLevelConfig->m_iNumberOfColor; 
+					newCells.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemID));	
+				}
+	}
+	else // 3
+	{
+		int iTestGenerateGemID = 0;
+		int neighbourDeltaRow[4] = { 1, 0, -1, 0};
+		int neighbourDeltaColumn[4] = { 0, 1, 0, -1};
+		int iGemID;
 
-							for(i=0; i<4; i++)
-								if (iRow+neighbourDeltaRow[i] >=0 && iRow+neighbourDeltaRow[i] < m_iRowNumber
-									&& iColumn+neighbourDeltaColumn[i] >=0 && iColumn+neighbourDeltaColumn[i] < m_iColumnNumber)
-									if ( iGemID % m_pLevelConfig->m_iNumberOfColor == m_BoardValueMatrix[iRow + neighbourDeltaRow[i]][iColumn + neighbourDeltaColumn[i]].m_iGemID)
-								{
-									bIsNoNeighbourMatchColor = false;
-									break;
-								}
-							if (bIsNoNeighbourMatchColor || (i == m_pLevelConfig->m_iNumberOfColor-1))
+		for(iRow = 0; iRow < m_iRowNumber; iRow++)
+			for(iColumn = 0; iColumn < m_iColumnNumber; iColumn++)
+				if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < 0)
+				{				
+					iTestGenerateGemID++;
+					for(iGemID=iTestGenerateGemID; iGemID < iTestGenerateGemID+ m_pLevelConfig->m_iNumberOfColor; iGemID++)
+					{
+						bool bIsNoNeighbourMatchColor = true;
+						int i;
+
+						for(i=0; i<4; i++)
+							if (iRow+neighbourDeltaRow[i] >=0 && iRow+neighbourDeltaRow[i] < m_iRowNumber
+								&& iColumn+neighbourDeltaColumn[i] >=0 && iColumn+neighbourDeltaColumn[i] < m_iColumnNumber)
+								if ( iGemID % m_pLevelConfig->m_iNumberOfColor == m_BoardValueMatrix[iRow + neighbourDeltaRow[i]][iColumn + neighbourDeltaColumn[i]].m_iGemID)
+							{
+								bIsNoNeighbourMatchColor = false;
 								break;
-						}
-						m_BoardValueMatrix[iRow][iColumn].m_iGemID = iGemID % m_pLevelConfig->m_iNumberOfColor;
+							}
+						if (bIsNoNeighbourMatchColor || (i == m_pLevelConfig->m_iNumberOfColor-1))
+							break;
 					}
-					//m_BoardValueMatrix[iRow][iColumn].m_iGemID =  (iTestGenerateGemID++) % m_pLevelConfig->m_iNumberOfColor; //rand() % m_pLevelConfig->m_iNumberOfColor;
+					m_BoardValueMatrix[iRow][iColumn].m_iGemID = iGemID % m_pLevelConfig->m_iNumberOfColor;
 					newCells.push_back(NewCellInfo(iRow, iColumn, m_BoardValueMatrix[iRow][iColumn].m_iGemID));				
+				}				
 	}
 	
 
