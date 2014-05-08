@@ -82,6 +82,8 @@ bool EndGameNode::initWin()
 	pBackgroundBoard->setPosition(Point(320.0f, 610.0f));
 	this->addChild(pBackgroundBoard);
 
+	m_pStarAndBonusQuestNode = Node::create();
+	this->addChild(m_pStarAndBonusQuestNode);
 	this->generateLayoutStartAndBonusQuest();
 
 	Sprite* pCompletedImage = Sprite::create("Target-End-Game/text_level_completed.png");
@@ -230,14 +232,14 @@ void EndGameNode::generateLayoutStartAndBonusQuest()
 		if (iIndex == 1)
 				pStarPurpleImage->setScale(1.4f);
 
-		this->addChild(pStarPurpleImage);
+		m_pStarAndBonusQuestNode->addChild(pStarPurpleImage);
 	}
 
 	for(int iIndex=0; iIndex<m_iTotalBonusQuest; iIndex++) 
 	{
 		Sprite* pMushRoomFail = Sprite::create("Target-End-Game/mushroom_fail.png");
 		pMushRoomFail->setPosition(Point(526.0f + iIndex*91.0f - m_iTotalBonusQuest*50, 750.0f));
-		this->addChild(pMushRoomFail);
+		m_pStarAndBonusQuestNode->addChild(pMushRoomFail);
 	}
 }
 
@@ -348,7 +350,7 @@ void EndGameNode::updateStar()
 			pStarYellowImage->setPosition(Point(220.0f + 2*100.0f - m_iTotalBonusQuest*46, 750.0f));
 		}
 
-		this->addChild(pStarYellowImage);
+		m_pStarAndBonusQuestNode->addChild(pStarYellowImage);
 		m_iCountYellowStar++;
 		this->sequenceUpdateStar();
 	}
@@ -367,7 +369,7 @@ void EndGameNode::updateBonusQuest()
 	{
 		Sprite* pMushRoom = Sprite::create("Target-End-Game/mushroom_win.png");
 		pMushRoom->setPosition(Point(526.0f + m_iCountBonusQuest*91.0f - m_iTotalBonusQuest*50, 750.0f));
-		this->addChild(pMushRoom);
+		m_pStarAndBonusQuestNode->addChild(pMushRoom);
 		m_iCountBonusQuest++;
 		this->sequenceUpdateBonusQuest();
 	}
@@ -410,7 +412,7 @@ void EndGameNode::menuNextLevelCallBack(Object* sender)
 	//pGameWordManager->GenerateWordForNewLevel(m_sChapterId, m_iCurrentLevel);
 
 	LevelMapScene* pLevelMapScene = (LevelMapScene*)Director::getInstance()->getRunningScene();
-	pLevelMapScene->getLayer()->playEffectUnlockLevel(true, m_iCurrentLevel, m_sChapterId);
+	pLevelMapScene->getLayer()->playEffectUnlockLevel(true, m_iCurrentLevel-1, m_sChapterId);
 	
 	this->getParent()->removeChild(this);
 }

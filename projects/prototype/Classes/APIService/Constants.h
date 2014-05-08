@@ -1,1 +1,1 @@
-#define _CONSTANT_URL_	"http:0//staging.api.kiss-concept.com/"
+#define _CONSTANT_URL_	"http://staging.api.kiss-concept.com/"

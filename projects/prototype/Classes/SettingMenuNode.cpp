@@ -48,19 +48,19 @@ bool SettingMenuNode::init()
 	this->addChild(m_pButtonManagerNode);
 
 	Sprite* pEffectSprite = Sprite::create("PanelSetting/btn_sfx.png");
-	Sprite* pEffectSpriteActive = Sprite::create("PanelSetting/btn_sfx.png");
+	Sprite* pEffectSpriteActive = Sprite::create("PanelSetting/btn_sound_off.png");
 	ButtonNode* pButtonEffectNode = ButtonNode::createButtonSprite(pEffectSprite, pEffectSpriteActive, CC_CALLBACK_0(SettingMenuNode::clickEffect, this));
 	pButtonEffectNode->setPosition(Point(390.0f, 625.0f));
 	m_pButtonManagerNode->addButtonNode(pButtonEffectNode);
 
 	Sprite* pMusicSprite = Sprite::create("PanelSetting/btn_music.png");
-	Sprite* pMusicSpriteActive = Sprite::create("PanelSetting/btn_music.png");
+	Sprite* pMusicSpriteActive = Sprite::create("PanelSetting/btn_music_off.png");
 	ButtonNode* pButtonMusicNode = ButtonNode::createButtonSprite(pMusicSprite, pMusicSpriteActive, CC_CALLBACK_0(SettingMenuNode::clickMusic, this));
 	pButtonMusicNode->setPosition(Point(250.0f, 625.0f));
 	m_pButtonManagerNode->addButtonNode(pButtonMusicNode);
 
 	Sprite* pVoiceSprite = Sprite::create("PanelSetting/btn_voice.png");
-	Sprite* pVoiceSpriteActive = Sprite::create("PanelSetting/btn_voice.png");
+	Sprite* pVoiceSpriteActive = Sprite::create("PanelSetting/btn_voice_off.png");
 	ButtonNode* pButtonVoiceNode = ButtonNode::createButtonSprite(pVoiceSprite, pVoiceSpriteActive, CC_CALLBACK_0(SettingMenuNode::clickVoice, this));
 	pButtonVoiceNode->setPosition(Point(113.0f, 625.0f));
 	m_pButtonManagerNode->addButtonNode(pButtonVoiceNode);
