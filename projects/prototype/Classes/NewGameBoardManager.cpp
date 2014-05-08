@@ -3958,24 +3958,25 @@ bool NewGameBoardManager::Shuffle(std::vector<Cell>& originalMovedCells, std::ve
 			}
 
 			// count all color gems
-			if (IsColorCell(iRow, iColumn))								
+			if (IsColorCell(iRow, iColumn))
 				m_TotalCountPerGemIDList[m_BoardValueMatrix[iRow][iColumn].m_iGemID]++;
 		}
 
 	// check whether there's at least 1 color that have at leat 3 gems
 	bool bGemsPerColorAllNotEnough = true;
-	int iGemID;
+	int iGemID, iRandomStartGemID = rand() % _MAX_GEM_ID_, iChosenGemID;
 	m_iOneGemIDHasAtLeast3Gems = -1;
 	for(iGemID=0; iGemID < _MAX_GEM_ID_; iGemID++)
 	{
-		if (m_TotalCountPerGemIDList[iGemID] >=3)
+		iChosenGemID = (iGemID + iRandomStartGemID) % _MAX_GEM_ID_;
+		if (m_TotalCountPerGemIDList[ iChosenGemID] >=3)
 		{
 			bGemsPerColorAllNotEnough = false;			
 			//break;
 
-			if (m_ShufflableCountPerGemIDList[iGemID] >= 3)
+			if (m_ShufflableCountPerGemIDList[iChosenGemID] >= 3)
 			{
-				m_iOneGemIDHasAtLeast3Gems = iGemID;
+				m_iOneGemIDHasAtLeast3Gems = iChosenGemID;
 				break;
 			}
 		}		

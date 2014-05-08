@@ -1053,14 +1053,14 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 	float fDeltaX = currentPosition.x - m_StartTouchPosition.x;
 	float fDeltaY = currentPosition.y - m_StartTouchPosition.y;
 
-	if( (currentPosition.x < m_fBoardLeftPosition - m_SymbolSize.width/2.f || currentPosition.y < m_fBoardBottomPosition - m_SymbolSize.height/2.f)
+	/*if( (currentPosition.x < m_fBoardLeftPosition - m_SymbolSize.width/2.f || currentPosition.y < m_fBoardBottomPosition - m_SymbolSize.height/2.f)
 		|| (currentPosition.x > m_fBoardLeftPosition + m_GameBoardManager.GetColumnNumber()* m_SymbolSize.width -m_SymbolSize.width/2.f
 		|| currentPosition.y > m_fBoardBottomPosition + m_GameBoardManager.GetRowNumber()* m_SymbolSize.height - m_SymbolSize.height/2.f))
 	{		
 		//AdjustPosition( fDeltaX, fDeltaY, m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn);
 		//m_eTouchMoveState = _TMS_NONE_;
 		//return;
-	}	
+	}*/	
 
 	if (m_eTouchMoveState == _TMS_BEGIN_IDENTIFY_)
 	{			
@@ -1703,7 +1703,10 @@ void HelloWorld::CheckHintAfterMove()
 	{	
 		if	(m_GameBoardManager.Shuffle(m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells))
 		{
-			MessageBox("Notice", "SHUFFLE!!!");
+			m_eTouchMoveState = _TMS_NONE_;
+			m_bIsCellDragPlaying = false;			
+
+			MessageBox("Notice", "SHUFFLE!!!");			
 
 			auto& originalMovedCells = m_ComputeMoveResult.m_OriginalMovedCells;
 			auto& targetMovedCells = m_ComputeMoveResult.m_TargetMovedCells;
@@ -1720,6 +1723,7 @@ void HelloWorld::CheckHintAfterMove()
 				Point pos(m_fBoardLeftPosition + targetMovedCells[i].m_iColumn * m_SymbolSize.width, 
 							m_fBoardBottomPosition + targetMovedCells[i].m_iRow * m_SymbolSize.height);
 
+				m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->stopAllActions();
 				m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->runAction(
 					Sequence::create( 
 						DelayTime::create( 2.3f), // + 0.01f * (targetMovedCells[i].m_iRow - originalMovedCells[i].m_iRow ),
@@ -1727,7 +1731,11 @@ void HelloWorld::CheckHintAfterMove()
 						EaseOut::create( MoveTo::create( _TME_MOVE_CELL_TIME_, centerPos),			3.f ),
 						EaseOut::create( MoveTo::create( _TME_MOVE_CELL_TIME_, pos),			3.f ),
 						NULL));				
-				m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->setPosition(pos);
+				if (m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow ][originalMovedCells[i].m_iColumn].m_pSprite != NULL)
+				{
+					m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow ][originalMovedCells[i].m_iColumn].m_pSprite->stopAllActions();
+					m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->setPosition(pos);
+				}
 
 				tempViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn] = m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];
 				tempMirrorViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn] = m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn];
@@ -1741,8 +1749,13 @@ void HelloWorld::CheckHintAfterMove()
 				iUpdatedZOrder = GetZOrder(targetMovedCells[i].m_iRow, targetMovedCells[i].m_iColumn, false);
 
 				m_BoardViewMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setZOrder( iUpdatedZOrder);		
+				m_BoardViewMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setVisible(true);
+
 				if (m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite != NULL)
+				{
 					m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setZOrder(iUpdatedZOrder);
+					m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setVisible(false);
+				}
 			}	
 
 			m_bIsEffectPlaying = true;
