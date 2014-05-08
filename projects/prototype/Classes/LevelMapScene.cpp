@@ -473,6 +473,7 @@ void LevelMapLayer::playEffectUnlockLevel(const bool& bPlayNextLevelGame, const 
 			m_buttonPlayPassLevel->setTag(levelInfoPass.iLevel);
 			m_pButtonManagerNode->addButtonNode(m_buttonPlayPassLevel);
 
+			m_iTotalStar = 3;
 			m_iYellowStar = levelInfoPass.iStar;
 			m_iCountYellowStar = 0;
 			m_iTotalBonusQuest = levelInfoPass.iTotalBonusQuest;
@@ -526,7 +527,7 @@ void LevelMapLayer::sequenceUpdateStar()
 {
 	auto actionUpdateStar = CallFunc::create(this, callfunc_selector(LevelMapLayer::updateStar));
 	auto delay = DelayTime::create(0.3f);
-	if (m_iCountYellowStar < m_iYellowStar) {
+	if (m_iCountYellowStar < m_iTotalStar) {
 		this->runAction(Sequence::create(delay->clone(), actionUpdateStar, NULL));
 	}
 	else
@@ -537,9 +538,18 @@ void LevelMapLayer::sequenceUpdateStar()
 
 void LevelMapLayer::updateStar()
 {
-	if(m_iCountYellowStar < m_iYellowStar)
+	if(m_iCountYellowStar < m_iTotalStar)
 	{
-		Sprite* pStarSprite = Sprite::create("World-Map/star_win_small.png");
+		Sprite* pStarSprite;
+		if (m_iCountYellowStar < m_iYellowStar)
+		{
+			pStarSprite = Sprite::create("World-Map/star_win_small.png");
+		}
+		else
+		{
+			pStarSprite = Sprite::create("World-Map/star_target_small.png");
+		}
+		
 		m_pNodeStarAndBonusQuestEffect->addChild(pStarSprite);
 
 		if (m_iCountYellowStar == 0)
@@ -573,9 +583,18 @@ void LevelMapLayer::sequenceUpdateBonusQuest()
 
 void LevelMapLayer::updateBonusQuest()
 {
-	if (m_iCountBonusQuest < m_iBonusQuestCompleted && m_iCountBonusQuest < m_iTotalBonusQuest)
+	if (m_iCountBonusQuest < m_iTotalBonusQuest)
 	{
-		Sprite* pBonusQuestSprite = Sprite::create("World-Map/mushroom_win.png");
+		Sprite* pBonusQuestSprite;
+		if (m_iCountBonusQuest < m_iBonusQuestCompleted)
+		{
+			pBonusQuestSprite = Sprite::create("World-Map/mushroom_win.png");
+		}
+		else
+		{
+			pBonusQuestSprite = Sprite::create("World-Map/mushroom_fail.png");
+		}
+
 		pBonusQuestSprite->setScale(0.5f);
 		pBonusQuestSprite->setPosition(Point(-15.0f + m_iCountBonusQuest*27, 90.0f));
 		m_pNodeStarAndBonusQuestEffect->addChild(pBonusQuestSprite);
