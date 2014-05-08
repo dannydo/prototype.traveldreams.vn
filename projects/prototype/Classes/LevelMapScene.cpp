@@ -454,7 +454,7 @@ void LevelMapLayer::playEffectUnlockLevel(const bool& bPlayNextLevelGame, const 
 		if (iCurrentLevel >= iPassLevel && sChapterId == m_sChapterId)
 		{
 			LevelInfo levelInfoPass = m_levels[iPassLevel-1];
-			m_pNodeStarAndBonusQuestEffect = Node::create();
+			m_pNodeStarAndBonusQuestEffect = this->generateLayoutStarAndBonusQuest(0, 0, levelInfoPass.iTotalBonusQuest);
 			m_pNodeStarAndBonusQuestEffect->setPosition(Point(70.0f, 12.0f));
 			
 			char sPassLevel[10];
@@ -473,7 +473,6 @@ void LevelMapLayer::playEffectUnlockLevel(const bool& bPlayNextLevelGame, const 
 			m_buttonPlayPassLevel->setTag(levelInfoPass.iLevel);
 			m_pButtonManagerNode->addButtonNode(m_buttonPlayPassLevel);
 
-			m_iTotalStar = 3;
 			m_iYellowStar = levelInfoPass.iStar;
 			m_iCountYellowStar = 0;
 			m_iTotalBonusQuest = levelInfoPass.iTotalBonusQuest;
@@ -527,7 +526,7 @@ void LevelMapLayer::sequenceUpdateStar()
 {
 	auto actionUpdateStar = CallFunc::create(this, callfunc_selector(LevelMapLayer::updateStar));
 	auto delay = DelayTime::create(0.3f);
-	if (m_iCountYellowStar < m_iTotalStar) {
+	if (m_iCountYellowStar < m_iYellowStar) {
 		this->runAction(Sequence::create(delay->clone(), actionUpdateStar, NULL));
 	}
 	else
@@ -538,18 +537,9 @@ void LevelMapLayer::sequenceUpdateStar()
 
 void LevelMapLayer::updateStar()
 {
-	if(m_iCountYellowStar < m_iTotalStar)
+	if(m_iCountYellowStar < m_iYellowStar)
 	{
-		Sprite* pStarSprite;
-		if (m_iCountYellowStar < m_iYellowStar)
-		{
-			pStarSprite = Sprite::create("World-Map/star_win_small.png");
-		}
-		else
-		{
-			pStarSprite = Sprite::create("World-Map/star_target_small.png");
-		}
-		
+		Sprite* pStarSprite = Sprite::create("World-Map/star_win_small.png");
 		m_pNodeStarAndBonusQuestEffect->addChild(pStarSprite);
 
 		if (m_iCountYellowStar == 0)
@@ -583,20 +573,11 @@ void LevelMapLayer::sequenceUpdateBonusQuest()
 
 void LevelMapLayer::updateBonusQuest()
 {
-	if (m_iCountBonusQuest < m_iTotalBonusQuest)
+	if (m_iCountBonusQuest < m_iBonusQuestCompleted && m_iCountBonusQuest < m_iTotalBonusQuest)
 	{
-		Sprite* pBonusQuestSprite;
-		if (m_iCountBonusQuest < m_iBonusQuestCompleted)
-		{
-			pBonusQuestSprite = Sprite::create("World-Map/mushroom_win.png");
-		}
-		else
-		{
-			pBonusQuestSprite = Sprite::create("World-Map/mushroom_fail.png");
-		}
-
+		Sprite* pBonusQuestSprite = Sprite::create("World-Map/mushroom_win.png");
 		pBonusQuestSprite->setScale(0.5f);
-		pBonusQuestSprite->setPosition(Point(-15.0f + m_iCountBonusQuest*27, 90.0f));
+		pBonusQuestSprite->setPosition(Point(-15.0f*(m_iTotalBonusQuest-1) + m_iCountBonusQuest*27, 90.0f));
 		m_pNodeStarAndBonusQuestEffect->addChild(pBonusQuestSprite);
 
 		m_iCountBonusQuest++;

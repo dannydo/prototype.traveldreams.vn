@@ -74,7 +74,6 @@ private:
 	ButtonNode* m_pButtonNodeCurrentLevel;
 	cocos2d::Sprite* m_ButtonNextLevelSprite;
 
-	int m_iTotalStar;
 	int m_iYellowStar;
 	int m_iCountYellowStar;
 	int m_iTotalBonusQuest;

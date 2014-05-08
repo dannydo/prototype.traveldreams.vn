@@ -37,6 +37,7 @@ private:
 	void updateDatabaseAndSync();
 
 	cocos2d::SpriteBatchNode* m_pSpriteBatchNode;
+	cocos2d::Node* m_pStarAndBonusQuestNode;
 
 	LevelInfo m_levelInfo;
 	ChapterInfo m_chapterInfo;
