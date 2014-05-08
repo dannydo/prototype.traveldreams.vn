@@ -410,7 +410,7 @@ void EndGameNode::menuNextLevelCallBack(Object* sender)
 	//pGameWordManager->GenerateWordForNewLevel(m_sChapterId, m_iCurrentLevel);
 
 	LevelMapScene* pLevelMapScene = (LevelMapScene*)Director::getInstance()->getRunningScene();
-	pLevelMapScene->getLayer()->playEffectUnlockLevel(true, m_iCurrentLevel, m_sChapterId);
+	pLevelMapScene->getLayer()->playEffectUnlockLevel(true, m_iCurrentLevel-1, m_sChapterId);
 	
 	this->getParent()->removeChild(this);
 }
