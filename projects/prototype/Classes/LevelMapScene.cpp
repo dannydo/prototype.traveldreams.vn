@@ -454,7 +454,10 @@ void LevelMapLayer::playEffectUnlockLevel(const bool& bPlayNextLevelGame, const 
 		if (iCurrentLevel >= iPassLevel && sChapterId == m_sChapterId)
 		{
 			LevelInfo levelInfoPass = m_levels[iPassLevel-1];
-			m_pNodeStarAndBonusQuestEffect = this->generateLayoutStarAndBonusQuest(0, 0, levelInfoPass.iTotalBonusQuest);
+			m_pNodeStarAndBonusQuestEffect = Node::create();
+			Node* pNode = this->generateLayoutStarAndBonusQuest(0, 0, levelInfoPass.iTotalBonusQuest);
+			pNode->setPosition(Point(-1.0f, 2.0f));
+			m_pNodeStarAndBonusQuestEffect->addChild(pNode);
 			m_pNodeStarAndBonusQuestEffect->setPosition(Point(70.0f, 12.0f));
 			
 			char sPassLevel[10];
