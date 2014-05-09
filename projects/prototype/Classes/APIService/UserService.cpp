@@ -86,6 +86,28 @@ void UserService::getLeaderBoardLevel(const std::string& sChapterId, const int& 
 	m_pRequest = NULL;
 }
 
+void UserService::getLeaderBoardAdvanceMode(const std::string& sPackageId, const int& iTag)
+{
+	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
+	String strURL = _CONSTANT_URL_;
+	strURL.append("api-custom/getLeaderBoard/");
+	strURL.appendWithFormat("%s/", userInfo.sFacebookId.c_str());
+	strURL.append(sPackageId);
+
+	m_pRequest = new HttpRequest();
+	m_pRequest->setUrl(strURL.getCString());
+	m_pRequest->setRequestType(HttpRequest::Type::GET);
+
+	String sTag = "LeaderBoardAdvanceMode";
+	sTag.appendWithFormat("_%d", iTag);
+	m_pRequest->setTag(sTag.getCString());
+
+	m_pRequest->setResponseCallback(this, httpresponse_selector(UserService::onHttpRequestCompleted));
+	m_pClient->send(m_pRequest);
+	m_pRequest->release();
+	m_pRequest = NULL;
+}
+
 void UserService::onCheckUserFacebookCompleted(HttpClient *sender, HttpResponse *response)
 {
 	std::string sKey = "";

@@ -53,6 +53,7 @@ void CSPackageTable::fetchCSPackages()
 		CSPackageInfo csPackageInfo;
 		csPackageInfo.sPackageId = re[iRow*nColumn+0];
 		csPackageInfo.sPackageName = re[iRow*nColumn+1];
+		csPackageInfo.iStage = int(strtod(re[iRow*nColumn+2], 0));
 
 		m_CSPackages.push_back(csPackageInfo);
 	}
@@ -85,15 +86,26 @@ bool CSPackageTable::updateCSPackage(const CSPackageInfo& csPackageInfo)
 
 	if (nRow > 0)
 	{
+		CSPackageInfo csPackageInfoTemp;
+		csPackageInfoTemp.sPackageId = re[nColumn+0];
+		csPackageInfoTemp.sPackageName = re[nColumn+1];
+		csPackageInfoTemp.iStage = int(strtod(re[nColumn+2], 0));
+
+		int iStage = csPackageInfo.iStage;
+		if (csPackageInfoTemp.iStage > iStage)
+			iStage = csPackageInfoTemp.iStage;
+
 		sql = "update CSPackage Set";
-		sql.appendWithFormat(" PackageName=%s", csPackageInfo.sPackageName.c_str());
+		sql.appendWithFormat(" PackageName='%s',", csPackageInfo.sPackageName.c_str());
+		sql.appendWithFormat(" Stage=%d", iStage);
 		sql.appendWithFormat(" where PackageId='%s'", csPackageInfo.sPackageId.c_str());
 	}
 	else
 	{
 		sql = "insert into CSPackage values(";
 		sql.appendWithFormat("'%s',", csPackageInfo.sPackageId.c_str());
-		sql.appendWithFormat("'%s');", csPackageInfo.sPackageName.c_str());
+		sql.appendWithFormat("'%s',", csPackageInfo.sPackageName.c_str());
+		sql.appendWithFormat("%d);", csPackageInfo.iStage);
 	}
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);

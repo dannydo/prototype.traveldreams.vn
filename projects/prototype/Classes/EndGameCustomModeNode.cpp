@@ -1,15 +1,17 @@
 #include "EndGameCustomModeNode.h"
 #include "MainMenuScene.h"
 #include "HelloWorldScene.h"
+#include "LeaderBoardAdvanceModeNode.h"
 
 USING_NS_CC;
 
-EndGameCustomModeNode* EndGameCustomModeNode::createLayout(const int& iStage, const int& iTotalWord, const int& iDurationSecond)
+EndGameCustomModeNode* EndGameCustomModeNode::createLayout(const int& iStage, const int& iTotalWord, const int& iDurationSecond, const std::string& sPackageId)
 {
 	EndGameCustomModeNode* pEndGameNode = new EndGameCustomModeNode();
 	pEndGameNode->m_iStage = iStage;
 	pEndGameNode->m_iTotalWord = iTotalWord;
 	pEndGameNode->m_iDurationSecond = iDurationSecond;
+	pEndGameNode->m_sPackageId = sPackageId;
 
 	if(pEndGameNode->init())
 	{
@@ -82,6 +84,10 @@ bool EndGameCustomModeNode::init()
 	pLabelDuration->setPosition(Point(150.0f, 500.0f));
 	this->addChild(pLabelDuration);
 
+	LeaderBoardAdvanceModeNode* pLeaderBoard = LeaderBoardAdvanceModeNode::createLayout(m_sPackageId);
+	pLeaderBoard->setPosition(Point(320.0f, 114.0f));
+	this->addChild(pLeaderBoard);
+
 	return true;
 }
 
@@ -122,15 +128,15 @@ void EndGameCustomModeNode::updateStar()
 		if (m_iCountYellowStar == 0)
 		{
 			pStarYellowImage->setScale(1.4f);
-			pStarYellowImage->setPosition(Point(220.0f + 1*100.0f, 750.0f));
+			pStarYellowImage->setPosition(Point(220.0f + 1*100.0f, 760.0f));
 		}
 		else if(m_iCountYellowStar == 1)
 		{
-			pStarYellowImage->setPosition(Point(220.0f + 0*100.0f, 750.0f));
+			pStarYellowImage->setPosition(Point(220.0f + 0*100.0f, 760.0f));
 		}
 		else if(m_iCountYellowStar == 2)
 		{
-			pStarYellowImage->setPosition(Point(220.0f + 2*100.0f, 750.0f));
+			pStarYellowImage->setPosition(Point(220.0f + 2*100.0f, 760.0f));
 		}
 
 		this->addChild(pStarYellowImage);

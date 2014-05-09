@@ -18,6 +18,8 @@ public:
 	void addCallBackList(InterfaceService* callBack);
 	void removeCallBackList(InterfaceService *callBack);
 
+	void getLeaderBoardAdvanceMode(const std::string& sPackageId, const int& iTag);
+
 	cs::JsonDictionary* parseStringToJson(const char* sJson);
 
 private:

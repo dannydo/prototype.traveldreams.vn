@@ -5066,7 +5066,7 @@ void HelloWorld::ShowTimeModeResultPopup()
 	//Director::getInstance()->replaceScene(pMainMenu);
 
 	auto pEndGameNode = EndGameCustomModeNode::createLayout( m_iCurrentTimeModeStage, MIN( m_iCurrentTimeModeStage, timeModeConfig->m_WordIndexList.size()) , 
-					GameWordManager::getInstance()->GetTotalPlayTimeOfTimeModeSession());	
+					GameWordManager::getInstance()->GetTotalPlayTimeOfTimeModeSession(), timeModeConfig->m_sCustomPackageID);	
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStartsOfTimeMode(m_iCurrentTimeModeStage-1));
 	m_pHUDLayer->addChild(pEndGameNode, 1000);
 

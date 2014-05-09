@@ -8,11 +8,13 @@ struct CSPackageInfo
 {
 	std::string sPackageId;
 	std::string sPackageName;
+	int iStage;
 
 	CSPackageInfo()
 	{
 		sPackageName = "";
 		sPackageId = "";
+		iStage = 0;
 	}
 };
 
