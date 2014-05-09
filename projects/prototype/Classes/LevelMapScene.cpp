@@ -90,6 +90,8 @@ bool LevelMapLayer::init()
 	Point pointScroll;
 	m_levels = LevelTable::getInstance()->getAllLevelsForChapter(m_sChapterId);
 	
+	m_pButtonNodeCurrentLevel = NULL;
+
 	m_iCalculatorLevel = GameConfigManager::getInstance()->CountLevelOfPreviousChapters(m_sChapterId);
 	for(int iIndex=0; iIndex<chapterConfig.m_iTotalevel; iIndex++)
 	{
@@ -378,6 +380,9 @@ Node* LevelMapLayer::generateLayoutStarAndBonusQuest(const int& iStarCompleted, 
 
 void LevelMapLayer::updateLayoutWordMapWhenRetryLevelWin(const int& iCurrentLevel, const std::string sChapterId)
 {
+	if (m_pButtonNodeCurrentLevel == NULL)
+		return;
+
 	m_levels = LevelTable::getInstance()->getAllLevelsForChapter(m_sChapterId);
 
 	// Update layout pass level
@@ -441,73 +446,85 @@ void LevelMapLayer::updateLayoutWordMapWhenRetryLevelWin(const int& iCurrentLeve
 
 void LevelMapLayer::playEffectUnlockLevel(const bool& bPlayNextLevelGame, const int& iCurrentLevel, const std::string sChapterId)
 {
-	m_levels = LevelTable::getInstance()->getAllLevelsForChapter(m_sChapterId);
-
-	// Update layout pass level
-	int iPassLevel = m_pButtonNodeCurrentLevel->getTag();
-	Point pointPassLevel = m_pButtonNodeCurrentLevel->getPosition();
-
-	// Van Dao
 	m_iCurrentLevel = iCurrentLevel + 1;
-	if(UserDefault::getInstance()->getIntegerForKey("IsUnlockALlLevel", 0) == 0)
+	if (m_pButtonNodeCurrentLevel != NULL)
 	{
-		if (iCurrentLevel >= iPassLevel && sChapterId == m_sChapterId)
+		m_levels = LevelTable::getInstance()->getAllLevelsForChapter(m_sChapterId);
+
+		// Update layout pass level
+		int iPassLevel = m_pButtonNodeCurrentLevel->getTag();
+		Point pointPassLevel = m_pButtonNodeCurrentLevel->getPosition();
+
+		// Van Dao
+		if(UserDefault::getInstance()->getIntegerForKey("IsUnlockALlLevel", 0) == 0)
 		{
-			LevelInfo levelInfoPass = m_levels[iPassLevel-1];
-			m_pNodeStarAndBonusQuestEffect = Node::create();
-			Node* pNode = this->generateLayoutStarAndBonusQuest(0, 0, levelInfoPass.iTotalBonusQuest);
-			pNode->setPosition(Point(-1.0f, 2.0f));
-			m_pNodeStarAndBonusQuestEffect->addChild(pNode);
-			m_pNodeStarAndBonusQuestEffect->setPosition(Point(70.0f, 12.0f));
-			
-			char sPassLevel[10];
-			sprintf(sPassLevel, "%d", levelInfoPass.iLevel + m_iCalculatorLevel);
-			LabelBMFont *pPassLevelLabel = LabelBMFont::create(sPassLevel, "fonts/font_title-popup.fnt");
-			pPassLevelLabel->setScale(0.75f);
-			pPassLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
-			pPassLevelLabel->setPosition(Point(74.0f, 60.0f));
-
-			Sprite* pButtonPassLevelSprite = Sprite::create("World-Map/pass-level.png");
-			pButtonPassLevelSprite->addChild(pPassLevelLabel);
-			pButtonPassLevelSprite->addChild(m_pNodeStarAndBonusQuestEffect);
-
-			m_buttonPlayPassLevel = ButtonNode::createButtonSprite(pButtonPassLevelSprite, CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
-			m_buttonPlayPassLevel->setPosition(pointPassLevel);
-			m_buttonPlayPassLevel->setTag(levelInfoPass.iLevel);
-			m_pButtonManagerNode->addButtonNode(m_buttonPlayPassLevel);
-
-			m_iYellowStar = levelInfoPass.iStar;
-			m_iCountYellowStar = 0;
-			m_iTotalBonusQuest = levelInfoPass.iTotalBonusQuest;
-			m_iBonusQuestCompleted = levelInfoPass.iBonusQuest;
-			m_iCountBonusQuest = 0;
-
-			this->sequenceUpdateStar();
-
-			auto actionScaleInButtonCurrent = ScaleTo::create(0.3f, 0.5);
-			auto actioneremoveButtonNodeCurrentLevel = CallFunc::create(this, callfunc_selector(LevelMapLayer::removeButtonNodeCurrentLevel));
-			m_pButtonNodeCurrentLevel->runAction(Sequence::create(actionScaleInButtonCurrent, DelayTime::create(0.3f), actioneremoveButtonNodeCurrentLevel, NULL));
-
-			m_buttonPlayPassLevel->setScale(0.4);
-			auto actionScaleOut = ScaleTo::create(0.3f, 1.1f);
-			auto actionScaleIn = ScaleTo::create(0.1f, 1.0f);
-			auto actioneffectChangeCurrentLevel = CallFunc::create(this, callfunc_selector(LevelMapLayer::effectChangeCurrentLevel));
-			auto actionshowPopupTargetGame = CallFunc::create(this, callfunc_selector(LevelMapLayer::showPopupTargetGame));
-
-			if (bPlayNextLevelGame)
+			if (iCurrentLevel >= iPassLevel && sChapterId == m_sChapterId)
 			{
-				m_buttonPlayPassLevel->runAction(Sequence::create(DelayTime::create(0.3f), actionScaleOut, DelayTime::create(0.3f), actionScaleIn, DelayTime::create(0.3f), 
-					actioneffectChangeCurrentLevel, DelayTime::create(0.6f), actionshowPopupTargetGame, NULL));
+				LevelInfo levelInfoPass = m_levels[iPassLevel-1];
+				m_pNodeStarAndBonusQuestEffect = Node::create();
+				Node* pNode = this->generateLayoutStarAndBonusQuest(0, 0, levelInfoPass.iTotalBonusQuest);
+				pNode->setPosition(Point(-1.0f, 2.0f));
+				m_pNodeStarAndBonusQuestEffect->addChild(pNode);
+				m_pNodeStarAndBonusQuestEffect->setPosition(Point(70.0f, 12.0f));
+			
+				char sPassLevel[10];
+				sprintf(sPassLevel, "%d", levelInfoPass.iLevel + m_iCalculatorLevel);
+				LabelBMFont *pPassLevelLabel = LabelBMFont::create(sPassLevel, "fonts/font_title-popup.fnt");
+				pPassLevelLabel->setScale(0.75f);
+				pPassLevelLabel->setAnchorPoint(Point(0.5f, 0.5f));
+				pPassLevelLabel->setPosition(Point(74.0f, 60.0f));
+
+				Sprite* pButtonPassLevelSprite = Sprite::create("World-Map/pass-level.png");
+				pButtonPassLevelSprite->addChild(pPassLevelLabel);
+				pButtonPassLevelSprite->addChild(m_pNodeStarAndBonusQuestEffect);
+
+				m_buttonPlayPassLevel = ButtonNode::createButtonSprite(pButtonPassLevelSprite, CC_CALLBACK_1(LevelMapLayer::menuLevelSelected, this));
+				m_buttonPlayPassLevel->setPosition(pointPassLevel);
+				m_buttonPlayPassLevel->setTag(levelInfoPass.iLevel);
+				m_pButtonManagerNode->addButtonNode(m_buttonPlayPassLevel);
+
+				m_iYellowStar = levelInfoPass.iStar;
+				m_iCountYellowStar = 0;
+				m_iTotalBonusQuest = levelInfoPass.iTotalBonusQuest;
+				m_iBonusQuestCompleted = levelInfoPass.iBonusQuest;
+				m_iCountBonusQuest = 0;
+
+				this->sequenceUpdateStar();
+
+				auto actionScaleInButtonCurrent = ScaleTo::create(0.3f, 0.5);
+				auto actioneremoveButtonNodeCurrentLevel = CallFunc::create(this, callfunc_selector(LevelMapLayer::removeButtonNodeCurrentLevel));
+				m_pButtonNodeCurrentLevel->runAction(Sequence::create(actionScaleInButtonCurrent, DelayTime::create(0.3f), actioneremoveButtonNodeCurrentLevel, NULL));
+
+				m_buttonPlayPassLevel->setScale(0.4);
+				auto actionScaleOut = ScaleTo::create(0.3f, 1.1f);
+				auto actionScaleIn = ScaleTo::create(0.1f, 1.0f);
+				auto actioneffectChangeCurrentLevel = CallFunc::create(this, callfunc_selector(LevelMapLayer::effectChangeCurrentLevel));
+				auto actionshowPopupTargetGame = CallFunc::create(this, callfunc_selector(LevelMapLayer::showPopupTargetGame));
+
+				if (bPlayNextLevelGame)
+				{
+					m_buttonPlayPassLevel->runAction(Sequence::create(DelayTime::create(0.3f), actionScaleOut, DelayTime::create(0.3f), actionScaleIn, DelayTime::create(0.3f), 
+						actioneffectChangeCurrentLevel, DelayTime::create(0.6f), actionshowPopupTargetGame, NULL));
 		
+				}
+				else
+				{
+					m_buttonPlayPassLevel->runAction(Sequence::create(DelayTime::create(0.3f), actionScaleOut, DelayTime::create(0.3f), actionScaleIn, DelayTime::create(0.3f), 
+						actioneffectChangeCurrentLevel, NULL));
+				}
 			}
 			else
 			{
-				m_buttonPlayPassLevel->runAction(Sequence::create(DelayTime::create(0.3f), actionScaleOut, DelayTime::create(0.3f), actionScaleIn, DelayTime::create(0.3f), 
-					actioneffectChangeCurrentLevel, NULL));
+				if (bPlayNextLevelGame)
+				{
+					this->showPopupTargetGame();
+				}
 			}
 		}
 		else
 		{
+			// Van Dao
+			updateLayoutWordMapWhenRetryLevelWin(iCurrentLevel, sChapterId);
 			if (bPlayNextLevelGame)
 			{
 				this->showPopupTargetGame();
@@ -516,8 +533,6 @@ void LevelMapLayer::playEffectUnlockLevel(const bool& bPlayNextLevelGame, const 
 	}
 	else
 	{
-		// Van Dao
-		updateLayoutWordMapWhenRetryLevelWin(iCurrentLevel, sChapterId);
 		if (bPlayNextLevelGame)
 		{
 			this->showPopupTargetGame();
