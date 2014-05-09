@@ -84,6 +84,7 @@ bool CSPackageTable::updateCSPackage(const CSPackageInfo& csPackageInfo)
 
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
 
+	int iStage = csPackageInfo.iStage;
 	if (nRow > 0)
 	{
 		CSPackageInfo csPackageInfoTemp;
@@ -91,7 +92,6 @@ bool CSPackageTable::updateCSPackage(const CSPackageInfo& csPackageInfo)
 		csPackageInfoTemp.sPackageName = re[nColumn+1];
 		csPackageInfoTemp.iStage = int(strtod(re[nColumn+2], 0));
 
-		int iStage = csPackageInfo.iStage;
 		if (csPackageInfoTemp.iStage > iStage)
 			iStage = csPackageInfoTemp.iStage;
 
@@ -113,6 +113,9 @@ bool CSPackageTable::updateCSPackage(const CSPackageInfo& csPackageInfo)
 		return false;
 
 	bool isFound = false;
+	CSPackageInfo csPackageInfoTemp = csPackageInfo;
+	csPackageInfoTemp.iStage = iStage;
+
 	for(int iIndex=0; iIndex<m_CSPackages.size(); iIndex++)
 	{
 		if (m_CSPackages[iIndex].sPackageId == csPackageInfo.sPackageId)

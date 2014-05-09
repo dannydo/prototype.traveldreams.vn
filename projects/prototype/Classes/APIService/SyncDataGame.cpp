@@ -207,7 +207,7 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 				{
 					strData.appendWithFormat("%c", (*buffer)[i]);
 				}
-				//CCLOG("Sync %s", strData.getCString());
+				//CCLOG("Push %s", strData.getCString());
 			}
 		}
 	}
@@ -228,7 +228,8 @@ void SyncDataGame::pushDataCustomGameMode(const std::string& sPackageId)
 
 	CSPackageInfo csPackageInfo = CSPackageTable::getInstance()->getCSPackageInfo(sPackageId);
 	sJsonData.append("\"Package\":{");
-	sJsonData.appendWithFormat("\"PackageId\":\"%s\"", csPackageInfo.sPackageId.c_str());
+	sJsonData.appendWithFormat("\"PackageId\":\"%s\",", csPackageInfo.sPackageId.c_str());
+	sJsonData.appendWithFormat("\"HighNumberStage\":%d", csPackageInfo.iStage);
 	sJsonData.append("},");
 
 	std::vector<CSWordInfo> csWords = CSWordTable::getInstance()->getAllCSWordsForPackage(sPackageId);
@@ -249,7 +250,7 @@ void SyncDataGame::pushDataCustomGameMode(const std::string& sPackageId)
 	
 	sJsonData.append("}}");
 
-	//CCLOG("Sync %s", sJsonData.getCString());
+	//CCLOG("Push %s", sJsonData.getCString());
 	//CCLOG("%d", sJsonData.length());
 	
 	// Post data to server

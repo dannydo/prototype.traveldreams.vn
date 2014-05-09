@@ -5143,6 +5143,7 @@ void HelloWorld::TimeMode_StartNextStage()
 	CSPackageInfo packageInfo;
 	packageInfo.sPackageId = timeModeConfig->m_sCustomPackageID;
 	packageInfo.sPackageName = "";
+	packageInfo.iStage = m_iCurrentTimeModeStage;
 	CSPackageTable::getInstance()->updateCSPackage(packageInfo);
 
 	CSWordInfo customWordDB;
