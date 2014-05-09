@@ -73,6 +73,7 @@ bool ButtonManagerNode::onTouchButtonBegan(Touch* pTouch,  Event* pEvent)
 		}
 	}
 
+	m_isFinishProcessButton = true;
 	return false;
 	
 }
@@ -116,11 +117,16 @@ void ButtonManagerNode::onTouchButtonEnded(Touch* pTouch,  Event* pEvent)
 		}
 		else
 		{
+			m_isFinishProcessButton = true;
 			auto scaleAction = ScaleTo::create(0.05, 1.05f);
 			auto scaleAction1 = ScaleTo::create(0.08, 0.98f);
 			auto scaleAction2 = ScaleTo::create(0.1, 1.0f);
 			pButtonSprite->runAction(Sequence::create(scaleAction, scaleAction1, scaleAction2, NULL));
 		}
+	}
+	else
+	{
+		m_isFinishProcessButton = true;
 	}
 
 	m_bIsInTapMode = false;
