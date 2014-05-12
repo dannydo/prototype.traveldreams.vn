@@ -225,7 +225,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 
 		pBaseLevelConfig = m_GameBoardManager.GetLevelConfig();
 	}
-	CCLOG("Generate 4-1");
+	//CCLOG("Generate 4-1");
 
 	
 	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
@@ -916,6 +916,7 @@ SpriteFrame* HelloWorld::GetSpriteFrameFromSnapGemID(int iGemID, GemComboType_e 
 
 bool HelloWorld::onTouchBegan(Touch *pTouch, Event *pEvent)
 {
+	//CCLOG("Begin touch began"); 
 	if (m_pSettingNode != NULL && m_pSettingNode->getShowSetting())
 	{
 		return false;
@@ -966,6 +967,8 @@ bool HelloWorld::onTouchBegan(Touch *pTouch, Event *pEvent)
 		}*/
 
 	}
+
+	//CCLOG("End touch began"); 
 
 	return true;
 }
@@ -1037,6 +1040,8 @@ void HelloWorld::onTouchCancelled(Touch *pTouch, Event *pEvent)
 
 void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 {
+	//CCLOG("Begin touch moved");
+
 	if (m_pSaveTouch != pTouch)
 		return;
 
@@ -1146,6 +1151,8 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 		}*/
 	}
 
+	//CCLOG("End touch moved");
+
 	if ((m_eTouchMoveState == _TMS_MOVE_HORIZONTAL_ && m_GameBoardManager.IsRowLocked(m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn)) || 
 		(m_eTouchMoveState == _TMS_MOVE_VERTICAL_ &&  m_GameBoardManager.IsColumnLocked(m_SelectedCell.m_iRow, m_SelectedCell.m_iColumn)))
 	{
@@ -1158,6 +1165,8 @@ void HelloWorld::update(float fDeltaTime)
 {
 	if (m_bIsCellDragPlaying)
 	{
+		//CCLOG("update-draging");
+
 		if (m_ePlayingDragEffect == _TMS_MOVE_HORIZONTAL_)
 		{
 			//CCLOG("%f", m_pTempSpriteForAction->getPositionX());
@@ -1167,6 +1176,8 @@ void HelloWorld::update(float fDeltaTime)
 		{
 			VerticalMoveUlti(m_pTempSpriteForAction->getPositionY());
 		}
+
+		//CCLOG("End update");
 
 		//m_fIdleTime = 0;
 	}
@@ -1220,7 +1231,7 @@ void HelloWorld::update(float fDeltaTime)
 		}
 		else
 			m_fIdleTime = 0;
-	}
+	}	
 }
 
 float round(float d)
@@ -1437,7 +1448,7 @@ void HelloWorld::AdjustPosition(bool bIsBlocked, float fDeltaX, float fDeltaY, i
 		}
 	}
 
-	CCLOG("2");
+	CCLOG("Adjust 2");
 	// now play effect to destroy/move old cells, and generate new cells
 	if (bMoveIsValid)
 	{				 
@@ -1602,7 +1613,7 @@ void HelloWorld::OnCompleteComboChain()
 		FiniteTimeAction* pFinalStep;
 		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked() || m_GameBoardManager.GetCurrentMove()==0)
 			pFinalStep = Sequence::createWithTwoActions(
-							CCCallFunc::create( this, callfunc_selector( HelloWorld::EndUnlockLetterAnimation)),
+							CCCallFunc::create( this, callfunc_selector( HelloWorld::CheckEndGameAtEndChain)),
 							RemoveSelf::create());
 		else
 			pFinalStep = RemoveSelf::create();
@@ -1620,7 +1631,7 @@ void HelloWorld::OnCompleteComboChain()
 				NULL));
 	}
 	else
-		EndUnlockLetterAnimation();
+		CheckEndGameAtEndChain();
 }
 
 void HelloWorld::OnEndDragEffect()
@@ -1705,8 +1716,12 @@ void HelloWorld::CheckHintAfterMove()
 		{
 			m_eTouchMoveState = _TMS_NONE_;
 			m_bIsCellDragPlaying = false;			
+			m_iMovingCellListLength = 0;
+			m_bIsEffectPlaying = true;
 
-			MessageBox("Notice", "SHUFFLE!!!");			
+			//CCLOG("Shuffle");
+
+			MessageBox("Notice", "SHUFFLE!!!");
 
 			auto& originalMovedCells = m_ComputeMoveResult.m_OriginalMovedCells;
 			auto& targetMovedCells = m_ComputeMoveResult.m_TargetMovedCells;
@@ -1724,13 +1739,14 @@ void HelloWorld::CheckHintAfterMove()
 							m_fBoardBottomPosition + targetMovedCells[i].m_iRow * m_SymbolSize.height);
 
 				m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->stopAllActions();
+				//m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->setPosition(pos);
 				m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->runAction(
 					Sequence::create( 
-						DelayTime::create( 2.3f), // + 0.01f * (targetMovedCells[i].m_iRow - originalMovedCells[i].m_iRow ),
+						DelayTime::create(0.3f), // + 0.01f * (targetMovedCells[i].m_iRow - originalMovedCells[i].m_iRow ),
 						
 						EaseOut::create( MoveTo::create( _TME_MOVE_CELL_TIME_, centerPos),			3.f ),
 						EaseOut::create( MoveTo::create( _TME_MOVE_CELL_TIME_, pos),			3.f ),
-						NULL));				
+						NULL));	
 				if (m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow ][originalMovedCells[i].m_iColumn].m_pSprite != NULL)
 				{
 					m_BoardViewMirrorMatrix[originalMovedCells[i].m_iRow ][originalMovedCells[i].m_iColumn].m_pSprite->stopAllActions();
@@ -1757,15 +1773,16 @@ void HelloWorld::CheckHintAfterMove()
 					m_BoardViewMirrorMatrix[targetMovedCells[i].m_iRow ][targetMovedCells[i].m_iColumn].m_pSprite->setVisible(false);
 				}
 			}	
-
-			m_bIsEffectPlaying = true;
+			
 			if (m_pTimeCountDownNode != NULL)
 				 m_pTimeCountDownNode->SetSuspendingState(true);
 
 			this->runAction( CCSequence::create(
-				CCDelayTime::create(3.2f),
+				CCDelayTime::create(1.2f),
 				CCCallFunc::create( this, callfunc_selector( HelloWorld::CheckBoardStateAfterMove)),
 				NULL));		
+
+			//CCLOG("End shuffle");
 		}		
 		else
 			MessageBox("Notice", "Sorry, game is over!!!");
@@ -2443,7 +2460,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 	m_bIsEffectPlaying = true;	
 
-	float fDelayTime = 0.2f;	
+	float fDelayTime = 0.1f; //2f;	
 	
 	int iNumberOfRow = m_GameBoardManager.GetRowNumber();
 	int iNumberOfColumn = m_GameBoardManager.GetColumnNumber();
@@ -2561,7 +2578,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	// increase score by basic matching
 	//m_GameBoardManager.IncreaseScoreForDestroyCells( iTotalDestroyCell, _CET_BASIC_MATCHING_);
 
-	CCLOG("Before combo chain");
+	//CCLOG("Before combo chain");
 
 	// play combo chain	
 	float fCurrentDelayComboChain;
@@ -2692,7 +2709,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		delete pComboEffect;
 	}	
 
-	CCLOG("Before check bonus quest");
+	//CCLOG("Before check bonus quest");
 
 	// check logic on bonus quest
 	if (!m_bIsEndGamePhase)
@@ -2818,7 +2835,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		}
 	}	
 
-	CCLOG("Before create combo cells");
+	//CCLOG("Before create combo cells");
 
 	// create new combo cells, this is right after basic matching cells are destroyed
 	for(auto cell: newComboCells)
@@ -3135,7 +3152,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		}
 	
 		this->runAction( CCSequence::create(
-						CCDelayTime::create(fTotalDestroyCellTime + _TME_MOVE_CELL_TIME_*2),
+						CCDelayTime::create(fTotalDestroyCellTime + _TME_MOVE_CELL_TIME_*2 - 0.1f),
 						CCCallFunc::create( this, callfunc_selector( HelloWorld::CheckBoardStateAfterMove)),
 						NULL));		
 	}
@@ -3535,9 +3552,10 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 				//m_pWordCollectBoardRenderNode->UnlockLetter(iUnlockedLetterIndexOfMainWord);
 				//m_pWordCollectBoardRenderNode->UnlockCharacter(fDelay, iUnlockedLetterIndexOfMainWord);
 
-				m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect( iUnlockedLetterIndexOfMainWord, fDelay, gemLetterData.m_iLetter,  //m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
-					ccp(m_fBoardLeftPosition + iColumn  * m_SymbolSize.width, 
-						m_fBoardBottomPosition + iRow * m_SymbolSize.height));
+				if (!m_bIsEndGamePhase) //sometimes we end game early to test so we need check this
+					m_pWordCollectBoardRenderNode->PlayUnlockLetterEffect( iUnlockedLetterIndexOfMainWord, fDelay, gemLetterData.m_iLetter,  //m_BoardViewMatrix[iRow][iColumn].m_iLetter, 
+						ccp(m_fBoardLeftPosition + iColumn  * m_SymbolSize.width, 
+							m_fBoardBottomPosition + iRow * m_SymbolSize.height));
 			}
 
 			
@@ -4911,7 +4929,7 @@ void HelloWorld::PlayCombo6_6Effect(ComboEffectBundle* pComboEffectBundle, float
 		this->runAction(
 			Sequence::create(
 			DelayTime::create( fDisplayTime),
-				CallFunc::create( this,  callfunc_selector(HelloWorld::EndUnlockLetterAnimation)),
+				CallFunc::create( this,  callfunc_selector(HelloWorld::CheckEndGameAtEndChain)),
 				NULL));
 	}
 	else
@@ -4921,7 +4939,7 @@ void HelloWorld::PlayCombo6_6Effect(ComboEffectBundle* pComboEffectBundle, float
 	}
 }*/
 
-void HelloWorld::EndUnlockLetterAnimation()
+void HelloWorld::CheckEndGameAtEndChain()
 {
 	//m_bIsEffectPlaying = false;
 
@@ -4934,6 +4952,7 @@ void HelloWorld::EndUnlockLetterAnimation()
 	{
 		//check end game
 		if (m_GameBoardManager.GetGameWordManager()->IsMainWordUnlocked()) // complete objective ==> win		
+		//if (true)
 		//if (true)
 		//if (false)		
 		{
@@ -5151,6 +5170,8 @@ void HelloWorld::TimeMode_StartNextStage()
 	customWordDB.iCollectedCount = iCollectedCount;
 	CSWordTable::getInstance()->updateCSWord(customWordDB);
 	
+	// update tracking info
+	m_GameBoardManager.GetGameWordManager()->UpdateTimeModeTracking( iMainWordIndex);
 
 	// start new stage
 	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(timeModeConfig);

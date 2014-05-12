@@ -339,6 +339,8 @@ void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTi
 
 	if (bStartNewTimeModeSession)
 	{	
+		m_TimeModeSessionTracking.clear();
+
 		timeval now;
 		gettimeofday(&now, NULL);
 		m_iStartTimeOfTimeModeGameSession = now.tv_sec * 1000 + now.tv_usec/1000 ; //miliseconds
@@ -403,6 +405,32 @@ void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTi
 
 	// reset data
 	ResetDataForNewPlay();
+}
+
+void GameWordManager::UpdateTimeModeTracking(const int& iCompletedWordIndex)
+{	
+	int iIndexInTrackingList=  -1;
+	for(int i=0; i< m_TimeModeSessionTracking.size(); i++)
+	{
+		if (m_TimeModeSessionTracking[i].m_iWordIndex == iCompletedWordIndex)
+		{
+			iIndexInTrackingList = i;
+			break;
+		}		
+	}
+
+	if (iIndexInTrackingList >=0)
+	{
+		m_TimeModeSessionTracking[iIndexInTrackingList].m_iCollectedCount++;
+	}
+	else
+	{
+		TimeModeWordTrackInfo wordTrackInfo;
+		wordTrackInfo.m_iCollectedCount = 1;
+		wordTrackInfo.m_iWordIndex = iCompletedWordIndex;
+
+		m_TimeModeSessionTracking.push_back(wordTrackInfo);
+	}
 }
 
 void GameWordManager::RetryCurrentLevel()

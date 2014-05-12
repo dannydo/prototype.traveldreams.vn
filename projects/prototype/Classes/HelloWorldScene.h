@@ -183,7 +183,7 @@ protected:
 
 	// unlock letter flow
 	//void PlayUnlockLettersOfMainWordAnimation(const float& fDelayTime);	
-	void EndUnlockLetterAnimation();
+	void CheckEndGameAtEndChain();
 
 	// execute win game effect flow
 	void ShowMainWordUnlockEffect();

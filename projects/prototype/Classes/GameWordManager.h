@@ -89,6 +89,8 @@ public:
 	const std::string& GetPackagePathFromWord(const Word& word);
 	const std::string GetWordIdFromWord(const Word& word);
 
+	// tracking in time mode
+	void UpdateTimeModeTracking(const int& iCompletedWordIndex);
 private:
 	void PreLoadPackageForWord(std::string sWordID);
 
@@ -96,7 +98,7 @@ private:
 		
 	bool GenerateLetterFromTrashCollection(unsigned char& sLetter);
 
-	void AddLetterToTrashCollection(const unsigned char sLetter);
+	void AddLetterToTrashCollection(const unsigned char sLetter);	
 private:
 	// word generate config
 	WordGenerateConfig m_WordGenerateConfig;
@@ -131,9 +133,21 @@ private:
 	// 	
 	std::vector<unsigned char> m_TrashLettersCollection;
 
+public:
+	struct TimeModeWordTrackInfo
+	{
+	public:
+		int m_iWordIndex;
+		int m_iCollectedCount;
+	};
 
+private:
 	// time mode only
 	unsigned long m_iStartTimeOfTimeModeGameSession;
+	std::vector<TimeModeWordTrackInfo> m_TimeModeSessionTracking;
+
+
+
 	/*struct TimeModeAnalysedWordInfo
 	{
 		int m_iLoadedWordIndex;

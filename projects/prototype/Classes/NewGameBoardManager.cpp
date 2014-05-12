@@ -2177,7 +2177,7 @@ void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bo
 	*/
 
 	// generate new gems	
-	int iGenerateGemMode = 3;
+	int iGenerateGemMode = 1;
 
 	if (iGenerateGemMode == 1)
 	{
@@ -2204,7 +2204,7 @@ void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bo
 	{
 		int iTestGenerateGemID = 0;
 		int neighbourDeltaRow[4] = { 1, 0, -1, 0};
-		int neighbourDeltaColumn[4] = { 0, 1, 0, -1};
+		int neighbourDeltaColumn[4] = { 0, 1, 0, -1}; 
 		int iGemID;
 
 		for(iRow = 0; iRow < m_iRowNumber; iRow++)

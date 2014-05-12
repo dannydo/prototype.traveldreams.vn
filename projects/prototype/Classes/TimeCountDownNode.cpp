@@ -33,7 +33,7 @@ void TimeCountDownNode::init(int iStageIndex, int iMaximumEnergy, int iEnergyLos
 	//_position.x = 0.f; //winSize.width / 2.f;
 	//anchor left
 
-	_contentSize.width = 468.f;
+	_contentSize.width = 488.f;
 
 	fEnergyWidth = m_fCurrentEnergy * _contentSize.width / m_fMaximumEnergy;
 
