@@ -7,7 +7,7 @@
 class EndGameCustomModeNode : public cocos2d::Node
 {
 public:
-	static EndGameCustomModeNode* createLayout(const int& iStage, const int& iTotalWord, const int& iDurationSecond);
+	static EndGameCustomModeNode* createLayout(const int& iStage, const int& iTotalWord, const int& iDurationSecond, const std::string& sPackageId);
 	bool init() override;
 	void addYellowStar(const int& iYellowStar);
 
@@ -28,6 +28,7 @@ private:
 	int	m_iDurationSecond;
 	int m_iYellowStar;
 	int m_iCountYellowStar;
+	std::string m_sPackageId;
 };
 
 #endif;
