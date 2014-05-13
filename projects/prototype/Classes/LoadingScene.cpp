@@ -8,6 +8,7 @@
 #include "GameWordManager.h"
 #include "Database\VersionTable.h"
 #include "APIService\SyncDataGame.h"
+#include "Database\TrackingTable.h"
 
 using namespace cocos2d;
 
@@ -151,6 +152,8 @@ void LoadingLayer::initData()
 
 			m_bIsWaittingSync = false;
 		}
+
+		TrackingTable::getInstance()->trackingOpenGame();
 	}
 
 	if(UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", -1) == -1)

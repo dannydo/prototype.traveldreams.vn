@@ -97,6 +97,8 @@ bool InitDatabase::createDatabase()
 	sqlRun.append("CREATE TABLE if not exists MapChapterWords (MapChapterWordId INTEGER PRIMARY KEY NOT NULL, ChapterId TEXT, WordId TEXT, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists CSPackage (PackageId TEXT PRIMARY KEY NOT NULL, PackageName TEXT, Stage INTEGER NOT NULL  DEFAULT 0);");
 	sqlRun.append("CREATE TABLE if not exists CSWords (WordId TEXT, PackageId TEXT, CollectedCount INTEGER);");
+	sqlRun.append("CREATE TABLE if not exists Trackings (TrackingId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Device TEXT, Player TEXT, StartTime INTEGER, Event TEXT, Data TEXT);");
+	
 	sqlRun.append("insert into Versions values(1, 0, 1);");
 
 	std::string sDeviceId = "windows";

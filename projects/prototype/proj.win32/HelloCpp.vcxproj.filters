@@ -243,6 +243,9 @@
     <ClCompile Include="..\Classes\LeaderBoardAdvanceModeNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Database\TrackingTable.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -463,6 +466,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\LeaderBoardAdvanceModeNode.h">
       <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\TrackingTable.h">
+      <Filter>Database</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

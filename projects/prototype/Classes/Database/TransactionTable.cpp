@@ -44,8 +44,8 @@ bool TransactionTable::insertTransaction(const TransactionInfo& transactionInfo)
 	sql.appendWithFormat(" %d,", transactionInfo.iQuantity);
 	sql.appendWithFormat(" %d,", transactionInfo.iTotalAmount);
 	sql.appendWithFormat(" %u,", getTimeLocalCurrent());
-	sql.appendWithFormat(" %d,)", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
-	sql.appendWithFormat(" '%s'", transactionInfo.sType.c_str());
+	sql.appendWithFormat(" %d,", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
+	sql.appendWithFormat(" '%s')", transactionInfo.sType.c_str());
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
@@ -71,7 +71,8 @@ std::string	TransactionTable::syncGetTransactions()
 		sJsonData.appendWithFormat("\"Quantity\": %s,", re[iRow*nColumn+2]);
 		sJsonData.appendWithFormat("\"TotalAmount\": %s,", re[iRow*nColumn+3]);
 		sJsonData.appendWithFormat("\"DateTime\": %s,", re[iRow*nColumn+4]);
-		sJsonData.appendWithFormat("\"Version\": %s", re[iRow*nColumn+5]);
+		sJsonData.appendWithFormat("\"Version\": %s,", re[iRow*nColumn+5]);
+		sJsonData.appendWithFormat("\"Type\": %s", re[iRow*nColumn+6]);
 
 		if (iRow == nRow)
 			sJsonData.append("}");

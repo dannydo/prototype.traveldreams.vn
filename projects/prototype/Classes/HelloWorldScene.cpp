@@ -3,7 +3,7 @@
 #include "EndGameNode.h"
 #include "LevelMapScene.h"
 #include "Database\UserTable.h"
-#include "Database\GameTracking.h"
+#include "Database\TrackingTable.h"
 #include "ActionExtension.h"
 #include "OutOfMovesNode.h"
 
@@ -1825,6 +1825,8 @@ void HelloWorld::ShowWinGamePopup()
 {	
 	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
 	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
+	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+	int iBonusQuestCompleted = m_GameBoardManager.GetBonusQuestManager()->CountBonusQuestCompleted();
 
 	// extra, regenerate word for current level
 	GameConfigManager::getInstance()->UpdateNewWordForLevel( sCurrentChapterID, iCurrentLevel);
@@ -1832,29 +1834,41 @@ void HelloWorld::ShowWinGamePopup()
 	// show win popup	
 	Breadcrumb::getInstance()->getSceneModePopBack();
 	LevelMapScene* pLevelMap =  LevelMapScene::create();
-	int iBonusQuestCompleted = m_GameBoardManager.GetBonusQuestManager()->CountBonusQuestCompleted();
+	
 	pLevelMap->getLayer()->showPopupEndGameWin(m_GameBoardManager.GetCurrentScore(),
-		m_GameBoardManager.GetGameWordManager()->GetMainWord(), iCurrentLevel, sCurrentChapterID, m_GameBoardManager.GetEarnedStars(), iBonusQuestCompleted);
+		mainWord, iCurrentLevel, sCurrentChapterID, m_GameBoardManager.GetEarnedStars(), iBonusQuestCompleted);
 	Director::getInstance()->replaceScene(pLevelMap);
+
+	//Game Tracking Level
+	auto& levelConfig = GameConfigManager::getInstance()->GetLevelConfig(sCurrentChapterID, iCurrentLevel);
+	const unsigned long uStartTime = 0;
+	
+	TrackingTable::getInstance()->trackingPlayLevelNormalMode(uStartTime, iCurrentLevel, sCurrentChapterID, mainWord.m_sWordID, 
+		"WIN", m_GameBoardManager.GetCurrentMove(), 0, m_GameBoardManager.GetCurrentScore(), m_GameBoardManager.GetEarnedStars(), 
+		levelConfig.m_iNumberOfMove, levelConfig.m_BonusQuestConfig.m_iBonusQuestCount, iBonusQuestCompleted);
 	
 }
 
 void HelloWorld::ShowFailGamePopup()
 {
 	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
-	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
+	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
+	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
 
 	OutOfMovesNode* pOutOfMoveNode = OutOfMovesNode::createLayout( m_GameBoardManager.GetCurrentScore(), 
-				m_GameBoardManager.GetGameWordManager()->GetMainWord(), iCurrentLevel, sCurrentChapterID);
+				mainWord, iCurrentLevel, sCurrentChapterID);
 	m_pHUDLayer->addChild( pOutOfMoveNode, 100);
 
 	//SoundManager::PlaySoundEffect(_SET_FAIL_);
 	UserTable::getInstance()->updateLife(1);
 
 	//Game Tracking Level
-	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+	auto& levelConfig = GameConfigManager::getInstance()->GetLevelConfig(sCurrentChapterID, iCurrentLevel);
+	const int iBonusQuestCompleted = m_GameBoardManager.GetBonusQuestManager()->CountBonusQuestCompleted();
+	const unsigned long uStartTime = 0;
 	
-	GameTracking::saveFileTrackingLevel(iCurrentLevel, 0, mainWord.m_iWordLength-mainWord.m_iRemainInactivatedCharacterCount, "Lose");
+	TrackingTable::getInstance()->trackingPlayLevelNormalMode(uStartTime, iCurrentLevel, sCurrentChapterID, mainWord.m_sWordID, 
+		"LOSE", 0, mainWord.m_iRemainInactivatedCharacterCount, m_GameBoardManager.GetCurrentScore(), 0, levelConfig.m_iNumberOfMove, levelConfig.m_BonusQuestConfig.m_iBonusQuestCount, iBonusQuestCompleted);
 }
 
 
@@ -3992,12 +4006,6 @@ void HelloWorld::ShowMainWordUnlockEffect()
 			DelayTime::create( MAX( fSpellingTime, fEffectTime)), //mainWord.m_iWordLength * fDelayPerLetter + fDisplayEffectTime + 4.5f),
 			CallFunc::create( this,  callfunc_selector(HelloWorld::StartWinBonusPhase)),
 			NULL));
-
-	//Game Tracking Level
-	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
-	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
-
-	GameTracking::saveFileTrackingLevel(iCurrentLevel, m_GameBoardManager.GetCurrentMove(), mainWord.m_iWordLength, "Win");
 }
 
 using namespace cocos2d::extension::armature;
