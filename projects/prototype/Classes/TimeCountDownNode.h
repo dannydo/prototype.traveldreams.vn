@@ -55,6 +55,7 @@ private:
 	//Scale9Sprite* m_pMidEnergyBar;
 	Scale3Sprite* m_pMidEnergyBar;
 	Sprite* m_pMirrorMidEnergyBar;
+	Sprite* m_pTimeIndicatorIcon;
 };
 
 #endif // _TIME_COUNT_DOWN_NODE_H_

@@ -140,15 +140,7 @@ bool WordCollectBoardRenderNode::init()
 	m_pCharacter->getAnimation()->playByIndex(4);//0);
 	m_pCharacter->setAnchorPoint(Point(0,0));
 	m_pCharacter->setPosition( 5.f, 740.f);
-	this->addChild(m_pCharacter);*/
-
-	Size winSize = Director::getInstance()->getWinSize();
-
-	// add background
-	auto pBackground = Sprite::createWithSpriteFrameName("Header_BG.png");
-	pBackground->setAnchorPoint( Point(0,0));
-	pBackground->setPositionY( winSize.height - pBackground->getContentSize().height);
-	m_pBackgroundBatchNode->addChild(pBackground,-2);
+	this->addChild(m_pCharacter);*/	
 	
 	this->setTouchEnabled(true);	
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);	
@@ -239,6 +231,28 @@ void WordCollectBoardRenderNode::PlayTimeModeWordStart(int iTimeModeStage)
 
 void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, int iTimeModeStage)
 {
+	Size winSize = Director::getInstance()->getWinSize();
+	m_eGameModeType = eGameModeType;
+
+	if (eGameModeType == _GMT_NORMAL_)
+	{
+		// add background
+		auto pBackground = Sprite::createWithSpriteFrameName("Header_BG.png");
+		pBackground->setAnchorPoint( Point(0,0));
+		pBackground->setPositionY( winSize.height - pBackground->getContentSize().height);
+		m_pBackgroundBatchNode->addChild(pBackground,-2);
+	}
+	else // time mode
+	{
+		auto pBackground = Sprite::createWithSpriteFrameName("MainBoard.png");
+		pBackground->setAnchorPoint( Point(0,0));
+		pBackground->setPositionY( winSize.height - pBackground->getContentSize().height - 66.f);
+		m_pBackgroundBatchNode->addChild(pBackground,-2);
+	}
+
+
+
+
 	GameWordManager* pGameWordManager = GameWordManager::getInstance();
 	m_pMainWord = &pGameWordManager->GetMainWord();
 	
@@ -263,16 +277,13 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 		}
 		else
 			m_LabelList[i] =  //CCLabelTTF::create("", "Arial", 34);
-				Sprite::createWithSpriteFrameName( GetImageInGemFileFromLetter(m_pMainWord->m_sWord[i]).c_str());
-		//m_LabelList[i]->setAnchorPoint(Point(0,0));		
+				Sprite::createWithSpriteFrameName( GetImageInGemFileFromLetter(m_pMainWord->m_sWord[i]).c_str());		
 
 		if (!m_pMainWord->m_ActivatedCharacterFlags[i])
 		{
 			m_LabelList[i]->setColor( ccc3(180, 180, 180));
 			m_LabelList[i]->setOpacity(110);
-		}
-		//pLabel->enableShadow(Size(10.f,10.f),0.8f,0.2f);
-		//m_LabelList[i]->enableStroke(ccc3(0,0,0), 2.f);		
+		}		
 
 		iTotalLabelsWidth += m_LabelList[i]->getContentSize().width + 2.f;
 				
@@ -281,62 +292,133 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 
 	// break line based on level config
 	int iLetterCountOfFirstLine;
-
-	//const LevelConfig* pLevelConfig = GameWordManager::getInstance()->GetLevelConfig();
-	//if (pLevelConfig->m_bBreakLineWhenDisplayMainWord) 
+	
 	if (m_pMainWord->m_iLimitLetterCountOfFirstLine > 0)
 		iLetterCountOfFirstLine = m_pMainWord->m_iLimitLetterCountOfFirstLine-1; //skip "SPACE"; 
 	else
 		iLetterCountOfFirstLine = m_pMainWord->m_iWordLength;
 
 	// draw first line, note that if has 2 row, must skip "SPACE" at the last of first line	
-	char sFirtLineLetter[_WCBRN_MAX_FIRST_LINE_LETTERS_];
-	memcpy( sFirtLineLetter, m_pMainWord->m_sWord, iLetterCountOfFirstLine);
-	int iIndexPositionOfFirstLine = (_WCBRN_MAX_FIRST_LINE_LETTERS_ - iLetterCountOfFirstLine + 1)/2;
+	//char sFirtLineLetter[_WCBRN_TIMEMODE_MAX_FIRST_LINE_LETTERS_];
+	//memcpy( sFirtLineLetter, m_pMainWord->m_sWord, iLetterCountOfFirstLine);
+	
 	int i, iZOrder;
-	for(i =0; i< iLetterCountOfFirstLine; i++)
+	if (eGameModeType == _GMT_NORMAL_)
 	{
-		if (!m_pMainWord->m_ActivatedCharacterFlags[i])		
-		{
-			m_BubbleList[i] = Sprite::createWithSpriteFrameName("Main_Bubble.png");
-			iZOrder = 1;
-		}
-		else
-		{
-			m_BubbleList[i] = Sprite::createWithSpriteFrameName("Main_Bubble_destroy.png");
-			m_BubbleList[i]->setRotation( rand() % 360);
-			iZOrder = -3; 
-		}
-		m_BubbleList[i]->setPosition( Point(m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].x, 960.f - m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].y - 10.f));		
-		m_pBackgroundBatchNode->addChild(m_BubbleList[i], iZOrder);
-				
-		m_LabelList[i]->setPosition(Point(m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].x, 960.f - m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].y - 10.f));
-	}		
+		int iIndexPositionOfFirstLine = (_WCBRN_NORMAL_MAX_FIRST_LINE_LETTERS_ - iLetterCountOfFirstLine + 1)/2;
 
-	// draw second line
-	//if (pLevelConfig->m_bBreakLineWhenDisplayMainWord)
-	if (m_pMainWord->m_iLimitLetterCountOfFirstLine > 0)
-	{
-		int iStartLetterIndexOfSecondLine = m_pMainWord->m_iLimitLetterCountOfFirstLine;//pLevelConfig->m_iLetterCountOfFirstLine;
-		int iLetterCountOfSecondLine = m_pMainWord->m_iWordLength - m_pMainWord->m_iLimitLetterCountOfFirstLine;//pLevelConfig->m_iLetterCountOfFirstLine;
-		int iIndexPositionOfSecondLine = (_WCBRN_MAX_SECOND_LINE_LETTERS_ - iLetterCountOfSecondLine + 1)/2;
-		for(i = 0; i<iLetterCountOfSecondLine; i++)
+		for(i =0; i< iLetterCountOfFirstLine; i++)
 		{
-			if (!m_pMainWord->m_ActivatedCharacterFlags[iStartLetterIndexOfSecondLine + i])		
+			if (!m_pMainWord->m_ActivatedCharacterFlags[i])		
 			{
-				m_BubbleList[iStartLetterIndexOfSecondLine + i] = Sprite::createWithSpriteFrameName("Main_Bubble.png");
+				m_BubbleList[i] = Sprite::createWithSpriteFrameName("Main_Bubble.png");
 				iZOrder = 1;
 			}
 			else
 			{
-				m_BubbleList[iStartLetterIndexOfSecondLine + i] = Sprite::createWithSpriteFrameName("Main_Bubble_destroy.png");
-				m_BubbleList[iStartLetterIndexOfSecondLine + i]->setRotation( rand() % 360);
-				iZOrder = -3;
+				m_BubbleList[i] = Sprite::createWithSpriteFrameName("Main_Bubble_destroy.png");
+				m_BubbleList[i]->setRotation( rand() % 360);
+				iZOrder = -3; 
 			}
-			m_BubbleList[iStartLetterIndexOfSecondLine + i]->setPosition( Point(m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].x, 960.f - m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].y - 10.f));		
-			m_pBackgroundBatchNode->addChild(m_BubbleList[iStartLetterIndexOfSecondLine+i], iZOrder);
+
+			m_BubbleList[i]->setPosition( Point(m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].x, 960.f - m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].y - 10.f));					
+			m_pBackgroundBatchNode->addChild(m_BubbleList[i], iZOrder);
+				
+			m_LabelList[i]->setPosition(Point(m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].x, 960.f - m_CharacterFirstLinePositions[iIndexPositionOfFirstLine+i].y - 10.f));
+		}		
+
+		// draw second line
+		//if (pLevelConfig->m_bBreakLineWhenDisplayMainWord)
+		if (m_pMainWord->m_iLimitLetterCountOfFirstLine > 0)
+		{
+			int iStartLetterIndexOfSecondLine = m_pMainWord->m_iLimitLetterCountOfFirstLine;//pLevelConfig->m_iLetterCountOfFirstLine;
+			int iLetterCountOfSecondLine = m_pMainWord->m_iWordLength - m_pMainWord->m_iLimitLetterCountOfFirstLine;//pLevelConfig->m_iLetterCountOfFirstLine;
+			int iIndexPositionOfSecondLine = (_WCBRN_NORMAL_MAX_SECOND_LINE_LETTERS_ - iLetterCountOfSecondLine + 1)/2;
+			for(i = 0; i<iLetterCountOfSecondLine; i++)
+			{
+				if (!m_pMainWord->m_ActivatedCharacterFlags[iStartLetterIndexOfSecondLine + i])		
+				{
+					m_BubbleList[iStartLetterIndexOfSecondLine + i] = Sprite::createWithSpriteFrameName("Main_Bubble.png");
+					iZOrder = 1;
+				}
+				else
+				{
+					m_BubbleList[iStartLetterIndexOfSecondLine + i] = Sprite::createWithSpriteFrameName("Main_Bubble_destroy.png");
+					m_BubbleList[iStartLetterIndexOfSecondLine + i]->setRotation( rand() % 360);
+					iZOrder = -3;
+				}
+				m_BubbleList[iStartLetterIndexOfSecondLine + i]->setPosition( Point(m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].x, 960.f - m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].y - 10.f));		
+				m_pBackgroundBatchNode->addChild(m_BubbleList[iStartLetterIndexOfSecondLine+i], iZOrder);
 					
-			m_LabelList[iStartLetterIndexOfSecondLine + i]->setPosition(Point(m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].x, 960.f - m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].y - 10.f));
+				m_LabelList[iStartLetterIndexOfSecondLine + i]->setPosition(Point(m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].x, 960.f - m_CharacterSecondLinePositions[iIndexPositionOfSecondLine+i].y - 10.f));
+			}
+		}
+	}
+	else // time mode
+	{
+		int iPositionYOfFirstLine = 840.f;
+		if (m_pMainWord->m_iLimitLetterCountOfFirstLine > 0)
+			iPositionYOfFirstLine = 863.f;
+		int iStartPositionXOfFirstLine = winSize.width/2.f - iLetterCountOfFirstLine/2.f * 34.f + 17.f;
+
+		for(i =0; i< iLetterCountOfFirstLine; i++)
+		{
+			if (!m_pMainWord->m_ActivatedCharacterFlags[i])		
+			{
+				m_BubbleList[i] = Sprite::createWithSpriteFrameName("Lock_Farm.png");
+				iZOrder = 1;
+			}
+			else if (m_pMainWord->m_sWord[i] != ' ')
+			{
+				m_BubbleList[i] = Sprite::createWithSpriteFrameName("Unlock_Farm.png");				
+				iZOrder = 1; 
+			}
+			else
+				m_BubbleList[i] = NULL;
+
+			if (m_BubbleList[i] != NULL)
+			{
+				m_BubbleList[i]->setPosition(
+					Point( iStartPositionXOfFirstLine + i * 34.f, iPositionYOfFirstLine));
+				m_pBackgroundBatchNode->addChild(m_BubbleList[i], iZOrder);
+				
+				m_LabelList[i]->setPosition( Point( iStartPositionXOfFirstLine + i * 34.f, iPositionYOfFirstLine));
+			}
+		}		
+
+		// draw second line
+		//if (pLevelConfig->m_bBreakLineWhenDisplayMainWord)
+		if (m_pMainWord->m_iLimitLetterCountOfFirstLine > 0)
+		{			
+			int iStartLetterIndexOfSecondLine = m_pMainWord->m_iLimitLetterCountOfFirstLine;//pLevelConfig->m_iLetterCountOfFirstLine;
+			int iLetterCountOfSecondLine = m_pMainWord->m_iWordLength - m_pMainWord->m_iLimitLetterCountOfFirstLine;//pLevelConfig->m_iLetterCountOfFirstLine;			
+
+			int iPositionYOfSecondLine = 818.f;
+			int iStartPositionXOfSecondLine = winSize.width/2.f - iLetterCountOfSecondLine/2.f * 34.f + 17.f;
+
+			for(i = 0; i<iLetterCountOfSecondLine; i++)
+			{
+				if (!m_pMainWord->m_ActivatedCharacterFlags[iStartLetterIndexOfSecondLine + i])		
+				{
+					m_BubbleList[iStartLetterIndexOfSecondLine + i] = Sprite::createWithSpriteFrameName("Lock_Farm.png");
+					iZOrder = 1;
+				}
+				else if (m_pMainWord->m_sWord[iStartLetterIndexOfSecondLine + i] != ' ')
+				{				
+					m_BubbleList[iStartLetterIndexOfSecondLine + i] = Sprite::createWithSpriteFrameName("Unlock_Farm.png");					
+					iZOrder = 1;
+				}
+				else
+					m_BubbleList[iStartLetterIndexOfSecondLine + i] = NULL;
+
+				if (m_BubbleList[iStartLetterIndexOfSecondLine + i] != NULL)
+				{
+					m_BubbleList[iStartLetterIndexOfSecondLine + i]->setPosition( Point( iStartPositionXOfSecondLine + i * 34.f, iPositionYOfSecondLine));
+					m_pBackgroundBatchNode->addChild(m_BubbleList[iStartLetterIndexOfSecondLine+i], iZOrder);
+					
+					m_LabelList[iStartLetterIndexOfSecondLine + i]->setPosition(Point( iStartPositionXOfSecondLine + i * 34.f, iPositionYOfSecondLine));
+				}
+			}
 		}
 	}
 
@@ -369,35 +451,54 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 	float fWindowWidth = Director::getInstance()->getWinSize().width;
 
 	// draw meaning
-	LabelTTF* pMeaningLabel = CCLabelTTF::create("", "fonts/UTM Cookies.ttf", 24); //"Arial", 17);//
-	pMeaningLabel->setString(m_pMainWord->m_sMeaning.c_str());		
-	pMeaningLabel->setAnchorPoint(Point(0,0));
-	//pMeaningLabel->setPosition(Point( 120.f, 860.f));
+	if (eGameModeType == _GMT_NORMAL_)
+	{
+		LabelTTF* pMeaningLabel = CCLabelTTF::create("", "fonts/UTM Cookies.ttf", 24); //"Arial", 17);//
+		pMeaningLabel->setString(m_pMainWord->m_sMeaning.c_str());		
+		pMeaningLabel->setAnchorPoint(Point(0,0));
+		//pMeaningLabel->setPosition(Point( 120.f, 860.f));
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-	pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 859.f));	
+		pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 859.f));	
 #else
-	pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 892.f));
+		pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 892.f));
 #endif
-	pMeaningLabel->setColor(ccc3( 160, 160, 160));
-	pMeaningLabel->disableStroke();
-	this->addChild(pMeaningLabel, 20);	
+		pMeaningLabel->setColor(ccc3( 160, 160, 160));
+		pMeaningLabel->disableStroke();
+		this->addChild(pMeaningLabel, 20);	
 
 
-	Size winSize = Director::getInstance()->getWinSize();
-	float fTextWidth = pMeaningLabel->getContentSize().width;
+		Size winSize = Director::getInstance()->getWinSize();
+		float fTextWidth = pMeaningLabel->getContentSize().width;
 
-	// draw background of meaning
-	float fHeaderWidth = 259.f;
-	if (fTextWidth > 153.f)
-		fHeaderWidth += fTextWidth - 153.f;
+		// draw background of meaning
+		float fHeaderWidth = 259.f;
+		if (fTextWidth > 153.f)
+			fHeaderWidth += fTextWidth - 153.f;
 
-	Point middlePosition( winSize.width/2.f - fHeaderWidth/2.f, winSize.height - 98.f);
+		Point middlePosition( winSize.width/2.f - fHeaderWidth/2.f, winSize.height - 98.f);
 
-	// new header graphic
-	m_pHeaderNode = Scale3Sprite::create( m_pBackgroundBatchNode, SpriteFrameCache::getInstance()->getSpriteFrameByName("Header.png"), 70, 70, -1);
-	m_pHeaderNode->setPosition(middlePosition);
-	m_pHeaderNode->setContentSize( Size( fHeaderWidth, 70.f));
-	this->addChild(m_pHeaderNode);
+		// new header graphic
+		m_pHeaderNode = Scale3Sprite::create( m_pBackgroundBatchNode, SpriteFrameCache::getInstance()->getSpriteFrameByName("Header.png"), 70, 70, -1);
+		m_pHeaderNode->setPosition(middlePosition);
+		m_pHeaderNode->setContentSize( Size( fHeaderWidth, 70.f));
+		this->addChild(m_pHeaderNode);
+	}
+	else // time mode
+	{
+		LabelTTF* pMeaningLabel = CCLabelTTF::create("", "Arial", 21);
+		pMeaningLabel->setString(m_pMainWord->m_sMeaning.c_str());		
+		pMeaningLabel->setAnchorPoint(Point(0,0));
+		//pMeaningLabel->setPosition(Point( 120.f, 860.f));
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+		pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 740.f));	
+#else
+		pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 833.f));
+#endif
+		pMeaningLabel->setColor(ccc3( 103, 48, 27));
+		pMeaningLabel->disableStroke();
+		this->addChild(pMeaningLabel, 20);		
+	}
+
 
 	/*
 
@@ -748,7 +849,11 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex,
 	Point destinationPosition = m_BubbleList[iLetterIndex]->getPosition();
 
 	// bubble
-	Sprite* pBubbleSprite = Sprite::createWithSpriteFrameName("bubble.png");
+	Sprite* pBubbleSprite;
+	if (m_eGameModeType == _GMT_NORMAL_)
+		pBubbleSprite	= Sprite::createWithSpriteFrameName("bubble.png");
+	else
+		pBubbleSprite	= Sprite::createWithSpriteFrameName("Lock_Farm.png");
 	pBubbleSprite->setPosition(position);
 	pBubbleSprite->setScale(0.3f);
 	pBubbleSprite->setOpacity(76);///30%
@@ -821,19 +926,42 @@ void WordCollectBoardRenderNode::PlayUnlockLetterEffect(const int& iLetterIndex,
 			RemoveSelf::create(),
 			NULL));				
 
-	m_BubbleList[iLetterIndex] = Sprite::createWithSpriteFrameName("Main_Bubble_destroy.png");
-	m_BubbleList[iLetterIndex]->setPosition(savePos);
-	m_BubbleList[iLetterIndex]->setRotation( rand() % 360);
-	m_pBackgroundBatchNode->addChild( m_BubbleList[iLetterIndex], -3);
+	if (m_eGameModeType == _GMT_NORMAL_)
+	{
+		m_BubbleList[iLetterIndex] = Sprite::createWithSpriteFrameName("Main_Bubble_destroy.png");
+		m_BubbleList[iLetterIndex]->setRotation( rand() % 360);
+	}
+	else
+		m_BubbleList[iLetterIndex] = Sprite::createWithSpriteFrameName("Unlock_Farm.png");
+	
+	m_BubbleList[iLetterIndex]->setPosition(savePos);	
+	if (m_eGameModeType == _GMT_NORMAL_)
+	{
+		m_pBackgroundBatchNode->addChild( m_BubbleList[iLetterIndex], -3);
 
-	m_BubbleList[iLetterIndex]->setVisible(false);
-	m_BubbleList[iLetterIndex]->runAction(
-		Sequence::create(
-			DelayTime::create(fDelayTime + 0.63f),
-			Show::create(),
-			DelayTime::create(0.0167f),
-			ScaleTo::create( 0.05f, 1.3f),
-			NULL));
+		m_BubbleList[iLetterIndex]->setVisible(false);
+		m_BubbleList[iLetterIndex]->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime + 0.63f),
+				Show::create(),
+				DelayTime::create(0.0167f),
+				ScaleTo::create( 0.05f, 1.3f),
+				NULL));
+	}
+	else
+	{
+		m_pBackgroundBatchNode->addChild( m_BubbleList[iLetterIndex], 1);
+
+		m_BubbleList[iLetterIndex]->setVisible(false);
+		m_BubbleList[iLetterIndex]->runAction(
+			Sequence::create(
+				DelayTime::create(fDelayTime + 0.63f),
+				Show::create(),
+				DelayTime::create(0.0167f),
+				ScaleTo::create( 0.05f, 1.f),
+				NULL));
+	}
+	
 
 
 	// new letter

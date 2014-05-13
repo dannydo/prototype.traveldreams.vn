@@ -189,7 +189,7 @@ void GameWordManager::LoadWords(const int& iPackageIndex)
 		// get word id first		
 		sprintf( sWordID, "%s-%s", m_WorldPackageList[iPackageIndex].m_sPackgageID.c_str(), sTemp.substr( 0, sTemp.size()-1).c_str()) ;
 		newWord.m_sWordID = sWordID;
-		m_MapWordIDToLoadedIndex[sWordID] = iWordIndex;
+		m_MapWordIDToLoadedIndex[sWordID] = m_WordList.size(); //iWordIndex;
 				
 
 		// get word content

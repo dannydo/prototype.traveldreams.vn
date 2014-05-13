@@ -18,6 +18,8 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,
 	Sprite* pBackground = Sprite::create("Background.pvr.ccz");
 	pBackground->setAnchorPoint(ccp(0,0));
 	backgroundLayer->addChild(pBackground);
+	if (eGameModeType == _GMT_TIME_MODE_)
+		pBackground->setPosition(Point( 0, -30.f));
 
 	scene->addChild(backgroundLayer);	
 
@@ -291,7 +293,13 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 		m_pStatusLayer->setCurrentMove(m_GameBoardManager.GetCurrentMove());
 	}
 	else
+	{
 		m_pStatusLayer->setCurrentScore( m_iCurrentTimeModeStage-1);	
+
+
+		m_fBoardBottomPosition -= 30.f;
+		m_fBoardBottomClipPosition -= 30.f;
+	}
 		
 
 	m_pStatusLayer->setScoreForStar( pBaseLevelConfig->m_ScoreOfStars[0], pBaseLevelConfig->m_ScoreOfStars[1], pBaseLevelConfig->m_ScoreOfStars[2]);
