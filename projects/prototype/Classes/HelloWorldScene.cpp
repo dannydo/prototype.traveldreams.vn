@@ -5108,6 +5108,10 @@ void HelloWorld::ShowTimeModeResultPopup()
 
 	// push result of custom mode to server
 	SyncDataGame::getInstance()->pushDataCustomGameMode(timeModeConfig->m_sCustomPackageID);
+
+	// write tracking data		
+	auto startTime = GameWordManager::getInstance()->GetStartTimeOfNewGameSession();
+	TrackingTable::getInstance()->trackingPlayAdvanceMode( startTime, timeModeConfig->m_sCustomPackageID, m_iCurrentTimeModeStage, GameWordManager::getInstance()->GetTimeModeTrackingList());		
 }
 
 void HelloWorld::OnTimeMode_StageComplete()
@@ -5153,11 +5157,7 @@ void HelloWorld::OnTimeMode_StageComplete()
 		DelayTime::create(3.f + fEffectTime),
 		CallFunc::create( this, callfunc_selector( HelloWorld::TimeMode_StartNextStage)),
 		NULL));	
-
-
-	// write tracking data		
-	auto startTime = GameWordManager::getInstance()->GetStartTimeOfNewGameSession();
-	TrackingTable::getInstance()->trackingPlayAdvanceMode( startTime, timeModeConfig->m_sCustomPackageID, m_iCurrentTimeModeStage, GameWordManager::getInstance()->GetTimeModeTrackingList());		
+	
 }
 
 #include "Database\CSWordTable.h"
