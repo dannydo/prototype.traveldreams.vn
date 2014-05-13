@@ -165,6 +165,19 @@ void FacebookManager::shareDialog(const char* name, const char* caption, const c
 	}
 }
 
+void FacebookManager::inviteFriends(const char* message, const char* title, const char* filters)
+{
+	if (_facebook)
+	{
+		m_bIsFinishRun = false;
+		PluginParam paramMessage(message);
+		PluginParam paramTitle(title);
+		PluginParam paramFilters(filters);
+		
+		_facebook->callFuncWithParam("requestDialog", &paramMessage,  &paramTitle,  &paramFilters, NULL); 
+	}
+}
+
 void FacebookManager::autoOpenActiveSession()
 {
 	if (_facebook)
