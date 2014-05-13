@@ -26,6 +26,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
@@ -56,6 +57,11 @@ public class UserFacebook implements InterfaceUser {
 		public static final String NAME = "name";
 		public static final String CAPTION = "caption";
 		public static final String DESCRIPTION = "description";
+		
+		public static final String MESSAGE = "message";
+		public static final String TITLE = "title";
+		public static final String FILTERS = "filters";
+		
 	}
 
 	protected static void LogE(String msg, Exception e) {
@@ -272,6 +278,28 @@ public class UserFacebook implements InterfaceUser {
 		return "";
 	}
 	
+	public String getDeviceName() {
+		try{
+			String sDeviceName = Build.MANUFACTURER + "_" + Build.MODEL;
+			return sDeviceName;
+		}catch(Exception e) {
+		    e.printStackTrace();
+		}
+		
+		return "";
+	}
+	
+	public String getOSVersion() {
+		try{
+			String sOsVersion = "Android " + Build.VERSION.RELEASE; 
+			return sOsVersion;
+		}catch(Exception e) {
+		    e.printStackTrace();
+		}
+		
+		return "";
+	}
+	
 	public void shareFacebookLink(JSONObject shareInfo) {
 		//TODO Auto-generated method stub
 		LogD("Share");
@@ -324,7 +352,7 @@ public class UserFacebook implements InterfaceUser {
 		        		RequestAsyncTask task = new RequestAsyncTask(request);
 		        		task.execute();
 					} catch (JSONException e) {
-						UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Parse Params error");
+						UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Share link parse Params error");
 					}
 	            }
 			});
@@ -388,13 +416,77 @@ public class UserFacebook implements InterfaceUser {
 					    feedDialog.show();
 	            	}
 	            	catch (JSONException e) {
-	            		UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Parse Params error");
+	            		UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Share dialog parse Params error");
 	            	}
 				}
 	    	});
 		}
 	}
 
+	
+	public void requestDialog(JSONObject shareInfo) {
+		//TODO Auto-generated method stub
+		LogD("RequestDialog");
+		if (isLogined()) {
+			final JSONObject curShareInfo = shareInfo;
+			LogD("requestDialog invoked! event : " + curShareInfo.toString());
+			
+			PluginWrapper.runOnMainThread(new Runnable() {
+	            @Override
+	            public void run() {
+	            	try {
+	            		String message = curShareInfo.getString("Param1");
+						String title = curShareInfo.getString("Param2");
+						String filters = curShareInfo.getString("Param3");
+						
+						UserFacebook.LogD(message);
+						UserFacebook.LogD(title);
+						UserFacebook.LogD(filters);
+		        		
+		        		Bundle params = new Bundle();
+						params.putString(UserFacebook.Parameters.MESSAGE, message);
+					    params.putString(UserFacebook.Parameters.TITLE, title);
+					    params.putString(UserFacebook.Parameters.FILTERS, filters);
+					    
+					    WebDialog requestsDialog = (new WebDialog.RequestsDialogBuilder(mContext, Session.getActiveSession(), params))
+				    		.setOnCompleteListener(new OnCompleteListener() {
+								
+								@Override
+								 public void onComplete(Bundle values, FacebookException error){
+									// TODO Auto-generated method stub
+									if (error != null) {
+										if (error instanceof FacebookOperationCanceledException) {
+											UserFacebook.LogD("Request cancelled!");
+					                    	//UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Request cancelled!");
+					                    } else {
+					                    	UserFacebook.LogD("Request Network Error!");
+					                    	//UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Request Network Error!");
+					                    }
+									}
+									else {
+										final String requestId = values.getString("request");
+				                        if (requestId != null) {
+				                        	UserFacebook.LogD("Request sent!");
+					                    	//UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_SUCCEED, "Request sent!");
+				                        } else {
+				                        	UserFacebook.LogD("Request cancelled!");
+					                    	//UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Request cancelled!");
+				                        }
+									}
+								}
+							}).build();
+					   
+					    //requestsDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+					    requestsDialog.show();
+	            	}
+	            	catch (JSONException e) {
+	            		UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Request parse Params error");
+	            	}
+				}
+	    	});
+		}
+	}
+	
 	@Override
 	public String getSessionID() {
 		// TODO Auto-generated method stub

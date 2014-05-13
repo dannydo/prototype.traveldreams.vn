@@ -246,6 +246,9 @@
     <ClCompile Include="..\Classes\Database\TrackingTable.cpp">
       <Filter>Database</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\APIService\TrackingService.cpp">
+      <Filter>APIService</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -469,6 +472,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Database\TrackingTable.h">
       <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\APIService\TrackingService.h">
+      <Filter>APIService</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

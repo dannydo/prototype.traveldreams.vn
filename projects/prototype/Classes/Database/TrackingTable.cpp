@@ -77,15 +77,15 @@ std::string	TrackingTable::genrateJsonTrackingPushToServer()
 	sql.appendWithFormat("%d", _LIMIT_PUSH_TRACKING_TO_SERVER_);
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
 
-	String sJsonData = "\"Data\":[";
+	String sJsonData = "data=[";
 	for (int iRow=1; iRow<=nRow; iRow++)
 	{
 		sJsonData.append("{");
-		sJsonData.appendWithFormat("\"Device\":\"%s\",", re[iRow*nColumn+0]);
-		sJsonData.appendWithFormat("\"Player\":\"%s\",", re[iRow*nColumn+1]);
-		sJsonData.appendWithFormat("\"StartTime\":%s,", re[iRow*nColumn+2]);
-		sJsonData.appendWithFormat("\"Event\":\"%s\",", re[iRow*nColumn+3]);
-		sJsonData.appendWithFormat("\"Data\":\"%s\"", re[iRow*nColumn+4]);
+		sJsonData.appendWithFormat("\"Device\":%s,", re[iRow*nColumn+1]);
+		sJsonData.appendWithFormat("\"Player\":%s,", re[iRow*nColumn+2]);
+		sJsonData.appendWithFormat("\"StartTime\":%s,", re[iRow*nColumn+3]);
+		sJsonData.appendWithFormat("\"Event\":\"%s\",", re[iRow*nColumn+4]);
+		sJsonData.appendWithFormat("\"Data\":%s", re[iRow*nColumn+5]);
 
 		if (iRow == nRow)
 			sJsonData.append("}");
@@ -139,7 +139,7 @@ bool TrackingTable::trackingOpenGame()
 	trackingInfo.sPlayerJson = getPlayerJson();
 	trackingInfo.uStartTime = getTimeLocalCurrent();
 	trackingInfo.eEventTracking = EventTracking_e::_ET_OPEN_GAME_;
-	trackingInfo.sDataJson = "";
+	trackingInfo.sDataJson = "{}";
 
 	return insertTracking(trackingInfo);
 }
@@ -196,9 +196,9 @@ bool TrackingTable::trackingPlayAdvanceMode(const unsigned long startTime, const
 	for (int iIndex = 0; iIndex < iSize; iIndex++)
 	{
 		if (iIndex == iSize-1)
-			sJsonData.appendWithFormat("\"WordId\":\"%s\"", sCSWordId[iIndex].c_str());
+			sJsonData.appendWithFormat("\"%s\"", sCSWordId[iIndex].c_str());
 		else
-			sJsonData.appendWithFormat("\"WordId\":\"%s\",", sCSWordId[iIndex].c_str());
+			sJsonData.appendWithFormat("\"%s\",", sCSWordId[iIndex].c_str());
 	}
 	sJsonData.append("]");
 	sJsonData.append("}");
