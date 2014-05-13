@@ -113,7 +113,11 @@ void AssetsManager::checkStoragePath()
 static std::string keyWithHash( const char* prefix, const std::string& url )
 {
     char buf[256];
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+	 sprintf(buf,"%s%lld",prefix,std::hash<std::string>()(url));
+#else
     sprintf(buf,"%s%zd",prefix,std::hash<std::string>()(url));
+#endif
     return buf;
 }
 
