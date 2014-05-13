@@ -193,6 +193,26 @@ std::string FacebookManager::getDeviceId()
 	return "";
 }
 
+std::string FacebookManager::getDeviceName()
+{
+	if (_facebook)
+	{
+		return _facebook->callStringFuncWithParam("getDeviceName", NULL);
+	}
+
+	return "";
+}
+
+std::string FacebookManager::getOSVersion()
+{
+	if (_facebook)
+	{
+		return _facebook->callStringFuncWithParam("getOSVersion", NULL);
+	}
+
+	return "";
+}
+
 std::string FacebookManager::getAccessToken() 
 {
 	std::string sessionID = "";

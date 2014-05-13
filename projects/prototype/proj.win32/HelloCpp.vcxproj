@@ -153,6 +153,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\Database\InitDatabase.cpp" />
     <ClCompile Include="..\Classes\Database\LevelTable.cpp" />
     <ClCompile Include="..\Classes\Database\sqlite3.c" />
+    <ClCompile Include="..\Classes\Database\TrackingTable.cpp" />
     <ClCompile Include="..\Classes\Database\TransactionTable.cpp" />
     <ClCompile Include="..\Classes\Database\UnlockChapterTable.cpp" />
     <ClCompile Include="..\Classes\Database\UserTable.cpp" />
@@ -226,6 +227,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\Database\InitDatabase.h" />
     <ClInclude Include="..\Classes\Database\LevelTable.h" />
     <ClInclude Include="..\Classes\Database\sqlite3.h" />
+    <ClInclude Include="..\Classes\Database\TrackingTable.h" />
     <ClInclude Include="..\Classes\Database\TransactionTable.h" />
     <ClInclude Include="..\Classes\Database\UnlockChapterTable.h" />
     <ClInclude Include="..\Classes\Database\UserTable.h" />
