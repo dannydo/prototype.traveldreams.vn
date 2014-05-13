@@ -4,6 +4,7 @@
 #include "GameConfigManager.h"
 #include "Database\LevelTable.h"
 #include "Database\CSWordTable.h"
+#include "FunctionCommon.h"
 
 using namespace cocos2d;
 
@@ -269,6 +270,8 @@ void GameWordManager::GenerateWordForNewLevel(std::string sChapterID, int iLevel
 //	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
 //	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
 
+	m_iStartTimeOfNewGameSession =  getTimeLocalCurrent();
+
 	LevelInfo levelInfo = LevelTable::getInstance()->getLevel( sChapterID, iLevel);	
 
 	m_pLevelConfig = &GameConfigManager::getInstance()->GetLevelConfig(sChapterID, iLevel);
@@ -324,12 +327,12 @@ void GameWordManager::GenerateWordForNewLevel(std::string sChapterID, int iLevel
 	ResetDataForNewPlay();
 }
 
-long GameWordManager::GetTotalPlayTimeOfTimeModeSession()
+long GameWordManager::GetTotalPlayTimeOfGameSession()
 {
-	timeval now;
-	gettimeofday(&now, NULL);
-	unsigned long iCurrentTime = now.tv_sec * 1000 + now.tv_usec/1000 ; //miliseconds
-	return (iCurrentTime - m_iStartTimeOfTimeModeGameSession)/1000;
+	//timeval now;
+	//gettimeofday(&now, NULL);
+	unsigned long iCurrentTime = getTimeLocalCurrent(); //now.tv_sec * 1000 + now.tv_usec/1000 ; //miliseconds
+	return (iCurrentTime - m_iStartTimeOfNewGameSession); //  /1000;
 }
 
 void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTimeModeConfig, bool bStartNewTimeModeSession)
@@ -341,9 +344,9 @@ void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTi
 	{	
 		m_TimeModeSessionTracking.clear();
 
-		timeval now;
-		gettimeofday(&now, NULL);
-		m_iStartTimeOfTimeModeGameSession = now.tv_sec * 1000 + now.tv_usec/1000 ; //miliseconds
+		//timeval now;
+		//gettimeofday(&now, NULL);
+		m_iStartTimeOfNewGameSession =  getTimeLocalCurrent(); // now.tv_sec * 1000 + now.tv_usec/1000 ; //miliseconds
 
 		auto wordDBList = CSWordTable::getInstance()->getAllCSWordsForPackage(pTimeModeConfig->m_sCustomPackageID);
 		auto currentWordIndexList = pTimeModeConfig->m_WordIndexList;
@@ -408,29 +411,9 @@ void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTi
 }
 
 void GameWordManager::UpdateTimeModeTracking(const int& iCompletedWordIndex)
-{	
-	int iIndexInTrackingList=  -1;
-	for(int i=0; i< m_TimeModeSessionTracking.size(); i++)
-	{
-		if (m_TimeModeSessionTracking[i].m_iWordIndex == iCompletedWordIndex)
-		{
-			iIndexInTrackingList = i;
-			break;
-		}		
-	}
-
-	if (iIndexInTrackingList >=0)
-	{
-		m_TimeModeSessionTracking[iIndexInTrackingList].m_iCollectedCount++;
-	}
-	else
-	{
-		TimeModeWordTrackInfo wordTrackInfo;
-		wordTrackInfo.m_iCollectedCount = 1;
-		wordTrackInfo.m_iWordIndex = iCompletedWordIndex;
-
-		m_TimeModeSessionTracking.push_back(wordTrackInfo);
-	}
+{	 
+	auto& word = GetWord(iCompletedWordIndex);
+	m_TimeModeSessionTracking.push_back(word.m_sWordID);	
 }
 
 void GameWordManager::RetryCurrentLevel()

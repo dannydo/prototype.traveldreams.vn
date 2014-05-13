@@ -1841,7 +1841,7 @@ void HelloWorld::ShowWinGamePopup()
 
 	//Game Tracking Level
 	auto& levelConfig = GameConfigManager::getInstance()->GetLevelConfig(sCurrentChapterID, iCurrentLevel);
-	const unsigned long uStartTime = 0;
+	const unsigned long uStartTime = GameWordManager::getInstance()->GetStartTimeOfNewGameSession();
 	
 	TrackingTable::getInstance()->trackingPlayLevelNormalMode(uStartTime, iCurrentLevel, sCurrentChapterID, mainWord.m_sWordID, 
 		"WIN", m_GameBoardManager.GetCurrentMove(), 0, m_GameBoardManager.GetCurrentScore(), m_GameBoardManager.GetEarnedStars(), 
@@ -1865,7 +1865,7 @@ void HelloWorld::ShowFailGamePopup()
 	//Game Tracking Level
 	auto& levelConfig = GameConfigManager::getInstance()->GetLevelConfig(sCurrentChapterID, iCurrentLevel);
 	const int iBonusQuestCompleted = m_GameBoardManager.GetBonusQuestManager()->CountBonusQuestCompleted();
-	const unsigned long uStartTime = 0;
+	const unsigned long uStartTime = GameWordManager::getInstance()->GetStartTimeOfNewGameSession();
 	
 	TrackingTable::getInstance()->trackingPlayLevelNormalMode(uStartTime, iCurrentLevel, sCurrentChapterID, mainWord.m_sWordID, 
 		"LOSE", 0, mainWord.m_iRemainInactivatedCharacterCount, m_GameBoardManager.GetCurrentScore(), 0, levelConfig.m_iNumberOfMove, levelConfig.m_BonusQuestConfig.m_iBonusQuestCount, iBonusQuestCompleted);
@@ -5087,7 +5087,7 @@ void HelloWorld::OnTimeMode_OutOfTime()
 	this->runAction( CCSequence::create(
 		DelayTime::create(fFailCollectWordEffectTime + 3.f),
 		CallFunc::create( this, callfunc_selector( HelloWorld::ShowTimeModeResultPopup)),
-		NULL));
+		NULL));	
 }
 
 //#include "MainMenuScene.h"
@@ -5101,9 +5101,10 @@ void HelloWorld::ShowTimeModeResultPopup()
 	//Director::getInstance()->replaceScene(pMainMenu);
 
 	auto pEndGameNode = EndGameCustomModeNode::createLayout( m_iCurrentTimeModeStage, MIN( m_iCurrentTimeModeStage, timeModeConfig->m_WordIndexList.size()) , 
-					GameWordManager::getInstance()->GetTotalPlayTimeOfTimeModeSession(), timeModeConfig->m_sCustomPackageID);	
+					GameWordManager::getInstance()->GetTotalPlayTimeOfGameSession(), timeModeConfig->m_sCustomPackageID);	
 	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStartsOfTimeMode(m_iCurrentTimeModeStage-1));
 	m_pHUDLayer->addChild(pEndGameNode, 1000);
+	
 
 	// push result of custom mode to server
 	SyncDataGame::getInstance()->pushDataCustomGameMode(timeModeConfig->m_sCustomPackageID);
@@ -5152,6 +5153,11 @@ void HelloWorld::OnTimeMode_StageComplete()
 		DelayTime::create(3.f + fEffectTime),
 		CallFunc::create( this, callfunc_selector( HelloWorld::TimeMode_StartNextStage)),
 		NULL));	
+
+
+	// write tracking data		
+	auto startTime = GameWordManager::getInstance()->GetStartTimeOfNewGameSession();
+	TrackingTable::getInstance()->trackingPlayAdvanceMode( startTime, timeModeConfig->m_sCustomPackageID, m_iCurrentTimeModeStage, GameWordManager::getInstance()->GetTimeModeTrackingList());		
 }
 
 #include "Database\CSWordTable.h"

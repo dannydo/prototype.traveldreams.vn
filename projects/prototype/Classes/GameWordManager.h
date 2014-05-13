@@ -56,7 +56,7 @@ public:
 
 	// temporary only random words of word list, should implement correctly later
 	void GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTimeModeConfig, bool bStartNewTimeModeSession = false);
-	long GetTotalPlayTimeOfTimeModeSession();
+	long GetTotalPlayTimeOfGameSession();
 
 	inline const Word& GetMainWord() { return m_WordList[m_iMainWordIndex];}	
 	inline const int GetLoadedIndexOfMainWord() { return m_iMainWordIndex;}
@@ -90,6 +90,9 @@ public:
 	const std::string GetWordIdFromWord(const Word& word);
 
 	// tracking in time mode
+	inline unsigned long GetStartTimeOfNewGameSession() { return m_iStartTimeOfNewGameSession;}
+
+	const std::vector<std::string>& GetTimeModeTrackingList() { return m_TimeModeSessionTracking;}
 	void UpdateTimeModeTracking(const int& iCompletedWordIndex);
 private:
 	void PreLoadPackageForWord(std::string sWordID);
@@ -133,19 +136,10 @@ private:
 	// 	
 	std::vector<unsigned char> m_TrashLettersCollection;
 
-public:
-	struct TimeModeWordTrackInfo
-	{
-	public:
-		int m_iWordIndex;
-		int m_iCollectedCount;
-	};
-
 private:
 	// time mode only
-	unsigned long m_iStartTimeOfTimeModeGameSession;
-	std::vector<TimeModeWordTrackInfo> m_TimeModeSessionTracking;
-
+	unsigned long m_iStartTimeOfNewGameSession;
+	std::vector<std::string> m_TimeModeSessionTracking;
 
 
 	/*struct TimeModeAnalysedWordInfo
