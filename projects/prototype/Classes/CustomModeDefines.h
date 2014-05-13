@@ -23,12 +23,16 @@ public:
 struct TimeModeLevelConfig : public BaseLevelConfig
 {
 public:
-	struct ObstacleDropConfig
+	struct ObstacleConfig
 	{
 	public:
 		int m_iObstacleID;
 		int m_iObstacleLevel;
-		
+	};
+
+	struct ObstacleDropConfig : public ObstacleConfig
+	{
+	public:		
 		int m_DropOnColumnsRateList[_BOARD_MAX_COLUMN_NUMBER_];		
 	};
 
@@ -39,7 +43,10 @@ public:
 		int m_iEnergyLostRatePersecond;
 		
 		// obstacle generate config
-		std::vector<ObstacleDropConfig> m_ObstacleConfigList;
+		std::vector<ObstacleDropConfig> m_ObstacleDropConfigList;
+
+		// obstacle appear on letter config		
+		std::vector<ObstacleConfig> m_ObstacleOnLetterConfigList;
 	};
 
 public:		

@@ -925,7 +925,8 @@ void GameConfigManager::LoadCustomModeConfig()
 	int iManualStageConfigCount;
 	inputStream >> iManualStageConfigCount;
 	
-	TimeModeLevelConfig::ObstacleDropConfig obstacleConfig;
+	TimeModeLevelConfig::ObstacleDropConfig obstacleDropConfig;
+	TimeModeLevelConfig::ObstacleConfig obstacleOnLetterConfig;
 	int iObstacleCount, i, j, k; 
 	bool bObstacleCanDropOnAllColumn;
 
@@ -935,17 +936,31 @@ void GameConfigManager::LoadCustomModeConfig()
 
 		inputStream >> pManualStageConfig->m_iMaximumEnergy;
 		inputStream >> pManualStageConfig->m_iEnergyLostRatePersecond;
+
+		// read natural-drop obstacle config
 		inputStream >> iObstacleCount;
 		
 		for(j =0; j < iObstacleCount; j++)
 		{			
 			inputStream >> sTemp;
-			obstacleConfig.m_iObstacleID = m_ObstaleNameToIDMap[sTemp];
-			inputStream >> obstacleConfig.m_iObstacleLevel;
+			obstacleDropConfig.m_iObstacleID = m_ObstaleNameToIDMap[sTemp];
+			inputStream >> obstacleDropConfig.m_iObstacleLevel;
 			for( k =0; k < levelConfig.m_iColumnNumber; k++)
-				inputStream >> obstacleConfig.m_DropOnColumnsRateList[k];
+				inputStream >> obstacleDropConfig.m_DropOnColumnsRateList[k];
 
-			pManualStageConfig->m_ObstacleConfigList.push_back(obstacleConfig);
+			pManualStageConfig->m_ObstacleDropConfigList.push_back(obstacleDropConfig);
+		}
+
+
+		// read obstacle on letter config
+		inputStream >> iObstacleCount;
+		for(j =0; j < iObstacleCount; j++)
+		{
+			inputStream >> sTemp;
+			obstacleOnLetterConfig.m_iObstacleID = m_ObstaleNameToIDMap[sTemp];
+			inputStream >> obstacleOnLetterConfig.m_iObstacleLevel;			
+
+			pManualStageConfig->m_ObstacleOnLetterConfigList.push_back(obstacleOnLetterConfig);
 		}
 
 		levelConfig.m_ManualStageConfigList.push_back(pManualStageConfig);

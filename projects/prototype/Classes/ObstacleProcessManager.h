@@ -55,7 +55,7 @@ public:
 	//void MoveObstacles(const int& iRow1, const int& iColumn1, const int& iRow2, const int& iColumn2);
 	inline std::vector<int>& GetBlockWaitingClearList() { return m_BlockWaitingClearList;}
 
-	void GenerateObstacle(Level_ObstacleConfig* pLevelObstacleConfig, int& iBlockID);
+	void GenerateObstacle(Level_ObstacleConfig* pLevelObstacleConfig, int& iBlockID, bool bDirtyFlag = true);
 
 	void CleanWaitingClearList();
 	void UpdateAfterMove();

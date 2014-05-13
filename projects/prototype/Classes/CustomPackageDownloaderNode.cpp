@@ -292,13 +292,23 @@ void CustomPackageDownloaderNode::onError(cocos2d::extension::AssetsManager::Err
     {
         m_pProgressLabel->setString("no new version");
 
-		// add new package to list
-		CustomPackageInfo customPackageInfo;
-		customPackageInfo.m_sCode = m_pCodeEditBox->getText();
-		customPackageInfo.m_sPackageFolder = m_sResultFolder;
-		AddNewPackageToList(customPackageInfo);
+		bool bAlreadyInList = false;
+		for(auto& package: m_CustomPackageList)
+		{
+			if (package.m_sCode.compare( m_pCodeEditBox->getText()) == 0)
+				bAlreadyInList = true;
+		}
 
-		SavePackageListToFile();
+		if (!bAlreadyInList)
+		{
+			// add new package to list
+			CustomPackageInfo customPackageInfo;
+			customPackageInfo.m_sCode = m_pCodeEditBox->getText();
+			customPackageInfo.m_sPackageFolder = m_sResultFolder;
+			AddNewPackageToList(customPackageInfo);
+
+			SavePackageListToFile();
+		}
 
 		//startCustomGame();
     }

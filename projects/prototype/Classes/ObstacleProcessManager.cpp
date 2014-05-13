@@ -45,14 +45,14 @@ void ObstacleProcessManager::InitLevel()
 }
 
 
-void ObstacleProcessManager::GenerateObstacle(Level_ObstacleConfig* pLevelObstacleConfig, int& iBlockID)
+void ObstacleProcessManager::GenerateObstacle(Level_ObstacleConfig* pLevelObstacleConfig, int& iBlockID, bool bDirtyFlag)
 {
 	if (iBlockID < 0)
 		iBlockID =  AllocFreeBlock();
 
 	m_ObstacleBoardList[iBlockID].m_ObstacleList[pLevelObstacleConfig->m_iObstacleID].m_bIsActive = true;
 	m_ObstacleBoardList[iBlockID].m_ObstacleList[pLevelObstacleConfig->m_iObstacleID].m_iObstacleLevel = pLevelObstacleConfig->m_iObstacleLevel;
-	m_ObstacleBoardList[iBlockID].m_ObstacleList[pLevelObstacleConfig->m_iObstacleID].m_bIsDirty = true;
+	m_ObstacleBoardList[iBlockID].m_ObstacleList[pLevelObstacleConfig->m_iObstacleID].m_bIsDirty = bDirtyFlag;
 }
 
 int ObstacleProcessManager::AllocFreeBlock()

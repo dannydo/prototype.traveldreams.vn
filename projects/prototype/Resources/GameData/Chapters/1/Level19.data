@@ -3,23 +3,23 @@
 ;number of move
 30
 ;number of color
-6
+5
 ;score of stars
-7000	14000	24000
+10000	14000	18000
 ;map matrix
 1	0	1	1	1	1	0	1
 1	0	1	1	1	1	0	1
 1	0	1	1	1	1	0	1
 1	1	1	1	1	1	1	1
-1	0	1	1	1	1	0	1
-1	0	1	1	1	1	0	1
-1	1	0	1	1	0	1	1
-1	0	1	1	1	1	0   1
+1	1	1	1	1	1	1	1
+1	1	1	1	1	1	1	1
+1	1	1	1	1	1	1	1
+0	0	0	0	0	0	0   0
 ;main word
 5
 0
 ;init rate, increase after move, decrease when destroyed, decrease when appeared, ratio betweens letters same generation
-5 10 20	80	10
+20 10 20 70 5
 ; config columns appear, 1: all columns, 0: specific columns + column count + columns list
 1
 ;end game bonus type
@@ -27,6 +27,11 @@
 ;boss
 0
 ;obstacle list: count, list
+1
+COUNTDOWN 5
 0
+1
+0 4
+3 20 4 30 5 30 6 20
 ;bonus quest
 0

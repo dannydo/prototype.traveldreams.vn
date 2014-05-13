@@ -162,6 +162,16 @@ void NewGameBoardManager::GeneratePositionOfLettersForTimeMode(std::vector<Cell>
 	seedList.insert(seedList.begin(), rejectList.begin(), rejectList.end());						
 
 	auto mainWord = const_cast<Word&>(m_pGameWordManager->GetMainWord());
+	
+	// special case: this stage may need to generate letter + obstacle, we must check and support it
+	const TimeModeLevelConfig* pTimeModeLevelConfig = (TimeModeLevelConfig*)m_pLevelConfig;;		
+	std::vector<TimeModeLevelConfig::ObstacleConfig>* pObstacleOnLetterConfigList;
+	if (m_iTimeModeStage <= pTimeModeLevelConfig->m_ManualStageConfigList.size())
+		pObstacleOnLetterConfigList = &pTimeModeLevelConfig->m_ManualStageConfigList[ m_iTimeModeStage-1]->m_ObstacleOnLetterConfigList;
+	else
+		pObstacleOnLetterConfigList = &pTimeModeLevelConfig->m_ManualStageConfigList[ pTimeModeLevelConfig->m_ManualStageConfigList.size()-1]->m_ObstacleOnLetterConfigList;
+
+
 	//int iRandomIndex;
 	for(int i=0; i< mainWord.m_iWordLength; i++)
 	{
@@ -177,6 +187,17 @@ void NewGameBoardManager::GeneratePositionOfLettersForTimeMode(std::vector<Cell>
 			iRandomIndex = rand() % iListSize;
 
 			positionList.push_back(seedList[iRandomIndex]);
+			
+			Level_ObstacleConfig levelObstacleConfig;
+			// generate obstacles with letter!!!
+			for(auto obstacleLevelConfig : *pObstacleOnLetterConfigList)
+			{								
+				levelObstacleConfig.m_iObstacleID = obstacleLevelConfig.m_iObstacleID;
+				levelObstacleConfig.m_iObstacleLevel = obstacleLevelConfig.m_iObstacleLevel;
+				m_pObstacleProcessManager->GenerateObstacle( &levelObstacleConfig, m_BoardValueMatrix[seedList[iRandomIndex].m_iRow][seedList[iRandomIndex].m_iColumn].m_iObstacleBlockID, false);
+			}			
+
+
 			seedList[iRandomIndex] = seedList[iListSize-1];			
 			iListSize--;
 		}
@@ -2317,19 +2338,19 @@ void NewGameBoardManager::GenerateNewGems(std::vector<NewCellInfo>& newCells, bo
 		// check for generating obstacles
 		unsigned char iLetter = 255;	
 		auto pTimeModeLevelConfig = (TimeModeLevelConfig*)m_pLevelConfig;
-		std::vector<TimeModeLevelConfig::ObstacleDropConfig>* pObstacleConfigList;
+		std::vector<TimeModeLevelConfig::ObstacleDropConfig>* pObstacleDropConfigList;
 
 		if (m_iTimeModeStage <= pTimeModeLevelConfig->m_ManualStageConfigList.size())
-			pObstacleConfigList = &pTimeModeLevelConfig->m_ManualStageConfigList[ m_iTimeModeStage-1]->m_ObstacleConfigList;
+			pObstacleDropConfigList = &pTimeModeLevelConfig->m_ManualStageConfigList[ m_iTimeModeStage-1]->m_ObstacleDropConfigList;
 		else
-			pObstacleConfigList = &pTimeModeLevelConfig->m_ManualStageConfigList[ pTimeModeLevelConfig->m_ManualStageConfigList.size()-1]->m_ObstacleConfigList;
+			pObstacleDropConfigList = &pTimeModeLevelConfig->m_ManualStageConfigList[ pTimeModeLevelConfig->m_ManualStageConfigList.size()-1]->m_ObstacleDropConfigList;
 		for(int iIndex = 0; iIndex < newCells.size(); iIndex++)	
 		{			
 			NewCellInfo& cell = newCells[iIndex];
 			Level_ObstacleConfig levelObstacleConfig;
 
 			// generate obstacle that can be dropped!!!
-			for(auto obstacleLevelConfig : *pObstacleConfigList)
+			for(auto obstacleLevelConfig : *pObstacleDropConfigList)
 			{								
 				if (obstacleLevelConfig.m_DropOnColumnsRateList[cell.m_iColumn] >0)
 					if (SuccessWithPercentRatio(obstacleLevelConfig.m_DropOnColumnsRateList[cell.m_iColumn]))
