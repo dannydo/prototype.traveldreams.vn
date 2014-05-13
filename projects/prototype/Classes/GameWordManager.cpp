@@ -417,7 +417,7 @@ void GameWordManager::UpdateTimeModeTracking(const int& iCompletedWordIndex)
 }
 
 void GameWordManager::RetryCurrentLevel()
-{
+{	
 	// reset data
 	ResetDataForNewPlay();
 }
