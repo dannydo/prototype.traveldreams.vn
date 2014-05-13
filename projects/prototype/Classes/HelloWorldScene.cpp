@@ -1844,7 +1844,7 @@ void HelloWorld::ShowWinGamePopup()
 	const unsigned long uStartTime = GameWordManager::getInstance()->GetStartTimeOfNewGameSession();
 	
 	TrackingTable::getInstance()->trackingPlayLevelNormalMode(uStartTime, iCurrentLevel, sCurrentChapterID, mainWord.m_sWordID, 
-		"WIN", m_GameBoardManager.GetCurrentMove(), 0, m_GameBoardManager.GetCurrentScore(), m_GameBoardManager.GetEarnedStars(), 
+		"WIN", m_iNormalModeRemainMoveAtEndGame, 0, m_GameBoardManager.GetCurrentScore(), m_GameBoardManager.GetEarnedStars(), 
 		levelConfig.m_iNumberOfMove, levelConfig.m_BonusQuestConfig.m_iBonusQuestCount, iBonusQuestCompleted);
 	
 }
@@ -4994,6 +4994,7 @@ void HelloWorld::CheckEndGameAtEndChain()
 
 					m_bIsEffectPlaying = true;//stop all interaction on board from now
 					m_bIsEndGamePhase = true; 
+					m_iNormalModeRemainMoveAtEndGame = m_GameBoardManager.GetCurrentMove();
 
 					float fExtraDelay = 0.1f;
 					if (m_GameBoardManager.GetPhaseMoveOfComboChain() == 2)

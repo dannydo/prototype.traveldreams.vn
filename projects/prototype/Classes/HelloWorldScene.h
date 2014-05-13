@@ -245,6 +245,7 @@ private:
 	bool m_bIsCellDragPlaying;
 	TouchMoveState m_ePlayingDragEffect;
 	bool m_bIsEndGamePhase;
+	int m_iNormalModeRemainMoveAtEndGame;
 
 	float m_fIdleTime;
 	//bool m_bIsShowingHint;
