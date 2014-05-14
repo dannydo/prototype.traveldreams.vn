@@ -23,7 +23,7 @@ private:
 public:
 	static WordCollectBoardRenderNode* create();
 
-	void GenerateLabels(GameModeType_e eGameModeType, int iTimeModeStage);//call this after generate level data
+	void GenerateLabels(GameModeType_e eGameModeType, int iStageIndex);//call this after generate level data
 	//void draw() override;
 	void update(float dt) override;	
 

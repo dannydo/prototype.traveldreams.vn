@@ -306,7 +306,16 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 	//m_pStatusLayer->update(0);
 
 	// init word-collect board
-	m_pWordCollectBoardRenderNode->GenerateLabels( eGameModeType, iTimeModeStage);
+	if (m_eGameModeType == _GMT_TIME_MODE_)
+		m_pWordCollectBoardRenderNode->GenerateLabels( eGameModeType, iTimeModeStage);
+	else //normal  //if (m_eGameModeType == _GMT_TIME_MODE_)
+	{		
+		string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
+		int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	
+
+		int iRealLevelIndex = GameConfigManager::getInstance()->CountLevelOfPreviousChapters( sCurrentChapterID) + iCurrentLevel;
+		m_pWordCollectBoardRenderNode->GenerateLabels( eGameModeType, iRealLevelIndex);
+	}
 
 	// init graphic for gameBoard
 	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResourceDemo.plist");
@@ -343,7 +352,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 
 	animCache->addAnimationsWithFile("ComboEffect/BonusTimeAnimations.plist"); 
 
-	ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/AnimationDetach/Animation detach.ExportJson");		
+	//ArmatureDataManager::getInstance()->addArmatureFileInfo("CCS_Animation/AnimationDetach/Animation detach.ExportJson");		
 
 	// get symbol size
 	CCSprite* pSprite;

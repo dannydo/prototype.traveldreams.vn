@@ -229,7 +229,7 @@ void WordCollectBoardRenderNode::PlayTimeModeWordStart(int iTimeModeStage)
 
 }
 
-void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, int iTimeModeStage)
+void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, int iStageIndex)
 {
 	Size winSize = Director::getInstance()->getWinSize();
 	m_eGameModeType = eGameModeType;
@@ -496,7 +496,7 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 #endif
 		pMeaningLabel->setColor(ccc3( 103, 48, 27));
 		pMeaningLabel->disableStroke();
-		this->addChild(pMeaningLabel, 20);		
+		this->addChild(pMeaningLabel, 10);		
 	}
 
 
@@ -532,23 +532,200 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 		m_pColorNode->drawPolygon(vertex, 4, ccc4f(0, 0, 0, 0.5f), 0, ccc4f(0, 0, 0, 0.5f) );
 		this->addChild(m_pColorNode, 19);
 	
-		Sprite* pTip = Sprite::create("tip-msg.png");
+		/*Sprite* pTip = Sprite::create("tip-msg.png");
 		pTip->setScale(1.2f);
 		pTip->setPosition(Point( 310.f, 790.f));
-		m_pColorNode->addChild(pTip);
+		m_pColorNode->addChild(pTip);*/
 	}
-	else {
-		PlayTimeModeWordStart( iTimeModeStage);
+	else  // time mode
+	{
+		PlayTimeModeWordStart( iStageIndex);
 	}
 
 
 	// extra tutorial
-	if (eGameModeType == _GMT_NORMAL_ && strcmp( m_pMainWord->m_sWord, "PEN") == 0)
+	if (eGameModeType == _GMT_NORMAL_)// && strcmp( m_pMainWord->m_sWord, "PEN") == 0)
 	{
-		Sprite* pTutorialSprite = Sprite::create("tutorial.png");
+		// removeSpriteFramesFromFile		
+
+		/*Sprite* pTutorialSprite = Sprite::create("tutorial.png");
 		pTutorialSprite->setScale(1.2f);
 		m_pColorNode->addChild(pTutorialSprite);
-		pTutorialSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+		pTutorialSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f));*/	
+		auto* pContinueTip = Sprite::create( "Tutorial/Continue.png");
+		pContinueTip->runAction(
+			RepeatForever::create(
+				Sequence::createWithTwoActions(
+					FadeTo::create(0.55f, 255),
+					FadeTo::create(0.55f, 80))));
+
+		if (iStageIndex == 1)
+		{
+			CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("Tutorial/Tutorial1.plist");		
+			AnimationCache::getInstance()->addAnimationsWithFile("Tutorial/Tutorial1Animations.plist");
+
+			auto pBoardBatchNode = CCSpriteBatchNode::create("Tutorial/Tutorial1.pvr.ccz");
+
+			auto pFrame = Sprite::createWithSpriteFrameName("tut1_Frame.png");
+			pFrame->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+
+			auto pAnimSprite = Sprite::createWithSpriteFrameName("tut1_anim_1.png");
+			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 20.f));
+			auto pAnimation = AnimationCache::getInstance()->getAnimation("Tutorial1");
+			pAnimSprite->runAction(	Animate::create(pAnimation));
+
+			pBoardBatchNode->addChild( pFrame);
+			pBoardBatchNode->addChild(pAnimSprite);			
+
+			m_pColorNode->addChild(pBoardBatchNode);
+
+			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 150.f));
+			m_pColorNode->addChild(pContinueTip);
+		}
+		else if (iStageIndex == 2)
+		{
+			CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("Tutorial/Tutorial2.plist");		
+			AnimationCache::getInstance()->addAnimationsWithFile("Tutorial/Tutorial2Animations.plist");
+
+			auto pBoardBatchNode = CCSpriteBatchNode::create("Tutorial/Tutorial2.pvr.ccz");
+
+			auto pFrame = Sprite::createWithSpriteFrameName("tut2_Frame.png");
+			pFrame->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+
+			auto pAnimSprite = Sprite::createWithSpriteFrameName("tut2_anim_1.png");
+			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 25.f));
+			auto pAnimation = AnimationCache::getInstance()->getAnimation("Tutorial2");
+			pAnimSprite->runAction(	Animate::create(pAnimation));
+
+			pBoardBatchNode->addChild( pFrame);
+			pBoardBatchNode->addChild(pAnimSprite);
+
+			m_pColorNode->addChild(pBoardBatchNode);
+
+
+			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 160.f));
+			m_pColorNode->addChild(pContinueTip);
+		}
+		else if (iStageIndex == 3)
+		{
+			CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("Tutorial/Tutorial3.plist");		
+			AnimationCache::getInstance()->addAnimationsWithFile("Tutorial/Tutorial3Animations.plist");
+
+			auto pBoardBatchNode = CCSpriteBatchNode::create("Tutorial/Tutorial3.pvr.ccz");
+
+			auto pFrame = Sprite::createWithSpriteFrameName("tut3_Frame.png");
+			pFrame->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+
+			auto pAnimSprite = Sprite::createWithSpriteFrameName("tut3_anim_1.png");
+			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 20.f));
+			auto pAnimation = AnimationCache::getInstance()->getAnimation("Tutorial3");
+			pAnimSprite->runAction(	Animate::create(pAnimation));
+
+			pBoardBatchNode->addChild( pFrame);
+			pBoardBatchNode->addChild(pAnimSprite);
+
+			m_pColorNode->addChild(pBoardBatchNode);
+
+
+			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 195.f));
+			m_pColorNode->addChild(pContinueTip);
+		}
+		else if (iStageIndex == 4)
+		{
+			CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("Tutorial/Tutorial4.plist");		
+			AnimationCache::getInstance()->addAnimationsWithFile("Tutorial/Tutorial4Animations.plist");
+
+			auto pBoardBatchNode = CCSpriteBatchNode::create("Tutorial/Tutorial4.pvr.ccz");
+
+			auto pFrame = Sprite::createWithSpriteFrameName("tut4_Frame.png");
+			pFrame->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+
+			auto pAnimSprite = Sprite::createWithSpriteFrameName("tut4_anim_1.png");
+			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 20.f));
+			auto pAnimation = AnimationCache::getInstance()->getAnimation("Tutorial4");
+			pAnimSprite->runAction(	Animate::create(pAnimation));
+
+			pBoardBatchNode->addChild( pFrame);
+			pBoardBatchNode->addChild(pAnimSprite);
+
+			m_pColorNode->addChild(pBoardBatchNode);
+
+
+			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 175.f));
+			m_pColorNode->addChild(pContinueTip);
+		}
+		else if (iStageIndex == 6)
+		{
+			CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("Tutorial/Tutorial6.plist");		
+			AnimationCache::getInstance()->addAnimationsWithFile("Tutorial/Tutorial6Animations.plist");
+
+			auto pBoardBatchNode = CCSpriteBatchNode::create("Tutorial/Tutorial6.pvr.ccz");
+
+			auto pFrame = Sprite::createWithSpriteFrameName("tut6_Frame.png");
+			pFrame->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+
+			auto pAnimSprite = Sprite::createWithSpriteFrameName("tut6_anim_1.png");
+			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 20.f));
+			auto pAnimation = AnimationCache::getInstance()->getAnimation("Tutorial6");
+			pAnimSprite->runAction(	Animate::create(pAnimation));
+
+			pBoardBatchNode->addChild( pFrame);
+			pBoardBatchNode->addChild(pAnimSprite);
+
+			m_pColorNode->addChild(pBoardBatchNode);
+
+
+			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 160.f));
+			m_pColorNode->addChild(pContinueTip);
+		}
+		else if (iStageIndex == 8)
+		{
+			CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("Tutorial/Tutorial8.plist");		
+			AnimationCache::getInstance()->addAnimationsWithFile("Tutorial/Tutorial8Animations.plist");
+
+			auto pBoardBatchNode = CCSpriteBatchNode::create("Tutorial/Tutorial8.pvr.ccz");
+
+			auto pFrame = Sprite::createWithSpriteFrameName("tut8_Frame.png");
+			pFrame->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+
+			auto pAnimSprite = Sprite::createWithSpriteFrameName("tut8_anim_1.png");
+			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 20.f));
+			auto pAnimation = AnimationCache::getInstance()->getAnimation("Tutorial8");
+			pAnimSprite->runAction(	Animate::create(pAnimation));
+
+			pBoardBatchNode->addChild( pFrame);
+			pBoardBatchNode->addChild(pAnimSprite);
+
+			m_pColorNode->addChild(pBoardBatchNode);
+
+
+			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 172.f));
+			m_pColorNode->addChild(pContinueTip);
+		}
+		else if (iStageIndex == 11)
+		{
+			CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("Tutorial/Tutorial11.plist");		
+			AnimationCache::getInstance()->addAnimationsWithFile("Tutorial/Tutorial11Animations.plist");
+
+			auto pBoardBatchNode = CCSpriteBatchNode::create("Tutorial/Tutorial11.pvr.ccz");
+
+			auto pFrame = Sprite::createWithSpriteFrameName("tut11_Frame.png");
+			pFrame->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+
+			auto pAnimSprite = Sprite::createWithSpriteFrameName("tut11_anim_1.png");
+			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 20.f));
+			auto pAnimation = AnimationCache::getInstance()->getAnimation("Tutorial11");
+			pAnimSprite->runAction(	Animate::create(pAnimation));
+
+			pBoardBatchNode->addChild( pFrame);
+			pBoardBatchNode->addChild(pAnimSprite);
+
+			m_pColorNode->addChild(pBoardBatchNode);
+
+
+			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 120.f));
+			m_pColorNode->addChild(pContinueTip);
+		}
 	}		
 }
 
