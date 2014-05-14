@@ -57,13 +57,9 @@ bool TrackingTable::insertTracking(const TrackingInfo& trackingInfo)
 	sql.appendWithFormat(" '%s',", getStringEventTracking(trackingInfo.eEventTracking).c_str());
 	sql.appendWithFormat(" '%s')", trackingInfo.sDataJson.c_str());
 
-	CCLOG("Tracking %s", sql.getCString());
-
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
 		return false;
-
-	CCLOG("Tracking success");
 
 	return true;
 }

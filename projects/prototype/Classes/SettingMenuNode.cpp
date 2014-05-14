@@ -83,11 +83,14 @@ bool SettingMenuNode::init()
 			m_isAddButtonFacebook = true;
 			this->addButtonFacebook();
 
+			/*
 			Sprite* pResetSprite = Sprite::create("PanelSetting/btn_reset.png");
 			ButtonNode* pButtonReset = ButtonNode::createButtonSprite(pResetSprite, CC_CALLBACK_1(SettingMenuNode::clickReset, this));
 			pButtonReset->setPosition(Point(252.5f, 278.0f));
 			m_pButtonManagerNode->addButtonNode(pButtonReset);
+			*/
 
+		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 			// Van Dao
 			m_pUnlockLabel = LabelBMFont::create("Unlock Levels", "fonts/font_score.fnt");
 			m_pUnlockLabel->setAnchorPoint(Point(0.5f, 0.5f));
@@ -110,6 +113,7 @@ bool SettingMenuNode::init()
 			ButtonNode* pButtonUnlock = ButtonNode::createButtonSprite(pUnlockSprite, CC_CALLBACK_1(SettingMenuNode::clickUnlockAllLevel, this));
 			pButtonUnlock->setPosition(Point(252.5f, 170.0f));
 			m_pButtonManagerNode->addButtonNode(pButtonUnlock);
+		#endif
 
 			break;
 		}
