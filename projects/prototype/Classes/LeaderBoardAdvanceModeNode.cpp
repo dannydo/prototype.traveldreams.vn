@@ -180,7 +180,7 @@ void LeaderBoardAdvanceModeNode::resultHttpRequestCompleted(cs::JsonDictionary* 
 	if (pJsonDict != NULL)
 	{
 		UserInfo userInfo = UserTable::getInstance()->getUserInfo();
-		CSPackageInfo csPackageInfo = CSPackageTable::getInstance()->getCSPackageInfo(m_sPackageId);
+		CSPackageInfo csPackageInfo = CSPackageTable::getCSPackageInfo(m_sPackageId);
 
 		String sTag = "LeaderBoardAdvanceMode";
 		sTag.appendWithFormat("_%d", m_iConnectServer);

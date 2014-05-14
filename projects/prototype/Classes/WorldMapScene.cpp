@@ -130,7 +130,6 @@ bool WorldMapLayer::init()
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 
 	m_pScrollManager = new ScrollManager();
-	m_bIsSwipe = false;
 
 	return true;
 }
@@ -169,12 +168,6 @@ void WorldMapLayer::menuPlayChapterCallBack(Object* sender)
 
 bool WorldMapLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
-	if(m_bIsSwipe)
-	{
-		return false;
-	}
-	m_bIsSwipe = true;
-
 	if(m_pFooterNode->getSettingNode() != NULL && m_pFooterNode->getSettingNode()->getShowSetting())
 	{
 		return false;
@@ -246,6 +239,4 @@ void WorldMapLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent
 		m_pBackgroundNode->stopAllActions();
 		m_pBackgroundNode->runAction(Sequence::create(actionEaseOut, NULL));
 	}
-
-	m_bIsSwipe = false;
 }

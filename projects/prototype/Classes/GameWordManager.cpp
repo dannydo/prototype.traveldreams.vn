@@ -348,7 +348,8 @@ void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTi
 		//gettimeofday(&now, NULL);
 		m_iStartTimeOfNewGameSession =  getTimeLocalCurrent(); // now.tv_sec * 1000 + now.tv_usec/1000 ; //miliseconds
 
-		auto wordDBList = CSWordTable::getInstance()->getAllCSWordsForPackage(pTimeModeConfig->m_sCustomPackageID);
+		std::vector<CSWordInfo> wordDBList;
+		CSWordTable::getAllCSWordsForPackage(wordDBList, pTimeModeConfig->m_sCustomPackageID);
 		auto currentWordIndexList = pTimeModeConfig->m_WordIndexList;
 	
 		int iLoadedWordIndex, i, iCurrentWordListSize = currentWordIndexList.size();

@@ -47,13 +47,19 @@ bool MiniGameLayer::init()
 
 	m_WordsNew = WordTable::getInstance()->getAllWordNew(getTimeLocalCurrent());
 	m_iTotalWordNew = WordTable::getInstance()->getNumberWordPlayMiniGame(getTimeLocalCurrent());
+	if (m_iTotalWordNew > m_WordsNew.size())
+		m_iTotalWordNew = m_WordsNew.size();
 
 	Sprite* pBackground = Sprite::create("FlashCard/background.png");
 	pBackground->setPosition(Point(320.0f, 480.0f));
 	this->addChild(pBackground);
 
 	char sTotalWordNew[20];
-	sprintf(sTotalWordNew, "(%d/%d)", 1, m_iTotalWordNew);
+	if (m_iTotalWordNew > 0)
+		sprintf(sTotalWordNew, "(%d/%d)", 1, m_iTotalWordNew);
+	else
+		sprintf(sTotalWordNew, "(%d/%d)", 0, m_iTotalWordNew);
+
 	m_pLabelIndex = LabelTTF::create(sTotalWordNew, "Arial", 30);
 	m_pLabelIndex->setColor(ccc3(0.0f, 0.0f, 0.0f));
 	m_pLabelIndex->setPosition(Point(320.0f, 850.0f));
@@ -153,7 +159,7 @@ void MiniGameLayer::createLayout()
 		this->randownIndexWordNew();
 
 		m_MaintWordInfo = m_WordsNew[m_iIndexWordNew];
-		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(m_MaintWordInfo.sWordId);
+		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(m_MaintWordInfo.sWordId);	
 		auto& wordMain = GameWordManager::getInstance()->GetWord(iIndex);
 
 		m_pFlashCard = FlashCardNode::createLayout(wordMain);

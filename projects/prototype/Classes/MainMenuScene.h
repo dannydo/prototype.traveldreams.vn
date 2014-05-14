@@ -19,8 +19,9 @@ private:
 	void playGame(cocos2d::Object* sender);
 	void loginFacebook(cocos2d::Object* sender);
 	void openSettingMenu(cocos2d::Object* sender);
-	void addButtonLoginFacebook();
+	void clickInviteFriends(cocos2d::Object* sender);
 
+	void addButtonLoginFacebook();
 	void startTimeModeDemo(cocos2d::Object* sender);	
 
 	cocos2d::CCMenuItemImage* m_pLoginfacebook;

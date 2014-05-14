@@ -4,9 +4,13 @@
 #include "SimpleAudioEngine.h"
 #include "LoadingScene.h"
 
+
+#include "Social\FacebookManager.h"
+
 #include "APIService\UserService.h"
-#include "Social\FacebookManager.h"		
 #include "APIService\SyncDataGame.h"
+#include "APIService\PackageService.h"
+#include "APIService\TrackingService.h"
 
 #include "Database\InitDatabase.h"
 #include "Database\ChapterTable.h"
@@ -17,6 +21,9 @@
 #include "Database\UnlockChapterTable.h"
 #include "Database\TransactionTable.h"
 #include "Database\PowerUpTable.h"
+#include "Database\TrackingTable.h"
+#include "Database\WordTable.h"
+
 
 USING_NS_CC;
 
@@ -41,6 +48,8 @@ AppDelegate::~AppDelegate()
 	TransactionTable::releaseInstance();
 	PowerUpTable::releaseInstance();
 	SyncDataGame::releaseInstance();
+	TrackingService::releaseInstance();
+	PackageService::releaseInstance();
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	//FacebookManager::getInstance()->unloadPlugin();

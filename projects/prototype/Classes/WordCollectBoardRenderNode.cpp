@@ -492,7 +492,7 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 		pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 740.f));	
 #else
-		pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 833.f));
+		pMeaningLabel->setPosition(Point( (fWindowWidth - pMeaningLabel->getContentSize().width)/2.f, 765.f));
 #endif
 		pMeaningLabel->setColor(ccc3( 103, 48, 27));
 		pMeaningLabel->disableStroke();
