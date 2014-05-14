@@ -651,7 +651,7 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 			m_pColorNode->addChild(pBoardBatchNode);
 
 
-			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 175.f));
+			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 155.f));
 			m_pColorNode->addChild(pContinueTip);
 		}
 		else if (iStageIndex == 6)
@@ -723,7 +723,7 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 			m_pColorNode->addChild(pBoardBatchNode);
 
 
-			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 120.f));
+			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 110.f));
 			m_pColorNode->addChild(pContinueTip);
 		}
 	}		

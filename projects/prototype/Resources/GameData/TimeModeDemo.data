@@ -3,26 +3,82 @@
 ;number of color
 6
 ;score of stars (1 word = 1 score)
-3	5	7
+5	7	10
 ;map matrix
 1	1	1	1	1	1	1   1
-0	1	1	1	1	1	1   0
-0	1	1	1	1	1	1   0
-0	1	1	1	1	1	1   0
-0	1	1	1	1	1	1   0
-0	1	1	1	1	1  	1   0
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1	1   1
+1	1	1	1	1	1  	1   1
 1	1	1	1	1	1	1  	1
 1	1	1	1	1	1	1  	1
 ;manual stage configs
+10
+1500
+30
+0
+0
+2500
+60
+0
 1
-5000
+SHIELD 1
+3000
+80
+1
+COUNTDOWN 5
+0 0	5 5 5 5 0 0
+0
+3500
 100
 0
 1
-SHIELD	2
+SHIELD 2
+4000
+120
+1
+COUNTDOWN 5
+0 0 10 10 10 10 0 0
+0
+4400
+150
+1
+COUNTDOWN 5
+0 5	5 5 5 5 5 0
+1
+SHIELD 1
+5000
+180
+1
+COUNTDOWN 7
+5 5 5 5 5 5 5 5
+1
+SHIELD 2
+5500
+200
+1
+COUNTDOWN 10
+5 5	10 10 10 10 5 5
+1
+SHIELD 2
+5800
+220
+1
+COUNTDOWN 10
+5 5	5 5 5 5 5 5
+1
+SHIELD 3
+6200
+250
+1
+COUNTDOWN 10
+5 5	5 5 5 5 5 5
+1
+SHIELD 3
 ;auto config for greater levels
 10
-10
+7
 ;score of gem
 10
 ;combo effect - destroy cell ratio (percent)
@@ -44,51 +100,25 @@ SHIELD	2
 ;bonus score when create combo
 ;simple combo 4,5,6
 40
-100
-150
+50
+60
 ;bonus score when activate combo
 ;simple combo 4,5,6
-80
-150
-200
+40
+50
+60
 ;double combo: 4-4, 4-5, 5-5, 6-4, 6-5, 6-6
-160
-230
-300
-280
-350
-400
+80
+90
+100
+100
+110
+120
 ;tripple combo: 4-4-4, 5-5-5, 6-6-6
-240
-450
-600
+120
+150
+180
 ;score letter of main word
-1000
+100
 ;ratio complete main word
-1000
-;word list
-20
-Pack1-PEN
-Pack1-RULER
-Pack1-GLOBE
-Pack1-CRAYON
-Pack1-SCISSORS
-Pack1-PAPER
-Pack1-COMPUTER
-Pack1-TABLE
-Pack1-BOOKCASE
-Pack1-BLACKBOARD
-Pack1-KITCHEN
-Pack1-LIVING ROOM
-Pack1-HAIRDRYER
-Pack1-BLOCK OF FLATS
-Pack1-TOILET PAPER
-Pack1-ERASER
-Pack1-STUDY
-Pack1-CLASSMATE
-Pack1-UNIFORM
-Pack1-CHAIR
-
-1
-SHIELD	1
-100	100	100	100 100	100	100	100 
+0

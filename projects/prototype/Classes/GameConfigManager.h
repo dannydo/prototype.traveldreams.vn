@@ -202,6 +202,7 @@ public:
 struct ObstacleDescription
 {
 public:
+	std::string m_sName;
 	int m_iObstacleID;
 	int m_iPriority;
 	

@@ -20,8 +20,7 @@ using namespace cocos2d::plugin;
 #endif
 
 SettingMenuNode::SettingMenuNode()
-{
-
+{	
 }
 
 SettingMenuNode::~SettingMenuNode()
@@ -35,6 +34,8 @@ bool SettingMenuNode::init()
 	{
 		return false;
 	}
+
+	m_OnHideSettingMenuCallback = nullptr;
 
 	Sprite* pBackground =  Sprite::create("PanelSetting/panel-setting.png");
 	pBackground->setAnchorPoint(Point(0,0));
@@ -411,11 +412,16 @@ void SettingMenuNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
 {
 	if(m_isClick)
 	{
-		m_pSettingButton->setStateActive(!m_pSettingButton->getStateActive());
-		if (m_iShowSetting)
-			this->hide();
+		if (m_OnHideSettingMenuCallback == nullptr)
+		{
+			m_pSettingButton->setStateActive(!m_pSettingButton->getStateActive());
+			if (m_iShowSetting)
+				this->hide();
+			else
+				this->show();
+		}
 		else
-			this->show();
+			m_OnHideSettingMenuCallback();
 	}
 	m_isClick = false;
 }

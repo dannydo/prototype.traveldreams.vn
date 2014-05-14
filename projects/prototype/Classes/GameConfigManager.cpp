@@ -475,6 +475,7 @@ void GameConfigManager::LoadObstacleConfig()
 		pObstacleDetailDict = pJsonDict->getSubItemFromArray("obstacles", i);
 		
 		sObstacleName = pObstacleDetailDict->getItemStringValue("name");
+		pObstacleDescription->m_sName = sObstacleName;
 		pObstacleDescription->m_iObstacleID = m_ObstaleNameToIDMap[sObstacleName];
 		pObstacleDescription->m_bIsWrapGem = pObstacleDetailDict->getItemBoolvalue("wrapGame", true);
 

@@ -20,6 +20,8 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,
 	backgroundLayer->addChild(pBackground);
 	if (eGameModeType == _GMT_TIME_MODE_)
 		pBackground->setPosition(Point( 0, -30.f));
+	else
+		pBackground->setPosition(Point( 0, -5.f));
 
 	scene->addChild(backgroundLayer);	
 
@@ -57,7 +59,7 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
 	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn_setting.png");
 	boardLayer->m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
-	boardLayer->m_pButtonSettingNode->setPosition(Point(36.0f, 33.0f));
+	boardLayer->m_pButtonSettingNode->setPosition(Point(36.0f, 33.0f));	
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(boardLayer->m_pButtonSettingNode);
@@ -221,7 +223,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 	}
 	else
 	{
-		m_GameBoardManager.GenerateGameBoard(m_eGameModeType);
+		m_GameBoardManager.GenerateGameBoard(m_eGameModeType, iTimeModeStage);
 		
 		m_GameBoardManager.GeneratePositionOfLettersForTimeMode( positionOfLettersOfTimeMode, iExistedCombo4Count, iExistedCombo5Count, iExistedCombo6Count);
 
@@ -291,6 +293,9 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 	{
 		m_pStatusLayer->setCurrentScore( m_GameBoardManager.GetCurrentScore());	
 		m_pStatusLayer->setCurrentMove(m_GameBoardManager.GetCurrentMove());
+
+		m_fBoardBottomPosition -= 5.f;
+		m_fBoardBottomClipPosition -= 5.f;
 	}
 	else
 	{
@@ -522,7 +527,57 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 	
 	if (m_eGameModeType == _GMT_NORMAL_)	
 	{
-		m_pTimeCountDownNode = NULL; //no time count down node
+		m_pTimeCountDownNode = NULL; //no time count down node		
+
+
+		// add drop indicator to map if need
+		bool letterAppearFlags[_BOARD_MAX_COLUMN_NUMBER_];
+		bool countDownAppearFlags[_BOARD_MAX_COLUMN_NUMBER_];
+		memset( letterAppearFlags, 0, sizeof(letterAppearFlags));
+		memset( countDownAppearFlags, 0, sizeof(countDownAppearFlags));
+
+		for(auto obstacleConfig : pNormalLevelConfig->m_ObstacleConfigList)
+		{
+			const ObstacleDescription* pObstacleDescription = GameConfigManager::getInstance()->GetObstacleDescription(obstacleConfig->m_iObstacleID);
+			if (pObstacleDescription->m_sName.compare("COUNTDOWN") == 0 && !obstacleConfig->m_bCanDropOnAllColumn)
+			{
+				for(int i=0; i < iNumberOfColumn; i++)
+					if (obstacleConfig->m_DropOnColumnsRateList[i] > 0)
+						countDownAppearFlags[i] = true;				
+				break;
+			}
+		}
+		
+		if (!pNormalLevelConfig->m_bIsMainWordExistedOnBoard)
+		{
+			if (!pNormalLevelConfig->m_bMainWordCanDropOnAllColumn)
+			{
+				for(int i=0; i < iNumberOfColumn; i++)
+					if (pNormalLevelConfig->m_MainWordDropOnColumnsFlagList[i])
+						letterAppearFlags[i] = true;				
+			}
+		}
+		// draw indicator
+		Sprite* pIndicatorSprite;
+		for(int i=0; i < iNumberOfColumn; i++)
+		{
+			pIndicatorSprite = NULL;
+			if (letterAppearFlags[i])
+			{
+				if (countDownAppearFlags[i])
+					pIndicatorSprite = Sprite::createWithSpriteFrameName("LetterCountdown_indicator.png");
+				else
+					pIndicatorSprite = Sprite::createWithSpriteFrameName("Letter_indicator.png");
+			}
+			else if (countDownAppearFlags[i])
+					pIndicatorSprite = Sprite::createWithSpriteFrameName("Countdown_indicator.png");
+
+			if (pIndicatorSprite != NULL)
+			{
+				pIndicatorSprite->setPosition(Point(m_fBoardLeftPosition + i * m_SymbolSize.width, m_fBoardBottomPosition + iNumberOfRow * m_SymbolSize.height - 25.f));
+				m_pBoardBatchNode->addChild(pIndicatorSprite, GetZOrder( iNumberOfRow, iColumn, true) + 1000);
+			}
+		}
 
 
 		// add letter to gems if existing
@@ -643,6 +698,9 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 
 void HelloWorld::menuCloseCallback(Object* pSender)
 {
+	if (m_bIsEffectPlaying)
+		return;
+
 	// play sound
 	SoundManager::PlaySoundEffect(_SET_BUTTON_PRESS_); 
 
@@ -651,6 +709,7 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 		m_pSettingNode = SettingMenuNode::create();
 		m_pSettingNode->setPosition(Point(-505.0f, 0));
 		m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
+		m_pSettingNode->SetOnHideSettingMenuCallback( std::bind( &HelloWorld::menuCloseCallback, this, this));
 		this->addChild(m_pSettingNode, 98);
 	}
 
@@ -3183,7 +3242,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		}
 	
 		this->runAction( CCSequence::create(
-						CCDelayTime::create(fTotalDestroyCellTime + _TME_MOVE_CELL_TIME_*2 - 0.1f),
+						CCDelayTime::create(fTotalDestroyCellTime + _TME_MOVE_CELL_TIME_*2 + 0.1f),
 						CCCallFunc::create( this, callfunc_selector( HelloWorld::CheckBoardStateAfterMove)),
 						NULL));		
 	}

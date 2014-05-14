@@ -31,6 +31,7 @@ public:
 	void update(float dt) override;
 	void setStatusButtonFacebook(const int& iStatus);
 
+	inline void SetOnHideSettingMenuCallback(std::function<void()> onHideSettingMenuCallback) { m_OnHideSettingMenuCallback = onHideSettingMenuCallback;}
 private:
 	bool onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
 	void onTouchCustomNodeMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override; 
@@ -65,6 +66,9 @@ private:
 	int m_iStatusButtonFacebook;
 
 	cocos2d::LabelBMFont *m_pUnlockLabel;
+
+
+	std::function<void()> m_OnHideSettingMenuCallback;
 };
 
 class Breadcrumb
