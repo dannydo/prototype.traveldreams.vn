@@ -21,21 +21,11 @@ struct CSWordInfo
 class CSWordTable
 {
 public:
-	static CSWordTable* getInstance();
-	bool init();
-	CSWordTable();
-	static void releaseInstance();
-
-	std::vector<CSWordInfo>& getAllCSWordsForPackage(const std::string& sPackageId);
-	CSWordInfo getCSWordInfoOnPackage(const std::string& sPackageId, const std::string& sCSWordId);
-
-	bool updateCSWord(const CSWordInfo& csWordInfo);
+	static void getAllCSWordsForPackage(std::vector<CSWordInfo>& packageCSWords, const std::string& sPackageId);
+	static CSWordInfo getCSWordInfoOnPackage(const std::string& sPackageId, const std::string& sCSWordId);
+	static bool updateCSWord(const CSWordInfo& csWordInfo);
 
 private:
-	void fetchCSWordsForPackage(const std::string& sPackageId);
-
-	static CSWordTable* m_CSWordTable;
-	std::vector<CSWordInfo> m_PackageCSWords;
-	std::string m_sCurrentPackageId;
+	
 };
 #endif

@@ -154,14 +154,12 @@ bool FlashCardCollectionLayer::init()
 		}
 	}
 
-	m_bIsSwipe = false;	
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kFlashCardCollection);
 
 	this->setTouchEnabled(true);
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 
 	m_pScrollManager = new ScrollManager();
-	m_bIsSwipe = false;
 
 	return true;
 }
@@ -181,12 +179,6 @@ void FlashCardCollectionLayer::clickPlayMiniGame(Object* sender)
 
 bool FlashCardCollectionLayer::onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent)
 {
-	if(m_bIsSwipe)
-	{
-		return false;
-	}
-	m_bIsSwipe = true;
-
 	if(m_pFooterNode->getSettingNode() != NULL && m_pFooterNode->getSettingNode()->getShowSetting() || m_maxHeight < 460)
 	{
 		return false;
@@ -253,8 +245,6 @@ void FlashCardCollectionLayer::onTouchEnded(cocos2d::Touch* pTouch, cocos2d::Eve
 		m_pSlideShow->stopAllActions();
 		m_pSlideShow->runAction(Sequence::create(actionEaseOut, NULL));
 	}
-
-	m_bIsSwipe = false;
 }
 
 void FlashCardCollectionLayer::clickOpenFlashCard(Object* sender)

@@ -34,6 +34,18 @@
     <Filter Include="ExtendedNodes\Source Files">
       <UniqueIdentifier>{48cd4d31-5963-4eb4-b15d-8362333c23e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="APIService\Header Files">
+      <UniqueIdentifier>{9a59115e-72ba-4132-bb82-794aa3cb97ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="APIService\Source Files">
+      <UniqueIdentifier>{facb59ff-9c54-4776-84a0-6df3ac62ef85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Database\Header Files">
+      <UniqueIdentifier>{ab766d0f-a4fc-4344-be64-161e3c930dce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Database\Source Files">
+      <UniqueIdentifier>{ee906ee7-55db-4708-b65e-795573dc7adf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -108,26 +120,8 @@
     <ClCompile Include="..\Classes\Social\FacebookManager.cpp">
       <Filter>Social</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\APIService\UserService.cpp">
-      <Filter>APIService</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\LifeSystemNode.cpp">
       <Filter>Classes\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\InitDatabase.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\sqlite3.c">
-      <Filter>Database</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\UserTable.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\ChapterTable.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\LevelTable.cpp">
-      <Filter>Database</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\SettingMenuNode.cpp">
       <Filter>Classes\Source Files</Filter>
@@ -141,12 +135,6 @@
     <ClCompile Include="..\Classes\LoadingImageNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Database\DictionaryDatabase.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\GameTracking.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\ActionExtension.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
@@ -159,26 +147,8 @@
     <ClCompile Include="..\Classes\ScrollManager.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Database\PowerUpTable.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\VersionTable.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\UnlockChapterTable.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\TransactionTable.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\WordTable.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\TimeCountDownNode.cpp">
       <Filter>Classes\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\APIService\SyncDataGame.cpp">
-      <Filter>APIService</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\SystemEventHandle.cpp">
       <Filter>Classes\Source Files</Filter>
@@ -194,12 +164,6 @@
     </ClCompile>
     <ClCompile Include="..\Classes\EndGameCustomModeNode.cpp">
       <Filter>Classes\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\CSWordTable.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Database\CSPackageTable.cpp">
-      <Filter>Database</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\ConfirmQuitLevelNode.cpp">
       <Filter>Classes\Source Files</Filter>
@@ -243,11 +207,68 @@
     <ClCompile Include="..\Classes\LeaderBoardAdvanceModeNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Database\TrackingTable.cpp">
-      <Filter>Database</Filter>
+    <ClCompile Include="..\Classes\APIService\PackageService.cpp">
+      <Filter>APIService\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\APIService\TrackingService.cpp">
-      <Filter>APIService</Filter>
+      <Filter>APIService\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\APIService\SyncDataGame.cpp">
+      <Filter>APIService\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\APIService\UserService.cpp">
+      <Filter>APIService\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\ChapterTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\CSPackageTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\DictionaryDatabase.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\CSWordTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\GameTracking.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\InitDatabase.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\LevelTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\PowerUpTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\TrackingTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\TransactionTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\UnlockChapterTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\UserTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\VersionTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\WordTable.cpp">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Database\sqlite3.c">
+      <Filter>Database\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\AdvanceModePopularPackagesScene.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\AdvanceModeMyPackagesScene.cpp">
+      <Filter>Classes\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -326,29 +347,8 @@
     <ClInclude Include="..\Classes\Social\FacebookManager.h">
       <Filter>Social</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\APIService\Constants.h">
-      <Filter>APIService</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\APIService\UserService.h">
-      <Filter>APIService</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\LifeSystemNode.h">
       <Filter>Classes\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\InitDatabase.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\sqlite3.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\UserTable.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\ChapterTable.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\LevelTable.h">
-      <Filter>Database</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\SettingMenuNode.h">
       <Filter>Classes\Header Files</Filter>
@@ -359,17 +359,8 @@
     <ClInclude Include="..\Classes\FlashCardCollection.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\APIService\InterfaceService.h">
-      <Filter>APIService</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\LoadingImageNode.h">
       <Filter>Classes\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\DictionaryDatabase.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\GameTracking.h">
-      <Filter>Database</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\ActionExtension.h">
       <Filter>Classes\Header Files</Filter>
@@ -383,26 +374,8 @@
     <ClInclude Include="..\Classes\ScrollManager.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Database\PowerUpTable.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\VersionTable.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\UnlockChapterTable.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\TransactionTable.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\WordTable.h">
-      <Filter>Database</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\TimeCountDownNode.h">
       <Filter>Classes\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\APIService\SyncDataGame.h">
-      <Filter>APIService</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\SystemEventHandle.h">
       <Filter>Classes\Header Files</Filter>
@@ -418,12 +391,6 @@
     </ClInclude>
     <ClInclude Include="..\Classes\EndGameCustomModeNode.h">
       <Filter>Classes\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\CSWordTable.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Database\CSPackageTable.h">
-      <Filter>Database</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\ConfirmQuitLevelNode.h">
       <Filter>Classes\Header Files</Filter>
@@ -470,11 +437,74 @@
     <ClInclude Include="..\Classes\LeaderBoardAdvanceModeNode.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Database\TrackingTable.h">
-      <Filter>Database</Filter>
+    <ClInclude Include="..\Classes\APIService\Constants.h">
+      <Filter>APIService\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\APIService\InterfaceService.h">
+      <Filter>APIService\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\APIService\PackageService.h">
+      <Filter>APIService\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\APIService\SyncDataGame.h">
+      <Filter>APIService\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\APIService\TrackingService.h">
-      <Filter>APIService</Filter>
+      <Filter>APIService\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\APIService\UserService.h">
+      <Filter>APIService\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\ChapterTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\CSPackageTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\CSWordTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\DictionaryDatabase.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\GameTracking.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\InitDatabase.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\LevelTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\PowerUpTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\sqlite3.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\TrackingTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\TransactionTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\UnlockChapterTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\UserTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\VersionTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Database\WordTable.h">
+      <Filter>Database\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\AdvanceModePopularPackagesScene.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\AdvanceModeMyPackagesScene.h">
+      <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

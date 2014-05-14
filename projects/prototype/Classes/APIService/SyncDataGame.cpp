@@ -226,13 +226,14 @@ void SyncDataGame::pushDataCustomGameMode(const std::string& sPackageId)
 	sJsonData.appendWithFormat("\"DeviceId\":\"%s\"", userInfo.sDeviceId.c_str());
 	sJsonData.append("},");
 
-	CSPackageInfo csPackageInfo = CSPackageTable::getInstance()->getCSPackageInfo(sPackageId);
+	CSPackageInfo csPackageInfo = CSPackageTable::getCSPackageInfo(sPackageId);
 	sJsonData.append("\"Package\":{");
 	sJsonData.appendWithFormat("\"PackageId\":\"%s\",", csPackageInfo.sPackageId.c_str());
 	sJsonData.appendWithFormat("\"HighNumberStage\":%d", csPackageInfo.iStage);
 	sJsonData.append("},");
 
-	std::vector<CSWordInfo> csWords = CSWordTable::getInstance()->getAllCSWordsForPackage(sPackageId);
+	std::vector<CSWordInfo> csWords;
+	CSWordTable::getAllCSWordsForPackage(csWords, sPackageId);
 	sJsonData.append("\"WordList\":[");
 	int iSize = csWords.size();
 	for (int iIndex=0; iIndex<iSize; iIndex++)

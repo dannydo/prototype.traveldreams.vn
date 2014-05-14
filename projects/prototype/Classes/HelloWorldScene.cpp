@@ -5195,13 +5195,13 @@ void HelloWorld::TimeMode_StartNextStage()
 	packageInfo.sPackageId = timeModeConfig->m_sCustomPackageID;
 	packageInfo.sPackageName = "";
 	packageInfo.iStage = m_iCurrentTimeModeStage;
-	CSPackageTable::getInstance()->updateCSPackage(packageInfo);
+	CSPackageTable::updateCSPackage(packageInfo);
 
 	CSWordInfo customWordDB;
 	customWordDB.sCSWordId = GameWordManager::getInstance()->GetMainWord().m_sWordID;
 	customWordDB.sPackageId = timeModeConfig->m_sCustomPackageID;
 	customWordDB.iCollectedCount = iCollectedCount;
-	CSWordTable::getInstance()->updateCSWord(customWordDB);
+	CSWordTable::updateCSWord(customWordDB);
 	
 	// update tracking info
 	m_GameBoardManager.GetGameWordManager()->UpdateTimeModeTracking( iMainWordIndex);

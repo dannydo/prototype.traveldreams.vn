@@ -133,6 +133,9 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\ActionExtension.cpp" />
+    <ClCompile Include="..\Classes\AdvanceModeMyPackagesScene.cpp" />
+    <ClCompile Include="..\Classes\AdvanceModePopularPackagesScene.cpp" />
+    <ClCompile Include="..\Classes\APIService\PackageService.cpp" />
     <ClCompile Include="..\Classes\APIService\TrackingService.cpp" />
     <ClCompile Include="..\Classes\APIService\SyncDataGame.cpp" />
     <ClCompile Include="..\Classes\APIService\UserService.cpp" />
@@ -206,8 +209,11 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\ActionExtension.h" />
+    <ClInclude Include="..\Classes\AdvanceModeMyPackagesScene.h" />
+    <ClInclude Include="..\Classes\AdvanceModePopularPackagesScene.h" />
     <ClInclude Include="..\Classes\APIService\Constants.h" />
     <ClInclude Include="..\Classes\APIService\InterfaceService.h" />
+    <ClInclude Include="..\Classes\APIService\PackageService.h" />
     <ClInclude Include="..\Classes\APIService\SyncDataGame.h" />
     <ClInclude Include="..\Classes\APIService\TrackingService.h" />
     <ClInclude Include="..\Classes\APIService\UserService.h" />

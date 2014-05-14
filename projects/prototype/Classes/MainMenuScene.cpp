@@ -4,6 +4,7 @@
 #include "ButtonNode.h"
 #include "StatusLayer.h"
 #include "SystemEventHandle.h"
+#include "AdvanceModeMyPackagesScene.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -70,12 +71,24 @@ bool MainMenuLayer::init()
 	ButtonNode* buttonTestTimeModeNode = ButtonNode::createButtonSprite(pButtonTestTimeModeGameSprite, CC_CALLBACK_1(MainMenuLayer::startTimeModeDemo, this));
 	buttonTestTimeModeNode->setPosition(Point(320.0f, 407.0f));
 
+	/*
+	LabelBMFont* pEnviteFriendsLabel = LabelBMFont::create("Invite Friends", "fonts/font_score.fnt");
+	pEnviteFriendsLabel->setAnchorPoint(Point(0.5f, 0.5f));
+	pEnviteFriendsLabel->setPosition(Point(230.0f, 52.0f));
+
+	Sprite* pButtonInviteSprite = Sprite::create("PanelSetting/btn_unlock_all_level.png");
+	pButtonInviteSprite->addChild(pEnviteFriendsLabel);
+	ButtonNode* m_buttonInvite = ButtonNode::createButtonSprite(pButtonInviteSprite, CC_CALLBACK_1(MainMenuLayer::clickInviteFriends, this));
+	m_buttonInvite->setPosition(Point(320.0f, 190.0f));
+	*/
+
 	m_pButtonManagerNode = ButtonManagerNode::create();
 	m_pButtonManagerNode->addButtonNode(buttonPlayNode);	
 	m_pButtonManagerNode->addButtonNode(m_pButtonSettingNode);
-
 	m_pButtonManagerNode->addButtonNode(buttonTestTimeModeNode);
+	//m_pButtonManagerNode->addButtonNode(m_buttonInvite);
 	this->addChild(m_pButtonManagerNode);
+
 
 	this->addButtonLoginFacebook();
 
@@ -132,6 +145,15 @@ void MainMenuLayer::loginFacebook(Object* sender)
 	if (m_pSettingNode != NULL)
 		m_pSettingNode->setStatusButtonFacebook(1);
 	SystemEventHandle::getInstance()->onStartConnectFacebook();
+}
+
+void MainMenuLayer::clickInviteFriends(Object* sender)
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	FacebookManager::getInstance()->inviteFriends("Invite friends play game", "Invite Friends", "['app_non_users']");
+#else
+	MessageBox("Facebook not run with platform window", "Facebook");
+#endif
 }
 
 /*
@@ -205,10 +227,15 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	if(!FacebookManager::getInstance()->isLogined() || UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) != 1)
 	{
-		//MessageBox("Please login facebook before play game!","");
-		//return;
+		MessageBox("Please login facebook before play advance mode game!","");
+		return;
 	}
 #endif
+
+	/*
+	auto scene = AdvanceModeMyPackagesScene::create();
+	Director::getInstance()->replaceScene(scene);
+	*/
 
 	CustomPackageDownloaderNode* pNode = CustomPackageDownloaderNode::create();
 	pNode->setPosition(Point(40.f, 200.f));

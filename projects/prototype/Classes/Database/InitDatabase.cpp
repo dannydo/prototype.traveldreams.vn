@@ -95,7 +95,7 @@ bool InitDatabase::createDatabase()
 	sqlRun.append("CREATE TABLE if not exists Versions (VersionId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, VersionSync INTEGER, VersionDatabase INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Words (WordId TEXT PRIMARY KEY NOT NULL, CountCollected INTEGER, Version INTEGER, IsCollected INTEGER, TimeBeginPlayMiniGame INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists MapChapterWords (MapChapterWordId INTEGER PRIMARY KEY NOT NULL, ChapterId TEXT, WordId TEXT, Version INTEGER);");
-	sqlRun.append("CREATE TABLE if not exists CSPackage (PackageId TEXT PRIMARY KEY NOT NULL, PackageName TEXT, Stage INTEGER NOT NULL  DEFAULT 0);");
+	sqlRun.append("CREATE TABLE if not exists CSPackage (PackageId TEXT PRIMARY KEY  NOT NULL,PackageName TEXT,Stage INTEGER NOT NULL DEFAULT (0),PackageCode TEXT,CreatedBy TEXT,TotalWordUnlock INTEGER,TotalWord INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists CSWords (WordId TEXT, PackageId TEXT, CollectedCount INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists Trackings (TrackingId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Device TEXT, Player TEXT, StartTime INTEGER, Event TEXT, Data TEXT);");
 	

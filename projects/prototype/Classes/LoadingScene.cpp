@@ -171,10 +171,10 @@ void LoadingLayer::initData()
 	}
 
 	// Tracking Game
-	TrackingService::getInstance()->pushTrackingToServer();
+	//TrackingService::getInstance()->pushTrackingToServer();
 
 	// Sync Data Game
-	SyncDataGame::getInstance()->runSyncDataGame();
+	//SyncDataGame::getInstance()->runSyncDataGame();
 }
 
 void LoadingLayer::finishLoading()
