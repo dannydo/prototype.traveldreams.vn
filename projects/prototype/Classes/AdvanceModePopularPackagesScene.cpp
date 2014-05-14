@@ -1,6 +1,6 @@
 #include "AdvanceModePopularPackagesScene.h"
-#include "FooterNode.h"
 #include "ClipMaskNode.h"
+#include "APIService\PackageService.h"
 
 USING_NS_CC;
 
@@ -48,6 +48,11 @@ bool AdvanceModePopularPackagesLayer::init()
 	pBackgroundPopUp->setPosition(Point(320.0f, 520.0f));
 	this->addChild(pBackgroundPopUp);
 
+	LabelTTF* pLabelMyPackage = LabelTTF::create("Popular Packages", "Arial", 35);
+	pLabelMyPackage->setColor(ccc3(255.0f, 255.0f, 255.0f));
+	pLabelMyPackage->setPosition(Point(200.0f, 630.0f));
+	this->addChild(pLabelMyPackage);
+
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	this->addChild(pButtonManagerNode);
 
@@ -63,7 +68,7 @@ bool AdvanceModePopularPackagesLayer::init()
 
 	LabelTTF* pLabelDescription = LabelTTF::create("Build your own vocab from vs.kiss-concept.com", "Arial", 20);
 	pLabelDescription->setColor(ccc3(255.0f, 255.0f, 255.0f));
-	pLabelDescription->setPosition(Point(320.0f, 705.0f));
+	pLabelDescription->setPosition(Point(320.0f, 700.0f));
 	this->addChild(pLabelDescription);
 
 	LabelBMFont *pLabelTitle = LabelBMFont::create("ADVANCE MODE", "fonts/font-bechic.fnt");
@@ -81,7 +86,98 @@ bool AdvanceModePopularPackagesLayer::init()
 	m_pFooterNode->removeButtonFlashcard();
 	this->addChild(m_pFooterNode);
 
+	m_pSlideShow = ButtonManagerNode::create();
+	m_pSlideShow->AllowSwipingBackground(true);
+	m_pSlideShow->setPosition(Point(0.0f, 295.0f));
+
+	ClipMaskNode* pClipMaskNode = ClipMaskNode::create();
+	pClipMaskNode->setPosition(Point(28.0f, 150.0f));
+	pClipMaskNode->setContentSize(Size(544.0f, 448.0f));
+	pClipMaskNode->addChild(m_pSlideShow);
+	m_pBackgroundSlideShow->addChild(pClipMaskNode);
+
+	this->setTouchEnabled(true);
+	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
+
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kPopularPackage);
+
+	m_pScrollManager = new ScrollManager();
+
+	m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
+	m_iConnectServer++;
+	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
+
+	PackageService::getInstance()->setInterfaceServiceCallBack(this);
+	PackageService::getInstance()->getPackagePopular(0, 20, m_iConnectServer);
+
+	m_iTotalPackage = 0;
+	m_maxHeight = 0;
+
 	return true;
+}
+
+void AdvanceModePopularPackagesLayer::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey)
+{
+	String sTag = "GetPackagePopular";
+	sTag.appendWithFormat("_%d", m_iConnectServer);
+	if (sKey == sTag.getCString())
+	{
+		if (pJsonDict != NULL)
+		{
+			cs::JsonDictionary* jsonData = pJsonDict->getSubDictionary("data");
+			if (jsonData->getItemBoolvalue("result", false))
+			{
+				m_iTotalPackage = jsonData->getArrayItemCount("list");
+				m_maxHeight = m_iTotalPackage*120.0f;
+				for(int iIndex=0; iIndex < m_iTotalPackage; iIndex++)
+				{
+					cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
+					CSPackageInfo csPackageInfo;
+					csPackageInfo.sPackageName = pJsonItem->getItemStringValue("WordListName");
+					csPackageInfo.sPackageCode = pJsonItem->getItemStringValue("PackageCode");
+					csPackageInfo.sCreatedBy = pJsonItem->getItemStringValue("Author");
+					csPackageInfo.iTotalWord = pJsonItem->getItemIntValue("TotalWords", 0);
+					csPackageInfo.iTotalWordUnlock = 0;
+
+					m_csPackageInfos.push_back(csPackageInfo);
+
+					LabelBMFont *pLabelPackageName = LabelBMFont::create(csPackageInfo.sPackageName.c_str(), "fonts/font_small_alert.fnt", 310.0f);
+					pLabelPackageName->setAnchorPoint(Point(0.0f, 0.5f));
+					pLabelPackageName->setPosition(Point(0.0f, -iIndex*120 - 10));
+					m_pSlideShow->addChild(pLabelPackageName);
+
+					LabelTTF* pLabelTCreatedBy = LabelTTF::create(csPackageInfo.sCreatedBy.c_str(), "Arial", 28, Size(310.0f, 30.0f), TextHAlignment::LEFT, TextVAlignment::TOP);
+					pLabelTCreatedBy->setColor(ccc3(255.0f, 255.0f, 255.0f));
+					pLabelTCreatedBy->setAnchorPoint(Point(0.0f, 0.5f));
+					pLabelTCreatedBy->setPosition(Point(0.0f, -iIndex*120 - 55));
+					m_pSlideShow->addChild(pLabelTCreatedBy);
+
+					LabelBMFont *pLabelPackageCode = LabelBMFont::create(csPackageInfo.sPackageCode.c_str(), "fonts/font_score.fnt");
+					pLabelPackageCode->setAnchorPoint(Point(1.0f, 0.5f));
+					pLabelPackageCode->setPosition(Point(440.0f, -iIndex*120 - 10));
+					m_pSlideShow->addChild(pLabelPackageCode);
+
+					char sTotalWord[20];
+					sprintf(sTotalWord, "%d Words", csPackageInfo.iTotalWord);
+					LabelTTF* pLabelTotalWord = LabelTTF::create(sTotalWord, "Arial", 28);
+					pLabelTotalWord->setColor(ccc3(255.0f, 255.0f, 255.0f));
+					pLabelTotalWord->setAnchorPoint(Point(1.0f, 0.5f));
+					pLabelTotalWord->setPosition(Point(420.0f, -iIndex*120 - 55));
+					m_pSlideShow->addChild(pLabelTotalWord);
+
+					Sprite* pButtonPlayPackageImage = Sprite::create("AdvanceMode/download-icon.png");
+					ButtonNode* pButtonPlayPackage = ButtonNode::createButtonSprite(pButtonPlayPackageImage, CC_CALLBACK_1(AdvanceModePopularPackagesLayer::clickDownloadPackage, this));
+					pButtonPlayPackage->setTag(iIndex);
+					pButtonPlayPackage->setPosition(Point(460.0f, -iIndex*120 - 35));
+					m_pSlideShow->addButtonNode(pButtonPlayPackage);
+
+					Sprite* pLineImage = Sprite::create("AdvanceMode/line.png"); 
+					pLineImage->setPosition(Point(245.0f, -iIndex*120 -90.0f));
+					m_pSlideShow->addChild(pLineImage, 5);
+				}
+			}
+		}
+	}
 }
 
 void AdvanceModePopularPackagesLayer::clickDownloadPackage(Object* sender)
@@ -98,13 +194,88 @@ void AdvanceModePopularPackagesLayer::clickAddPackageCode(Object* sender)
 
 bool AdvanceModePopularPackagesLayer::onTouchBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
-	return true;
+	if(m_pFooterNode->getSettingNode() != NULL && m_pFooterNode->getSettingNode()->getShowSetting() || m_maxHeight < 448.0f)
+	{
+		return false;
+	}
+
+	Point touchPosition = pTouch->getLocation();
+	m_fBeginY = touchPosition.y;
+
+	CCRect *pRectButton = new CCRect(m_pBackgroundSlideShow->getOffsetPosition().x, 
+			m_pBackgroundSlideShow->getOffsetPosition().y, 
+			m_pBackgroundSlideShow->getTextureRect().size.width, 
+			m_pBackgroundSlideShow->getTextureRect().size.height);
+
+	Point touchButton = m_pBackgroundSlideShow->convertToNodeSpace(touchPosition);
+
+	if(pRectButton->containsPoint(touchButton))
+	{
+		DataTouch dataTouch;
+		dataTouch.point = touchPosition;
+		dataTouch.lTime = 0;
+		dataTouch.fDeltaTime = 0;
+		m_pScrollManager->addDataToQueue(dataTouch);
+
+		return true;
+	}
+	
+	return false;
 }
 
 void AdvanceModePopularPackagesLayer::onTouchMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
+	if (m_pSlideShow->IsInTapMode())
+		return;
+
+	Point touchPosition = pTouch->getLocation();
+	m_fYMoved = touchPosition.y - m_fBeginY;
+
+	if (m_fYMoved + m_pSlideShow->getPosition().y <= 295.0f) {
+		m_fYMoved = 295.0f - m_pSlideShow->getPosition().y;
+	}
+	else if(m_fYMoved + m_pSlideShow->getPosition().y >= m_maxHeight + 295.0f - 448.0f)
+	{
+		m_fYMoved = m_maxHeight + 295.0f - 448.0f - m_pSlideShow->getPosition().y;
+	}
+
+	Point point = m_pSlideShow->getPosition();
+	m_pSlideShow->setPositionY(point.y + m_fYMoved);
+	m_fBeginY = touchPosition.y;
+
+	DataTouch dataTouch;
+	dataTouch.point = touchPosition;
+	dataTouch.lTime = 0;
+	dataTouch.fDeltaTime = 0;
+	m_pScrollManager->addDataToQueue(dataTouch);
 }
 
 void AdvanceModePopularPackagesLayer::onTouchEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent)
 {
+	if (m_pSlideShow->IsInTapMode())
+		return;
+
+	DataTouch dataTouch = m_pScrollManager->getDistanceScrollY();
+	float distanceY = dataTouch.point.y;
+	float deltaTime = dataTouch.fDeltaTime;
+	
+	if(distanceY!=0 && deltaTime!=0)
+	{
+		float fTime = 0.2f;
+		distanceY = distanceY * fTime / deltaTime / 10; 
+
+		
+		if (distanceY + m_pSlideShow->getPosition().y <= 295.0f) {
+			distanceY = 295.0f - m_pSlideShow->getPosition().y;
+		}
+		else if(distanceY + m_pSlideShow->getPosition().y >= m_maxHeight + 295.0f - 448.0f)
+		{
+			distanceY = m_maxHeight + 295.0f - 448.0f - m_pSlideShow->getPosition().y;
+		}
+
+		auto actionMove = MoveBy::create(fTime, Point(0.0f, distanceY));
+		auto actionEaseOut = EaseOut::create(actionMove, 2.5f);
+		m_pSlideShow->stopAllActions();
+		m_pSlideShow->runAction(Sequence::create(actionEaseOut, NULL));
+	}
 }

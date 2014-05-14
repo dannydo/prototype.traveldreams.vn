@@ -2,9 +2,6 @@
 #define ADVANCE_MODE_MY_PACKAGES_SCENE_H_
 
 #include "cocos2d.h"
-#include "GameDataStructure.h"
-#include "Database\ChapterTable.h"
-#include "SettingMenuNode.h"
 #include "FooterNode.h"
 #include "ButtonManagerNode.h"
 #include "ScrollManager.h"

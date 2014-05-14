@@ -11,6 +11,7 @@
 #include "WaitingNode.h"
 #include "ConfirmQuitLevelNode.h"
 #include "PopupConfirmNode.h"
+#include "AdvanceModeMyPackagesScene.h"
 
 USING_NS_CC;
 
@@ -120,6 +121,8 @@ bool SettingMenuNode::init()
 		case SceneMode::kMainMenu : 
 		case SceneMode::kWorldMap :
 		case SceneMode::kFlashCardCollection :
+		case SceneMode::kMyPackage :
+		case SceneMode::kPopularPackage :
 		{
 			Sprite* pMainMenuSprite = Sprite::create("PanelSetting/btn_mainmenu.png");
 			ButtonNode* pButtonManiMenu = ButtonNode::createButtonSprite(pMainMenuSprite, CC_CALLBACK_1(SettingMenuNode::clickMainMenu, this));
@@ -274,7 +277,7 @@ void SettingMenuNode::actionBack()
 	m_pSettingButton->setStateActive(!m_pSettingButton->getStateActive());
 	switch(Breadcrumb::getInstance()->getSceneModePopBack())
 	{
-	case SceneMode::kExitGame:
+		case SceneMode::kExitGame:
 		{
 			Director::getInstance()->end();
 			#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
@@ -282,31 +285,37 @@ void SettingMenuNode::actionBack()
 			#endif
 			break;
 		}
-	case SceneMode::kMainMenu :
+		case SceneMode::kMainMenu :
 		{
 			MainMenuScene* pMainMenu = MainMenuScene::create();
 			Director::getInstance()->replaceScene(pMainMenu);
 			break;
 		}
 
-	case SceneMode::kWorldMap :
+		case SceneMode::kWorldMap :
 		{
 			WorldMapScene* pWorldMap = WorldMapScene::create();
 			Director::getInstance()->replaceScene(pWorldMap);
 			break;
 		}
 
-	case SceneMode::kLevelMap :
+		case SceneMode::kLevelMap :
 		{
 			UserTable::getInstance()->updateLife(1);
 			LevelMapScene* pLevelMap = LevelMapScene::create();
 			Director::getInstance()->replaceScene(pLevelMap);
 			break;
 		}
-	case SceneMode::kFlashCardCollection :
+		case SceneMode::kFlashCardCollection :
 		{
 			FlashCardCollectionScene* pFlashCardCollection = FlashCardCollectionScene::create();
 			Director::getInstance()->replaceScene(pFlashCardCollection);
+			break;
+		}
+		case SceneMode::kMyPackage :
+		{
+			AdvanceModeMyPackagesScene* pAdvanceModeMyPackages = AdvanceModeMyPackagesScene::create();
+			Director::getInstance()->replaceScene(pAdvanceModeMyPackages);
 			break;
 		}
 	}

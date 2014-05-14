@@ -1,16 +1,14 @@
 #include "EndGameCustomModeNode.h"
-#include "MainMenuScene.h"
 #include "HelloWorldScene.h"
 #include "LeaderBoardAdvanceModeNode.h"
 
 USING_NS_CC;
 
-EndGameCustomModeNode* EndGameCustomModeNode::createLayout(const int& iStage, const int& iTotalWord, const int& iDurationSecond, const std::string& sPackageId)
+EndGameCustomModeNode* EndGameCustomModeNode::createLayout(const int& iStage, const int& iWordNew, const std::string& sPackageId)
 {
 	EndGameCustomModeNode* pEndGameNode = new EndGameCustomModeNode();
 	pEndGameNode->m_iStage = iStage;
-	pEndGameNode->m_iTotalWord = iTotalWord;
-	pEndGameNode->m_iDurationSecond = iDurationSecond;
+	pEndGameNode->m_iWordNew = iWordNew;
 	pEndGameNode->m_sPackageId = sPackageId;
 
 	if(pEndGameNode->init())
@@ -30,59 +28,97 @@ bool EndGameCustomModeNode::init()
 		return false;
 	}
 	
-	LayerColor* pBackground = LayerColor::create(ccc4(7, 25, 44, 150));
-	pBackground->setContentSize(CCSizeMake(640, 960));
+	Sprite* pBackground = Sprite::create("AdvanceMode/background.png");
+	pBackground->setPosition(Point(320.0f, 485.0f));
+	this->addChild(pBackground);
+
 	auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
 	listener->setSwallowTouches(true);
-	listener->onTouchBegan = [](Touch* touch, Event* event) { return true;  };
+	listener->onTouchBegan = [this](Touch* touch, Event* event) { return true;  };
 	EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, pBackground);
-	this->addChild(pBackground);
-	this->setContentSize(pBackground->getContentSize());
 
-	Sprite* pBackgroundBoard = Sprite::create("Target-End-Game/panel-level_popup.png");
-	pBackgroundBoard->setPosition(Point(320.0f, 610.0f));
-	this->addChild(pBackgroundBoard);
+	Sprite* pBackgroundPopUp = Sprite::create("AdvanceMode/panel-AM-short.png");
+	pBackgroundPopUp->setPosition(Point(320.0f, 595.0f));
+	this->addChild(pBackgroundPopUp);
 
-	Sprite* pButtonReplayGameSprite = Sprite::create("Target-End-Game/btn_replay.png");
-	ButtonNode* buttonReplayNode = ButtonNode::createButtonSprite(pButtonReplayGameSprite, CC_CALLBACK_1(EndGameCustomModeNode::menuRetryLevelCallBack, this));
-	buttonReplayNode->setPosition(Point(320.0f, 279.0f));
+	LabelBMFont *pLabelTitle = LabelBMFont::create("ADVANCE MODE", "fonts/font-bechic.fnt");
+	pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
+	pLabelTitle->setPosition(Point(320.0f, 880.0f));
+	this->addChild(pLabelTitle);
 
-	Sprite* pButtonCloseSprite = Sprite::create("Target-End-Game/btn_close.png");
-	ButtonNode* buttonCloseNode = ButtonNode::createButtonSprite(pButtonCloseSprite, CC_CALLBACK_1(EndGameCustomModeNode::menuCloseCallBack, this));
-	buttonCloseNode->setPosition(Point(572.0f, 894.0f));
+	Sprite* pPanel = Sprite::create("AdvanceMode/panel-target-end-game.png");
+	pPanel->setPosition(Point(320.0f, 550.0f));
+	this->addChild(pPanel);
 
-	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
-	pButtonManagerNode->addButtonNode(buttonCloseNode);
-	pButtonManagerNode->addButtonNode(buttonReplayNode);
-	this->addChild(pButtonManagerNode);
+	Sprite* pNewRecord = Sprite::create("AdvanceMode/new-record.png");
+	pNewRecord->setPosition(Point(548.0f, 668.0f));
+	this->addChild(pNewRecord);
 
-	this->generateLayoutStart();
+	Sprite* pIconEye1 = Sprite::create("AdvanceMode/eye-icon.png");
+	pIconEye1->setPosition(Point(500.0f, 550.0f));
+	this->addChild(pIconEye1);
 
-	LabelBMFont *pLabelGameOver = LabelBMFont::create("GAME OVER", "fonts/font-bechic.fnt");
-	pLabelGameOver->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelGameOver->setPosition(Point(320.0f, 870.0f));
-	this->addChild(pLabelGameOver);
+	Sprite* pIconEye2 = Sprite::create("AdvanceMode/eye-icon.png");
+	pIconEye2->setPosition(Point(500.0f, 480.0f));
+	this->addChild(pIconEye2);
+
+	m_csPackageInfo = CSPackageTable::getCSPackageInfo(m_sPackageId);
+
+	LabelBMFont *pLabelpackageName = LabelBMFont::create(m_csPackageInfo.sPackageName.c_str(), "fonts/font_title-popup.fnt");
+	pLabelpackageName->setAnchorPoint(Point(0.5f, 0.5f));
+	pLabelpackageName->setPosition(Point(320.0f, 780.0f));
+	this->addChild(pLabelpackageName);
+
+	LabelTTF* pLabelTCreatedBy = LabelTTF::create(m_csPackageInfo.sCreatedBy.c_str(), "Arial", 28);
+	pLabelTCreatedBy->setColor(ccc3(255.0f, 255.0f, 255.0f));
+	pLabelTCreatedBy->setPosition(Point(320.0f, 720.0f));
+	this->addChild(pLabelTCreatedBy);
 
 	char sStage[20];
-	sprintf(sStage, "STAGE %d", m_iStage);
-	LabelBMFont *pLabelStage = LabelBMFont::create(sStage, "fonts/font_title-popup.fnt");
-	pLabelStage->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelStage->setPosition(Point(320.0f, 670.0f));
+	sprintf(sStage, "Stage %d", m_csPackageInfo.iStage);
+	LabelBMFont *pLabelStage = LabelBMFont::create(sStage, "fonts/font_score.fnt", 310.0f);
+	pLabelStage->setPosition(Point(320.0f, 630));
+	pLabelStage->setScale(1.4);
 	this->addChild(pLabelStage);
 
-	char sTotalWord[20];
-	sprintf(sTotalWord, "Total Word: %d", m_iTotalWord);
-	LabelBMFont *pLabelTotalWord = LabelBMFont::create(sTotalWord, "fonts/font_score.fnt");
-	pLabelTotalWord->setAnchorPoint(Point(0.0f, 0.0f));
-	pLabelTotalWord->setPosition(Point(150.0f, 550.0f));
+	LabelBMFont *pLabelTotalWord = LabelBMFont::create("Total Words", "fonts/font_small_alert.fnt", 310.0f);
+	pLabelTotalWord->setAnchorPoint(Point(0.0f, 0.5f));
+	pLabelTotalWord->setPosition(Point(122.0f, 550));
 	this->addChild(pLabelTotalWord);
 
-	char sDuration[30];
-	sprintf(sDuration, "Game Duration %s", this->formatSecondsToDiaplay(m_iDurationSecond).getCString());
-	LabelBMFont *pLabelDuration = LabelBMFont::create(sDuration, "fonts/font_score.fnt");
-	pLabelDuration->setAnchorPoint(Point(0.0f, 0.0f));
-	pLabelDuration->setPosition(Point(150.0f, 500.0f));
-	this->addChild(pLabelDuration);
+	char sTotalWord[20];
+	sprintf(sTotalWord, "%d/%d", m_csPackageInfo.iTotalWordUnlock, m_csPackageInfo.iTotalWord);
+	LabelBMFont *pLabelNumberTotalWord = LabelBMFont::create(sTotalWord, "fonts/font_score.fnt");
+	pLabelNumberTotalWord->setAnchorPoint(Point(1.0f, 0.5f));
+	pLabelNumberTotalWord->setPosition(Point(475.0f, 550));
+	pLabelNumberTotalWord->setScale(1.2);
+	this->addChild(pLabelNumberTotalWord);
+
+	LabelBMFont *pLabelWordNew = LabelBMFont::create("Words Collected", "fonts/font_small_alert.fnt", 310.0f);
+	pLabelWordNew->setAnchorPoint(Point(0.0f, 0.5f));
+	pLabelWordNew->setPosition(Point(122.0f, 480));
+	this->addChild(pLabelWordNew);
+
+	char sTotalWordNew[10];
+	sprintf(sTotalWordNew, "%d", m_csPackageInfo.iTotalWordUnlock);
+	LabelBMFont *pLabelNumberWordNew = LabelBMFont::create(sTotalWordNew, "fonts/font_score.fnt");
+	pLabelNumberWordNew->setAnchorPoint(Point(1.0f, 0.5f));
+	pLabelNumberWordNew->setPosition(Point(475.0f, 480));
+	pLabelNumberWordNew->setScale(1.2);
+	this->addChild(pLabelNumberWordNew);
+
+	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
+	this->addChild(pButtonManagerNode);
+
+	Sprite* m_pButtonPlayImage = Sprite::create("AdvanceMode/btn_replay.png");
+	ButtonNode* pButtonPlay = ButtonNode::createButtonSprite(m_pButtonPlayImage, CC_CALLBACK_1(EndGameCustomModeNode::clickRetry, this));
+	pButtonPlay->setPosition(Point(320.0f, 345.0f));
+	pButtonManagerNode->addButtonNode(pButtonPlay);
+
+	Sprite* m_pButtonCloseImage = Sprite::create("AdvanceMode/btn_close.png");
+	ButtonNode* pButtonClose = ButtonNode::createButtonSprite(m_pButtonCloseImage, CC_CALLBACK_1(EndGameCustomModeNode::clickClose, this));
+	pButtonClose->setPosition(Point(580.0f, 898.0f));
+	pButtonManagerNode->addButtonNode(pButtonClose);
 
 	LeaderBoardAdvanceModeNode* pLeaderBoard = LeaderBoardAdvanceModeNode::createLayout(m_sPackageId);
 	pLeaderBoard->setPosition(Point(320.0f, 114.0f));
@@ -91,18 +127,21 @@ bool EndGameCustomModeNode::init()
 	return true;
 }
 
-void EndGameCustomModeNode::generateLayoutStart()
+void EndGameCustomModeNode::clickRetry(Object* sender)
 {
-	for(int iIndex=0; iIndex<3; iIndex++) 
-	{
-		Sprite* pStarPurpleImage = Sprite::create("Target-End-Game/star_target_small.png");
-		pStarPurpleImage->setPosition(Point(220.0f + iIndex*100.0f, 760));
-		if (iIndex == 1)
-			pStarPurpleImage->setScale(1.4f);
-		this->addChild(pStarPurpleImage);
-	}
+	auto timeModeConfig = &GameConfigManager::getInstance()->GetTimeModeDemoConfig();
+	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(timeModeConfig, true);
+
+	auto scene = HelloWorld::createScene( _GMT_TIME_MODE_);
+	Director::getInstance()->replaceScene(scene);
 }
 
+void EndGameCustomModeNode::clickClose(Object* sender)
+{
+	
+}
+
+/*
 void EndGameCustomModeNode::addYellowStar(const int& iYellowStar)
 {
 	m_iYellowStar = iYellowStar;
@@ -144,35 +183,4 @@ void EndGameCustomModeNode::updateStar()
 		this->sequenceUpdateStar();
 	}
 }
-
-void EndGameCustomModeNode::menuRetryLevelCallBack(Object* sender)
-{
-	auto timeModeConfig = &GameConfigManager::getInstance()->GetTimeModeDemoConfig();
-		//m_GameBoardManager.GetLevelConfig();
-	//GameConfigManager::getInstance()->GetTimeModeDemoConfig();	
-	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(timeModeConfig, true);
-
-	auto scene = HelloWorld::createScene( _GMT_TIME_MODE_);
-	Director::getInstance()->replaceScene(scene);
-}
-
-void EndGameCustomModeNode::menuCloseCallBack(Object* sender)
-{
-	Breadcrumb::getInstance()->getSceneModePopBack();
-	MainMenuScene* pMainMenu =  MainMenuScene::create();
-	Director::getInstance()->replaceScene(pMainMenu);
-}
-
-String EndGameCustomModeNode::formatSecondsToDiaplay(const int& iSeconds)
-{
-	String str = "";
-	str.appendWithFormat("%d", iSeconds/60);
-
-	str.appendWithFormat("%s", ":");
-
-	if(iSeconds%60 < 10)
-		str.append("0");	
-	str.appendWithFormat("%d", iSeconds%60);
-
-	return str;
-}
+*/

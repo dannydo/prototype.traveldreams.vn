@@ -5,6 +5,7 @@
 #include "StatusLayer.h"
 #include "SystemEventHandle.h"
 #include "AdvanceModeMyPackagesScene.h"
+#include "EndGameCustomModeNode.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -104,6 +105,9 @@ bool MainMenuLayer::init()
 	m_pSettingNode = NULL;
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
 	this->scheduleUpdate();
+
+	EndGameCustomModeNode* a = EndGameCustomModeNode::createLayout(15, 10, "C17");
+	this->addChild(a);
 
 	return true;
 }
@@ -232,12 +236,12 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 	}
 #endif
 
-	/*
-	auto scene = AdvanceModeMyPackagesScene::create();
+	AdvanceModeMyPackagesScene* scene = AdvanceModeMyPackagesScene::create();
 	Director::getInstance()->replaceScene(scene);
-	*/
-
+	
+	/*
 	CustomPackageDownloaderNode* pNode = CustomPackageDownloaderNode::create();
 	pNode->setPosition(Point(40.f, 200.f));
 	this->addChild(pNode, 1000);
+	*/
 }

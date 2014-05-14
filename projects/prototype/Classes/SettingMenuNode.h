@@ -14,6 +14,8 @@ typedef enum {
 	kFlashCardCollection,
 	kFlashCard,
 	kPlayGame,
+	kMyPackage,
+	kPopularPackage,
 } SceneMode;
 
 class SettingMenuNode : public CustomNode
