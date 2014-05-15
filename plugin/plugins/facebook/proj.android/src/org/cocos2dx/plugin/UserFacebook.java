@@ -61,6 +61,9 @@ public class UserFacebook implements InterfaceUser {
 		public static final String MESSAGE = "message";
 		public static final String TITLE = "title";
 		public static final String FILTERS = "filters";
+		public static final String TO = "to";
+		public static final String SUGGESTIONS = "suggestions";
+		public static final String DATA = "data";
 		
 	}
 
@@ -438,6 +441,9 @@ public class UserFacebook implements InterfaceUser {
 	            		String message = curShareInfo.getString("Param1");
 						String title = curShareInfo.getString("Param2");
 						String filters = curShareInfo.getString("Param3");
+						String to = curShareInfo.getString("Param3");
+						String suggestions = curShareInfo.getString("Param3");
+						String data = curShareInfo.getString("Param3");
 						
 						UserFacebook.LogD(message);
 						UserFacebook.LogD(title);
@@ -447,6 +453,9 @@ public class UserFacebook implements InterfaceUser {
 						params.putString(UserFacebook.Parameters.MESSAGE, message);
 					    params.putString(UserFacebook.Parameters.TITLE, title);
 					    params.putString(UserFacebook.Parameters.FILTERS, filters);
+					    params.putString(UserFacebook.Parameters.TO, to);
+					    params.putString(UserFacebook.Parameters.SUGGESTIONS, suggestions);
+					    params.putString(UserFacebook.Parameters.DATA, data);
 					    
 					    WebDialog requestsDialog = (new WebDialog.RequestsDialogBuilder(mContext, Session.getActiveSession(), params))
 				    		.setOnCompleteListener(new OnCompleteListener() {
