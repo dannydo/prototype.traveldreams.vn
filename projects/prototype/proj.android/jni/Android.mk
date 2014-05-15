@@ -78,6 +78,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/Database/TrackingTable.cpp \
 				   ../../Classes/APIService/TrackingService.cpp \
 				   ../../Classes/APIService/PackageService.cpp \
+				   ../../Classes/CustomPackageDownloadManager.cpp \
 				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
