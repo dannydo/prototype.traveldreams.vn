@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 
-#define _LIMIT_PUSH_TRACKING_TO_SERVER_		100
+#define _LIMIT_PUSH_TRACKING_TO_SERVER_		30
 
 typedef enum EventTracking_e {
 	_ET_PLAY_LEVEL_ = 0,

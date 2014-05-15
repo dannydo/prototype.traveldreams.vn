@@ -166,7 +166,7 @@ void MainMenuLayer::loginFacebook(Object* sender)
 void MainMenuLayer::clickInviteFriends(Object* sender)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-	FacebookManager::getInstance()->inviteFriends("Invite friends play game", "Invite Friends", "['app_non_users']");
+	//FacebookManager::getInstance()->inviteFriends("Invite friends play game", "Invite Friends", "['app_non_users']");
 #else
 	MessageBox("Facebook not run with platform window", "Facebook");
 #endif
