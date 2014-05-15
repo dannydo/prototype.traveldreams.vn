@@ -14,6 +14,7 @@ GameWordManager::GameWordManager()
 {
 	m_iCountOfLettersOnBoard = 0;
 	m_iTotalCollectibleLettersOfMainWord = 0;	
+	m_iTimeModeNewWordCount = 0;
 }
 
 void GameWordManager::LoadWordGenerateConfig()
@@ -338,11 +339,12 @@ long GameWordManager::GetTotalPlayTimeOfGameSession()
 void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTimeModeConfig, bool bStartNewTimeModeSession)
 {
 	m_pLevelConfig = NULL; //not have normal level config
-
+	m_bIsCurrentTimeModeWordIsNewWord = false;
 
 	if (bStartNewTimeModeSession)
 	{	
 		m_TimeModeSessionTracking.clear();
+		m_iTimeModeNewWordCount = 0;
 
 		//timeval now;
 		//gettimeofday(&now, NULL);
@@ -401,6 +403,10 @@ void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTi
 				break;
 			}
 		}
+
+	if (iSmallestColllectedCountOfWord == 0)
+		m_bIsCurrentTimeModeWordIsNewWord = true;
+
 	//m_iMainWordIndex = pTimeModeConfig->m_WordIndexList[iRandomIndex];
 
 	//CCLOG("Generate 2");
@@ -415,6 +421,9 @@ void GameWordManager::UpdateTimeModeTracking(const int& iCompletedWordIndex)
 {	 
 	auto& word = GetWord(iCompletedWordIndex);
 	m_TimeModeSessionTracking.push_back(word.m_sWordID);	
+
+	if (m_bIsCurrentTimeModeWordIsNewWord)
+		m_iTimeModeNewWordCount++;
 }
 
 void GameWordManager::RetryCurrentLevel()

@@ -5169,7 +5169,7 @@ void HelloWorld::ShowTimeModeResultPopup()
 	//MainMenuScene* pMainMenu = MainMenuScene::create();
 	//Director::getInstance()->replaceScene(pMainMenu);
 
-	int iNewWordCollected = 0;
+	int iNewWordCollected = GameWordManager::getInstance()->GetTimeModeNewWordCount();
 	auto pEndGameNode = EndGameCustomModeNode::createLayout( m_iCurrentTimeModeStage, iNewWordCollected , timeModeConfig->m_sCustomPackageID);	
 	m_pHUDLayer->addChild(pEndGameNode, 1000);
 	
