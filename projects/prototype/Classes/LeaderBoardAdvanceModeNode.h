@@ -35,6 +35,7 @@ private:
 	void parseJsonToLeadeBoard(cs::JsonDictionary* pJsonItem, const int& iRank);
 	void clickNo1(cocos2d::Object* pSender);
 	void clickMe(cocos2d::Object* pSender);
+	void clickInviteFriends(cocos2d::Object* pSender);
 	
 	cocos2d::Node* m_pSlideShow;
 	cocos2d::Sprite* m_pSpriteBackground;

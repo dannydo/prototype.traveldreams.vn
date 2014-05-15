@@ -84,13 +84,11 @@ bool LeaderBoardAdvanceModeNode::init()
 	}
 #endif
 
-	/*
 	UserService::getInstance()->addCallBackList(this);
 	m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
 	m_iConnectServer++;
 	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
 	UserService::getInstance()->getLeaderBoardAdvanceMode(m_sPackageId, m_iConnectServer);
-	*/
 
 	return true;
 }
@@ -120,12 +118,21 @@ void LeaderBoardAdvanceModeNode::clickMe(cocos2d::Object* pSender)
 	}
 }
 
+void LeaderBoardAdvanceModeNode::clickInviteFriends(Object* pSender)
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	FacebookManager::getInstance()->inviteFriends("Invite friends play game", "", "", "", "", "");
+#else
+	MessageBox("Facebook not run with platform window", "Facebook");
+#endif
+}
+
 void LeaderBoardAdvanceModeNode::addItemToSlide(const int& iStage, const char* sName, const char* sFacebookId, const int& iRank)
 {
 	Node* pNodeItem = Node::create();
 
 	Sprite* pLoadAvatar = Sprite::create("Target-End-Game/border_avatar.png");
-	pLoadAvatar->setPosition(Point(80.0f, 95.0f));
+	pLoadAvatar->setPosition(Point(55.0f, 65.0f));
 	pNodeItem->addChild(pLoadAvatar);
 
 	std::string urlAvatar = "https://graph.facebook.com/";
@@ -133,29 +140,32 @@ void LeaderBoardAdvanceModeNode::addItemToSlide(const int& iStage, const char* s
 	urlAvatar.append("/picture");
 
 	LoadingImagetNode* avatar = LoadingImagetNode::createLayout(urlAvatar.c_str());
-	avatar->setPosition(Point(81.0f, 95.0f));
+	avatar->setPosition(Point(56.0f, 65.0f));
 	pNodeItem->addChild(avatar);
+
+	LabelBMFont *pLabelName = LabelBMFont::create(sName, "fonts/font-small-green-alert.fnt");
+	pLabelName->setScale(0.80f);
+	pLabelName->setAnchorPoint(Point(0.0f, 0.5f));
+	pLabelName->setPosition(Point(26.0f, 17.0f));
+	pNodeItem->addChild(pLabelName);
 
 	char sStage[5];
 	sprintf(sStage, "%d", iStage);
-	LabelBMFont *pLabelStage = LabelBMFont::create(sStage, "fonts/font_small_alert.fnt");
-	pLabelStage->setAnchorPoint(Point(0.0f, 0.5f));
-	pLabelStage->setPosition(Point(57.0f, 8.0f));
-	pLabelStage->setScale(0.85);
+	LabelBMFont *pLabelNumberStage = LabelBMFont::create(sStage, "fonts/font-bechic.fnt");
+	pLabelNumberStage->setAnchorPoint(Point(0.5f, 0.5f));
+	pLabelNumberStage->setPosition(Point(130.0f, 85.0f));
+	pLabelNumberStage->setScale(0.90);
+	pNodeItem->addChild(pLabelNumberStage);
+
+	LabelBMFont *pLabelStage = LabelBMFont::create("Stage", "fonts/font_small_alert.fnt");
+	pLabelStage->setAnchorPoint(Point(0.5f, 0.5f));
+	pLabelStage->setPosition(Point(130.0f, 50.0f));
+	pLabelStage->setScale(0.8f);
 	pNodeItem->addChild(pLabelStage);
 
-	LabelBMFont *pLabelName = LabelBMFont::create(sName, "fonts/font-small-green-alert.fnt");
-	pLabelName->setScale(0.85f);
-	pLabelName->setAnchorPoint(Point(0.0f, 0.5f));
-	pLabelName->setPosition(Point(57.0f, 45.0f));
-	pNodeItem->addChild(pLabelName);
-
-	char sRank[10];
-	sprintf(sRank, "%d", iRank);
-	LabelBMFont *pLabelRank = LabelBMFont::create(sRank, "fonts/font-bechic.fnt");
-	pLabelRank->setAnchorPoint(Point(0.0f, 0.5f));
-	pLabelRank->setPosition(Point(25.0f, 23.0f));
-	pNodeItem->addChild(pLabelRank);
+	Sprite* pLineImage = Sprite::create("Target-End-Game/line.png");
+	pLineImage->setPosition(Point(160.0f, 55.0f));
+	pNodeItem->addChild(pLineImage);
 
 	pNodeItem->setContentSize(Size(160.0f, 160.0f));
 	pNodeItem->setPosition(Point(-320.0f + (iRank-1)*160, -100.0f));
@@ -237,8 +247,27 @@ void LeaderBoardAdvanceModeNode::resultHttpRequestCompleted(cs::JsonDictionary* 
 							this->parseJsonToLeadeBoard(pJsonItem, iCountRank);
 						}
 
-						m_iLeaderBoardCount = m_iLeaderBoardCount + 1;
+						m_iLeaderBoardCount = m_iLeaderBoardCount + 1 + 1;
 						m_fMinPositionLeft = -((m_iLeaderBoardCount-4)*160.0f);
+
+						Node* pInviteFriendsNode = Node::create();
+						Sprite* pButtonInviteImage = Sprite::create("Target-End-Game/btn-add-friend-small.png");
+
+						LabelTTF* pLabelTCreatedBy = LabelTTF::create("Invite Friends", "Arial", 22);
+						pLabelTCreatedBy->setColor(ccc3(255.0f, 255.0f, 255.0f));
+						pLabelTCreatedBy->setPosition(Point(55.0f, -10.0f));
+						pButtonInviteImage->addChild(pLabelTCreatedBy);
+
+						ButtonNode* pButtonInvite = ButtonNode::createButtonSprite(pButtonInviteImage, CC_CALLBACK_1(LeaderBoardAdvanceModeNode::clickInviteFriends, this));
+						pButtonInvite->setPosition(Point(80.0f, 70.0f));
+
+						ButtonManagerNode* pButtonManager = ButtonManagerNode::create();
+						pButtonManager->addButtonNode(pButtonInvite);
+						pInviteFriendsNode->addChild(pButtonManager);
+
+						pInviteFriendsNode->setContentSize(Size(160.0f, 160.0f));
+						pInviteFriendsNode->setPosition(Point(-320.0f + (m_iLeaderBoardCount-1)*160, -100.0f));
+						m_pSlideShow->addChild(pInviteFriendsNode);
 					}
 				}
 				else

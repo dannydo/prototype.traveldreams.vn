@@ -344,7 +344,7 @@ void SettingMenuNode::clickFacebook(Object* sender)
 void SettingMenuNode::clickReset(cocos2d::Object* sender)
 {
 	this->hide();
-	PopupConfirmNode* popupConfirm = PopupConfirmNode::createLayout("DO YOU WANT TO RESET GAME", PopupConfirmType::eResetGame);
+	PopupConfirmNode* popupConfirm = PopupConfirmNode::createLayout("DO YOU WANT TO RESET GAME", "", PopupConfirmActionType::eResetGame, PopupConfirmType::eYesNo);
 	this->getParent()->addChild(popupConfirm, 10000);
 }
 
@@ -363,7 +363,7 @@ void SettingMenuNode::clickQuitLevel(cocos2d::Object* sender)
 	bool bPlayCustomMode = false;
 	if (bPlayCustomMode)
 	{
-		PopupConfirmNode* popupConfirm = PopupConfirmNode::createLayout("DO YOU WANT TO QUIT GAME", PopupConfirmType::eQuitGameCustomMode);
+		PopupConfirmNode* popupConfirm = PopupConfirmNode::createLayout("DO YOU WANT TO QUIT GAME", "", PopupConfirmActionType::eQuitGameCustomMode,  PopupConfirmType::eYesNo);
 		this->getParent()->addChild(popupConfirm, 10000);
 	}
 	else

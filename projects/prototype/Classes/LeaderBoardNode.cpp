@@ -79,13 +79,13 @@ bool LeaderBoardtNode::init()
 	}
 #endif
 
-	/*
+	
 	UserService::getInstance()->addCallBackList(this);
 	m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
 	m_iConnectServer++;
 	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
 	UserService::getInstance()->getLeaderBoardLevel(m_sChapterId ,m_iLevel, m_iConnectServer);
-	*/
+	
 
 	m_bIsSwipe = false;
 
@@ -111,7 +111,7 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 	LabelBMFont *pLabelScore = LabelBMFont::create(formatNumber(iScore).getCString(), "fonts/font_small_alert.fnt");
 	pLabelScore->setAnchorPoint(Point(0.0f, 0.5f));
 	pLabelScore->setPosition(Point(57.0f, 8.0f));
-	pLabelScore->setScale(0.85);
+	pLabelScore->setScale(0.8);
 	pNodeItem->addChild(pLabelScore);
 
 	LabelBMFont *pLabelName = LabelBMFont::create(sName, "fonts/font-small-green-alert.fnt");
@@ -127,6 +127,10 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 	pLabelRank->setPosition(Point(25.0f, 23.0f));
 	pNodeItem->addChild(pLabelRank);
 
+	Sprite* pLineImage = Sprite::create("Target-End-Game/line.png");
+	pLineImage->setPosition(Point(160.0f, 55.0f));
+	pNodeItem->addChild(pLineImage);
+
 	pNodeItem->setContentSize(Size(160.0f, 160.0f));
 	pNodeItem->setPosition(Point(-320.0f + iIndex*160, -100.0f));
 	pNodeItem->setTag(iIndex);
@@ -141,6 +145,15 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 void LeaderBoardtNode::clickAskLife(cocos2d::Object* sender)
 {
 
+}
+
+void LeaderBoardtNode::clickInviteFriends(Object* pSender)
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	FacebookManager::getInstance()->inviteFriends("Invite friends play game", "", "", "", "", "");
+#else
+	MessageBox("Facebook not run with platform window", "Facebook");
+#endif
 }
 
 bool LeaderBoardtNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
@@ -343,11 +356,11 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 									cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
 									this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
 								}
-								else if (iIndex > iRank)
+								else if (iIndex > iRank-1)
 								{
 									iCount++;
 									cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
-									this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
+									this->parseJsonToLeadeBoard(pJsonItem, iIndex+2, iIndex+1);
 								}
 							}
 						}
@@ -355,15 +368,11 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 						m_iLeaderBoardCount = m_iLeaderBoardCount + 1;
 						if (m_iLeaderBoardCount > 6 )
 							m_iLeaderBoardCount = 6;
-			
-						m_fMinPositionLeft = -((m_iLeaderBoardCount-4)*160.0f);
 					}
 					else
 					{
 						if (m_iLeaderBoardCount > 6)
 							m_iLeaderBoardCount = 6;
-
-						m_fMinPositionLeft = -((m_iLeaderBoardCount-4)*160.0f);
 
 						for(int iIndex=0; iIndex < m_iLeaderBoardCount; iIndex++)
 						{
@@ -371,6 +380,28 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 							this->parseJsonToLeadeBoard(pJsonItem, iIndex+1, iIndex);
 						}
 					}
+
+					m_iLeaderBoardCount = m_iLeaderBoardCount + 1;
+					m_fMinPositionLeft = -((m_iLeaderBoardCount-4)*160.0f);
+
+					Node* pInviteFriendsNode = Node::create();
+					Sprite* pButtonInviteImage = Sprite::create("Target-End-Game/btn-add-friend-small.png");
+
+					LabelTTF* pLabelTCreatedBy = LabelTTF::create("Invite Friends", "Arial", 22);
+					pLabelTCreatedBy->setColor(ccc3(255.0f, 255.0f, 255.0f));
+					pLabelTCreatedBy->setPosition(Point(55.0f, -10.0f));
+					pButtonInviteImage->addChild(pLabelTCreatedBy);
+
+					ButtonNode* pButtonInvite = ButtonNode::createButtonSprite(pButtonInviteImage, CC_CALLBACK_1(LeaderBoardtNode::clickInviteFriends, this));
+					pButtonInvite->setPosition(Point(80.0f, 70.0f));
+
+					ButtonManagerNode* pButtonManager = ButtonManagerNode::create();
+					pButtonManager->addButtonNode(pButtonInvite);
+					pInviteFriendsNode->addChild(pButtonManager);
+
+					pInviteFriendsNode->setContentSize(Size(160.0f, 160.0f));
+					pInviteFriendsNode->setPosition(Point(-320.0f + (m_iLeaderBoardCount-1)*160, -100.0f));
+					m_pSlideShow->addChild(pInviteFriendsNode);
 				}
 				else
 				{

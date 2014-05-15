@@ -96,7 +96,7 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 			if (m_bIsShowSyncError)
 			{
 				// Show popup error
-				MessageBox("Sync Game Data Error!", "");
+				//MessageBox("Sync Game Data Error!", "");
 				m_bIsShowSyncError = false;
 			}
 		}

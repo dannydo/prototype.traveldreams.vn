@@ -43,7 +43,7 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 
 	LabelBMFont *pLabelTitle = LabelBMFont::create("ADVANCE MODE", "fonts/font-bechic.fnt");
 	pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelTitle->setPosition(Point(320.0f, 880.0f));
+	pLabelTitle->setPosition(Point(320.0f, 872.0f));
 	this->addChild(pLabelTitle);
 
 	Sprite* pPanel = Sprite::create("AdvanceMode/panel-target-end-game.png");

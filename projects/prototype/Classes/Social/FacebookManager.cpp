@@ -165,7 +165,7 @@ void FacebookManager::shareDialog(const char* name, const char* caption, const c
 	}
 }
 
-void FacebookManager::inviteFriends(const char* message, const char* title, const char* filters)
+void FacebookManager::inviteFriends(const char* message, const char* title, const char* filters, const char* to, const char* suggestions, const char* data)
 {
 	if (_facebook)
 	{
@@ -173,8 +173,11 @@ void FacebookManager::inviteFriends(const char* message, const char* title, cons
 		PluginParam paramMessage(message);
 		PluginParam paramTitle(title);
 		PluginParam paramFilters(filters);
+		PluginParam paramTo(to);
+		PluginParam paramSuggestions(suggestions);
+		PluginParam paramData(data);
 		
-		_facebook->callFuncWithParam("requestDialog", &paramMessage,  &paramTitle,  &paramFilters, NULL); 
+		_facebook->callFuncWithParam("requestDialog", &paramMessage,  &paramTitle,  &paramFilters, paramTo, paramSuggestions, paramData, NULL); 
 	}
 }
 

@@ -73,6 +73,7 @@ bool MiniGameLayer::init()
 	m_pHeaderNode = HeaderNode::create();
 	this->addChild(m_pHeaderNode);
 
+	m_uTimeLocalCurrent = getTimeLocalCurrent();
 	m_iIndexWordNewCount = 0;
 	m_iIndexWordNew = 0;
 	this->createLayout();
@@ -327,7 +328,7 @@ void MiniGameLayer::playEffectLose()
 	m_pFlashCard->runAction(actionFlashcardMoveLeft);
 	m_pChooseImageNode->runAction(actionChooseImageMoveLeft);
 
-	m_MaintWordInfo.uTimeBeginPlayMiniGame = getTimeLocalCurrent();
+	m_MaintWordInfo.uTimeBeginPlayMiniGame = m_uTimeLocalCurrent;
 	m_MaintWordInfo.bIsCollected = false;
 	WordTable::getInstance()->updateWord(m_MaintWordInfo);
 

@@ -53,6 +53,7 @@ private:
 
 	std::vector<int> m_arrIndexWordNew;
 	std::vector<int> m_arrIndexWord;
+	unsigned long m_uTimeLocalCurrent;
 };
 
 class MiniGameScene : public cocos2d::CCScene

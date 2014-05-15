@@ -43,16 +43,12 @@ bool EndGameCustomModeNode::init()
 
 	LabelBMFont *pLabelTitle = LabelBMFont::create("ADVANCE MODE", "fonts/font-bechic.fnt");
 	pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelTitle->setPosition(Point(320.0f, 880.0f));
+	pLabelTitle->setPosition(Point(320.0f, 872.0f));
 	this->addChild(pLabelTitle);
 
 	Sprite* pPanel = Sprite::create("AdvanceMode/panel-target-end-game.png");
 	pPanel->setPosition(Point(320.0f, 550.0f));
 	this->addChild(pPanel);
-
-	Sprite* pNewRecord = Sprite::create("AdvanceMode/new-record.png");
-	pNewRecord->setPosition(Point(548.0f, 668.0f));
-	this->addChild(pNewRecord);
 
 	Sprite* pIconEye1 = Sprite::create("AdvanceMode/eye-icon.png");
 	pIconEye1->setPosition(Point(500.0f, 550.0f));
@@ -63,6 +59,13 @@ bool EndGameCustomModeNode::init()
 	this->addChild(pIconEye2);
 
 	m_csPackageInfo = CSPackageTable::getCSPackageInfo(m_sPackageId);
+
+	if (m_csPackageInfo.iStage < m_iStage)
+	{
+		Sprite* pNewRecord = Sprite::create("AdvanceMode/new-record.png");
+		pNewRecord->setPosition(Point(548.0f, 668.0f));
+		this->addChild(pNewRecord);
+	}
 
 	LabelBMFont *pLabelpackageName = LabelBMFont::create(m_csPackageInfo.sPackageName.c_str(), "fonts/font_title-popup.fnt");
 	pLabelpackageName->setAnchorPoint(Point(0.5f, 0.5f));

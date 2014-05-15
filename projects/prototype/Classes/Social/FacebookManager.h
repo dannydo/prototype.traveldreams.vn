@@ -50,7 +50,7 @@ public:
     void logoutByMode();
 	void shareLink(const char* name, const char* caption, const char* description, const char* link, const char* picture);
 	void shareDialog(const char* name, const char* caption, const char* description, const char* link, const char* picture);
-	void inviteFriends(const char* message, const char* title, const char* filters);
+	void inviteFriends(const char* message, const char* title, const char* filters, const char* to, const char* suggestions, const char* data);
 	void autoOpenActiveSession();
 	bool isNetworkOnline();
 

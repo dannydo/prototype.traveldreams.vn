@@ -5,6 +5,8 @@
 #include "StatusLayer.h"
 #include "SystemEventHandle.h"
 #include "AdvanceModeMyPackagesScene.h"
+#include "EndGameCustomModeNode.h"
+#include "PopupConfirmNode.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -105,6 +107,9 @@ bool MainMenuLayer::init()
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
 	this->scheduleUpdate();
 
+	//EndGameCustomModeNode* a = EndGameCustomModeNode::createLayout(15, 10, "C17");
+	//this->addChild(a);
+
 	return true;
 }
 
@@ -141,10 +146,21 @@ void MainMenuLayer::playGame(Object* sender)
 
 void MainMenuLayer::loginFacebook(Object* sender)
 {
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	if (!FacebookManager::getInstance()->isNetworkOnline())
+	{
+		PopupConfirmNode* pPopupConfirmNode = PopupConfirmNode::createLayout("CONNECTION FAIL", "No internet connection was found. Please try later", PopupConfirmActionType::eNone, PopupConfirmType::eOK);
+		this->addChild(pPopupConfirmNode);
+		return;
+	}
+
 	UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
 	if (m_pSettingNode != NULL)
 		m_pSettingNode->setStatusButtonFacebook(1);
 	SystemEventHandle::getInstance()->onStartConnectFacebook();
+#else
+	MessageBox("Facebook not run with platform window", "Facebook");
+#endif
 }
 
 void MainMenuLayer::clickInviteFriends(Object* sender)
@@ -227,7 +243,8 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	if(!FacebookManager::getInstance()->isLogined() || UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) != 1)
 	{
-		MessageBox("Please login facebook before play advance mode game!","");
+		PopupConfirmNode* pPopupConfirmNode = PopupConfirmNode::createLayout("CONNECT", "Please connect facebook to play this mode", PopupConfirmActionType::eNone, PopupConfirmType::eConnectFacebook);
+		this->addChild(pPopupConfirmNode);
 		return;
 	}
 #endif
