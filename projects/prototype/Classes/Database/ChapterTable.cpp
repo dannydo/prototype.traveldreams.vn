@@ -77,6 +77,7 @@ void ChapterTable::fetchAllChapter()
 		chapterInfo.iVersion = int(strtod(re[iRow*nColumn+4], 0));
 		chapterInfo.iTotalFlashCardUnlock = int(strtod(re[iRow*nColumn+5], 0));
 		chapterInfo.iTotalFlashCard = int(strtod(re[iRow*nColumn+6], 0));
+		chapterInfo.iStageRevise = int(strtod(re[iRow*nColumn+7], 0));
 
 		m_Chapters.push_back(chapterInfo);
 	}
@@ -86,26 +87,33 @@ void ChapterTable::fetchAllChapter()
 
 bool ChapterTable::updateChapter(ChapterInfo chapterInfo)
 {
+	int iIndex=0;
+	for(iIndex; iIndex<m_Chapters.size(); iIndex++)
+	{
+		if(m_Chapters[iIndex].sChapterId == chapterInfo.sChapterId)
+		{
+			break;
+		}
+	}
+
+	if (chapterInfo.iStageRevise < m_Chapters[iIndex].iStageRevise)
+		chapterInfo.iStageRevise = m_Chapters[iIndex].iStageRevise;
+
 	String sql = "update Chapters Set";
 	sql.appendWithFormat(" TotalLevelUnlock=%d,", chapterInfo.iTotalLevelUnlock);
 	sql.appendWithFormat(" TotalStar=%d,", chapterInfo.iTotalStar);
 	sql.appendWithFormat(" IsUnlock=%d,", chapterInfo.bIsUnlock);
 	sql.appendWithFormat(" Version=%d,", VersionTable::getInstance()->getVersionInfo().iVersionSync + 1);
 	sql.appendWithFormat(" TotalFlashCardUnlock=%d,", chapterInfo.iTotalFlashCardUnlock);
-	sql.appendWithFormat(" TotalFlashCard=%d", chapterInfo.iTotalFlashCard);
+	sql.appendWithFormat(" TotalFlashCard=%d,", chapterInfo.iTotalFlashCard);
+	sql.appendWithFormat(" StageRevise=%d", chapterInfo.iStageRevise);
 	sql.appendWithFormat(" where ChapterId='%s'", chapterInfo.sChapterId.c_str());
 
 	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
 	if(iResult != SQLITE_OK)
 		return false;
 
-	for(int iIndex=0; iIndex<m_Chapters.size(); iIndex++)
-	{
-		if(m_Chapters[iIndex].sChapterId == chapterInfo.sChapterId)
-		{
-			m_Chapters[iIndex] = chapterInfo;
-		}
-	}
+	m_Chapters[iIndex] = chapterInfo;
 
 	return true;
 }
@@ -190,7 +198,7 @@ bool ChapterTable::updateDataSyncChapters(cs::JsonDictionary* pJsonSync, const i
 			sqlRun.appendWithFormat("%d,", 1);//pJsonChapter->getItemIntValue("IsUnlock", 0));
 			sqlRun.appendWithFormat("%d,", iVersion);
 			sqlRun.appendWithFormat("%d,", pJsonChapter->getItemIntValue("TotalFlashCardUnlock", 0));
-			sqlRun.appendWithFormat("%d);", pJsonChapter->getItemIntValue("TotalFlashCard", 0));
+			sqlRun.appendWithFormat("%d, 0);", pJsonChapter->getItemIntValue("TotalFlashCard", 0));
 		}
 		else
 		{

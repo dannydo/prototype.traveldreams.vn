@@ -1,6 +1,7 @@
 #include "FooterNode.h"
 #include "IntroductionLayer.h"
 #include "FlashCardCollection.h"
+#include "Database\WordTable.h"
 
 USING_NS_CC;
 
@@ -26,9 +27,32 @@ bool FooterNode::init()
 	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(FooterNode::openSettingMenu, this));
 	m_pButtonSettingNode->setPosition(Point(36.0f, 33.0f));
 
-	Sprite* pFlashCardSprite = Sprite::create("Footer/btn_flashcard.png");
+	Sprite* pFlashCardSprite = Sprite::create("Footer/flashcard_button.png");
+	int iWordNew = WordTable::getInstance()->getNumberWordNew();
+	if (iWordNew > 0)
+	{
+		Sprite* pIconNotiy = Sprite::create("Footer/noitify_msg.png");
+		pIconNotiy->setPosition(Point(95.0f, 110.0f));
+
+		char sNumberNew[10];
+		sprintf(sNumberNew, "%d", iWordNew);
+		LabelTTF* pLabelNumber = LabelTTF::create(sNumberNew, "Arial", 25);
+		pLabelNumber->setColor(ccc3(255.0f, 255.0f, 255.0f));
+		pLabelNumber->setPosition(Point(22.0f, 20.0f));
+		pIconNotiy->addChild(pLabelNumber);
+		pFlashCardSprite->addChild(pIconNotiy);
+	}
+
+	int iTotalFlashCard = WordTable::getInstance()->getNumberWordCollected();
+	char sTotalFlashCard[10];
+	sprintf(sTotalFlashCard, "%d", iTotalFlashCard);
+	LabelTTF* pLabelTotalFlashWord = LabelTTF::create(sTotalFlashCard, "Arial", 30);
+	pLabelTotalFlashWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
+	pLabelTotalFlashWord->setPosition(Point(61.0f, 50.0f));
+	pFlashCardSprite->addChild(pLabelTotalFlashWord);
+
 	m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
-	m_pButtonFlashCardNode->setPosition(Point(609.0f, 33.0f));
+	m_pButtonFlashCardNode->setPosition(Point(583.0f, 58.0f));
 
 	m_pButtonManagerNode = ButtonManagerNode::create();
 	m_pButtonManagerNode->addButtonNode(m_pButtonSettingNode);

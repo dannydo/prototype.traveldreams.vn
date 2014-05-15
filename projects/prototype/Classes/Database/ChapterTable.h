@@ -13,6 +13,7 @@ struct ChapterInfo
 	int iVersion;
 	int iTotalFlashCardUnlock;
 	int iTotalFlashCard;
+	int iStageRevise;
 
 	ChapterInfo()
 	{
@@ -23,6 +24,7 @@ struct ChapterInfo
 		iVersion = 0;
 		iTotalFlashCardUnlock = 0;
 		iTotalFlashCard = 0;
+		iStageRevise = 0;
 	}
 };
 

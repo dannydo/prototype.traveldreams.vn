@@ -52,6 +52,8 @@ public:
 	std::vector<WordInfo> getWordInfoCollectedForChapter(const std::string& sChapterId);
 	int getTotalWordInfoCollectedForChapter(const std::string& sChapterId);
 
+	int getNumberWordCollected();
+
 private:
 	void fetchWordsForChapter(const std::string& sChapterId);
 

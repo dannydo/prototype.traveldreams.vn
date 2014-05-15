@@ -276,6 +276,9 @@
     <ClCompile Include="..\Classes\CustomPackageDownloadManager.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\ReviseGameScene.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -516,6 +519,9 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\CustomPackageDownloadManager.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ReviseGameScene.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

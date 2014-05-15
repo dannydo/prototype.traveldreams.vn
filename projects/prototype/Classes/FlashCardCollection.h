@@ -24,6 +24,7 @@ private:
 	
 	void clickOpenFlashCard(Object* sender);
 	void clickPlayMiniGame(Object* sender);
+	void clickPlayReviseGame(Object* sender);
 
 	ButtonManagerNode* m_pSlideShow;
 	std::vector<ChapterInfo> m_chapters;

@@ -3,6 +3,7 @@
 #include "GameConfigManager.h"
 #include "GameWordManager.h"
 #include "HelloWorldScene.h"
+#include "AdvanceModeMyPackagesScene.h"
 
 USING_NS_CC;
 
@@ -140,6 +141,7 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 			pButtonManagerNode->addButtonNode(pButtonUpdate);
 		}
 	}
+	m_isBacktoMyPackage = false;
 
 	return true;
 }		
@@ -182,6 +184,7 @@ void AdvanceModeTargetNode::clickClose(Object* sender)
 
 void AdvanceModeTargetNode::clickUpdatePackage(cocos2d::Object* sender)
 {
+<<<<<<< a2e5f4877b9168d777fb103129c3a22bdfe4556b
 	m_CustomPackageDownloadManager.SetDownloadPackageCompleteCallback( std::bind(&AdvanceModeTargetNode::OnUpdatePackageComplete, this, std::placeholders::_1));
 	m_CustomPackageDownloadManager.StartDownloadPackage( this, m_csPackageInfo.sPackageCode.c_str());
 }
@@ -192,4 +195,23 @@ void AdvanceModeTargetNode::OnUpdatePackageComplete(const CSPackageInfo& package
 	this->getParent()->addChild(pTargetNode);	
 
 	this->removeFromParentAndCleanup(true);
+=======
+	if (m_isBacktoMyPackage)
+	{
+		m_isBacktoMyPackage = false;
+		Breadcrumb::getInstance()->resetSceneNodeToMainMenu();
+		Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
+		AdvanceModeMyPackagesScene* scene = AdvanceModeMyPackagesScene::create();
+		Director::getInstance()->replaceScene(scene);
+	}
+	else
+	{
+		this->getParent()->removeChild(this);
+	}
+}
+
+void AdvanceModeTargetNode::setIsBackToMyPackage(const bool& isbacktoMyPackage)
+{
+	m_isBacktoMyPackage = isbacktoMyPackage;
+>>>>>>> bed1f7dcd76a6e125c2c728f5644cc011f2f10ca
 }

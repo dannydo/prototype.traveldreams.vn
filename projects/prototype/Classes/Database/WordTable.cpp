@@ -1,6 +1,7 @@
 #include "WordTable.h"
 #include "InitDatabase.h"
 #include "VersionTable.h"
+#include "ChapterTable.h"
 
 USING_NS_CC; 
 USING_NS_CC_EXT;
@@ -43,6 +44,17 @@ int WordTable::getNumberWordNew()
 	int nRow, nColumn;
 
 	String sql = "select * from Words where IsCollected=0 and CountCollected > 1";
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	return nRow;
+}
+
+int WordTable::getNumberWordCollected()
+{
+	char **re;
+	int nRow, nColumn;
+
+	String sql = "select * from Words where IsCollected=1";
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
 
 	return nRow;
@@ -268,6 +280,10 @@ bool WordTable::insertWord(const WordInfo& wordInfo)
 	int iResult = sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sqlRun.getCString(), &re, &nRow, &nColumn,NULL);
 	if(iResult != SQLITE_OK)
 		return false;
+
+	ChapterInfo chapterInfo = ChapterTable::getInstance()->getChapterInfo(wordInfo.sChapterId);
+	chapterInfo.iTotalFlashCard++;
+	ChapterTable::getInstance()->updateChapter(chapterInfo);
 
 	return true;
 }

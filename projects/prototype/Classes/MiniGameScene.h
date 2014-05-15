@@ -10,7 +10,7 @@
 #include "Database\WordTable.h"
 #include "HeaderNode.h"
 
-#define _GIFT_COIN_ 100
+#define _GIFT_COIN_ 10
 
 class MiniGameLayer : public cocos2d::Layer
 {

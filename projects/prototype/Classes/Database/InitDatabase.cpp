@@ -87,7 +87,7 @@ bool InitDatabase::createDatabase()
 
 	std::string sqlRun = "";
 	sqlRun.append("CREATE TABLE if not exists Users (UserIdentifier TEXT PRIMARY KEY  NOT NULL, FacebookId TEXT, FacebookToken TEXT, FirstName TEXT, LastName TEXT, CurrentChapter TEXT, CurrentLevel INTEGER, Life INTEGER, LifeTimeRemaining INTEGER, LifeTImeBeginRemain INTEGER, Monney INTEGER, Version INTEGER, UserToken TEXT, DeviceId TEXT);");
-	sqlRun.append("CREATE TABLE if not exists Chapters (ChapterId TEXT PRIMARY KEY NOT NULL, TotalLevelUnlock INTEGER, TotalStar INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER, TotalFlashCardUnlock INTEGER, TotalFlashCard INTEGER);");
+	sqlRun.append("CREATE TABLE if not exists Chapters (ChapterId TEXT PRIMARY KEY NOT NULL, TotalLevelUnlock INTEGER, TotalStar INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER, TotalFlashCardUnlock INTEGER, TotalFlashCard INTEGER, StageRevise INTEGER DEFAULT 0);");
 	sqlRun.append("CREATE TABLE if not exists Levels (LevelId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ChapterId TEXT, Level INTEGER, WordId TEXT, Star INTEGER, Score INTEGER, BonusQuest INTEGER, TotalBonusQuest INTEGER, IsUnlock INTEGER NOT NULL DEFAULT 0, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists UnlockChapters (UnlockChapterId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ChapterId TEXT, Request INTEGER, Type TEXT, BeginTime INTEGER, Version INTEGER);");
 	sqlRun.append("CREATE TABLE if not exists PowerUps (PowerUpId TEXT PRIMARY KEY NOT NULL, Quantity INTEGER, Version INTEGER);");
@@ -142,7 +142,7 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 			sqlRun.append("', 0, 0, 1, ");
 			sqlRun.appendWithFormat("%d,", iVersion);
 			sqlRun.append("0,");
-			sqlRun.appendWithFormat("%d);", wordList.size());
+			sqlRun.appendWithFormat("%d, 0);", wordList.size());
 
 			int countCollected;
 			for (int iIndex=0; iIndex<wordList.size(); iIndex++)
@@ -203,7 +203,7 @@ bool InitDatabase::initDataChapter1AndLevel(const std::string& sChapterId, std::
 		sqlRun.append("', 0, 0, 1, ");
 		sqlRun.appendWithFormat("%d,", iVersion);
 		sqlRun.append("0,");
-		sqlRun.appendWithFormat("%d);", wordList.size());
+		sqlRun.appendWithFormat("%d, 0);", wordList.size());
 
 		int countCollected;
 		for (int iIndex=0; iIndex<wordList.size(); iIndex++)

@@ -208,8 +208,10 @@ void AdvanceModePopularPackagesLayer::clickDownloadPackage(Object* sender)
 }
 
 void AdvanceModePopularPackagesLayer::OnDownloadPackageComplete(const CSPackageInfo& packageInfo)
+<<<<<<< a2e5f4877b9168d777fb103129c3a22bdfe4556b
 {	
 	auto* pTargetNode = AdvanceModeTargetNode::createLayout( packageInfo.sPackageId, false);
+	pTargetNode->setIsBackToMyPackage(true);
 	this->addChild(pTargetNode);
 }
 

@@ -20,6 +20,7 @@ public:
 
 	cocos2d::Node* getNodeDescription() { return m_pNodeDescription; };
 	void removeButtonManageQuestion();
+	void setVisibleContentFlashCard(const bool& bVisible);
 
 private:
 

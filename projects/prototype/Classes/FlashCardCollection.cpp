@@ -7,6 +7,7 @@
 #include "Database\WordTable.h"
 #include "FunctionCommon.h"
 #include "MiniGameScene.h"
+#include "ReviseGameScene.h"
 
 USING_NS_CC;
 
@@ -100,6 +101,7 @@ bool FlashCardCollectionLayer::init()
 	this->addChild(pHeaderNode);
 
 	m_pSlideShow = ButtonManagerNode::create();
+	m_pSlideShow->AllowSwipingBackground(true);
 	m_pSlideShow->setPosition(Point(245.0f, 300.0f));
 
 	ClipMaskNode* pClipMaskNode = ClipMaskNode::create();
@@ -138,15 +140,24 @@ bool FlashCardCollectionLayer::init()
 				m_pSlideShow->addButtonNode(pButtonItem);
 
 				LabelBMFont* pLabelChapterName = LabelBMFont::create(worlMapConfig.m_WorlMapChapterConfigs[iIndexChapter].m_sChapterName.c_str(), "fonts/font_small_alert.fnt");
-				pLabelChapterName->setPosition(Point(110.0f, 18 -iIndex*190));
+				pLabelChapterName->setPosition(Point(90.0f, 18 -iIndex*190));
 				m_pSlideShow->addChild(pLabelChapterName);
 
 				char sTotalFlashCard[10];
 				sprintf(sTotalFlashCard, "(%d/%d)", iTotalFlashcardUnlock, chapterInfo.iTotalFlashCard);
 				LabelTTF* pLabelTotalFlashCard = LabelTTF::create(sTotalFlashCard, "Arial", 25);
 				pLabelTotalFlashCard->setColor(ccc3(0.0f, 0.0f, 0.0f));
-				pLabelTotalFlashCard->setPosition(Point(110.0f, -18 -iIndex*190));
+				pLabelTotalFlashCard->setPosition(Point(90.0f, -18 -iIndex*190));
 				m_pSlideShow->addChild(pLabelTotalFlashCard);
+
+				if (iTotalFlashcardUnlock >= 10)
+				{
+					Sprite* pButtonPlayReviseGameImage = Sprite::create("AdvanceMode/btn-play-advance-mode.png");
+					ButtonNode* pButtonPlayReviseGame = ButtonNode::createButtonSprite(pButtonPlayReviseGameImage, CC_CALLBACK_1(FlashCardCollectionLayer::clickPlayReviseGame, this));
+					pButtonPlayReviseGame->setTag(iIndex);
+					pButtonPlayReviseGame->setPosition(Point(235.0f, -iIndex*190));
+					m_pSlideShow->addButtonNode(pButtonPlayReviseGame);
+				}
 
 				iCountIndex++;
 				m_maxHeight = iCountIndex*190;
@@ -258,6 +269,22 @@ void FlashCardCollectionLayer::clickOpenFlashCard(Object* sender)
 		if (chapterInfo.bIsUnlock)
 		{
 			FlashCardScene* pFlashCard = FlashCardScene::createScene(chapterInfo);
+			Director::getInstance()->replaceScene(pFlashCard);
+		}
+	}
+}
+
+void FlashCardCollectionLayer::clickPlayReviseGame(Object* sender)
+{
+	ButtonNode* pSprite = (ButtonNode*)sender;
+	int iChapter = pSprite->getTag();
+
+	if (iChapter < m_chapters.size())
+	{
+		ChapterInfo chapterInfo = m_chapters[iChapter];
+		if (chapterInfo.bIsUnlock)
+		{
+			ReviseGameScene* pFlashCard = ReviseGameScene::createScene(chapterInfo);
 			Director::getInstance()->replaceScene(pFlashCard);
 		}
 	}

@@ -13,6 +13,8 @@ public:
 	bool init(bool bNeedCheckPackageVersion);
 
 	void OnUpdatePackageComplete(const CSPackageInfo& packageInfo);
+	void setIsBackToMyPackage(const bool& isBacktoMyPackage);
+
 private:
 	void clickPlayAdvanceMode(cocos2d::Object* sender);
 	void clickClose(cocos2d::Object* sender);
@@ -21,7 +23,9 @@ private:
 	CSPackageInfo m_csPackageInfo;
 	std::string m_sPackageId;
 
+
 	CustomPackageDownloadManager m_CustomPackageDownloadManager;
+	bool m_isBacktoMyPackage;
 };
 
 #endif;

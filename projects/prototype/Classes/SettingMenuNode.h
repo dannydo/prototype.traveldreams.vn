@@ -16,6 +16,7 @@ typedef enum {
 	kPlayGame,
 	kMyPackage,
 	kPopularPackage,
+	kReviseGame,
 } SceneMode;
 
 class SettingMenuNode : public CustomNode

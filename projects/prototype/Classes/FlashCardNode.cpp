@@ -159,3 +159,8 @@ void FlashCardNode::clickHintQuestion(Object* pSender)
 	m_pButtonManagerNodeQuestion->addChild(pLabelWordSentence);
 	m_pButtonManagerNodeQuestion->removeButtonNode(m_pButtonQuestion);
 }
+
+void FlashCardNode::setVisibleContentFlashCard(const bool& bVisible)
+{
+	m_pFlashCardContent->setVisible(bVisible);
+}

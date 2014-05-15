@@ -124,6 +124,7 @@ bool SettingMenuNode::init()
 		case SceneMode::kFlashCardCollection :
 		case SceneMode::kMyPackage :
 		case SceneMode::kPopularPackage :
+		case SceneMode::kReviseGame :
 		{
 			Sprite* pMainMenuSprite = Sprite::create("PanelSetting/btn_mainmenu.png");
 			ButtonNode* pButtonManiMenu = ButtonNode::createButtonSprite(pMainMenuSprite, CC_CALLBACK_1(SettingMenuNode::clickMainMenu, this));

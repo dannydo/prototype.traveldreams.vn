@@ -197,6 +197,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\OutOfMovesNode.cpp" />
     <ClCompile Include="..\Classes\PopupConfirmNode.cpp" />
     <ClCompile Include="..\Classes\QuitLevelFailedNode.cpp" />
+    <ClCompile Include="..\Classes\ReviseGameScene.cpp" />
     <ClCompile Include="..\Classes\ScrollManager.cpp" />
     <ClCompile Include="..\Classes\SettingMenuNode.cpp" />
     <ClCompile Include="..\Classes\Social\FacebookManager.cpp" />
@@ -278,6 +279,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\OutOfMovesNode.h" />
     <ClInclude Include="..\Classes\PopupConfirmNode.h" />
     <ClInclude Include="..\Classes\QuitLevelFailedNode.h" />
+    <ClInclude Include="..\Classes\ReviseGameScene.h" />
     <ClInclude Include="..\Classes\Scale3Sprite.h" />
     <ClInclude Include="..\Classes\ScrollManager.h" />
     <ClInclude Include="..\Classes\SettingMenuNode.h" />
