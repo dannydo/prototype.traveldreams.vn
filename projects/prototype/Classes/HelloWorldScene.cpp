@@ -5169,9 +5169,8 @@ void HelloWorld::ShowTimeModeResultPopup()
 	//MainMenuScene* pMainMenu = MainMenuScene::create();
 	//Director::getInstance()->replaceScene(pMainMenu);
 
-	auto pEndGameNode = EndGameCustomModeNode::createLayout( m_iCurrentTimeModeStage, MIN( m_iCurrentTimeModeStage, timeModeConfig->m_WordIndexList.size()) , 
-					GameWordManager::getInstance()->GetTotalPlayTimeOfGameSession(), timeModeConfig->m_sCustomPackageID);	
-	pEndGameNode->addYellowStar( m_GameBoardManager.GetEarnedStartsOfTimeMode(m_iCurrentTimeModeStage-1));
+	int iNewWordCollected = 0;
+	auto pEndGameNode = EndGameCustomModeNode::createLayout( m_iCurrentTimeModeStage, iNewWordCollected , timeModeConfig->m_sCustomPackageID);	
 	m_pHUDLayer->addChild(pEndGameNode, 1000);
 	
 

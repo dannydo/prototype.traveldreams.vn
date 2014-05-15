@@ -52,7 +52,6 @@ void PackageService::getPackagePopular(const int& iStart, const int& iNumberReco
 	strURL.append("packages/getTopDownload");
 	strURL.appendWithFormat("/%d", iStart);
 	strURL.appendWithFormat("/%d", iNumberRecords);
-	CCLOG("getPackagePopular %s", strURL.getCString());
 
 	m_pRequest = new HttpRequest();
 	m_pRequest->setUrl(strURL.getCString());
@@ -86,7 +85,6 @@ void PackageService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *re
 			{
 				strData.appendWithFormat("%c", (*buffer)[i]);
 			}
-			CCLOG("getPackagePopular %s", strData.getCString());
 
 		}
 	}

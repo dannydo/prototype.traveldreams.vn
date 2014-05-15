@@ -232,12 +232,12 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 	}
 #endif
 
-	/*
-	auto scene = AdvanceModeMyPackagesScene::create();
+	AdvanceModeMyPackagesScene* scene = AdvanceModeMyPackagesScene::create();
 	Director::getInstance()->replaceScene(scene);
-	*/
-
+	
+	/*
 	CustomPackageDownloaderNode* pNode = CustomPackageDownloaderNode::create();
 	pNode->setPosition(Point(40.f, 200.f));
 	this->addChild(pNode, 1000);
+	*/
 }

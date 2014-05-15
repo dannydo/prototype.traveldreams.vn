@@ -1,21 +1,22 @@
 #ifndef ADVANCE_MODE_POPULAR_PACKAGES_SCENE_H_
 #define ADVANCE_MODE_POPULAR_PACKAGES_SCENE_H_
 
-#include "cocos2d.h"
-#include "GameDataStructure.h"	 
-#include "Database\ChapterTable.h"
-#include "SettingMenuNode.h"
+#include "cocos2d.h" 
 #include "FooterNode.h"
 #include "ButtonManagerNode.h"	 
 #include "ScrollManager.h"	 
+#include "Database\CSPackageTable.h"
+#include "APIService\InterfaceService.h" 
 
-class AdvanceModePopularPackagesLayer : public cocos2d::Layer
+class AdvanceModePopularPackagesLayer : public cocos2d::Layer, InterfaceService
 {
 public:
 	AdvanceModePopularPackagesLayer() {};
 	virtual ~AdvanceModePopularPackagesLayer();
 	bool init();
 	CREATE_FUNC(AdvanceModePopularPackagesLayer);
+
+	void resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey) override;
 
 private:
 	bool onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
@@ -36,6 +37,11 @@ private:
 	float m_fYMoved;
 	float m_maxHeight;
 	bool m_bIsSwipe;
+
+	int m_iConnectServer;
+	int m_iTotalPackage;
+
+	std::vector<CSPackageInfo> m_csPackageInfos;
 };
 
 class AdvanceModePopularPackagesScene : public cocos2d::CCScene
