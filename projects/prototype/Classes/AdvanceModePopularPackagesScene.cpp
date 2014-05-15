@@ -1,6 +1,7 @@
 #include "AdvanceModePopularPackagesScene.h"
 #include "ClipMaskNode.h"
 #include "APIService\PackageService.h"
+#include "AdvanceModeTargetNode.h"
 
 USING_NS_CC;
 
@@ -62,9 +63,26 @@ bool AdvanceModePopularPackagesLayer::init()
 	pButtonManagerNode->addButtonNode(m_pButtonAddMorePackage);
 
 	Sprite* m_pButtonPackageCodeImage = Sprite::create("AdvanceMode/text-box-small.png");
-	ButtonNode* m_pButtonPackageCode = ButtonNode::createButtonSprite(m_pButtonPackageCodeImage, CC_CALLBACK_1(AdvanceModePopularPackagesLayer::clickAddPackageCode, this));
-	m_pButtonPackageCode->setPosition(Point(213.0f, 760.0f));
-	pButtonManagerNode->addButtonNode(m_pButtonPackageCode);
+	//ButtonNode* m_pButtonPackageCode = ButtonNode::createButtonSprite(m_pButtonPackageCodeImage, CC_CALLBACK_1(AdvanceModePopularPackagesLayer::clickAddPackageCode, this));
+	//m_pButtonPackageCode->setPosition(Point(213.0f, 760.0f));
+	//pButtonManagerNode->addButtonNode(m_pButtonPackageCode);
+	m_pButtonPackageCodeImage->setPosition(Point(213.0f, 760.0f));
+	this->addChild(m_pButtonPackageCodeImage);
+
+
+	m_pCodeEditBox = EditBox::create(Size(250.f, 50.f), Scale9Sprite::create("AdvanceMode/blank_edit.png"));
+	m_pCodeEditBox->setFont("Arial", 30);
+	m_pCodeEditBox->setFontColor(Color3B( 50, 50, 50));
+    //m_pCodeEditBox->setPosition( Point(60.f, 260.f)); //Point(visibleOrigin.x+visibleSize.width/2, visibleOrigin.y+visibleSize.height/4));
+	m_pCodeEditBox->setPosition(Point(215.0f, 760.0f));
+    //m_pCodeEditBox->setAnchorPoint(Point(0, 0.5f));
+    m_pCodeEditBox->setPlaceHolder("Input code");
+	m_pCodeEditBox->setInputFlag(EditBox::InputFlag::INTIAL_CAPS_ALL_CHARACTERS);
+	//m_pCodeEditBox->setInputMode(EditBox::InputMode::ANY);
+    //editCode->setDelegate(this);
+    addChild(m_pCodeEditBox);
+
+
 
 	LabelTTF* pLabelDescription = LabelTTF::create("Build your own vocab from vs.kiss-concept.com", "Arial", 20);
 	pLabelDescription->setColor(ccc3(255.0f, 255.0f, 255.0f));
@@ -112,6 +130,8 @@ bool AdvanceModePopularPackagesLayer::init()
 
 	m_iTotalPackage = 0;
 	m_maxHeight = 0;
+
+	m_CustomPackageDownloadManager.SetDownloadPackageCompleteCallback(std::bind( &AdvanceModePopularPackagesLayer::OnDownloadPackageComplete, this, std::placeholders::_1));
 
 	return true;
 }
@@ -182,10 +202,25 @@ void AdvanceModePopularPackagesLayer::resultHttpRequestCompleted(cs::JsonDiction
 
 void AdvanceModePopularPackagesLayer::clickDownloadPackage(Object* sender)
 {
+	int iPopularPackageIndex = ((ButtonNode*)sender)->getTag();
+	m_pCodeEditBox->setText( m_csPackageInfos[iPopularPackageIndex].sPackageCode.c_str());
+	clickAddPackage(NULL);
+}
+
+void AdvanceModePopularPackagesLayer::OnDownloadPackageComplete(const CSPackageInfo& packageInfo)
+{
+	int i = packageInfo.iStage;
+
+	auto* pTargetNode = AdvanceModeTargetNode::createLayout( packageInfo.sPackageId);
+	this->addChild(pTargetNode);
 }
 
 void AdvanceModePopularPackagesLayer::clickAddPackage(Object* sender)
 {
+	if(m_pCodeEditBox->getText()[0] == 0)
+		return;
+
+	m_CustomPackageDownloadManager.StartDownloadPackage( this, m_pCodeEditBox->getText());
 }
 
 void AdvanceModePopularPackagesLayer::clickAddPackageCode(Object* sender)

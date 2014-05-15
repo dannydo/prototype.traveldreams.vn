@@ -448,9 +448,9 @@ void GameConfigManager::LoadObstacleConfig()
 		return;
 	}
 
-	std::string strDes(des);
+	//std::string strDes(des);
     pJsonDict = new cs::JsonDictionary();
-    pJsonDict->initWithDescription(strDes.c_str());
+    pJsonDict->initWithDescription(des); //strDes.c_str());
 
 
 	// start to get data from dictionary

@@ -36,7 +36,7 @@ CustomPackageDownloaderNode::~CustomPackageDownloaderNode()
 #include <sys/stat.h>
 #endif
 
-void createDownloadedDir(const string& pathToSave)
+void createDownloadedDir2(const string& pathToSave)
 {    
     // Create the folder if it doesn't exist
 #if (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32)
@@ -112,7 +112,7 @@ bool CustomPackageDownloaderNode::init()
 	//init folder to save data
 	m_sPathToSave = FileUtils::getInstance()->getWritablePath();
 	m_sPathToSave += "downloaded";	
-	createDownloadedDir(m_sPathToSave);
+	createDownloadedDir2(m_sPathToSave);
 
 	// add tableView to contain old downloaded package
 	m_pTableView = TableView::create(this, Size(250.f, 80.f));
@@ -188,8 +188,8 @@ void CustomPackageDownloaderNode::LoadPackageListFromFile()
 	}	
 }
 
-bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string& sFolderName);
-void callTrackingURL(const std::string& sTrackingUrl);
+bool checkAndGetResultFolderName2(const std::string& sOuputFolderUrl, std::string& sFolderName);
+void callTrackingURL2(const std::string& sTrackingUrl);
 
 void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 {	
@@ -208,7 +208,7 @@ void CustomPackageDownloaderNode::startDownloadCallback(Object* sender)
 	sprintf(sFolderUrl, "%s/folder/%s",sBaseUrl, m_pCodeEditBox->getText());
 
 	std::string sFolderName;
-	if (checkAndGetResultFolderName( string(sFolderUrl), m_sResultFolder) && m_sResultFolder.size()!=0)
+	if (checkAndGetResultFolderName2( string(sFolderUrl), m_sResultFolder) && m_sResultFolder.size()!=0)
 	{	
 		/*
 		int iSpaceIndex = m_sResultFolder.find(' ');
@@ -343,7 +343,7 @@ void CustomPackageDownloaderNode::onSuccess()
 	char sTrackingURL[256];
 	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
 	sprintf(sTrackingURL, "%s/track/%s",sBaseUrl, m_pCodeEditBox->getText());
-	callTrackingURL(string(sTrackingURL));
+	callTrackingURL2(string(sTrackingURL));
 
 	// add new package to list
 	CustomPackageInfo customPackageInfo;
@@ -418,7 +418,7 @@ unsigned int CustomPackageDownloaderNode::numberOfCellsInTableView(TableView *ta
 #include <curl/curl.h>
 #include <curl/easy.h>
 
-static size_t getStringData(void *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t getStringData2(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
     string *data = (string*)userdata;
     data->append((char*)ptr, size * nmemb);
@@ -426,7 +426,7 @@ static size_t getStringData(void *ptr, size_t size, size_t nmemb, void *userdata
     return (size * nmemb);
 }
 
-void callTrackingURL(const std::string& sTrackingUrl)
+void callTrackingURL2(const std::string& sTrackingUrl)
 {
 	void* _curl = curl_easy_init();
     if (! _curl)
@@ -442,7 +442,7 @@ void callTrackingURL(const std::string& sTrackingUrl)
     res = curl_easy_perform(_curl);
 }
 
-bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string& sFolderName)
+bool checkAndGetResultFolderName2(const std::string& sOuputFolderUrl, std::string& sFolderName)
 {
     if (sOuputFolderUrl.size() == 0) return false;
     
@@ -459,7 +459,7 @@ bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string
     CURLcode res;
     curl_easy_setopt(_curl, CURLOPT_URL, sOuputFolderUrl.c_str());
     curl_easy_setopt(_curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, getStringData);
+    curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, getStringData2);
     curl_easy_setopt(_curl, CURLOPT_WRITEDATA, &sFolderName);	
     curl_easy_setopt(_curl, CURLOPT_CONNECTTIMEOUT, 3);
     res = curl_easy_perform(_curl);

@@ -1,6 +1,7 @@
 #include "AdvanceModeMyPackagesScene.h"
 #include "ClipMaskNode.h"
 #include "AdvanceModePopularPackagesScene.h"
+#include "AdvanceModeTargetNode.h"
 
 USING_NS_CC;
 
@@ -142,6 +143,9 @@ bool AdvanceModeMyPackagesLayer::init()
 
 void AdvanceModeMyPackagesLayer::clickPlayAdvanceMode(Object* sender)
 {
+	int iPackageIndex = ((ButtonNode*)sender)->getTag();	 
+	auto* pTargetNode = AdvanceModeTargetNode::createLayout( m_csPackageInfos[iPackageIndex].sPackageId);
+	this->addChild(pTargetNode);
 }
 
 void AdvanceModeMyPackagesLayer::clickAddMorePackage(Object* sender)

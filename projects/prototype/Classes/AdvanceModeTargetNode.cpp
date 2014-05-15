@@ -1,5 +1,8 @@
 #include "AdvanceModeTargetNode.h"
 #include "LeaderBoardAdvanceModeNode.h"
+#include "GameConfigManager.h"
+#include "GameWordManager.h"
+#include "HelloWorldScene.h"
 
 USING_NS_CC;
 
@@ -128,7 +131,34 @@ bool AdvanceModeTargetNode::init()
 
 void AdvanceModeTargetNode::clickPlayAdvanceMode(Object* sender)
 {	
+	string sPathToSave = FileUtils::getInstance()->getWritablePath();
+	sPathToSave += "downloaded";	
+
+	auto& timeModeConfig = GameConfigManager::getInstance()->GetTimeModeDemoConfig();
+	timeModeConfig.m_WordIndexList.clear();
+	timeModeConfig.m_WordCollectedCountList.clear();
 	
+	timeModeConfig.m_sCustomPackageID = m_csPackageInfo.sPackageId;
+	std::string sResultFolder = m_csPackageInfo.sPackageId;
+	sResultFolder.insert(0, "/");
+	sResultFolder.insert(0, sPathToSave);
+
+	int iWordPackageIndex = GameWordManager::getInstance()->AddAndLoadCustomPackageToList( timeModeConfig.m_sCustomPackageID, sResultFolder);
+	auto& wordList = GameWordManager::getInstance()->GetWordList();
+	for(int iWordIndex=0; iWordIndex < wordList.size(); iWordIndex++)
+	{
+		if (wordList[iWordIndex].m_iPackageIndex == iWordPackageIndex)
+		{
+			timeModeConfig.m_WordIndexList.push_back( iWordIndex);
+			timeModeConfig.m_WordCollectedCountList.push_back(0);
+		}
+	}
+
+	// start game
+	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(&timeModeConfig, true);	
+
+	auto scene = HelloWorld::createScene( _GMT_TIME_MODE_);
+	Director::getInstance()->replaceScene(scene);
 }
 
 void AdvanceModeTargetNode::clickClose(Object* sender)

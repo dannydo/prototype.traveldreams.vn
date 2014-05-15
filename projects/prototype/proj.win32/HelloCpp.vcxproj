@@ -149,6 +149,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\ConfirmQuitLevelNode.cpp" />
     <ClCompile Include="..\Classes\CustomNode.cpp" />
     <ClCompile Include="..\Classes\CustomPackageDownloaderNode.cpp" />
+    <ClCompile Include="..\Classes\CustomPackageDownloadManager.cpp" />
     <ClCompile Include="..\Classes\Database\ChapterTable.cpp" />
     <ClCompile Include="..\Classes\Database\CSPackageTable.cpp" />
     <ClCompile Include="..\Classes\Database\CSWordTable.cpp" />
@@ -228,6 +229,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\ConfirmQuitLevelNode.h" />
     <ClInclude Include="..\Classes\CustomNode.h" />
     <ClInclude Include="..\Classes\CustomPackageDownloaderNode.h" />
+    <ClInclude Include="..\Classes\CustomPackageDownloadManager.h" />
     <ClInclude Include="..\Classes\Database\ChapterTable.h" />
     <ClInclude Include="..\Classes\Database\CSPackageTable.h" />
     <ClInclude Include="..\Classes\Database\CSWordTable.h" />

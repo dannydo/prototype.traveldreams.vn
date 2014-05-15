@@ -7,6 +7,11 @@
 #include "ScrollManager.h"	 
 #include "Database\CSPackageTable.h"
 #include "APIService\InterfaceService.h" 
+#include "cocos-ext.h"
+#include "CustomPackageDownloadManager.h"
+
+using namespace cocos2d;
+USING_NS_CC_EXT;
 
 class AdvanceModePopularPackagesLayer : public cocos2d::Layer, InterfaceService
 {
@@ -27,7 +32,11 @@ private:
 	void clickAddPackage(cocos2d::Object* sender);	
 	void clickAddPackageCode(cocos2d::Object* sender);
 
+
+	void OnDownloadPackageComplete(const CSPackageInfo& packageInfo);
+private:
 	cocos2d::Sprite* m_pBackgroundSlideShow;
+	EditBox* m_pCodeEditBox;
 
 	ButtonManagerNode* m_pSlideShow;
 	FooterNode* m_pFooterNode;
@@ -41,6 +50,7 @@ private:
 	int m_iConnectServer;
 	int m_iTotalPackage;
 
+	CustomPackageDownloadManager m_CustomPackageDownloadManager;
 	std::vector<CSPackageInfo> m_csPackageInfos;
 };
 
