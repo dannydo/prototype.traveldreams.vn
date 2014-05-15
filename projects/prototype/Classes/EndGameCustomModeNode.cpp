@@ -94,13 +94,13 @@ bool EndGameCustomModeNode::init()
 	pLabelNumberTotalWord->setScale(1.2);
 	this->addChild(pLabelNumberTotalWord);
 
-	LabelBMFont *pLabelWordNew = LabelBMFont::create("Words Collected", "fonts/font_small_alert.fnt", 310.0f);
+	LabelBMFont *pLabelWordNew = LabelBMFont::create("New words", "fonts/font_small_alert.fnt", 310.0f);
 	pLabelWordNew->setAnchorPoint(Point(0.0f, 0.5f));
 	pLabelWordNew->setPosition(Point(122.0f, 480));
 	this->addChild(pLabelWordNew);
 
 	char sTotalWordNew[10];
-	sprintf(sTotalWordNew, "%d", m_csPackageInfo.iTotalWordUnlock);
+	sprintf(sTotalWordNew, "%d", m_iWordNew);
 	LabelBMFont *pLabelNumberWordNew = LabelBMFont::create(sTotalWordNew, "fonts/font_score.fnt");
 	pLabelNumberWordNew->setAnchorPoint(Point(1.0f, 0.5f));
 	pLabelNumberWordNew->setPosition(Point(475.0f, 480));

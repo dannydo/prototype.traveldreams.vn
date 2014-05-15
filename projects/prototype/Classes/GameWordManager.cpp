@@ -367,6 +367,8 @@ void GameWordManager::GenerateWordForNewLevelOfTimeMode(TimeModeLevelConfig* pTi
 				}
 			}		
 		}
+
+		m_iTimeModeTotalCollectedWordCount = wordDBList.size();
 	}
 
 	
@@ -423,7 +425,10 @@ void GameWordManager::UpdateTimeModeTracking(const int& iCompletedWordIndex)
 	m_TimeModeSessionTracking.push_back(word.m_sWordID);	
 
 	if (m_bIsCurrentTimeModeWordIsNewWord)
+	{
 		m_iTimeModeNewWordCount++;
+		m_iTimeModeTotalCollectedWordCount++;
+	}
 }
 
 void GameWordManager::RetryCurrentLevel()

@@ -6,12 +6,12 @@
 
 USING_NS_CC;
 
-AdvanceModeTargetNode* AdvanceModeTargetNode::createLayout(const std::string sPackageId)
+AdvanceModeTargetNode* AdvanceModeTargetNode::createLayout(const std::string sPackageId, bool bNeedCheckPackageVersion)
 {
 	AdvanceModeTargetNode* pGameTargetNode = new AdvanceModeTargetNode();
 	pGameTargetNode->m_sPackageId = sPackageId;
 
-	if(pGameTargetNode->init())
+	if(pGameTargetNode->init(bNeedCheckPackageVersion))
 	{
 		pGameTargetNode->autorelease();
 		return pGameTargetNode;
@@ -21,7 +21,7 @@ AdvanceModeTargetNode* AdvanceModeTargetNode::createLayout(const std::string sPa
 	return NULL;
 }
 
-bool AdvanceModeTargetNode::init()
+bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 {
 	if (!Node::init())
 	{
@@ -126,6 +126,21 @@ bool AdvanceModeTargetNode::init()
 	pLeaderBoard->setPosition(Point(320.0f, 114.0f));
 	this->addChild(pLeaderBoard);
 
+	if (bNeedCheckPackageVersion)
+	{
+		bool bCanUpdatePackage = m_CustomPackageDownloadManager.CheckUpdateOfPackage(this, m_csPackageInfo.sPackageCode);
+		if (bCanUpdatePackage)
+		{
+			Size winSize = Director::getInstance()->getWinSize();
+
+			Sprite* m_pUpdateImage = Sprite::create("AdvanceMode/update-label.png");			
+			m_pUpdateImage->setAnchorPoint(Point(0,0));
+			ButtonNode* pButtonUpdate = ButtonNode::createButtonSprite(m_pUpdateImage, CC_CALLBACK_1(AdvanceModeTargetNode::clickUpdatePackage, this));			
+			pButtonUpdate->setPosition(Point(0, winSize.height - m_pUpdateImage->getContentSize().height));
+			pButtonManagerNode->addButtonNode(pButtonUpdate);
+		}
+	}
+
 	return true;
 }		
 
@@ -162,6 +177,19 @@ void AdvanceModeTargetNode::clickPlayAdvanceMode(Object* sender)
 }
 
 void AdvanceModeTargetNode::clickClose(Object* sender)
+{	
+}
+
+void AdvanceModeTargetNode::clickUpdatePackage(cocos2d::Object* sender)
 {
-	
+	m_CustomPackageDownloadManager.SetDownloadPackageCompleteCallback( std::bind(&AdvanceModeTargetNode::OnUpdatePackageComplete, this, std::placeholders::_1));
+	m_CustomPackageDownloadManager.StartDownloadPackage( this, m_csPackageInfo.sPackageCode.c_str());
+}
+
+void AdvanceModeTargetNode::OnUpdatePackageComplete(const CSPackageInfo& packageInfo)
+{
+	auto* pTargetNode = AdvanceModeTargetNode::createLayout( packageInfo.sPackageId, false);
+	this->getParent()->addChild(pTargetNode);	
+
+	this->removeFromParentAndCleanup(true);
 }

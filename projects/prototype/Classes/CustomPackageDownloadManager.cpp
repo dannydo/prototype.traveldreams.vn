@@ -109,14 +109,56 @@ void CustomPackageDownloadManager::StartDownloadPackage(Node* pParentNode, const
 	}
 }
 
+bool CustomPackageDownloadManager::CheckUpdateOfPackage(Node* pParentNode, const std::string& sPackageCode)
+{
+	//m_pParentNode = NULL; //not need save parent node this case
+
+	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
+	char sVersionUrl[256], sFolderUrl[256];	
+	string sDownloadUrl;
+	sprintf(sFolderUrl, "%s/folder/%s",sBaseUrl, sPackageCode.c_str());
+
+	std::string sFolderName;
+	if (checkAndGetResultFolderName( string(sFolderUrl), m_sResultFolder) && m_sResultFolder.size()!=0)
+	{									
+		std::stringstream ss(m_sResultFolder);
+		std::istream_iterator<std::string> begin(ss);
+		std::istream_iterator<std::string> end;
+		std::vector<std::string> splitList(begin, end);
+		m_sResultFolder = splitList[0];
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+		sDownloadUrl = splitList[2];
+#else	
+		sDownloadUrl = splitList[1];
+#endif
+
+		//char sVersionUrl[256];
+		//const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
+		sprintf(sVersionUrl, "%s/version/%s",sBaseUrl, sPackageCode.c_str());
+
+		auto pAssetManager = new AssetsManager( sDownloadUrl.c_str(), sVersionUrl, "");
+		pAssetManager->setDelegate(NULL);
+		bool bResult = pAssetManager->checkUpdate();	
+
+		pParentNode->addChild(pAssetManager);
+		pAssetManager->release();
+
+		return bResult;
+	}
+	return false;
+}
+
 // assets manager callback
 void CustomPackageDownloadManager::onError(cocos2d::extension::AssetsManager::ErrorCode errorCode)
 {	
+	//if (m_pParentNode == NULL)
+		//return;
+
 	if (m_pNotificationPopup != NULL)
 	{
 		m_pNotificationPopup->removeFromParentAndCleanup(true);
 		m_pNotificationPopup = NULL;
-	}
+	}	
 
 	if (errorCode == AssetsManager::ErrorCode::NO_NEW_VERSION)
     {
@@ -185,7 +227,12 @@ void CustomPackageDownloadManager::onError(cocos2d::extension::AssetsManager::Er
 
 void CustomPackageDownloadManager::onProgress(int percent)
 {
+	if (percent < 0)
+		percent = 0;
 
+	char sText[30];
+	sprintf(sText, "Downloading %d", percent);
+	m_pNotificationPopup->UpdateTitle(sText);
 }
 
 void CustomPackageDownloadManager::onSuccess()
@@ -364,3 +411,4 @@ bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string
     }             
     return true;
 }
+

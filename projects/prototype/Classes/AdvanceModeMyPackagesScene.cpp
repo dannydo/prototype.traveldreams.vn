@@ -144,7 +144,7 @@ bool AdvanceModeMyPackagesLayer::init()
 void AdvanceModeMyPackagesLayer::clickPlayAdvanceMode(Object* sender)
 {
 	int iPackageIndex = ((ButtonNode*)sender)->getTag();	 
-	auto* pTargetNode = AdvanceModeTargetNode::createLayout( m_csPackageInfos[iPackageIndex].sPackageId);
+	auto* pTargetNode = AdvanceModeTargetNode::createLayout( m_csPackageInfos[iPackageIndex].sPackageId, true);
 	this->addChild(pTargetNode);
 }
 

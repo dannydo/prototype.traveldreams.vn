@@ -716,10 +716,17 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 	if (m_pSettingNode->getShowSetting() == false)
 	{
 		m_pSettingNode->show();
+
+		if (m_eGameModeType == _GMT_TIME_MODE_)
+			if (m_pTimeCountDownNode != NULL)
+				m_pTimeCountDownNode->Pause();
 	}
 	else
 	{
 		m_pSettingNode->hide();
+		if (m_eGameModeType == _GMT_TIME_MODE_)
+			if (m_pTimeCountDownNode != NULL)
+				m_pTimeCountDownNode->Resume();
 	}
 
     //Director::getInstance()->end();
@@ -1613,6 +1620,12 @@ void HelloWorld::OnStartGame()
 		m_bIsEffectPlaying = false;
 
 		m_pTimeCountDownNode->Start();
+
+		if (m_pSettingNode != NULL)
+		{
+			if (m_pSettingNode->getShowSetting())
+				m_pTimeCountDownNode->Pause();
+		}
 
 		/*char sText[20];
 		sprintf( sText, "STAGE %d", m_iCurrentTimeModeStage);
@@ -5250,10 +5263,10 @@ void HelloWorld::TimeMode_StartNextStage()
 
 	// update db to increase collect count of main word
 	CSPackageInfo packageInfo;
-	packageInfo.sPackageId = timeModeConfig->m_sCustomPackageID;
-	packageInfo.sPackageName = "";
+	packageInfo.sPackageId = timeModeConfig->m_sCustomPackageID;	
 	packageInfo.iStage = m_iCurrentTimeModeStage;
-	CSPackageTable::updateCSPackage(packageInfo);
+	packageInfo.iTotalWordUnlock = GameWordManager::getInstance()->GetTimeModeTotalCollectedWordCount();
+	CSPackageTable::updateTrackingInfoOfCSPackage(packageInfo);
 
 	CSWordInfo customWordDB;
 	customWordDB.sCSWordId = GameWordManager::getInstance()->GetMainWord().m_sWordID;

@@ -21,6 +21,8 @@ public:
 	void SetDownloadPackageCompleteCallback( std::function<void(const CSPackageInfo&)> downloadPackageCompleteCallback) { m_DownloadPackageCompleteCallback = downloadPackageCompleteCallback;}
 
 	void GetPackageInfoFromServer(CSPackageInfo& package);
+
+	bool CheckUpdateOfPackage(Node* pParentNode, const std::string& sPackageCode);
 private:
 	// assets manager callback
 	virtual void onError(cocos2d::extension::AssetsManager::ErrorCode errorCode);

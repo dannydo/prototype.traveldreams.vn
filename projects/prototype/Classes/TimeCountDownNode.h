@@ -18,6 +18,8 @@ public:
 	inline void SetSuspendingState(bool bIsSuspending) { m_bIsSuspendingDecreaseEnergy = bIsSuspending;}
 
 	inline void Start() { m_bIsStarted = true;}
+	inline void Pause() { m_bIsPaused = true;}
+	inline void Resume() { m_bIsPaused = false;}
 
 	void AddEnergy(int iIncrementEnergy) { 
 		m_fStoredEnergyIncrement += iIncrementEnergy;
@@ -37,6 +39,7 @@ private:
 	 void init(int iStageIndex, int iMaximumEnergy, int iEnergyLostPerSecond);
 private:
 	bool m_bIsStarted;
+	bool m_bIsPaused;
 	float m_fCurrentEnergy;
 	//float m_fNodeWidth, m_fNodeHeight, 
 	float fEnergyWidth;

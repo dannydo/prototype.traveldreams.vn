@@ -39,10 +39,10 @@ bool WaitingNode::init()
 	pBackgroundBoard->setScaleY(0.7f);
 	this->addChild(pBackgroundBoard);
 
-	LabelBMFont *pLabelTitle = LabelBMFont::create(m_sTitle, "fonts/font_title-popup.fnt", 410.0f, TextHAlignment::CENTER);
-	pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
-	pLabelTitle->setPosition(Point(320.0f, 485.0f));
-	this->addChild(pLabelTitle);
+	m_pLabelTitle = LabelBMFont::create(m_sTitle, "fonts/font_title-popup.fnt", 410.0f, TextHAlignment::CENTER);
+	m_pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
+	m_pLabelTitle->setPosition(Point(320.0f, 485.0f));
+	this->addChild(m_pLabelTitle);
 
 	return true;
 }

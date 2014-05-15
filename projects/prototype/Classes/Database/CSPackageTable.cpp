@@ -106,3 +106,37 @@ bool CSPackageTable::updateCSPackage(const CSPackageInfo& csPackageInfo)
 
 	return true;
 }
+
+bool CSPackageTable::updateTrackingInfoOfCSPackage(const CSPackageInfo& csPackageInfo)
+{
+	char **re;
+	int nRow, nColumn;
+
+	String sql = "select * from CSPackage where PackageId=";
+	sql.appendWithFormat("'%s'", csPackageInfo.sPackageId.c_str());
+
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	int iStage = csPackageInfo.iStage;
+	if (nRow > 0)
+	{
+		CSPackageInfo csPackageInfoTemp;
+		csPackageInfoTemp.sPackageId = re[nColumn+0];
+		csPackageInfoTemp.sPackageName = re[nColumn+1];
+		csPackageInfoTemp.iStage = int(strtod(re[nColumn+2], 0));
+
+		if (csPackageInfoTemp.iStage > iStage)
+			iStage = csPackageInfoTemp.iStage;
+
+		sql = "update CSPackage Set";		
+		sql.appendWithFormat(" Stage=%d,", iStage);		
+		sql.appendWithFormat(" TotalWordUnlock=%d", csPackageInfo.iTotalWordUnlock);		
+		sql.appendWithFormat(" where PackageId='%s'", csPackageInfo.sPackageId.c_str());
+	}	
+
+	int iResult = sqlite3_exec(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), NULL, NULL, NULL);
+	if(iResult != SQLITE_OK)
+		return false;
+
+	return true;
+}

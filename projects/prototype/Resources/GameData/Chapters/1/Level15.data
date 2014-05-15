@@ -26,8 +26,8 @@
 ;obstacle list: count, list
 1
 COUNTDOWN 5
-1
-6 5
+2
+6 5 5 4
 0
 ;bonus quest
 0

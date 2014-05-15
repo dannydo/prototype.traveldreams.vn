@@ -94,7 +94,8 @@ public:
 
 	const std::vector<std::string>& GetTimeModeTrackingList() { return m_TimeModeSessionTracking;}
 	void UpdateTimeModeTracking(const int& iCompletedWordIndex);
-	int GetTimeModeNewWordCount() { return m_iTimeModeNewWordCount;}
+	inline int GetTimeModeNewWordCount() { return m_iTimeModeNewWordCount;}
+	inline int GetTimeModeTotalCollectedWordCount() { return m_iTimeModeTotalCollectedWordCount;}	
 private:
 	void PreLoadPackageForWord(std::string sWordID);
 
@@ -143,6 +144,7 @@ private:
 	std::vector<std::string> m_TimeModeSessionTracking;
 	bool m_bIsCurrentTimeModeWordIsNewWord;
 	int m_iTimeModeNewWordCount;
+	int m_iTimeModeTotalCollectedWordCount;
 
 
 	/*struct TimeModeAnalysedWordInfo

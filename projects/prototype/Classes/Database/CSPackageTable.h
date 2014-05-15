@@ -32,7 +32,7 @@ public:
 	static void getAllCSPackages(std::vector<CSPackageInfo>& csPackages);
 	static CSPackageInfo getCSPackageInfo(const std::string& sPackageId);
 	static bool updateCSPackage(const CSPackageInfo& csPackageInfo);
-
+	static bool updateTrackingInfoOfCSPackage(const CSPackageInfo& csPackageInfo);
 private:
 };
 #endif

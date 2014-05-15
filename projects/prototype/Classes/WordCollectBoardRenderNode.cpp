@@ -1189,6 +1189,9 @@ float WordCollectBoardRenderNode::PlayUnlockWordEffect()
 	else
 		centerPoint= Point( fWindowWidth/2.f, 860.f);
 
+	if (m_eGameModeType == _GMT_TIME_MODE_)
+		centerPoint.y -= 20.f;
+
 	Point centerWindow( fWindowWidth/2.f, Director::getInstance()->getWinSize().height/2.f);
 
 	float fPhase1Time = 0.4f;

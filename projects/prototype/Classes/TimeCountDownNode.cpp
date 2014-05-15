@@ -18,6 +18,7 @@ TimeCountDownNode* TimeCountDownNode::create(int iStageIndex, int iMaximumEnergy
 void TimeCountDownNode::init(int iStageIndex, int iMaximumEnergy, int iEnergyLostPerSecond)
 {
 	m_bIsStarted = false;
+	m_bIsPaused = false;
 	m_bIsSuspendingDecreaseEnergy = false;
 	m_fMaximumEnergy = iMaximumEnergy;
 	m_fEnergyLostPersecond = iEnergyLostPerSecond;
@@ -104,7 +105,7 @@ void TimeCountDownNode::init(int iStageIndex, int iMaximumEnergy, int iEnergyLos
 
 void TimeCountDownNode::update(float fDeltaTime)
 {
-	if (!m_bIsStarted)
+	if (!m_bIsStarted || m_bIsPaused)
 		return;
 
 	if (m_fCurrentEnergy <=0 )
