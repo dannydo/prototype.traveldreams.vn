@@ -79,6 +79,10 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/APIService/TrackingService.cpp \
 				   ../../Classes/APIService/PackageService.cpp \
 				   ../../Classes/CustomPackageDownloadManager.cpp \
+				   ../../Classes/AdvanceModeMyPackagesScene.cpp \
+				   ../../Classes/AdvanceModePopularPackagesScene.cpp \
+				   ../../Classes/AdvanceModeTargetNode.cpp \
+				   ../../Classes/ReviseGameScene.cpp \
 				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \

@@ -5,6 +5,7 @@
 #include "GameWordManager.h"
 #include "Database\UserTable.h"
 #include "Database\ChapterTable.h"
+#include "SoundManager.h"
 
 USING_NS_CC;
 
@@ -162,6 +163,9 @@ void MiniGameLayer::createLayout()
 		m_MaintWordInfo = m_WordsNew[m_iIndexWordNew];
 		int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(m_MaintWordInfo.sWordId);	
 		auto& wordMain = GameWordManager::getInstance()->GetWord(iIndex);
+
+		// spelling
+		SoundManager::PlaySpellingOfWord( this,wordMain, 0.2f, false);
 
 		m_pFlashCard = FlashCardNode::createLayout(wordMain);
 		m_pFlashCard->addButtonPlaySoundWord();

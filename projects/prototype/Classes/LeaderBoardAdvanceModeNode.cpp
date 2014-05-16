@@ -84,11 +84,13 @@ bool LeaderBoardAdvanceModeNode::init()
 	}
 #endif
 
+	/*
 	UserService::getInstance()->addCallBackList(this);
 	m_iConnectServer = UserDefault::getInstance()->getIntegerForKey("NumberConnectServer", 0);
 	m_iConnectServer++;
 	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
 	UserService::getInstance()->getLeaderBoardAdvanceMode(m_sPackageId, m_iConnectServer);
+	*/
 
 	return true;
 }
