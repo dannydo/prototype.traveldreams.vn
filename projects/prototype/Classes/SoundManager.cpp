@@ -272,10 +272,10 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 			break;		
 
 		case _SET_FLASHCARD_CHOOSE_RIGHT_:
-			sFileName = "SoundEffectPC/Sfx_flashcard_right.ogg";
+			sFileName = "SoundEffect/Sfx_flashcard_right.ogg";
 			break;		
 		case _SET_FLASHCARD_CHOOSE_WRONG_:
-			sFileName = "SoundEffectPC/Sfx_flashcard_wrong.ogg";
+			sFileName = "SoundEffect/Sfx_flashcard_wrong.ogg";
 			break;		
 
 
