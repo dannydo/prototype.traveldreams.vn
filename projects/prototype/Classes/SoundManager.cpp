@@ -165,6 +165,13 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 			sFileName = "SoundEffectPC/Encouragement/LetsFind.wav";
 			break;		
 
+		case _SET_FLASHCARD_CHOOSE_RIGHT_:
+			sFileName = "SoundEffectPC/Sfx_flashcard_right.wav";
+			break;		
+		case _SET_FLASHCARD_CHOOSE_WRONG_:
+			sFileName = "SoundEffectPC/Sfx_flashcard_wrong.wav";
+			break;		
+
 		case _SET_ENCOURAGE_NICE_:
 			sFileName = "SoundEffectPC/Encouragement/Nice.wav";
 			break;		
@@ -262,6 +269,13 @@ void SoundManager::PlaySoundEffect(const SoundEffectType& eSoundEffectType, floa
 
 		case _SET_LETS_FIND_:
 			sFileName = "SoundEffect/Encouragement/LetsFind.ogg";
+			break;		
+
+		case _SET_FLASHCARD_CHOOSE_RIGHT_:
+			sFileName = "SoundEffectPC/Sfx_flashcard_right.ogg";
+			break;		
+		case _SET_FLASHCARD_CHOOSE_WRONG_:
+			sFileName = "SoundEffectPC/Sfx_flashcard_wrong.ogg";
 			break;		
 
 
