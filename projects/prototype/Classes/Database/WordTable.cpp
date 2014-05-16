@@ -65,7 +65,7 @@ int WordTable::getNumberWordPlayMiniGame(const unsigned long& iTimeCurrent)
 	char **re;
 	int nRow, nColumn;
 
-	unsigned long udeltaTime = iTimeCurrent - 86400; 
+	unsigned long udeltaTime = iTimeCurrent - _SECONDS_NEXT_PLAY_MINI_GAME_; 
 
 	String sql = "select * from Words where IsCollected=0 and CountCollected > 1 and (TimeBeginPlayMiniGame=0 or TimeBeginPlayMiniGame<=";
 	sql.appendWithFormat("%u)", udeltaTime);
@@ -122,7 +122,7 @@ std::vector<WordInfo> WordTable::getAllWordNew(const unsigned long& iTimeCurrent
 	char **re;
 	int nRow, nColumn;
 
-	unsigned long udeltaTime = iTimeCurrent - 86400; 
+	unsigned long udeltaTime = iTimeCurrent - _SECONDS_NEXT_PLAY_MINI_GAME_; 
 
 	String sql = "select * from Words inner join MapChapterWords on MapChapterWords.WordId = Words.WordId where IsCollected=0 and CountCollected > 1 and (TimeBeginPlayMiniGame=0 or TimeBeginPlayMiniGame<=";
 	sql.appendWithFormat("%u)", udeltaTime);

@@ -283,6 +283,7 @@ void MiniGameLayer::clickChoosePicture(Object* sender)
 	if (pButtonNode->getTag() == 1)
 	{
 		// Choose correct
+		SoundManager::PlaySoundEffect(SoundEffectType::_SET_FLASHCARD_CHOOSE_RIGHT_);
 		Sprite* pIconCorrect = Sprite::create("FlashCard/check.png");
 		pIconCorrect->setPosition(Point(109.0f, 78.5f));
 		pButtonNode->getChildByTag(10)->addChild(pIconCorrect);
@@ -295,6 +296,7 @@ void MiniGameLayer::clickChoosePicture(Object* sender)
 	else
 	{
 		// Choose incorrect
+		SoundManager::PlaySoundEffect(SoundEffectType::_SET_FLASHCARD_CHOOSE_WRONG_);
 		Sprite* pIconWrong = Sprite::create("FlashCard/wrong_icon.png");
 		pIconWrong->setPosition(Point(109.0f, 78.5f));
 		pButtonNode->getChildByTag(10)->addChild(pIconWrong);

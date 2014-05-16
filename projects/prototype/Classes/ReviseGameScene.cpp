@@ -208,7 +208,7 @@ void ReviseGameLayer::addPopupEndGame()
 	m_pPopupEndGame->addChild(pLabelBest);
 
 	char sBestStage[10];
-	sprintf(sBestStage, "%d", m_iStage);
+	sprintf(sBestStage, "%d", m_chapterInfo.iStageRevise);
 	LabelBMFont *pLabelNumberBest = LabelBMFont::create(sBestStage, "fonts/font_score.fnt");
 	pLabelNumberBest->setAnchorPoint(Point(1.0f, 0.5f));
 	pLabelNumberBest->setPosition(Point(350.0f, 585));
@@ -413,6 +413,7 @@ void ReviseGameLayer::clickChoosePicture(Object* sender)
 	if (pButtonNode->getTag() == 1)
 	{
 		// Choose correct
+		SoundManager::PlaySoundEffect(SoundEffectType::_SET_FLASHCARD_CHOOSE_RIGHT_);
 		Sprite* pIconCorrect = Sprite::create("FlashCard/check.png");
 		pIconCorrect->setPosition(Point(109.0f, 78.5f));
 		pButtonNode->getChildByTag(10)->addChild(pIconCorrect);
@@ -428,6 +429,7 @@ void ReviseGameLayer::clickChoosePicture(Object* sender)
 	else
 	{
 		// Choose incorrect
+		SoundManager::PlaySoundEffect(SoundEffectType::_SET_FLASHCARD_CHOOSE_WRONG_);
 		Sprite* pIconWrong = Sprite::create("FlashCard/wrong_icon.png");
 		pIconWrong->setPosition(Point(109.0f, 78.5f));
 		pButtonNode->getChildByTag(10)->addChild(pIconWrong);

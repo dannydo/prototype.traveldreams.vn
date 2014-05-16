@@ -4,6 +4,8 @@
 #include "cocos2d.h"
 #include "cocos-ext.h"
 
+#define _SECONDS_NEXT_PLAY_MINI_GAME_ 3600
+
 struct WordInfo
 {
 	std::string sWordId;

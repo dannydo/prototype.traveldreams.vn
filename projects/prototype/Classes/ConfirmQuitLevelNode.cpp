@@ -73,14 +73,16 @@ bool ConfirmQuitLevelNode::init()
 	ButtonNode* pButtonNoNode = ButtonNode::createButtonSprite(pButtonNoSprite, CC_CALLBACK_1(ConfirmQuitLevelNode::clickNo, this));
 	pButtonNoNode->setPosition(Point(440.0f, 382.0f));
 
+	/*
 	Sprite* pButtonCloseSprite = Sprite::create("Target-End-Game/btn_close.png");
 	ButtonNode* pButtonCloseNode = ButtonNode::createButtonSprite(pButtonCloseSprite, CC_CALLBACK_1(ConfirmQuitLevelNode::clickNo, this));
 	pButtonCloseNode->setPosition(Point(572.0f, 894.0f));
+	*/
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	pButtonManagerNode->addButtonNode(pButtonYesNode);
 	pButtonManagerNode->addButtonNode(pButtonNoNode);
-	pButtonManagerNode->addButtonNode(pButtonCloseNode);
+	//pButtonManagerNode->addButtonNode(pButtonCloseNode);
 	this->addChild(pButtonManagerNode);
 
 	return true;
