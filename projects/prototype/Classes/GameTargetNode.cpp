@@ -52,9 +52,17 @@ bool GameTargetNode::initLayout(const Word& pMainWord)
 
 	this->generateLayoutStartAndBonusQuest();
 
-	Sprite* pIconBoosterImage = Sprite::create("Target-End-Game/icon-boosters.png");
-	pIconBoosterImage->setPosition(Point(320.0f, 415.0f));
-	this->addChild(pIconBoosterImage);
+	Sprite* pIconBoosterLock1 = Sprite::create("Target-End-Game/lock-icon-powerup.png");
+	pIconBoosterLock1->setPosition(Point(220.0f, 415.0f));
+	this->addChild(pIconBoosterLock1);
+
+	Sprite* pIconBoosterLock2 = Sprite::create("Target-End-Game/lock-icon-powerup.png");
+	pIconBoosterLock2->setPosition(Point(320.0f, 415.0f));
+	this->addChild(pIconBoosterLock2);
+
+	Sprite* pIconBoosterLock3 = Sprite::create("Target-End-Game/lock-icon-powerup.png");
+	pIconBoosterLock3->setPosition(Point(420.0f, 415.0f));
+	this->addChild(pIconBoosterLock3);
 
 	FlashCardNode* pFlashCard = FlashCardNode::createLayout(pMainWord);
 	pFlashCard->setPosition(70.0f, 285.0f);

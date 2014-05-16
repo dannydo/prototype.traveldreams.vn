@@ -290,13 +290,13 @@ public:
 
 	inline bool GetNextChapterID(const std::string& sChapterID, std::string& sNextChapterID){
 		int iChapterIndex = m_WordlMapConfig.m_WorlMapChapterConfigMap[sChapterID];		
-		if (iChapterIndex < m_WordlMapConfig.m_iTotalChapter)
+		if (iChapterIndex + 1 < m_WordlMapConfig.m_iTotalChapter)
 		{
 			sNextChapterID = m_WordlMapConfig.m_WorlMapChapterConfigs[ iChapterIndex+1].m_sChapterId;
 			return true;
 		}
 		else
-			return true;
+			return false;
 	}
 
 	inline const ObstacleDescription* GetObstacleDescription(const int& iObstacleTypeID) {
