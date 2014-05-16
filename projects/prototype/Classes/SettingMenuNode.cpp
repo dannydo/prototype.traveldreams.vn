@@ -384,6 +384,8 @@ void SettingMenuNode::clickResume(cocos2d::Object* sender)
 
 void SettingMenuNode::show()
 {
+	this->getParent()->stopAllActions();
+
 	// play sound effect
 	SoundManager::PlaySoundEffect(_SET_GAME_MENU_);
 
@@ -394,6 +396,8 @@ void SettingMenuNode::show()
 
 void SettingMenuNode::hide()
 {
+	this->getParent()->stopAllActions();
+
 	// play sound effect
 	SoundManager::PlaySoundEffect(_SET_GAME_MENU_);
 

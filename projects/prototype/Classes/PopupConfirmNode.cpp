@@ -160,8 +160,6 @@ void PopupConfirmNode::clickLoginFacebook(cocos2d::Object* pSender)
 	else
 	{
 		UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 0);
-		if (m_pSettingNode != NULL)
-			m_pSettingNode->setStatusButtonFacebook(1);
 		SystemEventHandle::getInstance()->onStartConnectFacebook();
 	}
 #else

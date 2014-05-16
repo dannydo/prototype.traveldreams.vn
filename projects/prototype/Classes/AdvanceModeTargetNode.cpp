@@ -129,6 +129,7 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 
 	if (bNeedCheckPackageVersion)
 	{
+		CCLOG("Update 1");
 		bool bCanUpdatePackage = m_CustomPackageDownloadManager.CheckUpdateOfPackage(this, m_csPackageInfo.sPackageCode);
 		if (bCanUpdatePackage)
 		{
@@ -140,6 +141,7 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 			pButtonUpdate->setPosition(Point(0, winSize.height - m_pUpdateImage->getContentSize().height));
 			pButtonManagerNode->addButtonNode(pButtonUpdate);
 		}
+		CCLOG("Update 2");
 	}
 	m_isBacktoMyPackage = false;
 
@@ -148,6 +150,7 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 
 void AdvanceModeTargetNode::clickPlayAdvanceMode(Object* sender)
 {	
+	CCLOG("Start 1");
 	string sPathToSave = FileUtils::getInstance()->getWritablePath();
 	sPathToSave += "downloaded";	
 
@@ -159,6 +162,8 @@ void AdvanceModeTargetNode::clickPlayAdvanceMode(Object* sender)
 	std::string sResultFolder = m_csPackageInfo.sPackageId;
 	sResultFolder.insert(0, "/");
 	sResultFolder.insert(0, sPathToSave);
+	
+	CCLOG("Start 2");
 
 	int iWordPackageIndex = GameWordManager::getInstance()->AddAndLoadCustomPackageToList( timeModeConfig.m_sCustomPackageID, sResultFolder);
 	auto& wordList = GameWordManager::getInstance()->GetWordList();
@@ -171,11 +176,15 @@ void AdvanceModeTargetNode::clickPlayAdvanceMode(Object* sender)
 		}
 	}
 
+	CCLOG("Start 3");
+
 	// start game
 	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(&timeModeConfig, true);	
 
 	auto scene = HelloWorld::createScene( _GMT_TIME_MODE_);
 	Director::getInstance()->replaceScene(scene);
+
+	CCLOG("Start 4");
 }
 
 void AdvanceModeTargetNode::clickClose(Object* sender)
@@ -190,7 +199,8 @@ void AdvanceModeTargetNode::clickClose(Object* sender)
 	}
 	else
 	{
-		this->getParent()->removeChild(this);
+		this->removeFromParentAndCleanup(true);
+		//this->getParent()->removeChild(this);
 	}
 }
 

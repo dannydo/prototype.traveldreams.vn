@@ -5,6 +5,8 @@
 #include "GameWordManager.h"
 #include "Database\UserTable.h"
 #include "Database\ChapterTable.h"
+#include "SoundManager.h"
+#include "FlashCardCollection.h"
 
 USING_NS_CC;
 
@@ -100,15 +102,38 @@ bool ReviseGameLayer::init()
 	this->addChild(m_pLabelClock, 1000);
 
 	m_bIsEndGame = false;
-	m_iSeconds = 5;
+	//m_iSeconds = 5;
+	m_fSeconds = 5.2f;
 	this->createLayout();
 
-	this->schedule(schedule_selector(ReviseGameLayer::updateSeconds), 1.0f);
+	//this->schedule(schedule_selector(ReviseGameLayer::updateSeconds), 1.0f);
+	this->scheduleUpdate();
+
+	srand(time(NULL));
 
 	return true;
 }
 
-void ReviseGameLayer::updateSeconds(float dt)
+void ReviseGameLayer::update(float delta)
+{
+	if (!m_bIsEndGame && m_fSeconds > 0)
+	{
+		m_fSeconds -= delta;
+		if (m_fSeconds < 0) 
+			m_fSeconds = 0;
+
+		char sSeconds[2];
+		sprintf(sSeconds, "%d", (int)m_fSeconds);
+		m_pLabelClock->setString(sSeconds);
+
+		if (m_fSeconds == 0)
+		{
+			addPopupEndGame();
+		}
+	}	
+}
+
+/*void ReviseGameLayer::updateSeconds(float dt)
 {
 	if (m_iSeconds > 0 && m_bIsEndGame == false)
 	{
@@ -127,7 +152,7 @@ void ReviseGameLayer::updateSeconds(float dt)
 		sprintf(sSeconds, "%d", m_iSeconds);
 		m_pLabelClock->setString(sSeconds);
 	}
-}
+} */
 
 void ReviseGameLayer::addPopupEndGame()
 {
@@ -197,6 +222,11 @@ void ReviseGameLayer::addPopupEndGame()
 	ButtonNode* pButtonPlay = ButtonNode::createButtonSprite(m_pButtonPlayImage, CC_CALLBACK_1(ReviseGameLayer::clickRetry, this));
 	pButtonPlay->setPosition(Point(320.0f, 410.0f));
 	pButtonManagerNode->addButtonNode(pButtonPlay);
+
+	Sprite* m_pButtonCloseImage = Sprite::create("AdvanceMode/btn_close.png");
+	ButtonNode* pButtonClose = ButtonNode::createButtonSprite(m_pButtonCloseImage, CC_CALLBACK_1(ReviseGameLayer::clickClose, this));
+	pButtonClose->setPosition(Point(580.0f, 898.0f));
+	pButtonManagerNode->addButtonNode(pButtonClose);
 }
 
 void ReviseGameLayer::clickRetry(Object* sender)
@@ -212,9 +242,16 @@ void ReviseGameLayer::clickRetry(Object* sender)
 	
 }
 
+void ReviseGameLayer::clickClose(Object* sender)
+{
+	Breadcrumb::getInstance()->getSceneModePopBack();
+	FlashCardCollectionScene* scene = FlashCardCollectionScene::create();
+	Director::getInstance()->replaceScene(scene);
+}
+
 void ReviseGameLayer::randownIndexWordCollected()
 {
-	srand(time(NULL));
+	//srand(time(NULL));
 	m_iIndexWordCollected = rand() % (m_WordsCollected.size());
 }
 
@@ -225,7 +262,7 @@ void ReviseGameLayer::randownIndexWords()
 		m_arrIndexWord.pop_back();
 	}
 
-	srand(time(NULL));
+	//srand(time(NULL));
 
 	while(1)
 	{
@@ -267,6 +304,9 @@ void ReviseGameLayer::createLayout()
 	m_MaintWordInfo = m_WordsCollected[m_iIndexWordCollected];
 	int iIndex = GameWordManager::getInstance()->GetLoadedWordIndexFromID(m_MaintWordInfo.sWordId);	
 	auto& wordMain = GameWordManager::getInstance()->GetWord(iIndex);
+
+	// spelling
+	SoundManager::PlaySpellingOfWord( this,wordMain, 0.2f, false);
 
 	m_pFlashCard = FlashCardNode::createLayout(wordMain);
 	m_pFlashCard->setVisibleContentFlashCard(false);
@@ -364,6 +404,9 @@ ButtonNode* ReviseGameLayer::createButtonPictureFlashcard(const WordInfo& wordIn
 
 void ReviseGameLayer::clickChoosePicture(Object* sender)
 {
+	if (m_bIsEndGame)
+		return;	
+
 	m_bIsEndGame = true;
 
 	ButtonNode* pButtonNode = (ButtonNode*)sender;
@@ -404,8 +447,10 @@ void ReviseGameLayer::playEffectWin()
 {
 	m_pLabelClock->setVisible(false);
 
-	auto actionFlashcardMoveLeft = MoveBy::create(0.2f, Point(-640.0f, 0.0f));
-	auto actionChooseImageMoveLeft = MoveBy::create(0.2f, Point(-640.0f, -70.0f));
+	Size winSize = Director::getInstance()->getWinSize();
+
+	auto actionFlashcardMoveLeft = MoveBy::create(0.2f, Point( winSize.width, 0)); //FadeOut::create(0.2f); //MoveBy::create(0.2f, Point(-640.0f, 0.0f));
+	auto actionChooseImageMoveLeft = FadeOut::create(0.2f); //MoveBy::create(0.2f, Point(-640.0f, -70.0f)); MoveBy::create(0.2f, Point( winSize.width, 0));
 
 	m_pFlashCard->runAction(actionFlashcardMoveLeft);
 	m_pChooseImageNode->runAction(actionChooseImageMoveLeft);
@@ -417,17 +462,28 @@ void ReviseGameLayer::playEffectAddLayout()
 	this->removeChild(m_pChooseImageNode);
 	this->createLayout();
 
-	m_pFlashCard->setScale(0);
+	/*m_pFlashCard->setScale(0);
 	m_pChooseImageNode->setScale(0);
 
 	auto actionFlashcardScaleOut = ScaleTo::create(0.2f, 0.8f);
-	auto actionChooseImageScaleOut = ScaleTo::create(0.2f, 1.0f);
+	auto actionChooseImageScaleOut = ScaleTo::create(0.2f, 1.0f);*/
+	Point flashCardPos = m_pFlashCard->getPosition();
+	Point chooseImagePos = m_pChooseImageNode->getPosition();
+
+	m_pFlashCard->setPosition( Point(  -flashCardPos.x, flashCardPos.y));
+	m_pChooseImageNode->setPosition( Point(  -chooseImagePos.x, chooseImagePos.y));
+
+	auto actionFlashcardScaleOut = MoveBy::create(0.2f, Point( flashCardPos.x*2.f, 0));
+	auto actionChooseImageScaleOut = MoveBy::create(0.2f, Point( chooseImagePos.x*2.f, 0));
 
 	m_pFlashCard->runAction(actionFlashcardScaleOut);
 	m_pChooseImageNode->runAction(actionChooseImageScaleOut);
+
+
+	m_fSeconds =5.6f;
 }
 
 void ReviseGameLayer::updateIsEndGame()
 {
-	m_bIsEndGame = false;
+	m_bIsEndGame = false;	
 }

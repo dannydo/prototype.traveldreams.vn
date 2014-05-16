@@ -78,8 +78,11 @@ void PackageService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *re
 	if (response)
 	{
 		if (response->isSucceed()) 
-		{
+		{			
 			std::vector<char> *buffer = response->getResponseData();
+			
+			if ( buffer->size() == 0)
+				return;
 			
 			for (unsigned int i = 0; i < buffer->size(); i++)
 			{

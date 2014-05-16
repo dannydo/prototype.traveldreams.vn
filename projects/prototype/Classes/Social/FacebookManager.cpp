@@ -177,7 +177,7 @@ void FacebookManager::inviteFriends(const char* message, const char* title, cons
 		PluginParam paramSuggestions(suggestions);
 		PluginParam paramData(data);
 		
-		_facebook->callFuncWithParam("requestDialog", &paramMessage,  &paramTitle,  &paramFilters, paramTo, paramSuggestions, paramData, NULL); 
+		_facebook->callFuncWithParam("requestDialog", &paramMessage,  &paramTitle,  &paramFilters, &paramTo, &paramSuggestions, &paramData, NULL); 
 	}
 }
 

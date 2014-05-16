@@ -33,9 +33,13 @@ private:
 	void playEffectLose();
 	void playEffectAddLayout();
 
-	void updateSeconds(float dt);
+	//void updateSeconds(float dt);
+	void update(float delta) override;
 	void addPopupEndGame();
+
 	void clickRetry(Object* sender);
+	void clickClose(Object* sender);
+
 	void updateIsEndGame();
 
 	ChapterInfo m_chapterInfo;
@@ -56,7 +60,8 @@ private:
 
 	std::vector<int> m_arrIndexWord;
 	cocos2d::LabelTTF* m_pLabelClock;
-	int m_iSeconds;
+	//int m_iSeconds;
+	float m_fSeconds;
 
 	cocos2d::LayerColor* m_pPopupEndGame;
 	bool m_bIsEndGame;
