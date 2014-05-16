@@ -237,6 +237,7 @@ public:
 
 	// extra info for storing letter	
 	int m_iGemLetterBlockID;
+	int m_iUnlockedLetterBlockID;//only used to check when shuffle, get from board view
 	//int m_iWordID;
 
 
@@ -250,6 +251,7 @@ public:
 		//m_eObstacleType = _OT_NONE_;
 		
 		m_iGemLetterBlockID = -1;
+		m_iUnlockedLetterBlockID = -1;
 	}
 
 	void Reset()

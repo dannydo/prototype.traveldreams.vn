@@ -8,6 +8,8 @@
 #include "GemLetterManager.h"
 #include "BonusQuestManager.h"
 
+struct CellView;
+
 enum ComboEffectType
 {
 	_CET_NONE_,
@@ -274,6 +276,7 @@ private:
 		int m_iGemID;
 	};
 public:
+	void CopyExistingLetterDataToBoardLogic(CellView boardViewMatrix[_BOARD_MAX_ROW_NUMBER_][_BOARD_MAX_COLUMN_NUMBER_]);
 	bool Shuffle(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells);
 
 	bool findHintForGame(); 

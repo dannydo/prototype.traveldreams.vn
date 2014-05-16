@@ -1801,6 +1801,7 @@ void HelloWorld::CheckHintAfterMove()
 {
 	if (!m_GameBoardManager.findHintForGame())	
 	{	
+		m_GameBoardManager.CopyExistingLetterDataToBoardLogic(m_BoardViewMatrix);
 		if	(m_GameBoardManager.Shuffle(m_ComputeMoveResult.m_OriginalMovedCells, m_ComputeMoveResult.m_TargetMovedCells))
 		{
 			m_eTouchMoveState = _TMS_NONE_;
@@ -1810,7 +1811,55 @@ void HelloWorld::CheckHintAfterMove()
 
 			//CCLOG("Shuffle");
 
-			MessageBox("Notice", "SHUFFLE!!!");
+			//MessageBox("Notice", "SHUFFLE!!!");
+			float fDelayTime = 0.3f;
+
+
+			// show no more move text
+			auto pTextSprite1 = Sprite::createWithSpriteFrameName("no-more-moves.png");
+			Size winSize = Director::getInstance()->getWinSize();
+
+			pTextSprite1->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+			pTextSprite1->setOpacity(0);
+			pTextSprite1->setScale(1.1f);
+			m_pTextEffectBatchNode->addChild(pTextSprite1);
+
+			pTextSprite1->runAction( 
+				Sequence::create(
+					DelayTime::create(fDelayTime),
+					Spawn::createWithTwoActions(
+						FadeIn::create( 0.2f),
+						MoveBy::create( 0.2f, Point( 0, 35.f))),
+					DelayTime::create(0.35f),
+					Spawn::createWithTwoActions(
+						FadeOut::create( 0.2f),
+						ScaleTo::create(0.2f, 1.25f)),
+					RemoveSelf::create(),
+					NULL));
+
+			// show shuffle text
+			fDelayTime += 0.7f;
+			auto pTextSprite2 = Sprite::createWithSpriteFrameName("shuffle-text.png");
+
+			pTextSprite2->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
+			pTextSprite2->setOpacity(0);
+			pTextSprite2->setScale(1.1f);
+			m_pTextEffectBatchNode->addChild(pTextSprite2);
+
+			pTextSprite2->runAction( 
+				Sequence::create(
+					DelayTime::create(fDelayTime),
+					Spawn::createWithTwoActions(
+						FadeIn::create( 0.2f),
+						MoveBy::create( 0.2f, Point( 0, 35.f))),
+					DelayTime::create(0.4f),
+					Spawn::createWithTwoActions(
+						FadeOut::create( 0.2f),
+						ScaleTo::create(0.2f, 1.25f)),
+					RemoveSelf::create(),
+					NULL));
+
+			fDelayTime += 0.7f;
 
 			auto& originalMovedCells = m_ComputeMoveResult.m_OriginalMovedCells;
 			auto& targetMovedCells = m_ComputeMoveResult.m_TargetMovedCells;
@@ -1831,7 +1880,7 @@ void HelloWorld::CheckHintAfterMove()
 				//m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->setPosition(pos);
 				m_BoardViewMatrix[originalMovedCells[i].m_iRow][originalMovedCells[i].m_iColumn].m_pSprite->runAction(
 					Sequence::create( 
-						DelayTime::create(0.3f), // + 0.01f * (targetMovedCells[i].m_iRow - originalMovedCells[i].m_iRow ),
+						DelayTime::create(fDelayTime), // + 0.01f * (targetMovedCells[i].m_iRow - originalMovedCells[i].m_iRow ),
 						
 						EaseOut::create( MoveTo::create( _TME_MOVE_CELL_TIME_, centerPos),			3.f ),
 						EaseOut::create( MoveTo::create( _TME_MOVE_CELL_TIME_, pos),			3.f ),
@@ -1867,7 +1916,7 @@ void HelloWorld::CheckHintAfterMove()
 				 m_pTimeCountDownNode->SetSuspendingState(true);
 
 			this->runAction( CCSequence::create(
-				CCDelayTime::create(1.2f),
+				CCDelayTime::create(fDelayTime + 1.f),
 				CCCallFunc::create( this, callfunc_selector( HelloWorld::CheckBoardStateAfterMove)),
 				NULL));		
 

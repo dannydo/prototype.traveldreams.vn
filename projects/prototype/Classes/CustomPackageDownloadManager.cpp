@@ -231,7 +231,7 @@ void CustomPackageDownloadManager::onProgress(int percent)
 		percent = 0;
 
 	char sText[30];
-	sprintf(sText, "Downloading %d", percent);
+	sprintf(sText, "Downloading %d%%", percent);
 	m_pNotificationPopup->UpdateTitle(sText);
 }
 

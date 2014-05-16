@@ -1,5 +1,6 @@
 #include "NewGameBoardManager.h"
 #include "cocos2d.h"
+#include "HelloWorldScene.h"
 
 #define _MIN_(a,b) ((a)<(b))?(a):(b)
 #define _MAX_(a,b) ((a)>(b))?(a):(b)
@@ -3947,7 +3948,8 @@ void NewGameBoardManager::DestroySingleCellByComboUtil(const int& iActivateCombo
 bool NewGameBoardManager::IsCellShufflable(const int& iRow, const int& iColumn)
 {
 	if (m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell || m_BoardValueMatrix[iRow][iColumn].m_eGemComboType != _GCT_NONE_ 
-		|| m_BoardValueMatrix[iRow][iColumn].m_iGemLetterBlockID >= 0)
+		|| m_BoardValueMatrix[iRow][iColumn].m_iGemLetterBlockID >= 0 || m_BoardValueMatrix[iRow][iColumn].m_iObstacleBlockID >= 0
+		|| m_BoardValueMatrix[iRow][iColumn].m_iUnlockedLetterBlockID >= 0)
 	{
 		return false;
 	}
@@ -3959,6 +3961,16 @@ bool NewGameBoardManager::IsColorCell(const int& iRow, const int& iColumn)
 	if (!m_BoardValueMatrix[iRow][iColumn].m_bIsBlankCell && m_BoardValueMatrix[iRow][iColumn].m_iGemID < _MAX_GEM_ID_)
 		return true;
 	return false;
+}
+
+void NewGameBoardManager::CopyExistingLetterDataToBoardLogic(CellView boardViewMatrix[_BOARD_MAX_ROW_NUMBER_][_BOARD_MAX_COLUMN_NUMBER_])
+{
+	int iRow, iColumn;
+	for(iRow=0; iRow< m_iRowNumber; iRow++)
+		for(iColumn=0; iColumn< m_iColumnNumber; iColumn++)
+		{
+			m_BoardValueMatrix[iRow][iColumn].m_iUnlockedLetterBlockID = boardViewMatrix[iRow][iColumn].m_iGemLetterBlockID;
+		}
 }
 
 bool NewGameBoardManager::Shuffle(std::vector<Cell>& originalMovedCells, std::vector<Cell>& targetMovedCells)

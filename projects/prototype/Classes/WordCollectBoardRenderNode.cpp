@@ -726,7 +726,23 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 			pContinueTip->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 110.f));
 			m_pColorNode->addChild(pContinueTip);
 		}
-	}		
+	}	
+
+	if (m_pColorNode->getChildrenCount() == 0)
+	{
+		m_pColorNode->removeFromParentAndCleanup(true);
+		m_pColorNode = NULL;
+
+		this->runAction( 
+			Sequence::createWithTwoActions(
+				DelayTime::create(0.1f),
+				CallFunc::create( this,  callfunc_selector(WordCollectBoardRenderNode::ManualCallStartGameCallback))));
+	}
+}
+
+void WordCollectBoardRenderNode::ManualCallStartGameCallback()
+{
+	m_StartGameCallback();
 }
 
 /*void WordCollectBoardRenderNode::UnlockCharacter(const float& fDelayTime, const int& iLetterIndex)

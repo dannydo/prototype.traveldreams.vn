@@ -51,6 +51,7 @@ public:
 private:
 	//void LoadWords();
 	//void GetWordIndex();
+	void ManualCallStartGameCallback();
 
 	virtual bool init();			
 
