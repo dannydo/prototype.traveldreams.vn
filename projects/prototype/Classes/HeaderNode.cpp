@@ -1,6 +1,7 @@
 #include "HeaderNode.h"
 #include "LifeSystemNode.h"
 #include "ButtonManagerNode.h"
+#include "PopupUnderContructionNode.h"
 
 USING_NS_CC;
 
@@ -76,12 +77,14 @@ bool HeaderNode::init()
 
 void HeaderNode::clickBuyGold(cocos2d::Object* sender)
 {
-
+	PopupUnderContructionNode* pPopup = PopupUnderContructionNode::createLayout();
+	this->addChild(pPopup);
 }
 
 void HeaderNode::clickMail(cocos2d::Object* sender)
 {
-
+	PopupUnderContructionNode* pPopup = PopupUnderContructionNode::createLayout();
+	this->addChild(pPopup);
 }
 
 void HeaderNode::updateLayoutMonney(const int& iMonney)

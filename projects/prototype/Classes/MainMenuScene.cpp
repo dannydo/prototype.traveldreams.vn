@@ -7,6 +7,8 @@
 #include "AdvanceModeMyPackagesScene.h"
 #include "EndGameCustomModeNode.h"
 #include "PopupConfirmNode.h"
+#include "Database\CSPackageTable.h"
+#include "AdvanceModePopularPackagesScene.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -117,7 +119,7 @@ void MainMenuLayer::addButtonLoginFacebook()
 {
 	Sprite* pButtonLoginFacebookSprite = Sprite::create("LoadingAndMainMenu/btn_login.png");
 	m_buttonLoginNode = ButtonNode::createButtonSprite(pButtonLoginFacebookSprite, CC_CALLBACK_1(MainMenuLayer::loginFacebook, this));
-	m_buttonLoginNode->setPosition(Point(320.0f, 297.0f));
+	m_buttonLoginNode->setPosition(Point(320.0f, 150.0f));
 	m_pButtonManagerNode->addButtonNode(m_buttonLoginNode);
 	m_isAddButtonLogin = false;
 }
@@ -285,8 +287,20 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 	}
 #endif
 
-	AdvanceModeMyPackagesScene* scene = AdvanceModeMyPackagesScene::create();
-	Director::getInstance()->replaceScene(scene);
+	std::vector<CSPackageInfo> csPackageInfos;
+	CSPackageTable::getAllCSPackages(csPackageInfos);
+	if (csPackageInfos.size())
+	{
+		AdvanceModeMyPackagesScene* scene = AdvanceModeMyPackagesScene::create();
+		Director::getInstance()->replaceScene(scene);
+	}
+	else
+	{
+		AdvanceModePopularPackagesScene* scene = AdvanceModePopularPackagesScene::create();
+		Director::getInstance()->replaceScene(scene);
+	}
+
+
 	
 	/*
 	CustomPackageDownloaderNode* pNode = CustomPackageDownloaderNode::create();

@@ -52,7 +52,7 @@ bool ConfirmQuitLevelNode::init()
 	pLabelTitle->setPosition(Point(320.0f, 745.0f));
 	this->addChild(pLabelTitle);
 
-	LabelBMFont *pLabelDecription = LabelBMFont::create("You will lose a life!?", "fonts/font-small-green-alert.fnt");
+	LabelBMFont *pLabelDecription = LabelBMFont::create("You will lose a life!", "fonts/font-small-green-alert.fnt");
 	pLabelDecription->setAnchorPoint(Point(0.5f, 0.5f));
 	pLabelDecription->setPosition(Point(320.0f, 505.0f));
 	this->addChild(pLabelDecription);

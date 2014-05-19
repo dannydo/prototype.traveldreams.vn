@@ -145,8 +145,9 @@ void LeaderBoardAdvanceModeNode::addItemToSlide(const int& iStage, const char* s
 	avatar->setPosition(Point(56.0f, 65.0f));
 	pNodeItem->addChild(avatar);
 
-	LabelBMFont *pLabelName = LabelBMFont::create(sName, "fonts/font-small-green-alert.fnt");
-	pLabelName->setScale(0.80f);
+	LabelTTF *pLabelName = LabelTTF::create(sName, "Arial", 20.0f);
+	pLabelName->setColor(ccc3(0.0f, 0.0f, 0.0f));
+	//pLabelName->setScale(0.80f);
 	pLabelName->setAnchorPoint(Point(0.0f, 0.5f));
 	pLabelName->setPosition(Point(26.0f, 17.0f));
 	pNodeItem->addChild(pLabelName);

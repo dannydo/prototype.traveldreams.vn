@@ -52,7 +52,6 @@ private:
 	ScrollManager* m_pScrollManager;
 	ButtonManagerNode* m_pButtonManagerNode;
 
-	bool m_bIsSwipe;
 	int m_iConnectServer;
 };
 

@@ -84,7 +84,7 @@ bool AdvanceModePopularPackagesLayer::init()
 
 
 
-	LabelTTF* pLabelDescription = LabelTTF::create("Build your own vocab from vs.kiss-concept.com", "Arial", 20);
+	LabelTTF* pLabelDescription = LabelTTF::create("Build your own vocab from http://petzzlegame.com", "Arial", 20);
 	pLabelDescription->setColor(ccc3(255.0f, 255.0f, 255.0f));
 	pLabelDescription->setPosition(Point(320.0f, 700.0f));
 	this->addChild(pLabelDescription);
@@ -99,7 +99,6 @@ bool AdvanceModePopularPackagesLayer::init()
 	this->addChild(m_pBackgroundSlideShow);
 
 	m_pFooterNode = FooterNode::create();
-	m_pFooterNode->changeStatusButtonFlashcard(StatusButtonFlashcard::eNoClick);
 	m_pFooterNode->removeBackground();
 	m_pFooterNode->removeButtonFlashcard();
 	this->addChild(m_pFooterNode);

@@ -46,6 +46,8 @@ public class UserFacebook implements InterfaceUser {
 	private boolean mNeedPublishPermissions = false;
 	private static SessionStatusCallback mStatusCallback = null;
 	
+	public boolean isRequestPermission;
+	
 	private static final List<String> allPublishPermissions = Arrays.asList(
 			"publish_actions", "publish_stream", "ads_management",
 			"create_event", "rsvp_event", "manage_friendlists",
@@ -142,6 +144,7 @@ public class UserFacebook implements InterfaceUser {
 	            	LogD("Set active session");
             	}
             	Session.setActiveSession(session);
+            	isRequestPermission = false;
             	
             	if (session.isOpened()) {
             		if (scope != "" || session.getPermissions().containsAll(Arrays.asList(permissions))) {
@@ -166,17 +169,8 @@ public class UserFacebook implements InterfaceUser {
             		
             		if (!session.isClosed()) {
             			OpenRequest openRequest = new Session.OpenRequest(mContext);
-            			if (permissions != null) {
-            				openRequest.setPermissions(Arrays.asList(permissions));
-            			}
             			openRequest.setCallback(mStatusCallback);
-            			
-            			if (mNeedPublishPermissions) {
-            				session.openForPublish(openRequest);
-            			}
-            			else {
-            				session.openForRead(openRequest);
-            			}
+            			session.openForRead(openRequest);
             		}
             		else {
             			Session.openActiveSession(mContext, true, mStatusCallback);
@@ -185,6 +179,46 @@ public class UserFacebook implements InterfaceUser {
             }
         });
 	}
+
+public void requestPermissions() {
+	LogD("Request Permissions");
+	
+	if (mContext == null) {
+		LogD("mContext null");
+		UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Activity/context hasn't been initialized");
+		return;
+	}
+	
+	 PluginWrapper.runOnMainThread(new Runnable() {
+        @Override
+        public void run() {
+        	Session session = Session.getActiveSession();
+        	if (session == null) {
+            	session = new Session.Builder(mContext).setApplicationId(appId).build();
+            	LogD("Set active session");
+        	}
+        	Session.setActiveSession(session);
+        	
+        	if (session.isOpened()) {
+    			mStatusCallback.mCallByMode = SessionStatusCallback.CallByLogin;
+				mStatusCallback.mCallbackIndex = 1;
+				if (mNeedPublishPermissions) {
+					session.requestNewPublishPermissions(new Session.NewPermissionsRequest(
+							mContext, Arrays.asList(permissions)));
+				} else {
+					session.requestNewReadPermissions(new Session.NewPermissionsRequest(
+							mContext, Arrays.asList(permissions)));
+				}
+				isRequestPermission = true;
+        	}
+        	else
+        	{
+        		UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Session not open!");
+        	}
+        }
+    });
+}
+
 
 	@Override
 	public void logout() {
@@ -223,6 +257,7 @@ public class UserFacebook implements InterfaceUser {
 	public void autoOpenActiveSession() {
 		//TODO Auto-generated method stub
 		LogD("Login By Token");
+		isRequestPermission = true;
 		
 		if (mContext == null) {
 			LogD("mContext null");
@@ -530,7 +565,7 @@ public class UserFacebook implements InterfaceUser {
 		static final int CallByNull = 0;
 		static final int CallByLogin = 1;
 		static final int CallByLogout = 2;
-		
+				
 		int mCallbackIndex = -1;
 		String params = null;
 		int mCallByMode = CallByNull;
@@ -541,8 +576,14 @@ public class UserFacebook implements InterfaceUser {
 			switch (mCallByMode) {
 			case CallByLogin:
 				if (session.isOpened()) {
-            		LogD("User login succeed");
-        			UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_SUCCEED, "User login succeed");
+					if (facebook.isRequestPermission == true) {
+	        			LogD("User login succeed");
+	        			UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_SUCCEED, "User login succeed");
+	        		}
+					else
+					{
+						facebook.requestPermissions();
+					}
         		}
         		else if(session.getState() != SessionState.OPENING) {
         			LogD("User login failed");

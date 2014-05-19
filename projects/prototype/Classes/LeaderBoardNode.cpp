@@ -6,6 +6,7 @@
 #include "LoadingImageNode.h"
 #include "GameConfigManager.h"
 #include "FunctionCommon.h"
+#include "PopupUnderContructionNode.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -87,8 +88,6 @@ bool LeaderBoardtNode::init()
 	UserService::getInstance()->getLeaderBoardLevel(m_sChapterId ,m_iLevel, m_iConnectServer);
 	*/
 
-	m_bIsSwipe = false;
-
 	return true;
 }
 
@@ -114,8 +113,9 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 	pLabelScore->setScale(0.8);
 	pNodeItem->addChild(pLabelScore);
 
-	LabelBMFont *pLabelName = LabelBMFont::create(sName, "fonts/font-small-green-alert.fnt");
-	pLabelName->setScale(0.85f);
+	LabelTTF *pLabelName = LabelTTF::create(sName, "Arial", 20.0f);
+	pLabelName->setColor(ccc3(0.0f, 0.0f, 0.0f));
+	//pLabelName->setScale(0.85f);
 	pLabelName->setAnchorPoint(Point(0.0f, 0.5f));
 	pLabelName->setPosition(Point(57.0f, 45.0f));
 	pNodeItem->addChild(pLabelName);
@@ -144,7 +144,8 @@ void LeaderBoardtNode::addItemToSlide(const int& iScore, const char* sName, cons
 
 void LeaderBoardtNode::clickAskLife(cocos2d::Object* sender)
 {
-
+	PopupUnderContructionNode* pPopup = PopupUnderContructionNode::createLayout();
+	this->getParent()->addChild(pPopup);
 }
 
 void LeaderBoardtNode::clickInviteFriends(Object* pSender)
@@ -158,12 +159,6 @@ void LeaderBoardtNode::clickInviteFriends(Object* pSender)
 
 bool LeaderBoardtNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)
 {
-	if(m_bIsSwipe)
-	{
-		return false;
-	}
-	m_bIsSwipe = true;
-
 	if (m_iLeaderBoardCount > 3)
 	{
 		Point touchPosition = pTouch->getLocation();
@@ -244,8 +239,6 @@ void LeaderBoardtNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
 		m_pSlideShow->stopAllActions();
 		m_pSlideShow->runAction(Sequence::create(actionEaseOut, NULL));
 	}
-
-	m_bIsSwipe = false;
 }
 
 void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey)
