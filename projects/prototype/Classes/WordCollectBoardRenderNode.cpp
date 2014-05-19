@@ -229,8 +229,8 @@ void WordCollectBoardRenderNode::PlayTimeModeWordStart(int iTimeModeStage)
 
 
 	// play sound
-	//SoundManager::PlaySoundEffect(_SET_LETS_FIND_);		
-	//SoundManager::PlaySpellingOfWord( this, *m_pMainWord, 2.f, false);
+	SoundManager::PlaySoundEffect(_SET_LETS_FIND_);		
+	SoundManager::PlaySpellingOfWord( this, *m_pMainWord, 2.f, false);
 }
 
 void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, int iStageIndex)
@@ -669,7 +669,7 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 			pFrame->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
 
 			auto pAnimSprite = Sprite::createWithSpriteFrameName("tut6_anim_1.png");
-			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f - 20.f));
+			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f + 40.f));
 			auto pAnimation = AnimationCache::getInstance()->getAnimation("Tutorial6");
 			pAnimSprite->runAction(	Animate::create(pAnimation));
 
