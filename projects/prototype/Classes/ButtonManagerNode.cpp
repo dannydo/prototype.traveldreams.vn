@@ -81,7 +81,7 @@ bool ButtonManagerNode::onTouchButtonBegan(Touch* pTouch,  Event* pEvent)
 void ButtonManagerNode::onTouchButtonMoved(Touch* pTouch,  Event* pEvent)
 {
 	Point touchPosition = pTouch->getLocation();
-	if (fabsf(m_pointClickBegin.x - touchPosition.x) > 30 || fabsf(m_pointClickBegin.y - touchPosition.y) > 30)
+	if (fabsf(m_pointClickBegin.x - touchPosition.x) > 50 || fabsf(m_pointClickBegin.y - touchPosition.y) > 50)
 	{
 		m_bIsInTapMode = false;
 		m_isFinishProcessButton = true;
