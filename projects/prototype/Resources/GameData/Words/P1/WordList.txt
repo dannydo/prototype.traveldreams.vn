@@ -22,7 +22,7 @@ Chalk_Vi
 1.02
 Chalk.png
 /tʃɔ:k/
-Chalk is all over teacher's face.
+Chalk is all over the teacher's face.
 Chalk_FS_En_Male
 2.76
 -1
@@ -78,7 +78,7 @@ Pen_Vi
 0.9
 Pen.png
 /pen/
-He dropped his pen in the toilets.
+He dropped his pen in the toilet.
 Pen_FS_En_Male
 2.18
 -1
@@ -358,7 +358,7 @@ FryingPan_Vi
 1.04
 FryingPan.png
 /fraɪɪŋ pæn/
-My mother hitted the thief with a frying pan.
+My mother hit the thief with a frying pan.
 FryingPan_FS_En_Male
 2.97
 -1

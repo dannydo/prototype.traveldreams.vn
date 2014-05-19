@@ -130,7 +130,7 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 	if (bNeedCheckPackageVersion)
 	{
 		//CCLOG("Update 1");
-		bool bCanUpdatePackage = false; //m_CustomPackageDownloadManager.CheckUpdateOfPackage(this, m_csPackageInfo.sPackageCode);// false; //
+		bool bCanUpdatePackage = false; //m_CustomPackageDownloadManager.CheckUpdateOfPackage(this, m_csPackageInfo.sPackageCode, m_csPackageInfo.sPackageId);// false; //= false; //
 		if (bCanUpdatePackage)
 		{
 			Size winSize = Director::getInstance()->getWinSize();

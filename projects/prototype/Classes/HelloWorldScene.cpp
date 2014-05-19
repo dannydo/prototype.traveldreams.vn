@@ -3139,12 +3139,17 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	
 	//m_GameBoardManager.GetGameWordManager()->GenerateNewLetters( newCells.size(), outputLettersForGems, bIsNewMove);		
 
+	float fExtraDelayForNewDrop = 0;
+
 	for(int iGemIndex=0; iGemIndex < newCells.size(); iGemIndex++)
 	{
 		//iLetter = (unsigned char)outputLettersForGems[iGemIndex];
 		cell = newCells[iGemIndex];
 
 		fPercentChange = ( iNumberOfRow - cell.m_iRow) * 1.f / iNumberOfRow;
+
+		if (fExtraDelayForNewDrop < 0.03f* (m_GameBoardManager.GetRowNumber() - cell.m_iRow) + _TME_MOVE_CELL_TIME_ * 2)
+			fExtraDelayForNewDrop = 0.03f* (m_GameBoardManager.GetRowNumber() - cell.m_iRow) + _TME_MOVE_CELL_TIME_ * 2;
 
 		for(int i=0; i< 2; i++)
 		{					
@@ -3225,6 +3230,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			m_GameBoardManager.CheckAndActivateBonusWordQuest(bonusWordCellList);
 
 			fTotalDestroyCellTime += _TME_MOVE_CELL_TIME_ * 1.4f + 0.3f;
+			fExtraDelayForNewDrop -= _TME_MOVE_CELL_TIME_ * 1.4f;
 			GemLetterData data;
 			Sprite* pSprite;
 
@@ -3305,9 +3311,14 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 			m_GameBoardManager.DecreaseMove();		
 			m_GameBoardManager.GetGameWordManager()->UpdateParamForNewMove();
 		}
-	
+		
+		if (fExtraDelayForNewDrop> _TME_MOVE_CELL_TIME_*2 + 0.1f)
+			fTotalDestroyCellTime = fTotalDestroyCellTime + _TME_MOVE_CELL_TIME_*2 + 0.1f;
+		else
+			fTotalDestroyCellTime = fTotalDestroyCellTime + fExtraDelayForNewDrop;
+
 		this->runAction( CCSequence::create(
-						CCDelayTime::create(fTotalDestroyCellTime + _TME_MOVE_CELL_TIME_*2 + 0.1f),
+						CCDelayTime::create(fTotalDestroyCellTime),
 						CCCallFunc::create( this, callfunc_selector( HelloWorld::CheckBoardStateAfterMove)),
 						NULL));		
 	}

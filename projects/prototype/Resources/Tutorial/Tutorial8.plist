@@ -20,54 +20,54 @@
             <key>tut8_anim_1.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,413},{298,54}}</string>
+                <string>{{2,413},{306,53}}</string>
                 <key>offset</key>
-                <string>{-4,93}</string>
+                <string>{0,91}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{11,3},{298,54}}</string>
+                <string>{{70,87},{306,53}}</string>
                 <key>sourceSize</key>
-                <string>{328,246}</string>
+                <string>{446,409}</string>
             </dict>
             <key>tut8_anim_2.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{450,236},{308,232}}</string>
+                <string>{{450,235},{312,231}}</string>
                 <key>offset</key>
-                <string>{-9,4}</string>
+                <string>{-3,2}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{1,3},{308,232}}</string>
+                <string>{{64,87},{312,231}}</string>
                 <key>sourceSize</key>
-                <string>{328,246}</string>
+                <string>{446,409}</string>
             </dict>
             <key>tut8_anim_3.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{766,2},{308,232}}</string>
+                <string>{{766,2},{312,231}}</string>
                 <key>offset</key>
-                <string>{-9,4}</string>
+                <string>{-3,2}</string>
                 <key>rotated</key>
                 <true/>
                 <key>sourceColorRect</key>
-                <string>{{1,3},{308,232}}</string>
+                <string>{{64,87},{312,231}}</string>
                 <key>sourceSize</key>
-                <string>{328,246}</string>
+                <string>{446,409}</string>
             </dict>
             <key>tut8_anim_4.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{450,2},{314,232}}</string>
+                <string>{{450,2},{314,231}}</string>
                 <key>offset</key>
-                <string>{-7,4}</string>
+                <string>{-3,2}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,3},{314,232}}</string>
+                <string>{{63,87},{314,231}}</string>
                 <key>sourceSize</key>
-                <string>{328,246}</string>
+                <string>{446,409}</string>
             </dict>
         </dict>
         <key>metadata</key>
@@ -77,9 +77,9 @@
             <key>realTextureFileName</key>
             <string>Tutorial8.pvr.ccz</string>
             <key>size</key>
-            <string>{1000,470}</string>
+            <string>{999,468}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:cc6ca635f575a5d37b09d5d8123fef0f:055df3d1e62c58f0eba5732187d0a0bf:4baf6be60edf4a6cd852c5862927f0ca$</string>
+            <string>$TexturePacker:SmartUpdate:d539d4f54dbc034dcf59ffe2035894e6:0a4e06aa5231bfbb4e9e286d67ad1d51:4baf6be60edf4a6cd852c5862927f0ca$</string>
             <key>textureFileName</key>
             <string>Tutorial8.pvr.ccz</string>
         </dict>

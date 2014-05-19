@@ -127,7 +127,7 @@ bool LevelTable::updateLevel(const LevelInfo& levelInfo)
 
 	WordInfo wordInfo;
 	wordInfo.sWordId = levelInfo.sWordId;
-	wordInfo.sChapterId = wordInfo.sChapterId;
+	wordInfo.sChapterId = levelInfo.sChapterId;
 	wordInfo.iCountCollected = 1;
 	wordInfo.iMapChapterWordId = 0;
 	wordInfo.bIsCollected = 0;

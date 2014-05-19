@@ -96,6 +96,9 @@ bool ChapterTable::updateChapter(ChapterInfo chapterInfo)
 		}
 	}
 
+	if (iIndex >= m_Chapters.size())
+		return false;
+
 	if (chapterInfo.iStageRevise < m_Chapters[iIndex].iStageRevise)
 		chapterInfo.iStageRevise = m_Chapters[iIndex].iStageRevise;
 

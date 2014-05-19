@@ -22,7 +22,7 @@ public:
 
 	void GetPackageInfoFromServer(CSPackageInfo& package);
 
-	bool CheckUpdateOfPackage(Node* pParentNode, const std::string& sPackageCode);
+	bool CheckUpdateOfPackage(Node* pParentNode, const std::string& sPackageCode, const std::string& sPackageID);
 private:
 	// assets manager callback
 	virtual void onError(cocos2d::extension::AssetsManager::ErrorCode errorCode);

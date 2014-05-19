@@ -56,8 +56,8 @@ void CustomPackageDownloadManager::StartDownloadPackage(Node* pParentNode, const
 	string sDownloadUrl;
 	sprintf(sFolderUrl, "%s/folder/%s",sBaseUrl, sCode);
 
-	std::string sFolderName;
-	if (checkAndGetResultFolderName( string(sFolderUrl), m_sResultFolder) && m_sResultFolder.size()!=0)
+	std::string sTemp, sFolderName;
+	if (checkAndGetResultFolderName( string(sFolderUrl), sTemp) && sTemp.size()!=0)
 	{	
 		m_sCode = sCode;
 		m_pParentNode = pParentNode;
@@ -70,7 +70,7 @@ void CustomPackageDownloadManager::StartDownloadPackage(Node* pParentNode, const
 		sDownloadUrl = m_sResultFolder.substr(iSpaceIndex+1, m_sResultFolder.size() - iSpaceIndex -1);
 		m_sResultFolder = m_sResultFolder.substr(0, iSpaceIndex);*/
 
-		std::stringstream ss(m_sResultFolder);
+		std::stringstream ss(sTemp);
 		std::istream_iterator<std::string> begin(ss);
 		std::istream_iterator<std::string> end;
 		std::vector<std::string> splitList(begin, end);
@@ -109,8 +109,21 @@ void CustomPackageDownloadManager::StartDownloadPackage(Node* pParentNode, const
 	}
 }
 
-bool CustomPackageDownloadManager::CheckUpdateOfPackage(Node* pParentNode, const std::string& sPackageCode)
+bool CustomPackageDownloadManager::CheckUpdateOfPackage(Node* pParentNode, const std::string& sPackageCode, const std::string& sPackageID)
 {
+	string sLocalVersion  = UserDefault::getInstance()->getStringForKey(sPackageCode.c_str());
+
+	char sVersionUrl[256];
+	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
+	sprintf(sVersionUrl, "%s/version/%s",sBaseUrl, sPackageCode.c_str());
+
+	string sServerVersion;
+	if (checkAndGetResultFolderName( string(sVersionUrl), sServerVersion))
+		if (sServerVersion == sLocalVersion)
+			return false;
+	return true;
+
+	/*
 	//m_pParentNode = NULL; //not need save parent node this case
 
 	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
@@ -145,7 +158,7 @@ bool CustomPackageDownloadManager::CheckUpdateOfPackage(Node* pParentNode, const
 
 		return bResult;
 	}
-	return false;
+	return false;*/
 }
 
 // assets manager callback
@@ -182,6 +195,12 @@ void CustomPackageDownloadManager::onError(cocos2d::extension::AssetsManager::Er
 			SavePackageListToFile();
 		}*/
 
+		// track version manually by code
+		if ( m_pAssetManager != NULL)
+		{
+			UserDefault::getInstance()->setStringForKey(m_sCode.c_str(), m_pAssetManager->getVersion().c_str());
+		}
+
 		if (m_DownloadPackageCompleteCallback != nullptr)
 		{
 			CSPackageInfo packageInfo = CSPackageTable::getCSPackageInfo(m_sResultFolder);
@@ -194,7 +213,7 @@ void CustomPackageDownloadManager::onError(cocos2d::extension::AssetsManager::Er
 				CSPackageTable::updateCSPackage(packageInfo);
 			}
 			m_DownloadPackageCompleteCallback(packageInfo);
-		}
+		}		
 
 		//startCustomGame();
     }
@@ -243,6 +262,12 @@ void CustomPackageDownloadManager::onSuccess()
 		m_pNotificationPopup = NULL;
 	}
 
+	// track version manually by code
+	if ( m_pAssetManager != NULL)
+	{
+		UserDefault::getInstance()->setStringForKey(m_sCode.c_str(), m_pAssetManager->getVersion().c_str());
+	}
+
 
 	m_bIsDownloadingPackage = false;
 	//m_pProgressLabel->setString("download completed!");
@@ -285,7 +310,7 @@ void CustomPackageDownloadManager::onSuccess()
 		CSPackageTable::updateCSPackage(packageInfo);
 
 		m_DownloadPackageCompleteCallback(packageInfo);
-	}
+	}	
 }
 
 void CustomPackageDownloadManager::GetPackageInfoFromServer(CSPackageInfo& package)
