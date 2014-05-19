@@ -119,6 +119,12 @@ bool CustomPackageDownloadManager::CheckUpdateOfPackage(Node* pParentNode, const
 
 	string sServerVersion;
 	if (checkAndGetResultFolderName( string(sVersionUrl), sServerVersion))
+	{
+	}
+
+	return false;
+
+
 		if (sServerVersion == sLocalVersion)
 			return false;
 	return true;

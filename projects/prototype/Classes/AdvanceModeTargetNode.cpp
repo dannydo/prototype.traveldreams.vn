@@ -6,6 +6,7 @@
 #include "AdvanceModeMyPackagesScene.h"
 
 USING_NS_CC;
+USING_NS_CC_EXT;
 
 AdvanceModeTargetNode* AdvanceModeTargetNode::createLayout(const std::string sPackageId, bool bNeedCheckPackageVersion)
 {
@@ -110,18 +111,18 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 	pLabelNumberStage->setScale(1.2);
 	this->addChild(pLabelNumberStage);
 
-	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
-	this->addChild(pButtonManagerNode);
+	m_pButtonManagerNode = ButtonManagerNode::create();
+	this->addChild(m_pButtonManagerNode);
 
 	Sprite* m_pButtonPlayImage = Sprite::create("AdvanceMode/btn_big_play.png");
 	ButtonNode* pButtonPlay = ButtonNode::createButtonSprite(m_pButtonPlayImage, CC_CALLBACK_1(AdvanceModeTargetNode::clickPlayAdvanceMode, this));
 	pButtonPlay->setPosition(Point(320.0f, 320.0f));
-	pButtonManagerNode->addButtonNode(pButtonPlay);
+	m_pButtonManagerNode->addButtonNode(pButtonPlay);
 
 	Sprite* m_pButtonCloseImage = Sprite::create("AdvanceMode/btn_close.png");
 	ButtonNode* pButtonClose = ButtonNode::createButtonSprite(m_pButtonCloseImage, CC_CALLBACK_1(AdvanceModeTargetNode::clickClose, this));
 	pButtonClose->setPosition(Point(580.0f, 898.0f));
-	pButtonManagerNode->addButtonNode(pButtonClose);
+	m_pButtonManagerNode->addButtonNode(pButtonClose);
 
 	LeaderBoardAdvanceModeNode* pLeaderBoard = LeaderBoardAdvanceModeNode::createLayout(m_sPackageId);
 	pLeaderBoard->setPosition(Point(320.0f, 114.0f));
@@ -129,24 +130,57 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 
 	if (bNeedCheckPackageVersion)
 	{
-		//CCLOG("Update 1");
-		bool bCanUpdatePackage = false; //m_CustomPackageDownloadManager.CheckUpdateOfPackage(this, m_csPackageInfo.sPackageCode, m_csPackageInfo.sPackageId);// false; //= false; //
-		if (bCanUpdatePackage)
-		{
-			Size winSize = Director::getInstance()->getWinSize();
+		m_pRequest = NULL;
+		m_pClient = HttpClient::getInstance();	
 
-			Sprite* m_pUpdateImage = Sprite::create("AdvanceMode/update-label.png");			
-			m_pUpdateImage->setAnchorPoint(Point(0,0));
-			ButtonNode* pButtonUpdate = ButtonNode::createButtonSprite(m_pUpdateImage, CC_CALLBACK_1(AdvanceModeTargetNode::clickUpdatePackage, this));			
-			pButtonUpdate->setPosition(Point(0, winSize.height - m_pUpdateImage->getContentSize().height));
-			pButtonManagerNode->addButtonNode(pButtonUpdate);
-		}
-		//CCLOG("Update 2");*/
+		char sInfoUrl[256];
+		const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
+		sprintf(sInfoUrl, "%s/version/%s",sBaseUrl, m_csPackageInfo.sPackageCode.c_str());
+
+		m_pRequest = new HttpRequest();
+		m_pRequest->setUrl(sInfoUrl);
+		m_pRequest->setRequestType(HttpRequest::Type::GET);
+
+		m_pRequest->setResponseCallback(this, httpresponse_selector(AdvanceModeTargetNode::onHttpRequestCompleted));
+		m_pClient->send(m_pRequest);
+		m_pRequest->release();
+		m_pRequest = NULL;		
 	}
 	m_isBacktoMyPackage = false;
 
 	return true;
 }		
+
+void AdvanceModeTargetNode::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)
+{
+	string sLocalVersion  = UserDefault::getInstance()->getStringForKey(m_csPackageInfo.sPackageCode.c_str());
+
+	if (response)
+	{
+		if (response->isSucceed()) 
+		{			
+			std::vector<char> *buffer = response->getResponseData();
+			
+			if ( buffer->size() == 0)
+				return;
+
+			string strData(buffer->begin(), buffer->end());	
+			
+			if (strData != sLocalVersion)
+			{
+				//CCLOG("Update 1");				
+				Size winSize = Director::getInstance()->getWinSize();
+
+				Sprite* m_pUpdateImage = Sprite::create("AdvanceMode/update-label.png");			
+				m_pUpdateImage->setAnchorPoint(Point(0,0));
+				ButtonNode* pButtonUpdate = ButtonNode::createButtonSprite(m_pUpdateImage, CC_CALLBACK_1(AdvanceModeTargetNode::clickUpdatePackage, this));			
+				pButtonUpdate->setPosition(Point(0, winSize.height - m_pUpdateImage->getContentSize().height));
+				m_pButtonManagerNode->addButtonNode(pButtonUpdate);				
+				//CCLOG("Update 2");*/
+			}
+		}
+	}	
+}
 
 void AdvanceModeTargetNode::clickPlayAdvanceMode(Object* sender)
 {	
