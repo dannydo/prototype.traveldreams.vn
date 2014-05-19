@@ -131,7 +131,7 @@ void UserService::onCheckUserFacebookCompleted(HttpClient *sender, HttpResponse 
 		}
 	}
 
-	//CCLOG("%s", strData.getCString());
+	//MessageBox(strData.getCString(), "Error");
 	SystemEventHandle::getInstance()->onCheckUserFacebookResult(this->parseStringToJson(strData.getCString()), sKey);
 	
 }

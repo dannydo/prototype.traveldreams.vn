@@ -187,6 +187,7 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 					userInfo.ulLifeTimeBeginRemain = getTimeLocalCurrent();
 
 					Director::getInstance()->getRunningScene()->removeChildByTag(1000);
+					
 					if (sKey == "NOT_MAPPED_NO_FB_AND_FB_LINK_OTHER_USER")
 					{
 						// User have not account facebook and account login facebook has link other user
@@ -263,8 +264,20 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 							UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
 						}
 					}
+					else
+					{
+						// Show popup error
+						// MessageBox("Login", "Check user facebook error!");
+						Director::getInstance()->getRunningScene()->removeChildByTag(1000);
+					}
+
+					return;
 				}
 			}
 		}
 	}
+
+	// Show popup error
+	// MessageBox("Login", "Check user facebook error!");
+	Director::getInstance()->getRunningScene()->removeChildByTag(1000);
 }

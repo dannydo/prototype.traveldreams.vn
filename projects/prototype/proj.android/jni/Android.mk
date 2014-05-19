@@ -84,6 +84,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/AdvanceModeTargetNode.cpp \
 				   ../../Classes/ReviseGameScene.cpp \
 				   ../../Classes/PopupUnderContructionNode.cpp \
+				   ../../Classes/PopupThanksNode.cpp \
 				   ../../Classes/HelloWorldScene.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes \
