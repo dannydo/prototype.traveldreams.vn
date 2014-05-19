@@ -70,7 +70,7 @@ bool FlashCardNode::init()
 
 	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 		pLabelWordMean->setPosition(Point(320.0f, 410.0f));
-		pLabelWordPhonetic->setPosition(Point(320.0f, 690.0f));
+	//	pLabelWordPhonetic->setPosition(Point(320.0f, 690.0f));
 	#endif
 
 	return true;
