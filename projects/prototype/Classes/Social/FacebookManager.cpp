@@ -82,7 +82,7 @@ void FacebookManager::loadPlugin()
 		if (NULL != _facebook)
 		{
 			TUserDeveloperInfo pFacebookInfo;
-			pFacebookInfo["FacebookAppId"] = "440402379424810";
+			pFacebookInfo["FacebookAppId"] = "674930442556432";
 			pFacebookInfo["FacebookScope"] = "publish_actions";
 			if (pFacebookInfo.empty()) {
 				char msg[256] = { 0 };
