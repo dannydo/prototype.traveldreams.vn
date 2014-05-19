@@ -108,18 +108,43 @@ void FooterNode::changeStatusButtonFlashcard(StatusButtonFlashcard statusButtonF
 {
 	m_pButtonManagerNode->removeButtonNode(m_pButtonFlashCardNode);
 
-	Sprite* pFlashCardSprite = Sprite::create("Footer/btn_flashcard.png");
+	Sprite* pFlashCardSprite = Sprite::create("Footer/flashcard_button.png");
+	int iWordNew = WordTable::getInstance()->getNumberWordNew();
+	if (iWordNew > 0)
+	{
+		Sprite* pIconNotiy = Sprite::create("Footer/noitify_msg.png");
+		pIconNotiy->setPosition(Point(95.0f, 110.0f));
+
+		char sNumberNew[10];
+		sprintf(sNumberNew, "%d", iWordNew);
+		LabelTTF* pLabelNumber = LabelTTF::create(sNumberNew, "Arial", 25);
+		pLabelNumber->setColor(ccc3(255.0f, 255.0f, 255.0f));
+		pLabelNumber->setPosition(Point(22.0f, 20.0f));
+		pIconNotiy->addChild(pLabelNumber);
+		pFlashCardSprite->addChild(pIconNotiy);
+	}
+
+	int iTotalFlashCard = WordTable::getInstance()->getNumberWordCollected();
+	char sTotalFlashCard[10];
+	sprintf(sTotalFlashCard, "%d", iTotalFlashCard);
+	LabelTTF* pLabelTotalFlashWord = LabelTTF::create(sTotalFlashCard, "Arial", 30);
+	pLabelTotalFlashWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
+	pLabelTotalFlashWord->setPosition(Point(61.0f, 50.0f));
+	pFlashCardSprite->addChild(pLabelTotalFlashWord);
+
 	switch (statusButtonFlashcard)
 	{
 		case StatusButtonFlashcard::eNoClick :
 		{
-			pFlashCardSprite->setPosition(Point(609.0f, 33.0f));
+			pFlashCardSprite->setPosition(Point(593.0f, 48.0f));
+			pFlashCardSprite->setScale(0.8f);
 			this->addChild(pFlashCardSprite);
 			break;
 		}
 		case StatusButtonFlashcard::eClickShowFlashcardCollection:
 		{
 			m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
+			m_pButtonFlashCardNode->setPosition(Point(583.0f, 58.0f));
 			m_pButtonFlashCardNode->setPosition(Point(609.0f, 33.0f));
 			m_pButtonManagerNode->addButtonNode(m_pButtonFlashCardNode);
 			break;
@@ -127,6 +152,7 @@ void FooterNode::changeStatusButtonFlashcard(StatusButtonFlashcard statusButtonF
 		default:
 		{
 			m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
+			m_pButtonFlashCardNode->setPosition(Point(583.0f, 58.0f));
 			m_pButtonFlashCardNode->setPosition(Point(609.0f, 33.0f));
 			m_pButtonManagerNode->addButtonNode(m_pButtonFlashCardNode);
 			break;

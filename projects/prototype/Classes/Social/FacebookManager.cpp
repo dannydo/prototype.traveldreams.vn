@@ -83,7 +83,7 @@ void FacebookManager::loadPlugin()
 		{
 			TUserDeveloperInfo pFacebookInfo;
 			pFacebookInfo["FacebookAppId"] = "440402379424810";
-			pFacebookInfo["FacebookScope"] = "publish_actions,publish_stream";
+			pFacebookInfo["FacebookScope"] = "publish_actions";
 			if (pFacebookInfo.empty()) {
 				char msg[256] = { 0 };
 				sprintf(msg, "Developer info is empty. PLZ fill your Facebook info in %s(nearby line %d)", __FILE__, __LINE__);

@@ -133,7 +133,7 @@ bool SettingMenuNode::init()
 
 			Sprite* pBackSprite = Sprite::create("PanelSetting/btn_back.png");
 			ButtonNode* pButtonBack = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
-			pButtonBack->setPosition(Point(252.5f, 278.0f));
+			pButtonBack->setPosition(Point(252.5f, 386.0f));
 			m_pButtonManagerNode->addButtonNode(pButtonBack);
 
 			break;
@@ -150,7 +150,7 @@ bool SettingMenuNode::init()
 
 				Sprite* pQuitLevelSprite = Sprite::create("PanelSetting/btn_quitlevel.png");
 				ButtonNode* pButtonQuitLevel = ButtonNode::createButtonSprite(pQuitLevelSprite, CC_CALLBACK_1(SettingMenuNode::clickQuitLevel, this));
-				pButtonQuitLevel->setPosition(Point(252.5f, 278.0f));
+				pButtonQuitLevel->setPosition(Point(252.5f, 386.0f));
 				m_pButtonManagerNode->addButtonNode(pButtonQuitLevel);
 			}
 			else
@@ -162,17 +162,20 @@ bool SettingMenuNode::init()
 
 				Sprite* pBackSprite = Sprite::create("PanelSetting/btn_back.png");
 				ButtonNode* pButtonBack = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
-				pButtonBack->setPosition(Point(252.5f, 278.0f));
+				//pButtonBack->setPosition(Point(252.5f, 278.0f));
+				pButtonBack->setPosition(Point(252.5f, 386.0f));
 				m_pButtonManagerNode->addButtonNode(pButtonBack);
 			}
 			break;
 		}
 	}
 	
+	/*
 	Sprite* pTutorialSprite = Sprite::create("PanelSetting/tutorial.png");
 	ButtonNode* pButtonTutorial = ButtonNode::createButtonSprite(pTutorialSprite, CC_CALLBACK_1(SettingMenuNode::clickTutorial, this));
 	pButtonTutorial->setPosition(Point(252.5f, 386.0f));
 	m_pButtonManagerNode->addButtonNode(pButtonTutorial);
+	*/
 
 	m_iShowSetting = false;
 	m_isClick = false;

@@ -45,7 +45,7 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,
 	// extra layer for score/stars...	
 	boardLayer->m_pStatusLayer = StatusLayer::create();
 	if (eGameModeType == _GMT_TIME_MODE_)
-		boardLayer->m_pStatusLayer->hiddenLayoutMove();
+		boardLayer->m_pStatusLayer->setVisible(false);
 	boardLayer->m_pStatusLayer->setScale(0.88f);
 	boardLayer->m_pStatusLayer->setCurrentScore(0);
 	boardLayer->m_pStatusLayer->setCurrentMove(0);
@@ -1986,9 +1986,16 @@ void HelloWorld::ShowFailGamePopup()
 	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
 	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
 
+	/*
 	OutOfMovesNode* pOutOfMoveNode = OutOfMovesNode::createLayout( m_GameBoardManager.GetCurrentScore(), 
 				mainWord, iCurrentLevel, sCurrentChapterID);
 	m_pHUDLayer->addChild( pOutOfMoveNode, 100);
+	*/
+
+	Breadcrumb::getInstance()->getSceneModePopBack();
+	LevelMapScene* pLevelMap =  LevelMapScene::create();
+	pLevelMap->getLayer()->showPopupEndGameLose(m_GameBoardManager.GetCurrentScore(), mainWord, iCurrentLevel, sCurrentChapterID);
+	Director::getInstance()->replaceScene(pLevelMap);
 
 	//SoundManager::PlaySoundEffect(_SET_FAIL_);
 	UserTable::getInstance()->updateLife(1);

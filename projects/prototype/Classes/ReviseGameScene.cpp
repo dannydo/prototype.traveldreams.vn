@@ -83,7 +83,6 @@ bool ReviseGameLayer::init()
 	m_ChapterWords = WordTable::getInstance()->getAllWordsForChapter(m_chapterInfo.sChapterId);
 	
 	FooterNode* pFooterNode = FooterNode::create();
-	pFooterNode->changeStatusButtonFlashcard(StatusButtonFlashcard::eNoClick);
 	pFooterNode->removeBackground();
 	pFooterNode->removeButtonFlashcard();
 	this->addChild(pFooterNode);
@@ -319,7 +318,7 @@ void ReviseGameLayer::createLayout()
 	m_pChooseImageNode = Node::create();
 	this->addChild(m_pChooseImageNode);
 
-	LabelBMFont *pLabelTitle = LabelBMFont::create("CHOOSE RIGHT PICTURE", "fonts/font_score.fnt");
+	LabelBMFont *pLabelTitle = LabelBMFont::create("MATCH IT!", "fonts/font_score.fnt");
 	pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
 	pLabelTitle->setPosition(Point(330.0f, 467.0f));
 	m_pChooseImageNode->addChild(pLabelTitle);

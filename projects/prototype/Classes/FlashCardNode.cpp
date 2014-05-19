@@ -61,10 +61,12 @@ bool FlashCardNode::init()
 	pLabelWord->setPosition(Point(320.0f, 740.0f));
 	this->addChild(pLabelWord);
 
+	/*
 	LabelTTF* pLabelWordPhonetic = LabelTTF::create(m_pWord->m_sPhonetic.c_str(), "Arial", 28.0f);
 	pLabelWordPhonetic->setColor(ccc3(0.0f, 0.0f, 0.0f));
 	pLabelWordPhonetic->setPosition(Point(320.0f, 675.0f));
 	this->addChild(pLabelWordPhonetic);
+	*/
 
 	#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 		pLabelWordMean->setPosition(Point(320.0f, 410.0f));

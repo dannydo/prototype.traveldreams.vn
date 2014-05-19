@@ -989,9 +989,9 @@ bool WordCollectBoardRenderNode::onTouchBegan(Touch *pTouch, Event *pEvent)
 			Size winSize = Director::getInstance()->getWinSize();
 
 			// show dictionary
-			DictionaryNode* pDictionary = DictionaryNode::createLayout(GameWordManager::getInstance()->GetMainWord().m_sWord);
-			pDictionary->setPosition(Point(320.0f, 680.0f));
-			this->getParent()->addChild(pDictionary, 20);
+			//DictionaryNode* pDictionary = DictionaryNode::createLayout(GameWordManager::getInstance()->GetMainWord().m_sWord);
+			//pDictionary->setPosition(Point(320.0f, 680.0f));
+			//this->getParent()->addChild(pDictionary, 20);
 		}
 		else
 		{

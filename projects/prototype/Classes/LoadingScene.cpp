@@ -59,10 +59,12 @@ bool LoadingLayer::init()
 	pBackgroundSprite->setPosition(Point(320.0f, 480.0f));
 	this->addChild(pBackgroundSprite);
 
+	/*
 	Sprite* pLoadingSprite = Sprite::create("LoadingAndMainMenu/loading-text.png");
 	pLoadingSprite->setAnchorPoint(Point(0.5f, 0.5f));
 	pLoadingSprite->setPosition(Point(320.0f, 660.0f));
 	this->addChild(pLoadingSprite);
+	*/
 
 	m_bFinishLoad = false;
 	this->scheduleUpdate();

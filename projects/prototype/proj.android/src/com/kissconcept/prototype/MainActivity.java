@@ -15,6 +15,7 @@ import android.content.pm.Signature;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.WindowManager;
 
 public class MainActivity extends NativeActivity {
 
@@ -37,6 +38,8 @@ public class MainActivity extends NativeActivity {
 	    } catch (NoSuchAlgorithmException e) {
 
 	    }
+		
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
 	
 	@Override

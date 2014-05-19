@@ -71,13 +71,12 @@ bool AdvanceModeMyPackagesLayer::init()
 	pButtonAddMorePackage->setPosition(Point(320.0f, 175.0f));
 	pButtonManagerNode->addButtonNode(pButtonAddMorePackage);
 
-	LabelTTF* pLabelDescription = LabelTTF::create("Build your own vocab from vs.kiss-concept.com", "Arial", 20);
+	LabelTTF* pLabelDescription = LabelTTF::create("Build your own vocab from http://petzzlegame.com", "Arial", 20);
 	pLabelDescription->setColor(ccc3(179.0f, 190.0f, 196.0f));
 	pLabelDescription->setPosition(Point(320.0f, 120.0f));
 	this->addChild(pLabelDescription);
 
 	m_pFooterNode = FooterNode::create();
-	m_pFooterNode->changeStatusButtonFlashcard(StatusButtonFlashcard::eNoClick);
 	m_pFooterNode->removeBackground();
 	m_pFooterNode->removeButtonFlashcard();
 	this->addChild(m_pFooterNode);

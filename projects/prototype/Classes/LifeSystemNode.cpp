@@ -2,6 +2,7 @@
 #include "ButtonManagerNode.h"
 #include "GetMoreLifeNode.h"
 #include "FunctionCommon.h"
+#include "PopupUnderContructionNode.h"
 
 USING_NS_CC;
 
@@ -59,9 +60,13 @@ bool LifeSystemNode::init()
 
 void LifeSystemNode::clickGetLife(cocos2d::Object* sender)
 {
+	/*
 	GetMoreLifeNode* pGetMoreLife = GetMoreLifeNode::create();
 	pGetMoreLife->setGetMoreLifeType(GetMoreLifeType::eClosePopup);
 	this->getParent()->addChild(pGetMoreLife);
+	*/
+	PopupUnderContructionNode* pPopup = PopupUnderContructionNode::createLayout();
+	this->getParent()->addChild(pPopup);
 }
 
 void LifeSystemNode::updateWhenTimeChange(float dt)
