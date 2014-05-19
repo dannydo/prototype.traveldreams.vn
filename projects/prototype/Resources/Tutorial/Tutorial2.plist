@@ -7,20 +7,20 @@
             <key>tut2_Frame.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,2},{446,429}}</string>
+                <string>{{2,2},{444,427}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{446,429}}</string>
+                <string>{{1,1},{444,427}}</string>
                 <key>sourceSize</key>
                 <string>{446,429}</string>
             </dict>
             <key>tut2_anim_1.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{746,2},{72,251}}</string>
+                <string>{{744,2},{72,251}}</string>
                 <key>offset</key>
                 <string>{-105,5}</string>
                 <key>rotated</key>
@@ -33,7 +33,7 @@
             <key>tut2_anim_2.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{450,255},{166,251}}</string>
+                <string>{{448,255},{166,251}}</string>
                 <key>offset</key>
                 <string>{-59,5}</string>
                 <key>rotated</key>
@@ -46,7 +46,7 @@
             <key>tut2_anim_3.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{450,2},{294,251}}</string>
+                <string>{{448,2},{294,251}}</string>
                 <key>offset</key>
                 <string>{5,5}</string>
                 <key>rotated</key>
@@ -64,9 +64,9 @@
             <key>realTextureFileName</key>
             <string>Tutorial2.pvr.ccz</string>
             <key>size</key>
-            <string>{820,433}</string>
+            <string>{818,431}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:288b11d402dc54885eee5cf803beb389:3a2503ceaf981cafc2a43696a2e3444b:0d3c587da38b1f238f103438ebbb61f0$</string>
+            <string>$TexturePacker:SmartUpdate:8a49f4c10a3dfe8ed8142ff3ffb78e67:7736754baf9d4be87f6097bde13f43c1:0d3c587da38b1f238f103438ebbb61f0$</string>
             <key>textureFileName</key>
             <string>Tutorial2.pvr.ccz</string>
         </dict>
