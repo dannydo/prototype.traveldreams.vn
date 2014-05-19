@@ -227,6 +227,10 @@ void WordCollectBoardRenderNode::PlayTimeModeWordStart(int iTimeModeStage)
 		CallFunc::create( m_StartGameCallback),
 		NULL));
 
+
+	// play sound
+	//SoundManager::PlaySoundEffect(_SET_LETS_FIND_);		
+	//SoundManager::PlaySpellingOfWord( this, *m_pMainWord, 2.f, false);
 }
 
 void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, int iStageIndex)
