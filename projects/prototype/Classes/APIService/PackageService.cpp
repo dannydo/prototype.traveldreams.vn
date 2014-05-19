@@ -17,8 +17,9 @@ void PackageService::releaseInstance()
 		m_pRequest->release();
 	m_pRequest = NULL;
 
-	if (m_pClient != NULL)
-		m_pClient->release();
+	// note: should note release singleton directly!!!!
+	//if (m_pClient != NULL)
+	//	m_pClient->release();
 	m_pClient = NULL;
 
 	if (m_TrackingService == NULL)
@@ -37,8 +38,9 @@ PackageService* PackageService::getInstance()
 
 PackageService::PackageService()
 {
-	m_pRequest = new HttpRequest();
-	m_pClient = HttpClient::getInstance();
+	//m_pRequest = new HttpRequest();
+	m_pRequest = NULL;
+	m_pClient = HttpClient::getInstance();	
 }
 
 PackageService::~PackageService()
@@ -89,15 +91,14 @@ void PackageService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *re
 				strData.appendWithFormat("%c", (*buffer)[i]);
 			}
 
+			if (m_callBack != NULL)
+			{
+				cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
+				pJsonDict->initWithDescription(strData.getCString());
+				m_callBack->resultHttpRequestCompleted(pJsonDict, sKey);
+			}
 		}
-	}
-
-	if (m_callBack != NULL)
-	{
-		cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
-		pJsonDict->initWithDescription(strData.getCString());
-		m_callBack->resultHttpRequestCompleted(pJsonDict, sKey);
-	}
+	}	
 }
 
 void PackageService::setInterfaceServiceCallBack(InterfaceService* callBack)

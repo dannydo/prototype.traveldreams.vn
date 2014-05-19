@@ -266,11 +266,20 @@ void CustomPackageDownloadManager::onSuccess()
 	//startCustomGame();
 
 	if (m_DownloadPackageCompleteCallback != nullptr)
-	{
-		CSPackageInfo packageInfo;
-		packageInfo.sPackageId = m_sResultFolder;
-		packageInfo.sPackageCode = m_sCode;		
-		GetPackageInfoFromServer(packageInfo);		
+	{		
+		CSPackageInfo packageInfo = CSPackageTable::getCSPackageInfo(m_sResultFolder);
+
+		CSPackageInfo packageInfoFromServer;
+		packageInfoFromServer.sPackageId = m_sResultFolder;
+		packageInfoFromServer.sPackageCode = m_sCode;		
+		GetPackageInfoFromServer(packageInfoFromServer);
+
+		if (packageInfo.sPackageId.size() == 0) //new package
+		{			
+			packageInfo = packageInfoFromServer;
+		}
+		else //just update
+			packageInfo.iTotalWord = packageInfoFromServer.iTotalWord;
 
 		// save info to db
 		CSPackageTable::updateCSPackage(packageInfo);

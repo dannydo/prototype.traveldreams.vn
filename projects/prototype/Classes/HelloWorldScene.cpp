@@ -1245,11 +1245,9 @@ void HelloWorld::onTouchMoved(Touch *pTouch, Event *pEvent)
 }
 
 void HelloWorld::update(float fDeltaTime)
-{
+{		
 	if (m_bIsCellDragPlaying)
-	{
-		//CCLOG("update-draging");
-
+	{		
 		if (m_ePlayingDragEffect == _TMS_MOVE_HORIZONTAL_)
 		{
 			//CCLOG("%f", m_pTempSpriteForAction->getPositionX());
@@ -1731,6 +1729,8 @@ void HelloWorld::OnEndDragEffect()
 
 void HelloWorld::CheckBoardStateAfterMove()
 {
+	CCLOG("Check board after move");
+
 	// clean old list of chain
 	m_GameBoardManager.GetObstacleProcessManager()->CleanWaitingClearList();
 
@@ -1799,6 +1799,7 @@ void HelloWorld::CheckBoardStateAfterMove()
 // if this called when user move row/column can cause error/lag???
 void HelloWorld::CheckHintAfterMove()
 {
+	CCLOG("Check hint");
 	if (!m_GameBoardManager.findHintForGame())	
 	{	
 		m_GameBoardManager.CopyExistingLetterDataToBoardLogic(m_BoardViewMatrix);
@@ -1923,10 +1924,10 @@ void HelloWorld::CheckHintAfterMove()
 			//CCLOG("End shuffle");
 		}		
 		else
-			MessageBox("Notice", "Sorry, game is over!!!");
-
-		
+			MessageBox("Notice", "Sorry, game is over!!!");		
 	}
+
+	CCLOG("End check hint");
 }
 
 void HelloWorld::ExecuteBonusWinGameEffect()
@@ -2730,7 +2731,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 	// increase score by basic matching
 	//m_GameBoardManager.IncreaseScoreForDestroyCells( iTotalDestroyCell, _CET_BASIC_MATCHING_);
 
-	//CCLOG("Before combo chain");
+	CCLOG("Before combo chain");
 
 	// play combo chain	
 	float fCurrentDelayComboChain;
@@ -2861,7 +2862,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		delete pComboEffect;
 	}	
 
-	//CCLOG("Before check bonus quest");
+	CCLOG("Before check bonus quest");
 
 	// check logic on bonus quest
 	if (!m_bIsEndGamePhase)
@@ -2987,7 +2988,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		}
 	}	
 
-	//CCLOG("Before create combo cells");
+	CCLOG("Before create combo cells");
 
 	// create new combo cells, this is right after basic matching cells are destroyed
 	for(auto cell: newComboCells)
@@ -3130,7 +3131,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		fDelayTime = fDelayTime;
 	}
 
-	//CCLOG("Create new gems");
+	CCLOG("Create new gems");
 
 	//std::vector<unsigned char> outputLettersForGems;
 	NewCellInfo cell;
@@ -3209,7 +3210,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		}		
 	}
 	//delete afterMoveEffectAction;
-
+		
+	CCLOG("Before check word bonus quest");
 
 	// last check: activation of collect word bonus quest
 	if (!bIsBonusEndGamePhase)
@@ -3286,6 +3288,7 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 		
 	}
 
+	CCLOG("Before run actions");
 
 	if (bIsBonusEndGamePhase)
 	{
@@ -3309,6 +3312,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 						NULL));		
 	}
 
+	CCLOG("Before update obstacle list");
+
 	// update display of score/move 
 	if (m_eGameModeType == _GMT_NORMAL_)
 	{
@@ -3320,6 +3325,8 @@ void HelloWorld::PlayEffect2( const bool& bIsBonusEndGamePhase,  std::vector<Com
 
 	// ************** check obstacle
 	UpdateObstacleListAfterMove();
+
+	CCLOG("End");
 }
 
 void HelloWorld::PlayEarnScoreEffect(const int& iScore,  const Cell& cell, const float& fDelay)
@@ -3655,6 +3662,8 @@ void HelloWorld::ActivateImageEffect(Node* pSender)
 
 void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, const float& fDelay, const float fEffectDuration, bool bPlaySeparateEffect)
 {	
+	CCLOG("Begin basic destroy");
+
 	// NOTE: following code to hot fix error cause by cells destroy by double combo and other effect!!!
 	if (m_BoardViewMatrix[iRow][iColumn].m_pSprite == NULL)
 	{
@@ -3736,6 +3745,8 @@ void HelloWorld::BasicDestroyCellUlti(const int& iRow, const int & iColumn, cons
 	m_BoardViewMatrix[iRow][iColumn].m_pSprite = NULL;
 	m_BoardViewMatrix[iRow][iColumn].m_iGemLetterBlockID = -1;
 	m_BoardViewMirrorMatrix[iRow][iColumn].m_pSprite = NULL;	
+
+	CCLOG("End basic destroy");
 }
 
 void HelloWorld::PlaySplashLightDestroyEffectOnCell(const int& iRow, const int & iColumn, const float& fDelayTime, const float& fEffectDuration)
@@ -5089,6 +5100,7 @@ void HelloWorld::CheckEndGameAtEndChain()
 {
 	//m_bIsEffectPlaying = false;
 
+	CCLOG("Start CheckEndGameAtEndChain"); 
 	if (m_bIsEndGamePhase)
 	{
 		if (m_eGameModeType == _GMT_NORMAL_)		//ShowWinGamePopup();
@@ -5144,6 +5156,7 @@ void HelloWorld::CheckEndGameAtEndChain()
 			}
 			else //time mode
 			{
+				CCLOG("Start OnTimeMode_StageComplete");
 				/*if (m_pTimeCountDownNode != NULL)
 				{
 					//already out of time before!!!!
@@ -5153,6 +5166,8 @@ void HelloWorld::CheckEndGameAtEndChain()
 					OnTimeMode_StageComplete();	
 				}*/
 				OnTimeMode_StageComplete();
+
+				CCLOG("End OnTimeMode_StageComplete");
 			}
 		}
 		else //word is not unlocked yet
@@ -5169,37 +5184,35 @@ void HelloWorld::CheckEndGameAtEndChain()
 			{
 				if (m_pTimeCountDownNode != NULL)
 				{
+					CCLOG("Start OnTimeMode_OutOfTime");
+
 					//already out of time before!!!!
 					if (!m_pTimeCountDownNode->IsEnergyEmpty())
 						return;
 
-					OnTimeMode_OutOfTime();				
+					OnTimeMode_OutOfTime();		
+
+					CCLOG("End OnTimeMode_OutOfTime");
 				}
 			}
 		}
 	}
+
+	CCLOG("End CheckEndGameAtEndChain"); 
 }
 
 void HelloWorld::OnTimeMode_OutOfTime()
-{
+{			
+	CCLOG("Start OnTimeMode_OutOfTime");
+
 	if (m_bIsEndGamePhase)
 		return;
 
 	m_bIsEndGamePhase = true;
-	//m_bIsEndGamePhase = true;
-	
+	//m_bIsEndGamePhase = true;	
+
 	float fFailCollectWordEffectTime = m_pWordCollectBoardRenderNode->PlayTimeMode_UnlockWordFailEffect();
-
-	/*auto label = LabelTTF::create("OUT OF TIME!", "fonts/UTM Cookies.ttf", 70);		
-	label->setColor(Color3B( 200, 30, 30));
-	label->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));
-	label->disableStroke();
-	this->addChild(label, 2000);
-
-	label->runAction( 
-		Sequence::createWithTwoActions(
-			DelayTime::create(3.f),
-			Hide::create()));*/
+	
 	auto pTextSprite = Sprite::createWithSpriteFrameName("Time_Out.png");
 	m_pTextEffectBatchNode->addChild(pTextSprite);
 	pTextSprite->setPosition( Point( Director::getInstance()->getWinSize().width /2.f, 470));	
@@ -5214,19 +5227,24 @@ void HelloWorld::OnTimeMode_OutOfTime()
 
 
 	//label->setScale( 0.7f);	
+	CCLOG("OnTimeMode_OutOfTime");
 
 	this->runAction( CCSequence::create(
 		DelayTime::create(fFailCollectWordEffectTime + 3.f),
 		CallFunc::create( this, callfunc_selector( HelloWorld::ShowTimeModeResultPopup)),
 		NULL));	
+
+	CCLOG("End OnTimeMode_OutOfTime");
 }
 
 //#include "MainMenuScene.h"
 #include "EndGameCustomModeNode.h"
-#include "APIService\SyncDataGame.h"
+#include "APIService\SyncDataGame.h"				
 
 void HelloWorld::ShowTimeModeResultPopup()
-{	
+{		
+	CCLOG("Start ShowTimeModeResultPopup");
+
 	auto timeModeConfig = (TimeModeLevelConfig*)m_GameBoardManager.GetLevelConfig();
 	//MainMenuScene* pMainMenu = MainMenuScene::create();
 	//Director::getInstance()->replaceScene(pMainMenu);
@@ -5242,6 +5260,8 @@ void HelloWorld::ShowTimeModeResultPopup()
 	// write tracking data		
 	auto startTime = GameWordManager::getInstance()->GetStartTimeOfNewGameSession();
 	TrackingTable::getInstance()->trackingPlayAdvanceMode( startTime, timeModeConfig->m_sCustomPackageID, m_iCurrentTimeModeStage, GameWordManager::getInstance()->GetTimeModeTrackingList());		
+
+	CCLOG("End ShowTimeModeResultPopup");
 }
 
 void HelloWorld::OnTimeMode_StageComplete()

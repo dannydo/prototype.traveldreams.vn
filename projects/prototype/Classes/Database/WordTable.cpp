@@ -281,7 +281,7 @@ bool WordTable::insertWord(const WordInfo& wordInfo)
 	if(iResult != SQLITE_OK)
 		return false;
 
-	ChapterInfo chapterInfo = ChapterTable::getInstance()->getChapterInfo(wordInfo.sChapterId);
+	ChapterInfo chapterInfo = ChapterTable::getInstance()->getChapterInfo(wordInfo.sChapterId.c_str());
 	chapterInfo.iTotalFlashCard++;
 	ChapterTable::getInstance()->updateChapter(chapterInfo);
 

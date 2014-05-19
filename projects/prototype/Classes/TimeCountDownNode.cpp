@@ -104,19 +104,21 @@ void TimeCountDownNode::init(int iStageIndex, int iMaximumEnergy, int iEnergyLos
 }
 
 void TimeCountDownNode::update(float fDeltaTime)
-{
+{	
+	//CCLOG("Start TimeCountDownNode update");
+		
 	if (!m_bIsStarted || m_bIsPaused)
 		return;
-
+	
 	if (m_fCurrentEnergy <=0 )
-		return;
+		return;	
 
 	if (m_fStoredEnergyIncrement > 0)
 	{
 		if (m_fIncrementTimeRemain <= 0)
 			m_fIncrementTimeRemain = fDeltaTime;
 
-		float fDeltaIncrement = fDeltaTime/m_fIncrementTimeRemain * m_fStoredEnergyIncrement;
+		float fDeltaIncrement = fDeltaTime/m_fIncrementTimeRemain * m_fStoredEnergyIncrement ;
 		if (fDeltaIncrement >= m_fStoredEnergyIncrement)
 			fDeltaIncrement = m_fStoredEnergyIncrement;
 
@@ -175,10 +177,15 @@ void TimeCountDownNode::update(float fDeltaTime)
 	//m_pMidEnergyBar->setScaleX( fEnergyWidth / m_pMidEnergyBar->getContentSize().width);
 	//m_pRightEnergyBar->setPositionX( m_pMidEnergyBar->getPositionX() + m_pMidEnergyBar->getContentSize().width* m_pMidEnergyBar->getScaleX());
 
+	//CCLOG("TimeCountDownNode update %f", m_fCurrentEnergy);
+
 	if (m_fCurrentEnergy == 0)
 	{
+		//this->removeFromParentAndCleanup(true);
 		m_OutOfTimeCallback();
 	}
+
+	//CCLOG("End TimeCountDownNode update");
 }
 
 void TimeCountDownNode::draw()

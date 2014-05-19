@@ -23,9 +23,10 @@
 #include "Database\PowerUpTable.h"
 #include "Database\TrackingTable.h"
 #include "Database\WordTable.h"
-
+#include "cocos-ext.h"	
 
 USING_NS_CC;
+USING_NS_CC_EXT;
 
 AppDelegate::AppDelegate() {
 
@@ -50,6 +51,8 @@ AppDelegate::~AppDelegate()
 	SyncDataGame::releaseInstance();
 	TrackingService::releaseInstance();
 	PackageService::releaseInstance();
+
+	HttpClient::destroyInstance();
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	//FacebookManager::getInstance()->unloadPlugin();

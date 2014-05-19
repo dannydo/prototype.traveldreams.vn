@@ -728,16 +728,17 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 		}
 	}	
 
-	if (m_pColorNode->getChildrenCount() == 0)
-	{
-		m_pColorNode->removeFromParentAndCleanup(true);
-		m_pColorNode = NULL;
+	if (m_pColorNode != NULL)		
+		if (m_pColorNode->getChildrenCount() == 0)
+		{
+			m_pColorNode->removeFromParentAndCleanup(true);
+			m_pColorNode = NULL;
 
-		this->runAction( 
-			Sequence::createWithTwoActions(
-				DelayTime::create(0.1f),
-				CallFunc::create( this,  callfunc_selector(WordCollectBoardRenderNode::ManualCallStartGameCallback))));
-	}
+			this->runAction( 
+				Sequence::createWithTwoActions(
+					DelayTime::create(0.1f),
+					CallFunc::create( this,  callfunc_selector(WordCollectBoardRenderNode::ManualCallStartGameCallback))));
+		}
 }
 
 void WordCollectBoardRenderNode::ManualCallStartGameCallback()

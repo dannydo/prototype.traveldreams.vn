@@ -28,8 +28,9 @@ void SyncDataGame::releaseInstance()
 		m_pRequest->release();
 	m_pRequest = NULL;
 
-	if (m_pClient != NULL)
-		m_pClient->release();
+	// note: should note release singleton directly!!!!
+	//if (m_pClient != NULL)
+		//m_pClient->release();
 	m_pClient = NULL;
 
 	if (m_SyncDataGame == NULL)
@@ -47,7 +48,7 @@ SyncDataGame* SyncDataGame::getInstance()
 
 SyncDataGame::SyncDataGame()
 {
-	m_pRequest = new HttpRequest();
+	m_pRequest = NULL;// new HttpRequest();
 	m_pClient = HttpClient::getInstance();
 	m_bIsFinishSync = true;
 }

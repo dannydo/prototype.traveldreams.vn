@@ -129,8 +129,8 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 
 	if (bNeedCheckPackageVersion)
 	{
-		CCLOG("Update 1");
-		bool bCanUpdatePackage = m_CustomPackageDownloadManager.CheckUpdateOfPackage(this, m_csPackageInfo.sPackageCode);
+		//CCLOG("Update 1");
+		bool bCanUpdatePackage = false; //m_CustomPackageDownloadManager.CheckUpdateOfPackage(this, m_csPackageInfo.sPackageCode);// false; //
 		if (bCanUpdatePackage)
 		{
 			Size winSize = Director::getInstance()->getWinSize();
@@ -141,7 +141,7 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 			pButtonUpdate->setPosition(Point(0, winSize.height - m_pUpdateImage->getContentSize().height));
 			pButtonManagerNode->addButtonNode(pButtonUpdate);
 		}
-		CCLOG("Update 2");
+		//CCLOG("Update 2");*/
 	}
 	m_isBacktoMyPackage = false;
 

@@ -1,6 +1,7 @@
 #include "EndGameCustomModeNode.h"
 #include "HelloWorldScene.h"
 #include "LeaderBoardAdvanceModeNode.h"
+#include "AdvanceModeMyPackagesScene.h"
 
 USING_NS_CC;
 
@@ -141,7 +142,10 @@ void EndGameCustomModeNode::clickRetry(Object* sender)
 
 void EndGameCustomModeNode::clickClose(Object* sender)
 {
-	
+	Breadcrumb::getInstance()->resetSceneNodeToMainMenu();
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
+	AdvanceModeMyPackagesScene* scene = AdvanceModeMyPackagesScene::create();
+	Director::getInstance()->replaceScene(scene);
 }
 
 /*

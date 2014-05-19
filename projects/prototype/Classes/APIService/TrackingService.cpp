@@ -17,8 +17,9 @@ void TrackingService::releaseInstance()
 		m_pRequest->release();
 	m_pRequest = NULL;
 
-	if (m_pClient != NULL)
-		m_pClient->release();
+	// note: should note release singleton directly!!!!
+	//if (m_pClient != NULL)
+		//m_pClient->release();
 	m_pClient = NULL;
 
 	if (m_TrackingService == NULL)
@@ -36,7 +37,8 @@ TrackingService* TrackingService::getInstance()
 
 TrackingService::TrackingService()
 {
-	m_pRequest = new HttpRequest();
+	//m_pRequest = new HttpRequest();
+	m_pRequest = NULL;
 	m_pClient = HttpClient::getInstance();
 	m_bIsFinishTracking = true;
 }
@@ -47,13 +49,13 @@ TrackingService::~TrackingService()
 }
 
 void TrackingService::pushTrackingToServer()
-{
+{			
 	if (m_bIsFinishTracking)
 	{
 		// Load data from database
 		std::string sJsonData = TrackingTable::getInstance()->genrateJsonTrackingPushToServer();
 		
-		CCLOG("Tracking %s", sJsonData.c_str());
+		//CCLOG("Tracking %s", sJsonData.c_str());	  //can cause crash
 		//CCLOG("%d", sJsonData.length());
 	
 		// Post data to server
@@ -75,7 +77,7 @@ void TrackingService::pushTrackingToServer()
 }
 
 void TrackingService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)
-{
+{	
 	std::string sKey = "";
 	String strData = "";
 	sKey.append(response->getHttpRequest()->getTag());
@@ -95,7 +97,7 @@ void TrackingService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *r
 
 			cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
 			pJsonDict->initWithDescription(strData.getCString());
-			CCLOG("Tracking %s", strData.getCString());
+			//CCLOG("Tracking %s", strData.getCString()); //can cause crash
 			cs::JsonDictionary *pJsonData = pJsonDict->getSubDictionary("data");
 			if(pJsonData != NULL)
 			{

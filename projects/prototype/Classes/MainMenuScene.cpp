@@ -237,9 +237,45 @@ void MainMenuLayer::openSettingMenu(Object *sender)
 #include "GameWordManager.h"
 #include "CustomPackageDownloaderNode.h"
 
+#include "AdvanceModeTargetNode.h"
+
 // test time mode
 void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 {
+	/*string sPathToSave = FileUtils::getInstance()->getWritablePath();
+	sPathToSave += "downloaded";	
+
+	auto& timeModeConfig = GameConfigManager::getInstance()->GetTimeModeDemoConfig();
+	timeModeConfig.m_WordIndexList.clear();
+	timeModeConfig.m_WordCollectedCountList.clear();
+	
+	timeModeConfig.m_sCustomPackageID = "C17";
+	std::string sResultFolder = "C17";
+	sResultFolder.insert(0, "/");
+	sResultFolder.insert(0, sPathToSave);
+	
+	CCLOG("Start 2");
+
+	int iWordPackageIndex = GameWordManager::getInstance()->AddAndLoadCustomPackageToList( timeModeConfig.m_sCustomPackageID, sResultFolder);
+	auto& wordList = GameWordManager::getInstance()->GetWordList();
+	for(int iWordIndex=0; iWordIndex < wordList.size(); iWordIndex++)
+	{
+		if (wordList[iWordIndex].m_iPackageIndex == iWordPackageIndex)
+		{
+			timeModeConfig.m_WordIndexList.push_back( iWordIndex);
+			timeModeConfig.m_WordCollectedCountList.push_back(0);
+		}
+	}
+
+	CCLOG("Start 3");
+
+	// start game
+	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(&timeModeConfig, true);	
+
+	auto sceneX = HelloWorld::createScene( _GMT_TIME_MODE_);
+	Director::getInstance()->replaceScene(sceneX);		  */
+
+	
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	if(!FacebookManager::getInstance()->isLogined() || UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) != 1)
 	{
