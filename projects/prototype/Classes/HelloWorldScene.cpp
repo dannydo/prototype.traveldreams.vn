@@ -5348,6 +5348,9 @@ void HelloWorld::TimeMode_StartNextStage()
 		}
 	}
 
+	// update tracking info
+	m_GameBoardManager.GetGameWordManager()->UpdateTimeModeTracking( iMainWordIndex);
+
 	// update db to increase collect count of main word
 	CSPackageInfo packageInfo;
 	packageInfo.sPackageId = timeModeConfig->m_sCustomPackageID;	
@@ -5360,9 +5363,6 @@ void HelloWorld::TimeMode_StartNextStage()
 	customWordDB.sPackageId = timeModeConfig->m_sCustomPackageID;
 	customWordDB.iCollectedCount = iCollectedCount;
 	CSWordTable::updateCSWord(customWordDB);
-	
-	// update tracking info
-	m_GameBoardManager.GetGameWordManager()->UpdateTimeModeTracking( iMainWordIndex);
 
 	// start new stage
 	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(timeModeConfig);
