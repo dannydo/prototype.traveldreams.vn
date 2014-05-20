@@ -14,6 +14,7 @@
 #include "GetMoreLifeNode.h"
 #include "FlashCardNode.h"
 #include "GameTargetNode.h"
+#include "PopupThanksNode.h"
 
 USING_NS_CC;
 
@@ -405,10 +406,9 @@ void EndGameNode::menuNextLevelCallBack(Object* sender)
 		}
 		else // all level/chapter is finished
 		{
-			Breadcrumb::getInstance()->resetSceneNodeToMainMenu();
-			Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
-			WorldMapScene* pWorldMap = WorldMapScene::create();
-			CCDirector::getInstance()->replaceScene(pWorldMap);
+			PopupThanksNode* pPopupThanks = PopupThanksNode::createLayout();
+			this->getParent()->addChild(pPopupThanks, 10);
+			this->getParent()->removeChild(this);
 			return;
 		}
 	}

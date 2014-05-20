@@ -196,6 +196,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\ConnectFacebookConfirm.cpp" />
     <ClCompile Include="..\Classes\OutOfMovesNode.cpp" />
     <ClCompile Include="..\Classes\PopupConfirmNode.cpp" />
+    <ClCompile Include="..\Classes\PopupThanksNode.cpp" />
     <ClCompile Include="..\Classes\PopupUnderContructionNode.cpp" />
     <ClCompile Include="..\Classes\QuitLevelFailedNode.cpp" />
     <ClCompile Include="..\Classes\ReviseGameScene.cpp" />
@@ -279,6 +280,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\ConnectFacebookConfirm.h" />
     <ClInclude Include="..\Classes\OutOfMovesNode.h" />
     <ClInclude Include="..\Classes\PopupConfirmNode.h" />
+    <ClInclude Include="..\Classes\PopupThanksNode.h" />
     <ClInclude Include="..\Classes\PopupUnderContructionNode.h" />
     <ClInclude Include="..\Classes\QuitLevelFailedNode.h" />
     <ClInclude Include="..\Classes\ReviseGameScene.h" />

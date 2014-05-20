@@ -2,6 +2,7 @@
 #include "GameConfigManager.h"
 #include "EndGameNode.h"
 #include "MainMenuScene.h"
+#include "PopupUnderContructionNode.h"
 
 USING_NS_CC;
 
@@ -126,12 +127,16 @@ void GetMoreLifeNode::setGetMoreLifeType(GetMoreLifeType getMoreLifeType)
 
 void GetMoreLifeNode::clickBuy(Object* sender)
 {
-	
+	PopupUnderContructionNode* pPopup = PopupUnderContructionNode::createLayout();
+	this->getParent()->addChild(pPopup);
+	this->removeFromParentAndCleanup(true);
 }
 
 void GetMoreLifeNode::clickAskFriend(Object* sender)
 {
-	
+	PopupUnderContructionNode* pPopup = PopupUnderContructionNode::createLayout();
+	this->getParent()->addChild(pPopup);
+	this->removeFromParentAndCleanup(true);
 }
 
 void GetMoreLifeNode::clickClose(Object* sender)

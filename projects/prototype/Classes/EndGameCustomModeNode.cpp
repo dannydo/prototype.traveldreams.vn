@@ -51,6 +51,7 @@ bool EndGameCustomModeNode::init()
 	pPanel->setPosition(Point(320.0f, 550.0f));
 	this->addChild(pPanel);
 
+	/*
 	Sprite* pIconEye1 = Sprite::create("AdvanceMode/eye-icon.png");
 	pIconEye1->setPosition(Point(500.0f, 550.0f));
 	this->addChild(pIconEye1);
@@ -58,14 +59,20 @@ bool EndGameCustomModeNode::init()
 	Sprite* pIconEye2 = Sprite::create("AdvanceMode/eye-icon.png");
 	pIconEye2->setPosition(Point(500.0f, 480.0f));
 	this->addChild(pIconEye2);
+	*/
 
 	m_csPackageInfo = CSPackageTable::getCSPackageInfo(m_sPackageId);
 
-	if (m_csPackageInfo.iStage < m_iStage)
+	if (m_csPackageInfo.iStage < m_iStage && m_iStage > 1)
 	{
 		Sprite* pNewRecord = Sprite::create("AdvanceMode/new-record.png");
 		pNewRecord->setPosition(Point(548.0f, 668.0f));
 		this->addChild(pNewRecord);
+		m_csPackageInfo.iStage = m_iStage;
+	}
+	else if (m_csPackageInfo.iStage == 0)
+	{
+		m_csPackageInfo.iStage = m_iStage;
 	}
 
 	LabelBMFont *pLabelpackageName = LabelBMFont::create(m_csPackageInfo.sPackageName.c_str(), "fonts/font_title-popup.fnt");

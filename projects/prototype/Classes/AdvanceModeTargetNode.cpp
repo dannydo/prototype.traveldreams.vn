@@ -52,6 +52,7 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 	pPanel->setPosition(Point(320.0f, 550.0f));
 	this->addChild(pPanel);
 
+	/*
 	Sprite* pIconEye1 = Sprite::create("AdvanceMode/eye-icon.png");
 	pIconEye1->setPosition(Point(500.0f, 620.0f));
 	this->addChild(pIconEye1);
@@ -59,6 +60,7 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 	Sprite* pIconEye2 = Sprite::create("AdvanceMode/eye-icon.png");
 	pIconEye2->setPosition(Point(500.0f, 550.0f));
 	this->addChild(pIconEye2);
+	*/
 
 	m_csPackageInfo = CSPackageTable::getCSPackageInfo(m_sPackageId);
 
