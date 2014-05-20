@@ -74,6 +74,19 @@ void CustomPackageDownloadManager::StartDownloadPackage(Node* pParentNode, const
 		std::istream_iterator<std::string> begin(ss);
 		std::istream_iterator<std::string> end;
 		std::vector<std::string> splitList(begin, end);
+		if (splitList.size() != 3)
+		{
+			m_pNotificationPopup->removeFromParentAndCleanup(true);
+
+			auto errorPopup = WaitingNode::createLayout("Unknown error!");
+			pParentNode->addChild(errorPopup);
+			errorPopup->runAction(
+				Sequence::createWithTwoActions(
+					DelayTime::create(2.f),
+					RemoveSelf::create()));
+			return;
+		}
+
 		m_sResultFolder = splitList[0];
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 		sDownloadUrl = splitList[2];
@@ -351,7 +364,7 @@ void CustomPackageDownloadManager::GetPackageInfoFromServer(CSPackageInfo& packa
         curl_easy_cleanup(_curl);
         return;
     }         
-	else // parse data
+	else if (sData.size() > 0) // parse data
 	{
 		auto pJsonDict = new cs::JsonDictionary();
 		pJsonDict->initWithDescription(sData.c_str());
