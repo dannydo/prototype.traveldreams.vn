@@ -248,6 +248,21 @@ void AssetsManager::update()
     t.detach();
 }
 
+void AssetsManager::updateWithoutCheckVersion(const char* sVersion)
+{
+	if (_isDownloading) return;
+    
+	_version = sVersion;
+
+    _isDownloading = true;
+       
+    // Is package already downloaded?
+    _downloadedVersion = UserDefault::getInstance()->getStringForKey(keyOfDownloadedVersion().c_str());
+    
+    auto t = std::thread(&AssetsManager::downloadAndUncompress, this);
+    t.detach();
+}
+
 bool AssetsManager::uncompress()
 {
     // Open the zip file
