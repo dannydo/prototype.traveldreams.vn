@@ -25,6 +25,10 @@ public:
 	void removeBackground();
 	void changeStatusButtonFlashcard(StatusButtonFlashcard statusButtonFlashcard);
 
+	void increaseTotalFlashcard(const int& iIncrease);
+
+	void updateLayoutWordNew();
+
 private:
 	void openSettingMenu(cocos2d::Object* sender);
 	void openFlashCardCollection(cocos2d::Object* sender);
@@ -36,7 +40,10 @@ private:
 	ButtonNode* m_pButtonSettingNode;
 
 	ButtonManagerNode* m_pButtonManagerNode;
-
+	cocos2d::LabelTTF* m_pLabelTotalFlashWord;
+	
+	cocos2d::Sprite* m_pIconNotiy;
+	cocos2d::LabelTTF* m_pLabelNumber;
 };
 
 #endif;

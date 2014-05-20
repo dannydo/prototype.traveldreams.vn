@@ -150,66 +150,67 @@ void AdvanceModePopularPackagesLayer::resultHttpRequestCompleted(cs::JsonDiction
 		if (pJsonDict != NULL)
 		{			
 			cs::JsonDictionary* jsonData = pJsonDict->getSubDictionary("data");
-			
-
-			if (jsonData->getItemBoolvalue("result", false))
-			{				
-
-				m_iTotalPackage = jsonData->getArrayItemCount("list");
-				m_maxHeight = m_iTotalPackage*120.0f;
-				for(int iIndex=0; iIndex < m_iTotalPackage; iIndex++)
+			if(jsonData != NULL)
+			{
+				if (jsonData->getItemBoolvalue("result", false))
 				{
 
-					cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
-					CSPackageInfo csPackageInfo;
-					csPackageInfo.sPackageName = pJsonItem->getItemStringValue("WordListName");
+					m_iTotalPackage = jsonData->getArrayItemCount("list");
+					m_maxHeight = m_iTotalPackage*120.0f;
+					for(int iIndex=0; iIndex < m_iTotalPackage; iIndex++)
+					{
+
+						cs::JsonDictionary* pJsonItem = jsonData->getSubItemFromArray("list", iIndex);
+						CSPackageInfo csPackageInfo;
+						csPackageInfo.sPackageName = pJsonItem->getItemStringValue("WordListName");
 					
 
-					csPackageInfo.sPackageCode = pJsonItem->getItemStringValue("PackageCode");
-					csPackageInfo.sCreatedBy = pJsonItem->getItemStringValue("Author");
+						csPackageInfo.sPackageCode = pJsonItem->getItemStringValue("PackageCode");
+						csPackageInfo.sCreatedBy = pJsonItem->getItemStringValue("Author");
 
 
-					csPackageInfo.iTotalWord = pJsonItem->getItemIntValue("TotalWords", 0);
-					csPackageInfo.iTotalWordUnlock = 0;
+						csPackageInfo.iTotalWord = pJsonItem->getItemIntValue("TotalWords", 0);
+						csPackageInfo.iTotalWordUnlock = 0;
 					
 
-					m_csPackageInfos.push_back(csPackageInfo);
+						m_csPackageInfos.push_back(csPackageInfo);
 
-					LabelBMFont *pLabelPackageName = LabelBMFont::create(csPackageInfo.sPackageName.c_str(), "fonts/font_small_alert.fnt", 310.0f);
-					pLabelPackageName->setAnchorPoint(Point(0.0f, 0.5f));
-					pLabelPackageName->setPosition(Point(0.0f, -iIndex*120 - 10));
-					m_pSlideShow->addChild(pLabelPackageName);
+						LabelBMFont *pLabelPackageName = LabelBMFont::create(csPackageInfo.sPackageName.c_str(), "fonts/font_small_alert.fnt", 310.0f);
+						pLabelPackageName->setAnchorPoint(Point(0.0f, 0.5f));
+						pLabelPackageName->setPosition(Point(0.0f, -iIndex*120 - 10));
+						m_pSlideShow->addChild(pLabelPackageName);
 
-					LabelTTF* pLabelTCreatedBy = LabelTTF::create(csPackageInfo.sCreatedBy.c_str(), "Arial", 28, Size(310.0f, 30.0f), TextHAlignment::LEFT, TextVAlignment::TOP);
-					pLabelTCreatedBy->setColor(ccc3(255.0f, 255.0f, 255.0f));
-					pLabelTCreatedBy->setAnchorPoint(Point(0.0f, 0.5f));
-					pLabelTCreatedBy->setPosition(Point(0.0f, -iIndex*120 - 55));
-					m_pSlideShow->addChild(pLabelTCreatedBy);
+						LabelTTF* pLabelTCreatedBy = LabelTTF::create(csPackageInfo.sCreatedBy.c_str(), "Arial", 28, Size(310.0f, 30.0f), TextHAlignment::LEFT, TextVAlignment::TOP);
+						pLabelTCreatedBy->setColor(ccc3(255.0f, 255.0f, 255.0f));
+						pLabelTCreatedBy->setAnchorPoint(Point(0.0f, 0.5f));
+						pLabelTCreatedBy->setPosition(Point(0.0f, -iIndex*120 - 55));
+						m_pSlideShow->addChild(pLabelTCreatedBy);
 
 
-					LabelBMFont *pLabelPackageCode = LabelBMFont::create(csPackageInfo.sPackageCode.c_str(), "fonts/font_score.fnt");
-					pLabelPackageCode->setAnchorPoint(Point(1.0f, 0.5f));
-					pLabelPackageCode->setPosition(Point(440.0f, -iIndex*120 - 10));
-					m_pSlideShow->addChild(pLabelPackageCode);
+						LabelBMFont *pLabelPackageCode = LabelBMFont::create(csPackageInfo.sPackageCode.c_str(), "fonts/font_score.fnt");
+						pLabelPackageCode->setAnchorPoint(Point(1.0f, 0.5f));
+						pLabelPackageCode->setPosition(Point(440.0f, -iIndex*120 - 10));
+						m_pSlideShow->addChild(pLabelPackageCode);
 
-					char sTotalWord[20];
-					sprintf(sTotalWord, "%d Words", csPackageInfo.iTotalWord);
-					LabelTTF* pLabelTotalWord = LabelTTF::create(sTotalWord, "Arial", 28);
-					pLabelTotalWord->setColor(ccc3(255.0f, 255.0f, 255.0f));
-					pLabelTotalWord->setAnchorPoint(Point(1.0f, 0.5f));
-					pLabelTotalWord->setPosition(Point(420.0f, -iIndex*120 - 55));
-					m_pSlideShow->addChild(pLabelTotalWord);
+						char sTotalWord[20];
+						sprintf(sTotalWord, "%d Words", csPackageInfo.iTotalWord);
+						LabelTTF* pLabelTotalWord = LabelTTF::create(sTotalWord, "Arial", 28);
+						pLabelTotalWord->setColor(ccc3(255.0f, 255.0f, 255.0f));
+						pLabelTotalWord->setAnchorPoint(Point(1.0f, 0.5f));
+						pLabelTotalWord->setPosition(Point(420.0f, -iIndex*120 - 55));
+						m_pSlideShow->addChild(pLabelTotalWord);
 					
 
-					Sprite* pButtonPlayPackageImage = Sprite::create("AdvanceMode/download-icon.png");
-					ButtonNode* pButtonPlayPackage = ButtonNode::createButtonSprite(pButtonPlayPackageImage, CC_CALLBACK_1(AdvanceModePopularPackagesLayer::clickDownloadPackage, this));
-					pButtonPlayPackage->setTag(iIndex);
-					pButtonPlayPackage->setPosition(Point(460.0f, -iIndex*120 - 35));
-					m_pSlideShow->addButtonNode(pButtonPlayPackage);					
+						Sprite* pButtonPlayPackageImage = Sprite::create("AdvanceMode/download-icon.png");
+						ButtonNode* pButtonPlayPackage = ButtonNode::createButtonSprite(pButtonPlayPackageImage, CC_CALLBACK_1(AdvanceModePopularPackagesLayer::clickDownloadPackage, this));
+						pButtonPlayPackage->setTag(iIndex);
+						pButtonPlayPackage->setPosition(Point(460.0f, -iIndex*120 - 35));
+						m_pSlideShow->addButtonNode(pButtonPlayPackage);					
 
-					Sprite* pLineImage = Sprite::create("AdvanceMode/line.png"); 
-					pLineImage->setPosition(Point(245.0f, -iIndex*120 -90.0f));
-					m_pSlideShow->addChild(pLineImage, 5);
+						Sprite* pLineImage = Sprite::create("AdvanceMode/line.png"); 
+						pLineImage->setPosition(Point(245.0f, -iIndex*120 -90.0f));
+						m_pSlideShow->addChild(pLineImage, 5);
+					}
 				}
 			}
 		}

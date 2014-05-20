@@ -1,6 +1,7 @@
 #include "ChapterTable.h" 
 #include "InitDatabase.h"
 #include "VersionTable.h"
+#include "GameConfigManager.h"
 
 USING_NS_CC; 
 USING_NS_CC_EXT;
@@ -80,6 +81,9 @@ void ChapterTable::fetchAllChapter()
 		chapterInfo.iStageRevise = int(strtod(re[iRow*nColumn+7], 0));
 
 		m_Chapters.push_back(chapterInfo);
+
+		ChapterConfig chapterConfig = GameConfigManager::getInstance()->GetChapterConfig(chapterInfo.sChapterId);
+		chapterInfo.iTotalFlashCard = chapterConfig.m_WordIDList.size();
 	}
 
 	sqlite3_free_table(re);

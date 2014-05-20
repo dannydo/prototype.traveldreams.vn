@@ -72,7 +72,7 @@ void PackageService::getPackagePopular(const int& iStart, const int& iNumberReco
 void PackageService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)
 {
 	std::string sKey = "";
-	String strData = "";
+	string strData = "";
 	sKey.append(response->getHttpRequest()->getTag());
 	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
 	bool bResult = true;
@@ -83,19 +83,16 @@ void PackageService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *re
 		{			
 			std::vector<char> *buffer = response->getResponseData();
 			
-			if ( buffer->size() == 0)
-				return;
-			
-			for (unsigned int i = 0; i < buffer->size(); i++)
+			if ( buffer->size() > 0)
 			{
-				strData.appendWithFormat("%c", (*buffer)[i]);
-			}
+				string strData(buffer->begin(), buffer->end());
 
-			if (m_callBack != NULL)
-			{
-				cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
-				pJsonDict->initWithDescription(strData.getCString());
-				m_callBack->resultHttpRequestCompleted(pJsonDict, sKey);
+				if (m_callBack != NULL)
+				{
+					cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
+					pJsonDict->initWithDescription(strData.c_str());
+					m_callBack->resultHttpRequestCompleted(pJsonDict, sKey);
+				}
 			}
 		}
 	}	

@@ -56,3 +56,23 @@ unsigned long getMilisecondsTimeLocalOfDay()
 	unsigned long iCurrentTime = now.tv_sec*1000 + now.tv_usec/1000 ; //miliseconds
 	return iCurrentTime;
 }
+
+String formatHMSToDisplay(const int& iSeconds)
+{
+	String str = "";
+
+	if(iSeconds/3600 < 10)
+		str.append("0");
+	str.appendWithFormat("%d:", iSeconds/3600);
+	int iSecondsTemp = iSeconds%3600;
+
+	if(iSecondsTemp/60 < 10)
+		str.append("0");
+	str.appendWithFormat("%d:", iSecondsTemp/60);
+
+	if(iSecondsTemp%60 < 10)
+		str.append("0");	
+	str.appendWithFormat("%d", iSecondsTemp%60);
+
+	return str;
+}

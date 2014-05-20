@@ -111,7 +111,7 @@ bool LevelMapLayer::init()
 			m_ButtonNextLevelSprite = NULL;
 			Sprite* pButtonLevelSprite;
 
-			if(levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId)
+			if(levelInfo.iLevel == userInfo.iCurrentLevel && levelInfo.sChapterId == userInfo.sCurrentChapterId && levelInfo.bIsUnlock == false)
 			{
 				pointScroll = point;
 
@@ -230,6 +230,7 @@ void LevelMapLayer::showPopupEndGameWin(const int& iScore, const Word& mainWord,
 {
 	EndGameNode* pEndGameLose = EndGameNode::createLayoutWin(iScore, mainWord, iCurrentLevel, sChapterId, iYellowStar, iBonusQuestCompleted);
 	this->addChild(pEndGameLose, 10);
+	m_pFooterNode->updateLayoutWordNew();
 }
 
 void LevelMapLayer::showPopupQuitLevelFailed( const int& iCurrentLevel, const std::string sChapterId)
@@ -451,6 +452,16 @@ void LevelMapLayer::playEffectUnlockLevel(const bool& bPlayNextLevelGame, const 
 		{
 			if (iCurrentLevel >= iPassLevel && sChapterId == m_sChapterId)
 			{
+				LayerColor* pBackground = LayerColor::create(ccc4(255, 255, 255, 0));
+				pBackground->setContentSize(CCSizeMake(640.0f, 960.0f));
+				pBackground->setTag(1000);
+
+				auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
+				listener->setSwallowTouches(true);
+				listener->onTouchBegan = [](Touch* touch, Event* event) { return true;  };
+				EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, pBackground);
+				this->addChild(pBackground, 1000);
+
 				LevelInfo levelInfoPass = m_levels[iPassLevel-1];
 				m_pNodeStarAndBonusQuestEffect = Node::create();
 				Node* pNode = this->generateLayoutStarAndBonusQuest(0, 0, levelInfoPass.iTotalBonusQuest);
@@ -491,17 +502,18 @@ void LevelMapLayer::playEffectUnlockLevel(const bool& bPlayNextLevelGame, const 
 				auto actionScaleIn = ScaleTo::create(0.1f, 1.0f);
 				auto actioneffectChangeCurrentLevel = CallFunc::create(this, callfunc_selector(LevelMapLayer::effectChangeCurrentLevel));
 				auto actionshowPopupTargetGame = CallFunc::create(this, callfunc_selector(LevelMapLayer::showPopupTargetGame));
+				auto actionfinishEffectUnlockLevel = CallFunc::create(this, callfunc_selector(LevelMapLayer::finishEffectUnlockLevel));
 
 				if (bPlayNextLevelGame)
 				{
 					m_buttonPlayPassLevel->runAction(Sequence::create(DelayTime::create(0.3f), actionScaleOut, DelayTime::create(0.3f), actionScaleIn, DelayTime::create(0.3f), 
-						actioneffectChangeCurrentLevel, DelayTime::create(0.6f), actionshowPopupTargetGame, NULL));
+						actioneffectChangeCurrentLevel, DelayTime::create(0.6f), actionfinishEffectUnlockLevel, actionshowPopupTargetGame, NULL));
 		
 				}
 				else
 				{
 					m_buttonPlayPassLevel->runAction(Sequence::create(DelayTime::create(0.3f), actionScaleOut, DelayTime::create(0.3f), actionScaleIn, DelayTime::create(0.3f), 
-						actioneffectChangeCurrentLevel, NULL));
+						actioneffectChangeCurrentLevel, DelayTime::create(0.6f), actionfinishEffectUnlockLevel, NULL));
 				}
 			}
 			else
@@ -642,4 +654,9 @@ void LevelMapLayer::showPopupTargetGame()
 void LevelMapLayer::removeButtonNodeCurrentLevel()
 {
 	m_pButtonManagerNode->removeButtonNode(m_pButtonNodeCurrentLevel);
+}
+
+void LevelMapLayer::finishEffectUnlockLevel()
+{
+	this->removeChildByTag(1000);
 }

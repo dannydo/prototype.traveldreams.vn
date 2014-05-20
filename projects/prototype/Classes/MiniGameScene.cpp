@@ -1,11 +1,11 @@
 #include "MiniGameScene.h"
-#include "FooterNode.h"
 #include "SettingMenuNode.h"
 #include "FunctionCommon.h"
 #include "GameWordManager.h"
 #include "Database\UserTable.h"
 #include "Database\ChapterTable.h"
 #include "SoundManager.h"
+#include "PopupConfirmNode.h"
 
 USING_NS_CC;
 
@@ -66,10 +66,10 @@ bool MiniGameLayer::init()
 	m_pLabelIndex->setPosition(Point(320.0f, 850.0f));
 	this->addChild(m_pLabelIndex);
 
-	FooterNode* pFooterNode = FooterNode::create();
-	pFooterNode->changeStatusButtonFlashcard(StatusButtonFlashcard::eNoClick);
-	pFooterNode->removeBackground();
-	this->addChild(pFooterNode);
+	m_pFooterNode = FooterNode::create();
+	m_pFooterNode->changeStatusButtonFlashcard(StatusButtonFlashcard::eNoClick);
+	m_pFooterNode->removeBackground();
+	this->addChild(m_pFooterNode);
 
 	m_pHeaderNode = HeaderNode::create();
 	this->addChild(m_pHeaderNode);
@@ -219,11 +219,37 @@ void MiniGameLayer::createLayout()
 	}
 	else
 	{
-		// Win Game
-		LabelBMFont *pLabelTitle = LabelBMFont::create("NO WORD FOR PLAY MINI GAME", "fonts/font-bechic.fnt");
-		pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
-		pLabelTitle->setPosition(Point(330.0f, 480.0f));
-		this->addChild(pLabelTitle);
+		// End Game
+		int iWordNew = WordTable::getInstance()->getNumberWordNew();
+		int iWordPlayMiniGame = WordTable::getInstance()->getNumberWordPlayMiniGame(getTimeLocalCurrent());
+
+		if (iWordNew < 1)
+		{
+			char sTitle[50];
+			sprintf(sTitle, "Total flash cards: %d", WordTable::getInstance()->getTotalWordCollected());
+			PopupConfirmNode* pPopup = PopupConfirmNode::createLayout("YOU HAVE COLLECTED ALL FLASH CARDS", sTitle, PopupConfirmActionType::eFlashcardCollection, PopupConfirmType::eOK);
+			this->addChild(pPopup);
+		}
+		else
+		{
+			if (iWordPlayMiniGame < 1)
+			{
+				int iTimeCountDown = 0;
+				unsigned long uMinTime = WordTable::getInstance()->getMinTimeNextPlayMiniGame();
+				iTimeCountDown = uMinTime + _SECONDS_NEXT_PLAY_MINI_GAME_ - getTimeLocalCurrent();
+				
+				char sTitle[50];
+				sprintf(sTitle, "YOU HAVE %d NEW FLASH CARDS", iWordNew);
+				PopupConfirmNode* pPopup = PopupConfirmNode::createLayout(sTitle, "Please come back in", PopupConfirmActionType::eFlashcardCollection, PopupConfirmType::eOK);
+				pPopup->addClockMiniGame(iTimeCountDown);
+				this->addChild(pPopup);
+			}
+			else
+			{
+				MiniGameScene* pMiniGame = MiniGameScene::create();
+				Director::getInstance()->replaceScene(pMiniGame);
+			}
+		}
 	}
 	m_iIndexWordNewCount++;
 }
@@ -324,6 +350,8 @@ void MiniGameLayer::playEffectCollect()
 
 	auto actionplayEffectAddLayout = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddLayout));
 	m_pFlashCard->runAction(Spawn::create(actionFlashcardScaleOut, actionFlashcardMove, NULL));
+
+	m_pFooterNode->increaseTotalFlashcard(1);
 }
 
 void MiniGameLayer::playEffectLose()

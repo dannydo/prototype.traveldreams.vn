@@ -17,6 +17,8 @@ public:
 	bool init();
 	CREATE_FUNC(FlashCardCollectionLayer);
 
+	void update(float dt) override;
+
 private:
 	bool onTouchBegan(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
 	void onTouchMoved(cocos2d::Touch* pTouch, cocos2d::Event* pEvent) override;
@@ -31,10 +33,14 @@ private:
 	FooterNode* m_pFooterNode;
 	ScrollManager* m_pScrollManager;
 
+	cocos2d::LabelTTF* m_pLabelMiniGame;
+
 	float m_fBeginY;
 	float m_fYMoved;
 	float m_maxHeight;
 	int m_iWordPlayMiniGame;
+	int m_iWordNew;
+	float m_iTimeCountDown;
 };
 
 class FlashCardCollectionScene : public cocos2d::CCScene

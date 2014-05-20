@@ -79,7 +79,7 @@ void TrackingService::pushTrackingToServer()
 void TrackingService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)
 {	
 	std::string sKey = "";
-	String strData = "";
+	string strData = "";
 	sKey.append(response->getHttpRequest()->getTag());
 	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
 	bool bResult = true;
@@ -90,13 +90,10 @@ void TrackingService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *r
 		{
 			std::vector<char> *buffer = response->getResponseData();
 			
-			for (unsigned int i = 0; i < buffer->size(); i++)
-			{
-				strData.appendWithFormat("%c", (*buffer)[i]);
-			}
+			string strData(buffer->begin(), buffer->end());
 
 			cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
-			pJsonDict->initWithDescription(strData.getCString());
+			pJsonDict->initWithDescription(strData.c_str());
 			//CCLOG("Tracking %s", strData.getCString()); //can cause crash
 			cs::JsonDictionary *pJsonData = pJsonDict->getSubDictionary("data");
 			if(pJsonData != NULL)
