@@ -35,7 +35,28 @@ WordTable* WordTable::getInstance()
 bool WordTable::init()
 {
 	m_sCurrentChapterId = "";
+	m_iTotalFlashCardCollected = getNumberWordCollected();
 	return true;
+}
+
+int WordTable::increaseTotalWordCollected(const int& iIncrease)
+{
+	m_iTotalFlashCardCollected += iIncrease;
+	return m_iTotalFlashCardCollected;
+}
+
+unsigned long WordTable::getMinTimeNextPlayMiniGame()
+{
+	char **re;
+	int nRow, nColumn;
+
+	String sql = "select * from Words where IsCollected=0 and CountCollected > 1 and TimeBeginPlayMiniGame > 0 order by TimeBeginPlayMiniGame asc limit 1";
+	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
+
+	if (nRow > 0)
+		return long(strtod(re[nColumn+4], 0));
+
+	return 0;
 }
 
 int WordTable::getNumberWordNew()

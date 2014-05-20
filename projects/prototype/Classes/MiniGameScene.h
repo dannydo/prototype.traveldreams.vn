@@ -8,7 +8,8 @@
 #include "ButtonNode.h"
 #include "GameDataStructure.h"
 #include "Database\WordTable.h"
-#include "HeaderNode.h"
+#include "HeaderNode.h"	 
+#include "FooterNode.h"
 
 #define _GIFT_COIN_ 10
 
@@ -46,6 +47,7 @@ private:
 	WordInfo m_MaintWordInfo;
 
 	HeaderNode* m_pHeaderNode;
+	FooterNode* m_pFooterNode;
 
 	int m_iIndexWordNewCount;
 	int m_iIndexWordNew;

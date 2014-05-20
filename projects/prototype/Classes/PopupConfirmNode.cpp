@@ -5,6 +5,8 @@
 #include "GameConfigManager.h"
 #include "Database\InitDatabase.h"
 #include "SystemEventHandle.h"
+#include "FunctionCommon.h"
+#include "FlashCardCollection.h"
 
 USING_NS_CC;
 
@@ -51,14 +53,22 @@ bool PopupConfirmNode::init()
 	pBackgroundBoard->setPosition(Point(320.0f, 480.0f));
 	this->addChild(pBackgroundBoard);
 	
-	LabelBMFont *pLabelTitle = LabelBMFont::create(m_sTitle.c_str(), "fonts/font_title-popup.fnt", 415.0f, TextHAlignment::CENTER);
+	LabelBMFont *pLabelTitle = LabelBMFont::create(m_sTitle.c_str(), "fonts/font_title-popup.fnt", 420.0f, TextHAlignment::CENTER);
 	pLabelTitle->setAnchorPoint(Point(0.5f, 1.0f));
 	pLabelTitle->setPosition(Point(320.0f, 630.0f));
 	this->addChild(pLabelTitle);
 
-	LabelBMFont *pLabelDescription= LabelBMFont::create(m_sDescription.c_str(), "fonts/font-small-green-alert.fnt", 415.0f, TextHAlignment::CENTER);
+	LabelBMFont *pLabelDescription= LabelBMFont::create(m_sDescription.c_str(), "fonts/font-small-green-alert.fnt", 420.0f, TextHAlignment::CENTER);
 	pLabelDescription->setAnchorPoint(Point(0.5f, 1.0f));
-	pLabelDescription->setPosition(Point(320.0f, 560.0f));
+	if (pLabelTitle->getContentSize().height <= 70)
+	{
+		pLabelDescription->setPosition(Point(320.0f, 560.0f));
+	}
+	else
+	{
+		pLabelDescription->setPosition(Point(320.0f, 630.0f - pLabelTitle->getContentSize().height));
+	}
+
 	pLabelDescription->setScale(1.2f);
 	this->addChild(pLabelDescription);
 
@@ -146,7 +156,19 @@ void PopupConfirmNode::clickNo(cocos2d::Object* pSender)
 
 void PopupConfirmNode::clickOk(cocos2d::Object* pSender)
 {
-	this->getParent()->removeChild(this);
+	switch (m_popupConfirmActionType)
+	{
+		case PopupConfirmActionType::eFlashcardCollection :
+		{
+			Breadcrumb::getInstance()->getSceneModePopBack();
+			FlashCardCollectionScene* scene = FlashCardCollectionScene::create();
+			Director::getInstance()->replaceScene(scene);
+
+			break;
+		}
+		default:
+			this->getParent()->removeChild(this);
+	}
 }
 
 void PopupConfirmNode::clickLoginFacebook(cocos2d::Object* pSender)
@@ -205,4 +227,30 @@ void PopupConfirmNode::finishResetGame()
 {
 	this->getParent()->removeChildByTag(1000);
 	this->getParent()->removeChild(this);
+}
+
+void PopupConfirmNode::update(float dt)
+{
+	m_iTimeCountDown -= dt;
+	if (m_iTimeCountDown < 0)
+	{
+		m_iTimeCountDown = 0;
+		m_pLabelClockMiniGame->setString(formatHMSToDisplay((int)m_iTimeCountDown).getCString());
+		m_pLabelClockMiniGame->setString("MINI GAME");
+	}
+	else
+	{
+		m_pLabelClockMiniGame->setString(formatHMSToDisplay((int)m_iTimeCountDown).getCString());
+	}
+	
+}
+
+void PopupConfirmNode::addClockMiniGame(const float& iTimeCountDown)
+{
+	m_iTimeCountDown = iTimeCountDown;
+	m_pLabelClockMiniGame = LabelBMFont::create(formatHMSToDisplay(m_iTimeCountDown).getCString(), "fonts/font_score.fnt");
+	m_pLabelClockMiniGame->setPosition(Point(320.0f, 443.0f));
+	m_pLabelClockMiniGame->setScale(1.2f);
+	this->addChild(m_pLabelClockMiniGame);
+	this->scheduleUpdate();
 }

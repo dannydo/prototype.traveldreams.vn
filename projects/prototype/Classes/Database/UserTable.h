@@ -42,6 +42,8 @@ public:
 	std::string syncGetUser();
 	bool updateDataSyncUser(cs::JsonDictionary* pJsonSync, const int& iVersion);
 
+	void haveGenerateNextChapter();
+
 private:
 	void fetchhUser();
 

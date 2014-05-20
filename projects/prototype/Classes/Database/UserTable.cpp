@@ -2,6 +2,9 @@
 #include "InitDatabase.h"
 #include "VersionTable.h"
 #include "FunctionCommon.h"
+#include "ChapterTable.h"
+#include "LevelTable.h"
+#include "GameConfigManager.h"
 
 USING_NS_CC; 
 USING_NS_CC_EXT;
@@ -231,4 +234,35 @@ bool UserTable::updateDataSyncUser(cs::JsonDictionary* pJsonSync, const int& iVe
 	CCLOG("sync User true");
 	this->fetchhUser();
 	return true;
+}
+
+void UserTable::haveGenerateNextChapter()
+{
+	ChapterInfo chapterInfo = ChapterTable::getInstance()->getChapterInfo(m_userInfo.sCurrentChapterId);
+	if (chapterInfo.sChapterId != "" && chapterInfo.bIsUnlock)
+	{
+		ChapterConfig chapterConfig = GameConfigManager::getInstance()->GetChapterConfig(m_userInfo.sCurrentChapterId);
+		if (chapterConfig.m_iTotalevel <= m_userInfo.iCurrentLevel)
+		{
+			LevelInfo levelInfo = LevelTable::getInstance()->getLevel(m_userInfo.sCurrentChapterId, chapterConfig.m_iTotalevel);
+			if (levelInfo.bIsUnlock == true)
+			{
+				std::string sNextChapterID;
+				if ( GameConfigManager::getInstance()->GetNextChapterID(m_userInfo.sCurrentChapterId, sNextChapterID))
+				{
+					std::vector<std::string> wordList;
+					std::vector<int> mapLevels;
+
+					GameConfigManager::getInstance()->GenerateWordsForNewChapter( sNextChapterID, wordList, mapLevels);
+					InitDatabase::getInstance()->createDataChapterAndLevel( sNextChapterID, wordList, mapLevels);
+					ChapterTable::getInstance()->refreshChapters();
+
+					m_userInfo.sCurrentChapterId = sNextChapterID;
+					m_userInfo.iCurrentLevel = 1;
+
+					updateUser(m_userInfo);
+				}
+			}
+		}
+	}
 }

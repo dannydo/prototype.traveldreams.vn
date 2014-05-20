@@ -8,6 +8,7 @@
 #include "FunctionCommon.h"
 #include "MiniGameScene.h"
 #include "ReviseGameScene.h"
+#include "PopupConfirmNode.h"
 
 USING_NS_CC;
 
@@ -55,28 +56,46 @@ bool FlashCardCollectionLayer::init()
 	this->addChild(pButtonManagerNode);
 
 	Sprite* pIconFlashCard = Sprite::create("FlashCard/flashcard_icon_btn.png");
-	pIconFlashCard->setPosition(Point(-140.0f, 55.0f));
+	pIconFlashCard->setPosition(Point(-140.0f, 45.0f));
 
-	Sprite* pButtonMiniGameSprite = Sprite::create("FlashCard/btn_minigame.png");
+	Sprite* pButtonMiniGameSprite = Sprite::create("FlashCard/minigame-countdown.png");
 	pButtonMiniGameSprite->addChild(pIconFlashCard);
 	pButtonMiniGameSprite->setPosition(Point(154.0f, 0.0f));
 
 	ButtonNode* pButtonMiniGame = ButtonNode::createButtonSprite(pButtonMiniGameSprite, CC_CALLBACK_1(FlashCardCollectionLayer::clickPlayMiniGame, this));
-	pButtonMiniGame->setPosition(Point(320.0f, 817.0f));
+	pButtonMiniGame->setPosition(Point(320.0f, 810.0f));
 	pButtonManagerNode->addButtonNode(pButtonMiniGame);
 
 
-	int iWordNew = WordTable::getInstance()->getNumberWordNew();
+	m_iWordNew = WordTable::getInstance()->getNumberWordNew();
 	m_iWordPlayMiniGame = WordTable::getInstance()->getNumberWordPlayMiniGame(getTimeLocalCurrent());
 
-	if (iWordNew > 0)
+	m_pLabelMiniGame = LabelTTF::create("MINI GAME", "Arial", 30);
+	m_pLabelMiniGame->setColor(ccc3(255.0f, 255.0f, 255.0f));
+	m_pLabelMiniGame->setPosition(Point(148.0f, 47.0f));
+	pButtonMiniGameSprite->addChild(m_pLabelMiniGame);
+
+	m_iTimeCountDown = 0;
+	if (m_iWordPlayMiniGame < 1 && m_iWordNew > 0)
+	{
+		unsigned long uMinTime = WordTable::getInstance()->getMinTimeNextPlayMiniGame();
+		m_iTimeCountDown = uMinTime + _SECONDS_NEXT_PLAY_MINI_GAME_ - getTimeLocalCurrent();
+		if (m_iTimeCountDown > 0)
+		{
+			m_pLabelMiniGame->setString(formatHMSToDisplay(m_iTimeCountDown).getCString());
+			this->scheduleUpdate();
+		}
+		
+	}
+
+	if (m_iWordNew > 0)
 	{
 		Sprite* pIconNew = Sprite::create("FlashCard/noitify_msg.png");
-		pIconNew->setPosition(Point(247.0f, 105.0f));
+		pIconNew->setPosition(Point(240.0f, 85.0f));
 		pButtonMiniGameSprite->addChild(pIconNew);
 
 		char sNumberNew[10];
-		sprintf(sNumberNew, "%d", iWordNew);
+		sprintf(sNumberNew, "%d", m_iWordNew);
 		LabelTTF* pLabelNumber = LabelTTF::create(sNumberNew, "Arial", 25);
 		pLabelNumber->setColor(ccc3(255.0f, 255.0f, 255.0f));
 		pLabelNumber->setPosition(Point(22.0f, 20.0f));
@@ -175,16 +194,46 @@ bool FlashCardCollectionLayer::init()
 	return true;
 }
 
-void FlashCardCollectionLayer::clickPlayMiniGame(Object* sender)
+void FlashCardCollectionLayer::update(float dt)
 {
-	if (m_iWordPlayMiniGame > 0)
+	m_iTimeCountDown -= dt;
+	if (m_iTimeCountDown < 0)
 	{
-		MiniGameScene* pMiniGame = MiniGameScene::create();
-		Director::getInstance()->replaceScene(pMiniGame);
+		m_iTimeCountDown = 0;
+		this->unscheduleUpdate();
+		m_pLabelMiniGame->setString("MINI GAME");
 	}
 	else
 	{
-		MessageBox("No word for play game", "");
+		m_pLabelMiniGame->setString(formatHMSToDisplay((int)m_iTimeCountDown).getCString());
+	}
+	
+}
+
+void FlashCardCollectionLayer::clickPlayMiniGame(Object* sender)
+{
+	if (m_iWordNew < 1)
+	{
+		char sTitle[50];
+		sprintf(sTitle, "Total flash cards: %d", WordTable::getInstance()->getTotalWordCollected());
+		PopupConfirmNode* pPopup = PopupConfirmNode::createLayout("YOU HAVE COLLECTED ALL FLASH CARDS", sTitle, PopupConfirmActionType::eNone, PopupConfirmType::eOK);
+		this->addChild(pPopup);
+	}
+	else
+	{
+		if (m_iWordPlayMiniGame < 1)
+		{
+			char sTitle[50];
+			sprintf(sTitle, "YOU HAVE %d NEW FLASH CARDS", m_iWordNew);
+			PopupConfirmNode* pPopup = PopupConfirmNode::createLayout(sTitle, "Please come back in", PopupConfirmActionType::eNone, PopupConfirmType::eOK);
+			pPopup->addClockMiniGame(m_iTimeCountDown);
+			this->addChild(pPopup);
+		}
+		else
+		{
+			MiniGameScene* pMiniGame = MiniGameScene::create();
+			Director::getInstance()->replaceScene(pMiniGame);
+		}
 	}
 }
 

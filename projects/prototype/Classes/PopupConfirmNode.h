@@ -8,7 +8,8 @@
 typedef enum {
 	eNone = 0,
 	eResetGame,
-    eQuitGameCustomMode,
+    eQuitGameCustomMode,  
+	eFlashcardCollection,
 } PopupConfirmActionType;
 
 typedef enum {
@@ -27,6 +28,10 @@ public:
 
 	bool onTouchCustomNodeBegan(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
 
+	void update(float dt) override;
+
+	void addClockMiniGame(const float& iTimeCountDown);
+
 private:
 	void clickYes(cocos2d::Object* pSender);
 	void clickNo(cocos2d::Object* pSender);
@@ -35,6 +40,9 @@ private:
 
 	void runResetGame();
 	void finishResetGame();
+
+	cocos2d::LabelBMFont* m_pLabelClockMiniGame;
+	float m_iTimeCountDown;
 
 	std::string m_sTitle;
 	std::string m_sDescription;

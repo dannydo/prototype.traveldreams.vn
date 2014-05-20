@@ -28,28 +28,33 @@ bool FooterNode::init()
 	m_pButtonSettingNode->setPosition(Point(36.0f, 33.0f));
 
 	Sprite* pFlashCardSprite = Sprite::create("Footer/flashcard_button.png");
-	int iWordNew = WordTable::getInstance()->getNumberWordNew();
-	if (iWordNew > 0)
-	{
-		Sprite* pIconNotiy = Sprite::create("Footer/noitify_msg.png");
-		pIconNotiy->setPosition(Point(95.0f, 110.0f));
 
-		char sNumberNew[10];
-		sprintf(sNumberNew, "%d", iWordNew);
-		LabelTTF* pLabelNumber = LabelTTF::create(sNumberNew, "Arial", 25);
-		pLabelNumber->setColor(ccc3(255.0f, 255.0f, 255.0f));
-		pLabelNumber->setPosition(Point(22.0f, 20.0f));
-		pIconNotiy->addChild(pLabelNumber);
-		pFlashCardSprite->addChild(pIconNotiy);
+	int iWordNew = WordTable::getInstance()->getNumberWordNew();
+
+	m_pIconNotiy = Sprite::create("Footer/noitify_msg.png");
+	m_pIconNotiy->setPosition(Point(95.0f, 110.0f));
+
+	char sNumberNew[10];
+	sprintf(sNumberNew, "%d", iWordNew);
+	m_pLabelNumber = LabelTTF::create(sNumberNew, "Arial", 25);
+	m_pLabelNumber->setColor(ccc3(255.0f, 255.0f, 255.0f));
+	m_pLabelNumber->setPosition(Point(22.0f, 20.0f));
+	m_pIconNotiy->addChild(m_pLabelNumber);
+	pFlashCardSprite->addChild(m_pIconNotiy);
+
+	if (iWordNew < 1)
+	{
+		m_pIconNotiy->setVisible(false);
+		m_pLabelNumber->setVisible(false);
 	}
 
-	int iTotalFlashCard = WordTable::getInstance()->getNumberWordCollected();
+	int iTotalFlashCard = WordTable::getInstance()->getTotalWordCollected();
 	char sTotalFlashCard[10];
 	sprintf(sTotalFlashCard, "%d", iTotalFlashCard);
-	LabelTTF* pLabelTotalFlashWord = LabelTTF::create(sTotalFlashCard, "Arial", 30);
-	pLabelTotalFlashWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
-	pLabelTotalFlashWord->setPosition(Point(61.0f, 50.0f));
-	pFlashCardSprite->addChild(pLabelTotalFlashWord);
+	m_pLabelTotalFlashWord = LabelTTF::create(sTotalFlashCard, "Arial", 30);
+	m_pLabelTotalFlashWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
+	m_pLabelTotalFlashWord->setPosition(Point(61.0f, 50.0f));
+	pFlashCardSprite->addChild(m_pLabelTotalFlashWord);
 
 	m_pButtonFlashCardNode = ButtonNode::createButtonSprite(pFlashCardSprite, CC_CALLBACK_1(FooterNode::openFlashCardCollection, this));
 	m_pButtonFlashCardNode->setPosition(Point(583.0f, 58.0f));
@@ -124,20 +129,20 @@ void FooterNode::changeStatusButtonFlashcard(StatusButtonFlashcard statusButtonF
 		pFlashCardSprite->addChild(pIconNotiy);
 	}
 
-	int iTotalFlashCard = WordTable::getInstance()->getNumberWordCollected();
+	int iTotalFlashCard = WordTable::getInstance()->getTotalWordCollected();
 	char sTotalFlashCard[10];
 	sprintf(sTotalFlashCard, "%d", iTotalFlashCard);
-	LabelTTF* pLabelTotalFlashWord = LabelTTF::create(sTotalFlashCard, "Arial", 30);
-	pLabelTotalFlashWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
-	pLabelTotalFlashWord->setPosition(Point(61.0f, 50.0f));
-	pFlashCardSprite->addChild(pLabelTotalFlashWord);
+	m_pLabelTotalFlashWord = LabelTTF::create(sTotalFlashCard, "Arial", 30);
+	m_pLabelTotalFlashWord->setColor(ccc3(0.0f, 0.0f, 0.0f));
+	m_pLabelTotalFlashWord->setPosition(Point(61.0f, 50.0f));
+	pFlashCardSprite->addChild(m_pLabelTotalFlashWord);
 
 	switch (statusButtonFlashcard)
 	{
 		case StatusButtonFlashcard::eNoClick :
 		{
-			pFlashCardSprite->setPosition(Point(593.0f, 48.0f));
-			pFlashCardSprite->setScale(0.8f);
+			pFlashCardSprite->setPosition(Point(590.0f, 50.0f));
+			pFlashCardSprite->setScale(0.85f);
 			this->addChild(pFlashCardSprite);
 			break;
 		}
@@ -157,5 +162,26 @@ void FooterNode::changeStatusButtonFlashcard(StatusButtonFlashcard statusButtonF
 			m_pButtonManagerNode->addButtonNode(m_pButtonFlashCardNode);
 			break;
 		}
+	}
+}
+
+void FooterNode::increaseTotalFlashcard(const int& iIncrease)
+{
+	char sTotalFlashCard[10];
+	int iTotalFlashCard = WordTable::getInstance()->increaseTotalWordCollected(iIncrease);
+	sprintf(sTotalFlashCard, "%d", iTotalFlashCard);
+	m_pLabelTotalFlashWord->setString(sTotalFlashCard);
+}
+
+void FooterNode::updateLayoutWordNew()
+{
+	int iWordNew = WordTable::getInstance()->getNumberWordNew();
+	if (iWordNew > 0)
+	{
+		char sNumberNew[10];
+		sprintf(sNumberNew, "%d", iWordNew);
+		m_pIconNotiy->setVisible(true);
+		m_pLabelNumber->setVisible(true);
+		m_pLabelNumber->setString(sNumberNew);
 	}
 }

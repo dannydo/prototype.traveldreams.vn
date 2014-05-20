@@ -139,7 +139,7 @@ void UserService::onCheckUserFacebookCompleted(HttpClient *sender, HttpResponse 
 void UserService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)
 {
 	std::string sKey = "";
-	String strData = "";
+	string strData = "";
 	sKey.append(response->getHttpRequest()->getTag());
 	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
 
@@ -149,17 +149,13 @@ void UserService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *respo
 		{
 			
 			std::vector<char> *buffer = response->getResponseData();
-			
-			for (unsigned int i = 0; i < buffer->size(); i++)
-			{
-				strData.appendWithFormat("%c", (*buffer)[i]);
-			}
+			string strData(buffer->begin(), buffer->end());
 		}
     }
 
 	for(auto callBack : m_callBackList)
 	{
-		callBack->resultHttpRequestCompleted(this->parseStringToJson(strData.getCString()), sKey);
+		callBack->resultHttpRequestCompleted(this->parseStringToJson(strData.c_str()), sKey);
 	}
 }
 

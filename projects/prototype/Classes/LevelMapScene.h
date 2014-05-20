@@ -68,6 +68,8 @@ private:
 
 	void removeButtonNodeCurrentLevel();
 
+	void finishEffectUnlockLevel();
+
 	ButtonNode* m_buttonPlayPassLevel;
 	ButtonManagerNode* m_pButtonManagerNode;
 	ButtonNode* m_pButtonNodeCurrentLevel;

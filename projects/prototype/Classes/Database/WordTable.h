@@ -54,13 +54,19 @@ public:
 	std::vector<WordInfo> getWordInfoCollectedForChapter(const std::string& sChapterId);
 	int getTotalWordInfoCollectedForChapter(const std::string& sChapterId);
 
-	int getNumberWordCollected();
+	unsigned long getMinTimeNextPlayMiniGame();
+
+	int getTotalWordCollected() { return m_iTotalFlashCardCollected; };
+	int increaseTotalWordCollected(const int& iIncrease);
 
 private:
 	void fetchWordsForChapter(const std::string& sChapterId);
+	int getNumberWordCollected();
 
 	static WordTable* m_WordTable;
 	std::vector<WordInfo> m_ChapterWords;
 	std::string m_sCurrentChapterId;
+
+	int m_iTotalFlashCardCollected;
 };
 #endif

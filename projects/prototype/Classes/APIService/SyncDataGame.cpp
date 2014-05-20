@@ -126,7 +126,7 @@ void SyncDataGame::runSyncDataGame()
 void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)
 {
 	std::string sKey = "";
-	String strData = "";
+	string strData = "";
 	sKey.append(response->getHttpRequest()->getTag());
 	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
 	bool bResult = true;
@@ -139,14 +139,11 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 			{
 				std::vector<char> *buffer = response->getResponseData();
 			
-				for (unsigned int i = 0; i < buffer->size(); i++)
-				{
-					strData.appendWithFormat("%c", (*buffer)[i]);
-				}
+				string strData(buffer->begin(), buffer->end());
 
 				cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
-				pJsonDict->initWithDescription(strData.getCString());
-				CCLOG("Sync %s", strData.getCString());
+				pJsonDict->initWithDescription(strData.c_str());
+				CCLOG("Sync %s", strData.c_str());
 				cs::JsonDictionary *pJsonData = pJsonDict->getSubDictionary("data");
 				if(pJsonData != NULL)
 				{
@@ -176,6 +173,8 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 								VersionInfo versionInfo = VersionTable::getInstance()->getVersionInfo();
 								versionInfo.iVersionSync = iVersion;
 								VersionTable::getInstance()->updateVersion(versionInfo);
+
+								UserTable::getInstance()->haveGenerateNextChapter();
 							}
 						}
 						else
@@ -202,12 +201,8 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 		{
 			if (response->isSucceed()) 
 			{
-				std::vector<char> *buffer = response->getResponseData();
-			
-				for (unsigned int i = 0; i < buffer->size(); i++)
-				{
-					strData.appendWithFormat("%c", (*buffer)[i]);
-				}
+				//std::vector<char> *buffer = response->getResponseData();
+				//string strData(buffer->begin(), buffer->end());
 				//CCLOG("Push %s", strData.getCString());
 			}
 		}
