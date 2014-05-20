@@ -28,6 +28,9 @@ CustomPackageDownloadManager::CustomPackageDownloadManager()
 	// try to load custom mode config
 	GameConfigManager::getInstance()->GetTimeModeDemoConfig();
 
+
+	m_pClient = HttpClient::getInstance();
+
 	//init folder to save data
 	m_sPathToSave = FileUtils::getInstance()->getWritablePath();
 	m_sPathToSave += "downloaded";	
@@ -42,7 +45,112 @@ CustomPackageDownloadManager::~CustomPackageDownloadManager()
 bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string& sFolderName);
 void callTrackingURL(const std::string& sTrackingUrl);
 
-void CustomPackageDownloadManager::StartDownloadPackage(Node* pParentNode, const char* sCode)
+void CustomPackageDownloadManager::CheckAndStartDownloadPackage(Node* pParentNode, const char* sCode)
+{
+	if (m_bIsDownloadingPackage)
+		return;	
+
+	m_pNotificationPopup = WaitingNode::createLayout("Checking code...");
+	pParentNode->addChild(m_pNotificationPopup);
+
+	m_bIsDownloadingPackage = true;
+
+	m_sCode = sCode;
+	m_pParentNode = pParentNode;
+
+	char sInfoUrl[256];
+	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
+	sprintf(sInfoUrl, "%s/downloadInfo/%s",sBaseUrl, sCode);
+
+	auto pRequest = new HttpRequest();
+	pRequest->setUrl(sInfoUrl);
+	pRequest->setRequestType(HttpRequest::Type::GET);
+	
+	pRequest->setResponseCallback(this, httpresponse_selector(CustomPackageDownloadManager::onCheckCodeRequestCompleted));
+	m_pClient->send(pRequest);
+	pRequest->release();
+	pRequest = NULL;			
+}
+
+void CustomPackageDownloadManager::onCheckCodeRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response)
+{		
+	bool bSuccessChecking = false;
+	if (m_pNotificationPopup != NULL)
+	{
+		m_pNotificationPopup->removeFromParentAndCleanup(true);
+		m_pNotificationPopup = NULL;
+	}
+
+	if (response)
+	{
+		if (response->isSucceed()) 
+		{			
+			std::vector<char> *buffer = response->getResponseData();
+			
+			if ( buffer->size() != 0)			
+			{
+				string strData(buffer->begin(), buffer->end());	
+
+				std::stringstream ss(strData);
+				std::istream_iterator<std::string> begin(ss);
+				std::istream_iterator<std::string> end;
+				std::vector<std::string> splitList(begin, end);
+
+				if (splitList.size() == 4)
+				{
+					bSuccessChecking = true;
+						 				
+					string sDownloadUrl;
+					string sServerVersion;
+
+					m_sResultFolder = splitList[0];
+					sServerVersion = splitList[1];
+
+					#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+						sDownloadUrl = splitList[3];
+					#else	
+						sDownloadUrl = splitList[2];
+					#endif
+
+
+					string sLocalVersion  = UserDefault::getInstance()->getStringForKey(m_sCode.c_str());
+					if (sServerVersion == sLocalVersion)
+					{
+						onError(AssetsManager::ErrorCode::NO_NEW_VERSION);
+						return;
+					}
+
+
+					m_pNotificationPopup = WaitingNode::createLayout("Downloading...");
+					m_pParentNode->addChild(m_pNotificationPopup);
+
+					
+					m_pAssetManager = new AssetsManager( sDownloadUrl.c_str(), "", m_sPathToSave.c_str());
+					m_pAssetManager->setDelegate(this);
+					m_pAssetManager->setConnectionTimeout(4);
+					m_pParentNode->addChild(m_pAssetManager);
+					m_pAssetManager->release();
+
+					m_pAssetManager->updateWithoutCheckVersion(sServerVersion.c_str());
+				}
+			}
+		}
+	}
+	
+	if (!bSuccessChecking)
+	{
+		m_bIsDownloadingPackage = false;
+
+		auto errorPopup = WaitingNode::createLayout("Invalid code!");
+		m_pParentNode->addChild(errorPopup);
+		errorPopup->runAction(
+			Sequence::createWithTwoActions(
+				DelayTime::create(2.f),
+				RemoveSelf::create()));
+	}
+}
+
+/*void CustomPackageDownloadManager::StartDownloadPackage(Node* pParentNode, const char* sCode)
 {
 	if (m_bIsDownloadingPackage)
 		return;	
@@ -64,11 +172,6 @@ void CustomPackageDownloadManager::StartDownloadPackage(Node* pParentNode, const
 
 		m_pNotificationPopup = WaitingNode::createLayout("Downloading...");
 		pParentNode->addChild(m_pNotificationPopup);
-
-		/*
-		int iSpaceIndex = m_sResultFolder.find(' ');
-		sDownloadUrl = m_sResultFolder.substr(iSpaceIndex+1, m_sResultFolder.size() - iSpaceIndex -1);
-		m_sResultFolder = m_sResultFolder.substr(0, iSpaceIndex);*/
 
 		std::stringstream ss(sTemp);
 		std::istream_iterator<std::string> begin(ss);
@@ -121,65 +224,7 @@ void CustomPackageDownloadManager::StartDownloadPackage(Node* pParentNode, const
 		m_bIsDownloadingPackage = false;
 	}
 }
-
-bool CustomPackageDownloadManager::CheckUpdateOfPackage(Node* pParentNode, const std::string& sPackageCode, const std::string& sPackageID)
-{
-	string sLocalVersion  = UserDefault::getInstance()->getStringForKey(sPackageCode.c_str());
-
-	char sVersionUrl[256];
-	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
-	sprintf(sVersionUrl, "%s/version/%s",sBaseUrl, sPackageCode.c_str());
-
-	string sServerVersion;
-	if (checkAndGetResultFolderName( string(sVersionUrl), sServerVersion))
-	{
-	}
-
-	return false;
-
-
-		if (sServerVersion == sLocalVersion)
-			return false;
-	return true;
-
-	/*
-	//m_pParentNode = NULL; //not need save parent node this case
-
-	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
-	char sVersionUrl[256], sFolderUrl[256];	
-	string sDownloadUrl;
-	sprintf(sFolderUrl, "%s/folder/%s",sBaseUrl, sPackageCode.c_str());
-
-	std::string sFolderName;
-	if (checkAndGetResultFolderName( string(sFolderUrl), m_sResultFolder) && m_sResultFolder.size()!=0)
-	{									
-		std::stringstream ss(m_sResultFolder);
-		std::istream_iterator<std::string> begin(ss);
-		std::istream_iterator<std::string> end;
-		std::vector<std::string> splitList(begin, end);
-		m_sResultFolder = splitList[0];
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-		sDownloadUrl = splitList[2];
-#else	
-		sDownloadUrl = splitList[1];
-#endif
-
-		//char sVersionUrl[256];
-		//const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
-		sprintf(sVersionUrl, "%s/version/%s",sBaseUrl, sPackageCode.c_str());
-
-		auto pAssetManager = new AssetsManager( sDownloadUrl.c_str(), sVersionUrl, "");
-		pAssetManager->setDelegate(NULL);
-		bool bResult = pAssetManager->checkUpdate();	
-
-		pParentNode->addChild(pAssetManager);
-		pAssetManager->release();
-
-		return bResult;
-	}
-	return false;*/
-}
-
+*/
 // assets manager callback
 void CustomPackageDownloadManager::onError(cocos2d::extension::AssetsManager::ErrorCode errorCode)
 {	

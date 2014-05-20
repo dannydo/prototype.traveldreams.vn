@@ -31,7 +31,11 @@ AdvanceModePopularPackagesScene::~AdvanceModePopularPackagesScene()
 
 AdvanceModePopularPackagesLayer::~AdvanceModePopularPackagesLayer()
 {
-	
+	if (m_pCustomPackageDownloadManager != NULL)
+	{
+		m_pCustomPackageDownloadManager->release();
+		m_pCustomPackageDownloadManager = NULL;
+	}
 }
 
 bool AdvanceModePopularPackagesLayer::init()
@@ -130,7 +134,8 @@ bool AdvanceModePopularPackagesLayer::init()
 	m_iTotalPackage = 0;
 	m_maxHeight = 0;
 
-	m_CustomPackageDownloadManager.SetDownloadPackageCompleteCallback(std::bind( &AdvanceModePopularPackagesLayer::OnDownloadPackageComplete, this, std::placeholders::_1));
+	m_pCustomPackageDownloadManager = new CustomPackageDownloadManager();
+	m_pCustomPackageDownloadManager->SetDownloadPackageCompleteCallback(std::bind( &AdvanceModePopularPackagesLayer::OnDownloadPackageComplete, this, std::placeholders::_1));
 
 	return true;
 }
@@ -230,7 +235,7 @@ void AdvanceModePopularPackagesLayer::clickAddPackage(Object* sender)
 	if(m_pCodeEditBox->getText()[0] == 0)
 		return;
 
-	m_CustomPackageDownloadManager.StartDownloadPackage( this, m_pCodeEditBox->getText());
+	m_pCustomPackageDownloadManager->CheckAndStartDownloadPackage( this, m_pCodeEditBox->getText());
 }
 
 void AdvanceModePopularPackagesLayer::clickAddPackageCode(Object* sender)

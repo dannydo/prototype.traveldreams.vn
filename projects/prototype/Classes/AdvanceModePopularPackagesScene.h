@@ -49,7 +49,7 @@ private:
 	int m_iConnectServer;
 	int m_iTotalPackage;
 
-	CustomPackageDownloadManager m_CustomPackageDownloadManager;
+	CustomPackageDownloadManager* m_pCustomPackageDownloadManager;
 	std::vector<CSPackageInfo> m_csPackageInfos;
 };
 

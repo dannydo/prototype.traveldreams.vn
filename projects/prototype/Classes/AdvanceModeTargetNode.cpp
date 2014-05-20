@@ -23,6 +23,16 @@ AdvanceModeTargetNode* AdvanceModeTargetNode::createLayout(const std::string sPa
 	return NULL;
 }
 
+
+AdvanceModeTargetNode::~AdvanceModeTargetNode()
+{
+	if (m_pCustomPackageDownloadManager != NULL)
+	{
+		m_pCustomPackageDownloadManager->release();
+		m_pCustomPackageDownloadManager = NULL;
+	}
+}
+
 bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 {
 	if (!Node::init())
@@ -130,6 +140,8 @@ bool AdvanceModeTargetNode::init(bool bNeedCheckPackageVersion)
 	pLeaderBoard->setPosition(Point(320.0f, 114.0f));
 	this->addChild(pLeaderBoard);
 
+	m_pCustomPackageDownloadManager = NULL;
+
 	if (bNeedCheckPackageVersion)
 	{
 		m_pRequest = NULL;
@@ -185,8 +197,7 @@ void AdvanceModeTargetNode::onHttpRequestCompleted(HttpClient *sender, HttpRespo
 }
 
 void AdvanceModeTargetNode::clickPlayAdvanceMode(Object* sender)
-{	
-	CCLOG("Start 1");
+{		
 	string sPathToSave = FileUtils::getInstance()->getWritablePath();
 	sPathToSave += "downloaded";	
 
@@ -197,9 +208,7 @@ void AdvanceModeTargetNode::clickPlayAdvanceMode(Object* sender)
 	timeModeConfig.m_sCustomPackageID = m_csPackageInfo.sPackageId;
 	std::string sResultFolder = m_csPackageInfo.sPackageId;
 	sResultFolder.insert(0, "/");
-	sResultFolder.insert(0, sPathToSave);
-	
-	CCLOG("Start 2");
+	sResultFolder.insert(0, sPathToSave);	
 
 	int iWordPackageIndex = GameWordManager::getInstance()->AddAndLoadCustomPackageToList( timeModeConfig.m_sCustomPackageID, sResultFolder);
 	auto& wordList = GameWordManager::getInstance()->GetWordList();
@@ -211,16 +220,13 @@ void AdvanceModeTargetNode::clickPlayAdvanceMode(Object* sender)
 			timeModeConfig.m_WordCollectedCountList.push_back(0);
 		}
 	}
-
-	CCLOG("Start 3");
+	
 
 	// start game
 	GameWordManager::getInstance()->GenerateWordForNewLevelOfTimeMode(&timeModeConfig, true);	
 
 	auto scene = HelloWorld::createScene( _GMT_TIME_MODE_);
-	Director::getInstance()->replaceScene(scene);
-
-	CCLOG("Start 4");
+	Director::getInstance()->replaceScene(scene);	
 }
 
 void AdvanceModeTargetNode::clickClose(Object* sender)
@@ -242,8 +248,13 @@ void AdvanceModeTargetNode::clickClose(Object* sender)
 
 void AdvanceModeTargetNode::clickUpdatePackage(cocos2d::Object* sender)
 {
-	m_CustomPackageDownloadManager.SetDownloadPackageCompleteCallback( std::bind(&AdvanceModeTargetNode::OnUpdatePackageComplete, this, std::placeholders::_1));
-	m_CustomPackageDownloadManager.StartDownloadPackage( this, m_csPackageInfo.sPackageCode.c_str());
+	if (m_pCustomPackageDownloadManager == NULL)
+	{
+		m_pCustomPackageDownloadManager = new CustomPackageDownloadManager();
+	}
+
+	m_pCustomPackageDownloadManager->SetDownloadPackageCompleteCallback( std::bind(&AdvanceModeTargetNode::OnUpdatePackageComplete, this, std::placeholders::_1));
+	m_pCustomPackageDownloadManager->CheckAndStartDownloadPackage( this, m_csPackageInfo.sPackageCode.c_str());
 }
 
 void AdvanceModeTargetNode::OnUpdatePackageComplete(const CSPackageInfo& packageInfo)

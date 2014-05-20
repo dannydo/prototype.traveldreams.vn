@@ -9,21 +9,22 @@
 using namespace cocos2d;
 USING_NS_CC_EXT;
 
-class CustomPackageDownloadManager : public cocos2d::extension::AssetsManagerDelegateProtocol
+class CustomPackageDownloadManager : public Object, public cocos2d::extension::AssetsManagerDelegateProtocol
 {
 
 public:
 	CustomPackageDownloadManager();
 	~CustomPackageDownloadManager();
 
-	void StartDownloadPackage(Node* pParentNode, const char* sCode);
+	void CheckAndStartDownloadPackage(Node* pParentNode, const char* sCode);
+	//void StartDownloadPackage(Node* pParentNode, const char* sCode);
 
 	void SetDownloadPackageCompleteCallback( std::function<void(const CSPackageInfo&)> downloadPackageCompleteCallback) { m_DownloadPackageCompleteCallback = downloadPackageCompleteCallback;}
 
-	void GetPackageInfoFromServer(CSPackageInfo& package);
-
-	bool CheckUpdateOfPackage(Node* pParentNode, const std::string& sPackageCode, const std::string& sPackageID);
+	void GetPackageInfoFromServer(CSPackageInfo& package);	
 private:
+	void onCheckCodeRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
+
 	// assets manager callback
 	virtual void onError(cocos2d::extension::AssetsManager::ErrorCode errorCode);
     virtual void onProgress(int percent);
@@ -42,6 +43,8 @@ private:
 
 	std::function<void(const CSPackageInfo&)> m_DownloadPackageCompleteCallback;
 	//std::function<void()> m_DownloadPackageErrorCallback;
+	
+	cocos2d::extension::HttpClient* m_pClient;
 };
 
 #endif _CUSTOM_PACKAGE_DOWNLOAD_MANAGER_H_

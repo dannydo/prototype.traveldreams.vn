@@ -14,6 +14,9 @@ public:
 	static AdvanceModeTargetNode* createLayout(const std::string sPackageId, bool bNeedCheckPackageVersion = true);
 	bool init(bool bNeedCheckPackageVersion);
 
+
+	~AdvanceModeTargetNode();
+
 	void OnUpdatePackageComplete(const CSPackageInfo& packageInfo);
 	void setIsBackToMyPackage(const bool& isBacktoMyPackage);
 
@@ -29,7 +32,7 @@ private:
 	std::string m_sPackageId;
 
 
-	CustomPackageDownloadManager m_CustomPackageDownloadManager;
+	CustomPackageDownloadManager* m_pCustomPackageDownloadManager;
 	bool m_isBacktoMyPackage;
 	ButtonManagerNode* m_pButtonManagerNode;
 
