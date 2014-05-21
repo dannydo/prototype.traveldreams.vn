@@ -61,6 +61,8 @@ void UserService::checkUserFacebook(const std::string strAccessToken, const int&
 
 	m_pRequest->setResponseCallback(this, httpresponse_selector(UserService::onCheckUserFacebookCompleted));
 	m_pClient->send(m_pRequest);
+	m_pClient->setTimeoutForConnect(10);
+	m_pClient->setTimeoutForRead(10);
 	m_pRequest->release();
 	m_pRequest = NULL;
 }
@@ -84,6 +86,8 @@ void UserService::getLeaderBoardLevel(const std::string& sChapterId, const int& 
 
 	m_pRequest->setResponseCallback(this, httpresponse_selector(UserService::onHttpRequestCompleted));
 	m_pClient->send(m_pRequest);
+	m_pClient->setTimeoutForConnect(10);
+	m_pClient->setTimeoutForRead(10);
 	m_pRequest->release();
 	m_pRequest = NULL;
 }
@@ -106,6 +110,8 @@ void UserService::getLeaderBoardAdvanceMode(const std::string& sPackageId, const
 
 	m_pRequest->setResponseCallback(this, httpresponse_selector(UserService::onHttpRequestCompleted));
 	m_pClient->send(m_pRequest);
+	m_pClient->setTimeoutForConnect(10);
+	m_pClient->setTimeoutForRead(10);
 	m_pRequest->release();
 	m_pRequest = NULL;
 }

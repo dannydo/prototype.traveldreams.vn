@@ -65,6 +65,8 @@ void PackageService::getPackagePopular(const int& iStart, const int& iNumberReco
 
 	m_pRequest->setResponseCallback(this, httpresponse_selector(PackageService::onHttpRequestCompleted));
 	m_pClient->send(m_pRequest);
+	m_pClient->setTimeoutForConnect(10);
+	m_pClient->setTimeoutForRead(10);
 	m_pRequest->release();
 	m_pRequest = NULL;
 }

@@ -69,6 +69,8 @@ void TrackingService::pushTrackingToServer()
 		m_pRequest->setResponseCallback(this, httpresponse_selector(TrackingService::onHttpRequestCompleted));
 
 		m_pClient->send(m_pRequest);
+		m_pClient->setTimeoutForConnect(10);
+		m_pClient->setTimeoutForRead(10);
 		m_pRequest->release();
 		m_pRequest = NULL;
 
