@@ -350,7 +350,8 @@ void SettingMenuNode::clickMainMenu(cocos2d::Object* sender)
 
 void SettingMenuNode::clickQuitLevel(cocos2d::Object* sender)
 {
-	this->hide();
+	if (m_iShowSetting)
+		this->hide();
 
 	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
 	std::string sChapterId = GameConfigManager::getInstance()->GetCurrentChapterID();
@@ -503,6 +504,9 @@ void SettingMenuNode::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, coc
 		{
 			if (this->getParent()->getChildByTag(10000) == nullptr)
 			{
+				if (m_iShowSetting)
+					this->hide();
+
 				PopupConfirmNode* popupConfirm = PopupConfirmNode::createLayout("DO YOU WANT TO EXIT GAME?", "", PopupConfirmActionType::eExitGame,  PopupConfirmType::eYesNo);
 				popupConfirm->setTag(10000);
 				this->getParent()->addChild(popupConfirm, 10000);
