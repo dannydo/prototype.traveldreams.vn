@@ -79,7 +79,6 @@ void TrackingService::pushTrackingToServer()
 void TrackingService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)
 {	
 	std::string sKey = "";
-	string strData = "";
 	sKey.append(response->getHttpRequest()->getTag());
 	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
 	bool bResult = true;

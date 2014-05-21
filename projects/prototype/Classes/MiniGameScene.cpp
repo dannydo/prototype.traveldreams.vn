@@ -352,6 +352,7 @@ void MiniGameLayer::playEffectCollect()
 	m_pFlashCard->runAction(Spawn::create(actionFlashcardScaleOut, actionFlashcardMove, NULL));
 
 	m_pFooterNode->increaseTotalFlashcard(1);
+	m_pFooterNode->updateLayoutWordNew();
 }
 
 void MiniGameLayer::playEffectLose()

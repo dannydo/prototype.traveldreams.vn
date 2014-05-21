@@ -72,7 +72,6 @@ void PackageService::getPackagePopular(const int& iStart, const int& iNumberReco
 void PackageService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)
 {
 	std::string sKey = "";
-	string strData = "";
 	sKey.append(response->getHttpRequest()->getTag());
 	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
 	bool bResult = true;

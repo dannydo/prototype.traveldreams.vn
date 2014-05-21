@@ -113,7 +113,7 @@ void UserService::getLeaderBoardAdvanceMode(const std::string& sPackageId, const
 void UserService::onCheckUserFacebookCompleted(HttpClient *sender, HttpResponse *response)
 {
 	std::string sKey = "";
-	String strData = "";
+	string strData = "";
 	sKey.append(response->getHttpRequest()->getTag());
 	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
 
@@ -121,18 +121,14 @@ void UserService::onCheckUserFacebookCompleted(HttpClient *sender, HttpResponse 
     {
 		if (response->isSucceed()) 
 		{
-			
 			std::vector<char> *buffer = response->getResponseData();
-			
-			for (unsigned int i = 0; i < buffer->size(); i++)
-			{
-				strData.appendWithFormat("%c", (*buffer)[i]);
-			}
+			string strDataTemp(buffer->begin(), buffer->end());
+			strData = strDataTemp;
 		}
 	}
 
 	//MessageBox(strData.getCString(), "Error");
-	SystemEventHandle::getInstance()->onCheckUserFacebookResult(this->parseStringToJson(strData.getCString()), sKey);
+	SystemEventHandle::getInstance()->onCheckUserFacebookResult(this->parseStringToJson(strData.c_str()), sKey);
 	
 }
 
@@ -147,9 +143,9 @@ void UserService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *respo
     {
 		if (response->isSucceed()) 
 		{
-			
 			std::vector<char> *buffer = response->getResponseData();
-			string strData(buffer->begin(), buffer->end());
+			string strDataTemp(buffer->begin(), buffer->end());
+			strData = strDataTemp;
 		}
     }
 
