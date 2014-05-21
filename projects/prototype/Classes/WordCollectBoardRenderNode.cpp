@@ -669,7 +669,7 @@ void WordCollectBoardRenderNode::GenerateLabels(GameModeType_e eGameModeType, in
 			pFrame->setPosition(Point( winSize.width/2.f, winSize.height/2.f));
 
 			auto pAnimSprite = Sprite::createWithSpriteFrameName("tut6_anim_1.png");
-			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f + 40.f));
+			pAnimSprite->setPosition(Point( winSize.width/2.f, winSize.height/2.f + 55.f));
 			auto pAnimation = AnimationCache::getInstance()->getAnimation("Tutorial6");
 			pAnimSprite->runAction(	Animate::create(pAnimation));
 
