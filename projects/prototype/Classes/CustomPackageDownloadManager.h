@@ -21,7 +21,7 @@ public:
 
 	void SetDownloadPackageCompleteCallback( std::function<void(const CSPackageInfo&)> downloadPackageCompleteCallback) { m_DownloadPackageCompleteCallback = downloadPackageCompleteCallback;}
 
-	void GetPackageInfoFromServer(CSPackageInfo& package);	
+	//void GetPackageInfoFromServer(CSPackageInfo& package);	
 private:
 	void onCheckCodeRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
 
@@ -44,6 +44,8 @@ private:
 	std::function<void(const CSPackageInfo&)> m_DownloadPackageCompleteCallback;
 	//std::function<void()> m_DownloadPackageErrorCallback;
 	
+	CSPackageInfo m_ServerPackageInfo;
+
 	cocos2d::extension::HttpClient* m_pClient;
 };
 

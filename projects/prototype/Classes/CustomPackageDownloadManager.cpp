@@ -60,7 +60,7 @@ void CustomPackageDownloadManager::CheckAndStartDownloadPackage(Node* pParentNod
 
 	char sInfoUrl[256];
 	const char* sBaseUrl = "http://vocab.kiss-concept.com/packages";
-	sprintf(sInfoUrl, "%s/downloadInfo/%s",sBaseUrl, sCode);
+	sprintf(sInfoUrl, "%s/getinfo/%s",sBaseUrl, sCode);
 
 	auto pRequest = new HttpRequest();
 	pRequest->setUrl(sInfoUrl);
@@ -91,25 +91,39 @@ void CustomPackageDownloadManager::onCheckCodeRequestCompleted(cocos2d::extensio
 			{
 				string strData(buffer->begin(), buffer->end());	
 
+				/*
 				std::stringstream ss(strData);
 				std::istream_iterator<std::string> begin(ss);
 				std::istream_iterator<std::string> end;
 				std::vector<std::string> splitList(begin, end);
 
 				if (splitList.size() == 4)
+				{*/
+				if (strData.size() > 0)
 				{
 					bSuccessChecking = true;
-						 				
+
 					string sDownloadUrl;
 					string sServerVersion;
 
-					m_sResultFolder = splitList[0];
-					sServerVersion = splitList[1];
+					auto pJsonDict = new cs::JsonDictionary();
+					pJsonDict->initWithDescription(strData.c_str());
+					
+					m_ServerPackageInfo.sPackageId = pJsonDict->getItemStringValue("id");
+					m_ServerPackageInfo.sPackageCode = m_sCode;
+					m_ServerPackageInfo.iTotalWord = pJsonDict->getItemIntValue("total", 0);		
+					m_ServerPackageInfo.sPackageName = pJsonDict->getItemStringValue("name");		
+					auto pAuthorSubDict = pJsonDict->getSubDictionary("author");
+					m_ServerPackageInfo.sCreatedBy = pAuthorSubDict->getItemStringValue("fullname");
+
+					m_sResultFolder = m_ServerPackageInfo.sPackageId;
+					sServerVersion  = pJsonDict->getItemStringValue("lastedVersion");
+										 												
 
 					#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
-						sDownloadUrl = splitList[3];
+						sDownloadUrl = pJsonDict->getItemStringValue("urlDownloadPC");
 					#else	
-						sDownloadUrl = splitList[2];
+						sDownloadUrl = pJsonDict->getItemStringValue("urlDownloadAndroid");
 					#endif
 
 
@@ -270,12 +284,10 @@ void CustomPackageDownloadManager::onError(cocos2d::extension::AssetsManager::Er
 			CSPackageInfo packageInfo = CSPackageTable::getCSPackageInfo(m_sResultFolder);
 			if (packageInfo.sPackageId.size() == 0)
 			{
-				packageInfo.sPackageId = m_sResultFolder;
-				packageInfo.sPackageCode = m_sCode;		
-				GetPackageInfoFromServer(packageInfo);		
-
+				packageInfo = m_ServerPackageInfo;
 				CSPackageTable::updateCSPackage(packageInfo);
 			}
+			
 			m_DownloadPackageCompleteCallback(packageInfo);
 		}		
 
@@ -357,18 +369,17 @@ void CustomPackageDownloadManager::onSuccess()
 	if (m_DownloadPackageCompleteCallback != nullptr)
 	{		
 		CSPackageInfo packageInfo = CSPackageTable::getCSPackageInfo(m_sResultFolder);
-
-		CSPackageInfo packageInfoFromServer;
-		packageInfoFromServer.sPackageId = m_sResultFolder;
-		packageInfoFromServer.sPackageCode = m_sCode;		
-		GetPackageInfoFromServer(packageInfoFromServer);
-
+		
 		if (packageInfo.sPackageId.size() == 0) //new package
 		{			
-			packageInfo = packageInfoFromServer;
+			packageInfo = m_ServerPackageInfo;
 		}
-		else //just update
-			packageInfo.iTotalWord = packageInfoFromServer.iTotalWord;
+		else
+		{
+			//just update
+			packageInfo.sPackageName = m_ServerPackageInfo.sPackageName;
+			packageInfo.iTotalWord = m_ServerPackageInfo.iTotalWord;
+		}
 
 		// save info to db
 		CSPackageTable::updateCSPackage(packageInfo);
@@ -377,7 +388,7 @@ void CustomPackageDownloadManager::onSuccess()
 	}	
 }
 
-void CustomPackageDownloadManager::GetPackageInfoFromServer(CSPackageInfo& package)
+/*void CustomPackageDownloadManager::GetPackageInfoFromServer(CSPackageInfo& package)
 {	     
 	std::string sData;
 	char sInfoUrl[256];
@@ -420,7 +431,7 @@ void CustomPackageDownloadManager::GetPackageInfoFromServer(CSPackageInfo& packa
 		auto pAuthorSubDict = pJsonDict->getSubDictionary("author");
 		package.sCreatedBy = pAuthorSubDict->getItemStringValue("fullname");
 	}    
-}
+}*/
 
 
 
@@ -476,7 +487,7 @@ void callTrackingURL(const std::string& sTrackingUrl)
     res = curl_easy_perform(_curl);
 }
 
-bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string& sFolderName)
+/*bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string& sFolderName)
 {
     if (sOuputFolderUrl.size() == 0) return false;
     
@@ -510,3 +521,4 @@ bool checkAndGetResultFolderName(const std::string& sOuputFolderUrl, std::string
     return true;
 }
 
+*/
