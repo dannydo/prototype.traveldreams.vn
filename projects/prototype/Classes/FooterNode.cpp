@@ -23,8 +23,7 @@ bool FooterNode::init()
 	this->addChild(m_pBackground);
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
-	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn_setting.png");
-	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(FooterNode::openSettingMenu, this));
+	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, CC_CALLBACK_1(FooterNode::openSettingMenu, this));
 	m_pButtonSettingNode->setPosition(Point(36.0f, 33.0f));
 
 	Sprite* pFlashCardSprite = Sprite::create("Footer/flashcard_button.png");
@@ -66,6 +65,9 @@ bool FooterNode::init()
 	this->addChild(m_pButtonManagerNode);
 
 	m_pSettingNode = NULL;
+
+	auto actioneAddSettingNode = CallFunc::create(this, callfunc_selector(FooterNode::addSettingNode));
+	this->runAction(Sequence::create(DelayTime::create(0.01), actioneAddSettingNode, NULL));
 	
 	return true;
 }
@@ -77,6 +79,14 @@ void FooterNode::openFlashCardCollection(Object* sender)
 		FlashCardCollectionScene* pFlashCardCollection = FlashCardCollectionScene::create();
 		Director::getInstance()->replaceScene(pFlashCardCollection);
 	}
+}
+
+void FooterNode::addSettingNode()
+{
+	m_pSettingNode = SettingMenuNode::create();
+	m_pSettingNode->setPosition(Point(-505.0f, 0.0f));
+	m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
+	this->getParent()->addChild(m_pSettingNode);
 }
 
 void FooterNode::openSettingMenu(Object* sender)

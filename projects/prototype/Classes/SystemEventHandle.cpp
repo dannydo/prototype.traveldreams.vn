@@ -82,7 +82,7 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 			if (m_bIsShowSyncError)
 			{
 				// Show popup error
-				MessageBox("Sync Game Data Error!", "");
+				//MessageBox("Sync Game Data Error!", "");
 				m_bIsShowSyncError = false;
 			}
 		}
@@ -147,6 +147,7 @@ void SystemEventHandle::onLoginFacebookResult(const bool& bResult)
 		else
 		{
 			UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
+			Director::getInstance()->getRunningScene()->removeChildByTag(1000);
 		}
 	}
 	else
@@ -161,6 +162,8 @@ void SystemEventHandle::onLoginFacebookResult(const bool& bResult)
 
 void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict, std::string sKey)
 {
+	Director::getInstance()->getRunningScene()->removeChildByTag(1000);
+
 	if(pJsonDict != NULL)
 	{
 		cs::JsonDictionary* pJsonData = pJsonDict->getSubDictionary("data");
@@ -186,18 +189,12 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 					userInfo.sUserToken = pJsonUser->getItemStringValue("UserToken");
 					userInfo.ulLifeTimeBeginRemain = getTimeLocalCurrent();
 
-					Director::getInstance()->getRunningScene()->removeChildByTag(1000);
-					
 					if (sKey == "NOT_MAPPED_NO_FB_AND_FB_LINK_OTHER_USER")
 					{
 						// User have not account facebook and account login facebook has link other user
-						// Show popup
-						if (UserTable::getInstance()->getUserInfo().sFacebookId == "")
-						{
-							ConnectFacebookConfirm* pConfirm = ConnectFacebookConfirm::createLayout(userInfo);
-							Director::getInstance()->getRunningScene()->addChild(pConfirm);
-							pConfirm->setPosition(320.0f, 480.0f);
-						}
+						ConnectFacebookConfirm* pConfirm = ConnectFacebookConfirm::createLayout(userInfo);
+						Director::getInstance()->getRunningScene()->addChild(pConfirm);
+						pConfirm->setPosition(320.0f, 480.0f);
 					}
 					else if (sKey == "NOT_MAPPED_HAS_FB_AND_FB_LINK_OTHER_USER")
 					{
@@ -264,20 +261,8 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 							UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
 						}
 					}
-					else
-					{
-						// Show popup error
-						// MessageBox("Login", "Check user facebook error!");
-						Director::getInstance()->getRunningScene()->removeChildByTag(1000);
-					}
-
-					return;
 				}
 			}
 		}
 	}
-
-	// Show popup error
-	// MessageBox("Login", "Check user facebook error!");
-	Director::getInstance()->getRunningScene()->removeChildByTag(1000);
 }

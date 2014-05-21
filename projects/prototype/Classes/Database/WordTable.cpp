@@ -431,6 +431,7 @@ bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iV
 		return false;
 
 	CCLOG("sync Word true");
+	m_iTotalFlashCardCollected = getNumberWordCollected();
 
 	if (m_sCurrentChapterId != "")
 		this->fetchWordsForChapter(m_sCurrentChapterId);

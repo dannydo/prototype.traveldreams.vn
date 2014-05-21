@@ -33,6 +33,8 @@ private:
 	void openSettingMenu(cocos2d::Object* sender);
 	void openFlashCardCollection(cocos2d::Object* sender);
 
+	void addSettingNode();
+
 	cocos2d::Sprite* m_pBackground;
 	SettingMenuNode* m_pSettingNode	;
 

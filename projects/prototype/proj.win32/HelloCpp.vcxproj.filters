@@ -285,6 +285,9 @@
     <ClCompile Include="..\Classes\PopupThanksNode.cpp">
       <Filter>Classes\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\IconLoadingNode.cpp">
+      <Filter>Classes\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -534,6 +537,9 @@
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\PopupThanksNode.h">
+      <Filter>Classes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\IconLoadingNode.h">
       <Filter>Classes\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

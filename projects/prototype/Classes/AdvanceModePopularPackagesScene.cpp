@@ -2,6 +2,7 @@
 #include "ClipMaskNode.h"
 #include "APIService\PackageService.h"
 #include "AdvanceModeTargetNode.h"
+#include "IconLoadingNode.h"
 
 USING_NS_CC;
 
@@ -137,6 +138,11 @@ bool AdvanceModePopularPackagesLayer::init()
 	m_pCustomPackageDownloadManager = new CustomPackageDownloadManager();
 	m_pCustomPackageDownloadManager->SetDownloadPackageCompleteCallback(std::bind( &AdvanceModePopularPackagesLayer::OnDownloadPackageComplete, this, std::placeholders::_1));
 
+	IconLoadingNode* iconLoadingNode = IconLoadingNode::create();
+	iconLoadingNode->setTag(1000);
+	iconLoadingNode->setPosition(320.0f, 400.0f);
+	this->addChild(iconLoadingNode, 1000);
+
 	return true;
 }
 
@@ -215,6 +221,8 @@ void AdvanceModePopularPackagesLayer::resultHttpRequestCompleted(cs::JsonDiction
 			}
 		}
 	}
+
+	this->removeChildByTag(1000);
 }
 
 void AdvanceModePopularPackagesLayer::clickDownloadPackage(Object* sender)

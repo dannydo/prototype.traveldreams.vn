@@ -10,6 +10,7 @@ typedef enum {
 	eResetGame,
     eQuitGameCustomMode,  
 	eFlashcardCollection,
+	eExitGame,
 } PopupConfirmActionType;
 
 typedef enum {

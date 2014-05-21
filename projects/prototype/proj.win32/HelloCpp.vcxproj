@@ -181,6 +181,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClCompile Include="..\Classes\GetMoreLifeNode.cpp" />
     <ClCompile Include="..\Classes\HeaderNode.cpp" />
     <ClCompile Include="..\Classes\HelloWorldScene.cpp" />
+    <ClCompile Include="..\Classes\IconLoadingNode.cpp" />
     <ClCompile Include="..\Classes\IntroductionLayer.cpp" />
     <ClCompile Include="..\Classes\GameConfigManager.cpp" />
     <ClCompile Include="..\Classes\LeaderBoardAdvanceModeNode.cpp" />
@@ -265,6 +266,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\..\external\libwebsockets\win32\lib\*.*" "$(OutD
     <ClInclude Include="..\Classes\GetMoreLifeNode.h" />
     <ClInclude Include="..\Classes\HeaderNode.h" />
     <ClInclude Include="..\Classes\HelloWorldScene.h" />
+    <ClInclude Include="..\Classes\IconLoadingNode.h" />
     <ClInclude Include="..\Classes\IntroductionLayer.h" />
     <ClInclude Include="..\Classes\GameConfigManager.h" />
     <ClInclude Include="..\Classes\LeaderBoardAdvanceModeNode.h" />

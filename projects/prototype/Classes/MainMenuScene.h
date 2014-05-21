@@ -15,7 +15,6 @@ public:
 
 	void update(float dt) override;
 
-	virtual void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 private:
 	void playGame(cocos2d::Object* sender);
 	void loginFacebook(cocos2d::Object* sender);

@@ -17,6 +17,7 @@ typedef enum {
 	kMyPackage,
 	kPopularPackage,
 	kReviseGame,
+	kPlayAdvanceMode,
 } SceneMode;
 
 class SettingMenuNode : public CustomNode
@@ -40,6 +41,9 @@ private:
 	void onTouchCustomNodeMoved(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override; 
 	void onTouchCustomNodeEnded(cocos2d::Touch* pTouch,  cocos2d::Event* pEvent) override;
 
+	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+
 	void clickMusic();
 	void clickEffect();
 	void clickVoice();
@@ -51,6 +55,7 @@ private:
 	void clickQuitLevel(cocos2d::Object* sender);
 	void clickResume(cocos2d::Object* sender);
 	void clickUnlockAllLevel(cocos2d::Object* sender);
+	void clickQuitGame(cocos2d::Object* sender);
 
 	void actionBack();
 	void addButtonFacebook();
@@ -69,7 +74,6 @@ private:
 	int m_iStatusButtonFacebook;
 
 	cocos2d::LabelBMFont *m_pUnlockLabel;
-
 
 	std::function<void()> m_OnHideSettingMenuCallback;
 };

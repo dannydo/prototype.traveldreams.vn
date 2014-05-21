@@ -2,7 +2,8 @@
 #include "APIService\UserService.h"
 #include "LoadingImageNode.h"
 #include "Database\UserTable.h"
-#include "Database\CSPackageTable.h"
+#include "Database\CSPackageTable.h"	 
+#include "IconLoadingNode.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -81,6 +82,11 @@ bool LeaderBoardAdvanceModeNode::init()
 		m_iConnectServer++;
 		UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
 		UserService::getInstance()->getLeaderBoardAdvanceMode(m_sPackageId, m_iConnectServer);
+
+		IconLoadingNode* iconLoadingNode = IconLoadingNode::create();
+		iconLoadingNode->setTag(1000);
+		iconLoadingNode->setPosition(0.0f, -30.0f);
+		this->addChild(iconLoadingNode, 1000);
 	}
 #endif
 
@@ -280,6 +286,8 @@ void LeaderBoardAdvanceModeNode::resultHttpRequestCompleted(cs::JsonDictionary* 
 			}
 		}
 	}
+
+	this->removeChildByTag(1000);
 }
 
 bool LeaderBoardAdvanceModeNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)

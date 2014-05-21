@@ -7,6 +7,7 @@
 #include "GameConfigManager.h"
 #include "FunctionCommon.h"
 #include "PopupUnderContructionNode.h"
+#include "IconLoadingNode.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -77,6 +78,11 @@ bool LeaderBoardtNode::init()
 		m_iConnectServer++;
 		UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", m_iConnectServer);
 		UserService::getInstance()->getLeaderBoardLevel(m_sChapterId ,m_iLevel, m_iConnectServer);
+
+		IconLoadingNode* iconLoadingNode = IconLoadingNode::create();
+		iconLoadingNode->setTag(1000);
+		iconLoadingNode->setPosition(0.0f, -30.0f);
+		this->addChild(iconLoadingNode, 1000);
 	}
 #endif
 
@@ -403,6 +409,8 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 			}
 		}
 	}
+
+	this->removeChildByTag(1000);
 }
 
 void LeaderBoardtNode::parseJsonToLeadeBoard(cs::JsonDictionary* pJsonItem, const int& iRank, const int& iIndex)

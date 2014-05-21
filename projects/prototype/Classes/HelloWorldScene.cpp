@@ -57,8 +57,7 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,
 	boardLayer->initLevel(eGameModeType, iTimeModeStage, iExistedCombo4Count, iExistedCombo5Count, iExistedCombo6Count);
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
-	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn_setting.png");
-	boardLayer->m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
+	boardLayer->m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, CC_CALLBACK_1(HelloWorld::menuCloseCallback, boardLayer));
 	boardLayer->m_pButtonSettingNode->setPosition(Point(36.0f, 33.0f));	
 
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
@@ -83,6 +82,17 @@ Scene* HelloWorld::createScene(GameModeType_e eGameModeType, int iTimeModeStage,
 
 	//
 	boardLayer->m_pHUDLayer->addChild(boardLayer->m_pWordCollectBoardRenderNode, 11);
+
+	if (eGameModeType == _GMT_NORMAL_)
+		Breadcrumb::getInstance()->addSceneMode(SceneMode::kPlayGame);
+	else
+		Breadcrumb::getInstance()->addSceneMode(SceneMode::kPlayAdvanceMode);
+
+	boardLayer->m_pSettingNode = SettingMenuNode::create();
+	boardLayer->m_pSettingNode->setPosition(Point(-505.0f, 0));
+	boardLayer->m_pSettingNode->addButtonSetting(boardLayer->m_pButtonSettingNode);
+	boardLayer->m_pSettingNode->SetOnHideSettingMenuCallback( std::bind( &HelloWorld::menuCloseCallback, boardLayer, boardLayer));
+	boardLayer->addChild(boardLayer->m_pSettingNode, 98);
 
     // return the scene
     return scene;
@@ -176,8 +186,6 @@ bool HelloWorld::init()
 	this->setTouchEnabled(true);	
 	this->setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
 	this->scheduleUpdate();
-
-	m_pSettingNode = NULL;
 
     return true;
 }
@@ -687,8 +695,7 @@ void HelloWorld::initLevel(GameModeType_e eGameModeType, int iTimeModeStage, int
 
 	// play sound
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kGameMusic);
-	Breadcrumb::getInstance()->addSceneMode(SceneMode::kPlayGame);	
-
+	
 	// make sure fint hint at begin of game
 	this->runAction( CCSequence::create(
 				CCDelayTime::create(1.f),
@@ -703,15 +710,6 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 
 	// play sound
 	SoundManager::PlaySoundEffect(_SET_BUTTON_PRESS_); 
-
-	if(m_pSettingNode == NULL)
-	{
-		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-505.0f, 0));
-		m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
-		m_pSettingNode->SetOnHideSettingMenuCallback( std::bind( &HelloWorld::menuCloseCallback, this, this));
-		this->addChild(m_pSettingNode, 98);
-	}
 
 	if (m_pSettingNode->getShowSetting() == false)
 	{

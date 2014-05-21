@@ -78,9 +78,9 @@ bool SettingMenuNode::init()
 
 	m_isAddButtonFacebook = false;
 	int iSize = Breadcrumb::getInstance()->getSceneModes().size();
-	switch(Breadcrumb::getInstance()->getSceneMode(iSize - 2))
+	switch(Breadcrumb::getInstance()->getSceneMode(iSize - 1))
 	{
-		case SceneMode::kExitGame:
+		case SceneMode::kMainMenu:
 		{
 			m_isAddButtonFacebook = true;
 			this->addButtonFacebook();
@@ -92,22 +92,11 @@ bool SettingMenuNode::init()
 			m_pButtonManagerNode->addButtonNode(pButtonReset);
 			*/
 
-		#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+			#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 			// Van Dao
 			m_pUnlockLabel = LabelBMFont::create("Unlock Levels", "fonts/font_score.fnt");
 			m_pUnlockLabel->setAnchorPoint(Point(0.5f, 0.5f));
 			m_pUnlockLabel->setPosition(Point(230.0f, 52.0f));
-
-			/*
-			if(UserDefault::getInstance()->getIntegerForKey("IsUnlockALlLevel", 0) == 1)
-			{
-				m_pUnlockLabel->setString("Not Unlock Levels");
-			}
-			else
-			{
-				m_pUnlockLabel->setString("Unlock Levels");
-			}
-			*/
 
 			Sprite* pUnlockSprite = Sprite::create("PanelSetting/btn_unlock_all_level.png");
 			pUnlockSprite->addChild(m_pUnlockLabel);
@@ -115,16 +104,36 @@ bool SettingMenuNode::init()
 			ButtonNode* pButtonUnlock = ButtonNode::createButtonSprite(pUnlockSprite, CC_CALLBACK_1(SettingMenuNode::clickUnlockAllLevel, this));
 			pButtonUnlock->setPosition(Point(252.5f, 170.0f));
 			m_pButtonManagerNode->addButtonNode(pButtonUnlock);
-		#endif
-
+			#endif
 			break;
 		}
-		case SceneMode::kMainMenu : 
-		case SceneMode::kWorldMap :
-		case SceneMode::kFlashCardCollection :
-		case SceneMode::kMyPackage :
-		case SceneMode::kPopularPackage :
-		case SceneMode::kReviseGame :
+		case SceneMode::kPlayGame :
+		{
+			Sprite* pBackToGameSprite = Sprite::create("PanelSetting/btn_resume.png");
+			ButtonNode* pButtonBackToGame = ButtonNode::createButtonSprite(pBackToGameSprite, CC_CALLBACK_1(SettingMenuNode::clickResume, this));
+			pButtonBackToGame->setPosition(Point(252.5f, 495.0f));
+			m_pButtonManagerNode->addButtonNode(pButtonBackToGame);
+
+			Sprite* pQuitLevelSprite = Sprite::create("PanelSetting/btn_quitlevel.png");
+			ButtonNode* pButtonQuitLevel = ButtonNode::createButtonSprite(pQuitLevelSprite, CC_CALLBACK_1(SettingMenuNode::clickQuitLevel, this));
+			pButtonQuitLevel->setPosition(Point(252.5f, 386.0f));
+			m_pButtonManagerNode->addButtonNode(pButtonQuitLevel);
+			break;
+		}
+		case SceneMode::kPlayAdvanceMode :
+		{
+			Sprite* pBackToGameSprite = Sprite::create("PanelSetting/btn_resume.png");
+			ButtonNode* pButtonBackToGame = ButtonNode::createButtonSprite(pBackToGameSprite, CC_CALLBACK_1(SettingMenuNode::clickResume, this));
+			pButtonBackToGame->setPosition(Point(252.5f, 495.0f));
+			m_pButtonManagerNode->addButtonNode(pButtonBackToGame);
+
+			Sprite* pQuitLevelSprite = Sprite::create("PanelSetting/btn_quitgame.png");
+			ButtonNode* pButtonQuitLevel = ButtonNode::createButtonSprite(pQuitLevelSprite, CC_CALLBACK_1(SettingMenuNode::clickQuitGame, this));
+			pButtonQuitLevel->setPosition(Point(252.5f, 386.0f));
+			m_pButtonManagerNode->addButtonNode(pButtonQuitLevel);
+			break;
+		}
+		default:
 		{
 			Sprite* pMainMenuSprite = Sprite::create("PanelSetting/btn_mainmenu.png");
 			ButtonNode* pButtonManiMenu = ButtonNode::createButtonSprite(pMainMenuSprite, CC_CALLBACK_1(SettingMenuNode::clickMainMenu, this));
@@ -138,36 +147,7 @@ bool SettingMenuNode::init()
 
 			break;
 		}
-		case SceneMode::kLevelMap :
-		{
-			Sprite* pBackSprite;
-			if (Breadcrumb::getInstance()->getSceneMode(iSize - 1) == SceneMode::kPlayGame)
-			{
-				Sprite* pBackToGameSprite = Sprite::create("PanelSetting/btn_resume.png");
-				ButtonNode* pButtonBackToGame = ButtonNode::createButtonSprite(pBackToGameSprite, CC_CALLBACK_1(SettingMenuNode::clickResume, this));
-				pButtonBackToGame->setPosition(Point(252.5f, 495.0f));
-				m_pButtonManagerNode->addButtonNode(pButtonBackToGame);
 
-				Sprite* pQuitLevelSprite = Sprite::create("PanelSetting/btn_quitlevel.png");
-				ButtonNode* pButtonQuitLevel = ButtonNode::createButtonSprite(pQuitLevelSprite, CC_CALLBACK_1(SettingMenuNode::clickQuitLevel, this));
-				pButtonQuitLevel->setPosition(Point(252.5f, 386.0f));
-				m_pButtonManagerNode->addButtonNode(pButtonQuitLevel);
-			}
-			else
-			{
-				Sprite* pMainMenuSprite = Sprite::create("PanelSetting/btn_mainmenu.png");
-				ButtonNode* pButtonManiMenu = ButtonNode::createButtonSprite(pMainMenuSprite, CC_CALLBACK_1(SettingMenuNode::clickMainMenu, this));
-				pButtonManiMenu->setPosition(Point(252.5f, 495.0f));
-				m_pButtonManagerNode->addButtonNode(pButtonManiMenu);
-
-				Sprite* pBackSprite = Sprite::create("PanelSetting/btn_back.png");
-				ButtonNode* pButtonBack = ButtonNode::createButtonSprite(pBackSprite, CC_CALLBACK_1(SettingMenuNode::clickBack, this));
-				//pButtonBack->setPosition(Point(252.5f, 278.0f));
-				pButtonBack->setPosition(Point(252.5f, 386.0f));
-				m_pButtonManagerNode->addButtonNode(pButtonBack);
-			}
-			break;
-		}
 	}
 	
 	/*
@@ -186,6 +166,12 @@ bool SettingMenuNode::init()
 
 	this->scheduleUpdate();
 	m_iStatusButtonFacebook = -1;
+
+	auto dispatcher = EventDispatcher::getInstance();
+	auto listener = EventListenerKeyboard::create();
+	listener->onKeyPressed = CC_CALLBACK_2(SettingMenuNode::onKeyPressed,this);
+	listener->onKeyReleased = CC_CALLBACK_2(SettingMenuNode::onKeyReleased, this);
+	dispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 	return true;
 }
@@ -318,7 +304,10 @@ void SettingMenuNode::actionBack()
 			break;
 		}
 		case SceneMode::kMyPackage :
+		case SceneMode::kPopularPackage :
 		{
+			Breadcrumb::getInstance()->resetSceneNodeToMainMenu();
+			Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
 			AdvanceModeMyPackagesScene* pAdvanceModeMyPackages = AdvanceModeMyPackagesScene::create();
 			Director::getInstance()->replaceScene(pAdvanceModeMyPackages);
 			break;
@@ -362,27 +351,35 @@ void SettingMenuNode::clickMainMenu(cocos2d::Object* sender)
 void SettingMenuNode::clickQuitLevel(cocos2d::Object* sender)
 {
 	this->hide();
-	 
-	// check play time mode van dao
-	bool bPlayCustomMode = false;
-	if (bPlayCustomMode)
-	{
-		PopupConfirmNode* popupConfirm = PopupConfirmNode::createLayout("DO YOU WANT TO QUIT GAME", "", PopupConfirmActionType::eQuitGameCustomMode,  PopupConfirmType::eYesNo);
-		this->getParent()->addChild(popupConfirm, 10000);
-	}
-	else
-	{
-		int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
-		std::string sChapterId = GameConfigManager::getInstance()->GetCurrentChapterID();
 
-		ConfirmQuitLevelNode* confirmQuitLevel = ConfirmQuitLevelNode::createLayout(iCurrentLevel, sChapterId);
-		this->getParent()->addChild(confirmQuitLevel, 10000);
-	}
+	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
+	std::string sChapterId = GameConfigManager::getInstance()->GetCurrentChapterID();
+
+	ConfirmQuitLevelNode* confirmQuitLevel = ConfirmQuitLevelNode::createLayout(iCurrentLevel, sChapterId);
+	confirmQuitLevel->setTag(10010);
+	this->getParent()->addChild(confirmQuitLevel, 10010);
+}
+
+void SettingMenuNode::clickQuitGame(cocos2d::Object* sender)
+{
+	Breadcrumb::getInstance()->resetSceneNodeToMainMenu();
+	Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
+	AdvanceModeMyPackagesScene* pAdvanceModeMyPackages = AdvanceModeMyPackagesScene::create();
+	Director::getInstance()->replaceScene(pAdvanceModeMyPackages);
 }
 
 void SettingMenuNode::clickResume(cocos2d::Object* sender)
 {
-	this->hide();
+	if (m_OnHideSettingMenuCallback == nullptr)
+	{
+		m_pSettingButton->setStateActive(!m_pSettingButton->getStateActive());
+		if (m_iShowSetting)
+			this->hide();
+		else
+			this->show();
+	}
+	else
+		m_OnHideSettingMenuCallback();
 }
 
 void SettingMenuNode::show()
@@ -468,6 +465,54 @@ void SettingMenuNode::clickUnlockAllLevel(cocos2d::Object* sender)
 		UserDefault::getInstance()->setIntegerForKey("IsUnlockALlLevel", 1);
 	}
 	*/
+}
+
+
+void SettingMenuNode::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event)
+{
+
+}
+
+void SettingMenuNode::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event)
+{
+	if ( keyCode== EventKeyboard::KeyCode::KEY_BACKSPACE)
+	{
+		std::vector<SceneMode> sceneModes = Breadcrumb::getInstance()->getSceneModes();
+
+		if (sceneModes[sceneModes.size() - 1] == SceneMode::kPlayGame)
+		{
+			if (this->getParent()->getChildByTag(10010) == nullptr)
+			{
+				this->clickQuitLevel(nullptr);
+			}
+		}
+		else if (sceneModes[sceneModes.size() - 1] == SceneMode::kPlayAdvanceMode)
+		{
+			if (m_OnHideSettingMenuCallback == nullptr)
+			{
+				m_pSettingButton->setStateActive(!m_pSettingButton->getStateActive());
+				if (m_iShowSetting)
+					this->hide();
+				else
+					this->show();
+			}
+			else
+				m_OnHideSettingMenuCallback();
+		}
+		else if (sceneModes[sceneModes.size() - 1] == SceneMode::kMainMenu)
+		{
+			if (this->getParent()->getChildByTag(10000) == nullptr)
+			{
+				PopupConfirmNode* popupConfirm = PopupConfirmNode::createLayout("DO YOU WANT TO EXIT GAME?", "", PopupConfirmActionType::eExitGame,  PopupConfirmType::eYesNo);
+				popupConfirm->setTag(10000);
+				this->getParent()->addChild(popupConfirm, 10000);
+			}
+		}
+		else
+		{
+			this->actionBack();
+		}
+	}
 }
 
 

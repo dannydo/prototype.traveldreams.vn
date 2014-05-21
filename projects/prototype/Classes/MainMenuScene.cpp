@@ -66,8 +66,7 @@ bool MainMenuLayer::init()
 	buttonPlayNode->setPosition(Point(320.0f, 515.0f));
 
 	Sprite* pSettingSprite = Sprite::create("Footer/btn_setting.png");
-	Sprite* pSettingSpriteActive = Sprite::create("Footer/btn_setting.png");
-	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, pSettingSpriteActive, CC_CALLBACK_1(MainMenuLayer::openSettingMenu, this));
+	m_pButtonSettingNode = ButtonNode::createButtonSprite(pSettingSprite, CC_CALLBACK_1(MainMenuLayer::openSettingMenu, this));
 	m_pButtonSettingNode->setPosition(Point(36.0f, 33.0f));
 	
 	//test time mode
@@ -105,12 +104,13 @@ bool MainMenuLayer::init()
 	}
 #endif
 
-	m_pSettingNode = NULL;
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kMainMenu);
 	this->scheduleUpdate();
 
-	//EndGameCustomModeNode* a = EndGameCustomModeNode::createLayout(15, 10, "C17");
-	//this->addChild(a);
+	m_pSettingNode = SettingMenuNode::create();
+	m_pSettingNode->setPosition(Point(-505.0f, 0.0f));
+	m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
+	this->addChild(m_pSettingNode);
 
 	this->setKeyboardEnabled(true);
 
@@ -205,14 +205,6 @@ void MainMenuLayer::shareDialogFacebook()
 
 void MainMenuLayer::openSettingMenu(Object *sender)
 {
-	if(m_pSettingNode == NULL)
-	{
-		m_pSettingNode = SettingMenuNode::create();
-		m_pSettingNode->setPosition(Point(-505.0f, 0.0f));
-		m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
-		this->addChild(m_pSettingNode);
-	}
-
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	if(FacebookManager::getInstance()->isLogined() && UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) == 1)
 	{
@@ -309,17 +301,4 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 	pNode->setPosition(Point(40.f, 200.f));
 	this->addChild(pNode, 1000);
 	*/
-}
-
-
-void MainMenuLayer::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
-{
-	if ( keyCode== EventKeyboard::KeyCode::KEY_BACKSPACE)
-	{				
-		Director::getInstance()->end();		
-		
-		#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-			exit(0);
-		#endif
-	}
 }
