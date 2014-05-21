@@ -112,6 +112,8 @@ bool MainMenuLayer::init()
 	//EndGameCustomModeNode* a = EndGameCustomModeNode::createLayout(15, 10, "C17");
 	//this->addChild(a);
 
+	this->setKeyboardEnabled(true);
+
 	return true;
 }
 
@@ -307,4 +309,17 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 	pNode->setPosition(Point(40.f, 200.f));
 	this->addChild(pNode, 1000);
 	*/
+}
+
+
+void MainMenuLayer::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
+{
+	if ( keyCode== EventKeyboard::KeyCode::KEY_BACKSPACE)
+	{				
+		Director::getInstance()->end();		
+		
+		#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+			exit(0);
+		#endif
+	}
 }
