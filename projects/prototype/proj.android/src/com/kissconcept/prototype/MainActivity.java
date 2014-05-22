@@ -23,9 +23,9 @@ public class MainActivity extends NativeActivity {
 	{
 		super.onCreate(savedInstanceState);
 		
-		try {
+		/*try {
 		    PackageInfo info = getPackageManager().getPackageInfo(
-		            "ENTER.YOUR.PACKAGE.NAME", PackageManager.GET_SIGNATURES);
+		            "com.kiss_concept.prototype", PackageManager.GET_SIGNATURES);
 		    for (Signature signature : info.signatures) {
 		        MessageDigest md = MessageDigest.getInstance("SHA");
 		        md.update(signature.toByteArray());
@@ -37,7 +37,7 @@ public class MainActivity extends NativeActivity {
 
 	    } catch (NoSuchAlgorithmException e) {
 
-	    }
+	    }*/
 		
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
