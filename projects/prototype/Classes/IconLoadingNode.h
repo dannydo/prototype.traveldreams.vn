@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 
+#define _TAG_ICON_LOADING_ 1000
+
 USING_NS_CC;
 
 class IconLoadingNode : public cocos2d::Node

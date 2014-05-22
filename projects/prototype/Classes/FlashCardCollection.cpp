@@ -169,7 +169,7 @@ bool FlashCardCollectionLayer::init()
 				pLabelTotalFlashCard->setPosition(Point(90.0f, -18 -iIndex*190));
 				m_pSlideShow->addChild(pLabelTotalFlashCard);
 
-				if (iTotalFlashcardUnlock >= 10)
+				if (iTotalFlashcardUnlock >= 0)
 				{
 					Sprite* pButtonPlayReviseGameImage = Sprite::create("AdvanceMode/btn-play-advance-mode.png");
 					ButtonNode* pButtonPlayReviseGame = ButtonNode::createButtonSprite(pButtonPlayReviseGameImage, CC_CALLBACK_1(FlashCardCollectionLayer::clickPlayReviseGame, this));
@@ -221,7 +221,7 @@ void FlashCardCollectionLayer::clickPlayMiniGame(Object* sender)
 	}
 	else
 	{
-		if (m_iWordPlayMiniGame < 1)
+		if (m_iWordPlayMiniGame < 1 && m_iTimeCountDown > 0)
 		{
 			char sTitle[50];
 			sprintf(sTitle, "YOU HAVE %d NEW FLASH CARDS", m_iWordNew);

@@ -52,10 +52,14 @@ private:
 	int m_iIndexWordNewCount;
 	int m_iIndexWordNew;
 	int m_iTotalWordNew;
+	int m_iWordChooseRight;
 
 	std::vector<int> m_arrIndexWordNew;
 	std::vector<int> m_arrIndexWord;
 	unsigned long m_uTimeLocalCurrent;
+
+	std::vector<std::string> m_WordIds;
+	std::vector<int> m_ResultChooses;
 };
 
 class MiniGameScene : public cocos2d::CCScene

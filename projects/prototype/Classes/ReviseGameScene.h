@@ -65,6 +65,9 @@ private:
 
 	cocos2d::LayerColor* m_pPopupEndGame;
 	bool m_bIsEndGame;
+	std::vector<std::string> m_WordIds;
+	unsigned long m_uTimeLocalCurrent;
+	int m_iBestStage;
 };
 
 class ReviseGameScene : public cocos2d::CCScene

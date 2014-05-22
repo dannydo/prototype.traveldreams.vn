@@ -80,9 +80,9 @@ bool LeaderBoardtNode::init()
 		UserService::getInstance()->getLeaderBoardLevel(m_sChapterId ,m_iLevel, m_iConnectServer);
 
 		IconLoadingNode* iconLoadingNode = IconLoadingNode::create();
-		iconLoadingNode->setTag(1000);
+		iconLoadingNode->setTag(_TAG_ICON_LOADING_);
 		iconLoadingNode->setPosition(0.0f, -30.0f);
-		this->addChild(iconLoadingNode, 1000);
+		this->addChild(iconLoadingNode, _TAG_ICON_LOADING_);
 	}
 #endif
 
@@ -249,6 +249,8 @@ void LeaderBoardtNode::onTouchCustomNodeEnded(Touch* pTouch,  Event* pEvent)
 
 void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey)
 {
+	this->removeChildByTag(_TAG_ICON_LOADING_);
+
 	if (pJsonDict != NULL)
 	{
 		LevelInfo levelInfo =  LevelTable::getInstance()->getLevel(m_sChapterId, m_iLevel);
@@ -409,8 +411,6 @@ void LeaderBoardtNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict,
 			}
 		}
 	}
-
-	this->removeChildByTag(1000);
 }
 
 void LeaderBoardtNode::parseJsonToLeadeBoard(cs::JsonDictionary* pJsonItem, const int& iRank, const int& iIndex)

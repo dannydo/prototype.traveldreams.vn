@@ -2,6 +2,7 @@
 #include "SystemEventHandle.h"
 #include "Database\InitDatabase.h"
 #include "WaitingNode.h"
+#include "APIService\UserService.h"
 
 USING_NS_CC;
 
@@ -67,6 +68,9 @@ void ConnectFacebookConfirm::clickUseFacebook()
 	WaitingNode* pWaitingNode = WaitingNode::createLayout("Loading...");
 	pWaitingNode->setTag(1099);
 	this->getParent()->addChild(pWaitingNode);
+
+	UserInfo userInfo = UserTable::getInstance()->getUserInfo();
+	UserService::getInstance()->disableUser(userInfo.sUserToken);
 	
 	auto actionRunProcess = CallFunc::create(this, callfunc_selector(ConnectFacebookConfirm::runProcess));
 	auto actionFinishWord = CallFunc::create(this, callfunc_selector(ConnectFacebookConfirm::finishProcess));
@@ -78,7 +82,7 @@ void ConnectFacebookConfirm::runProcess()
 	if(InitDatabase::getInstance()->resetDatabase())
 	{
 		m_UserInfo.iCurrentLevel = 1;
-		m_UserInfo.sCurrentChapterId = "";
+		m_UserInfo.sCurrentChapterId = "Chapter1";
 		m_UserInfo.sFirstName = "";
 		m_UserInfo.sLastName = "";
 		m_UserInfo.iMonney = 0;

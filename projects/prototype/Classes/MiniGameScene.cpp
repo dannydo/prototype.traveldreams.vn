@@ -6,6 +6,7 @@
 #include "Database\ChapterTable.h"
 #include "SoundManager.h"
 #include "PopupConfirmNode.h"
+#include "Database\TrackingTable.h"
 
 USING_NS_CC;
 
@@ -77,6 +78,7 @@ bool MiniGameLayer::init()
 	m_uTimeLocalCurrent = getTimeLocalCurrent();
 	m_iIndexWordNewCount = 0;
 	m_iIndexWordNew = 0;
+	m_iWordChooseRight = 0;
 	this->createLayout();
 
 	Breadcrumb::getInstance()->addSceneMode(SceneMode::kFlashCard);
@@ -219,6 +221,8 @@ void MiniGameLayer::createLayout()
 	}
 	else
 	{
+		TrackingTable::getInstance()->trackingPlayMiniGame(m_uTimeLocalCurrent, m_iWordChooseRight, m_iTotalWordNew, m_WordIds, m_ResultChooses);
+
 		// End Game
 		int iWordNew = WordTable::getInstance()->getNumberWordNew();
 		int iWordPlayMiniGame = WordTable::getInstance()->getNumberWordPlayMiniGame(getTimeLocalCurrent());
@@ -309,6 +313,9 @@ void MiniGameLayer::clickChoosePicture(Object* sender)
 	if (pButtonNode->getTag() == 1)
 	{
 		// Choose correct
+		m_iWordChooseRight++;
+		m_ResultChooses.push_back(1);
+
 		SoundManager::PlaySoundEffect(SoundEffectType::_SET_FLASHCARD_CHOOSE_RIGHT_);
 		Sprite* pIconCorrect = Sprite::create("FlashCard/check.png");
 		pIconCorrect->setPosition(Point(109.0f, 78.5f));
@@ -322,6 +329,8 @@ void MiniGameLayer::clickChoosePicture(Object* sender)
 	else
 	{
 		// Choose incorrect
+		m_ResultChooses.push_back(0);
+
 		SoundManager::PlaySoundEffect(SoundEffectType::_SET_FLASHCARD_CHOOSE_WRONG_);
 		Sprite* pIconWrong = Sprite::create("FlashCard/wrong_icon.png");
 		pIconWrong->setPosition(Point(109.0f, 78.5f));
@@ -331,6 +340,8 @@ void MiniGameLayer::clickChoosePicture(Object* sender)
 		auto actionplayEffectAddLayout = CallFunc::create(this, callfunc_selector(MiniGameLayer::playEffectAddLayout));
 		this->runAction(Sequence::create(DelayTime::create(0.3f), actionPlayEffectLose, DelayTime::create(0.25f), actionplayEffectAddLayout, NULL));
 	}
+
+	m_WordIds.push_back(m_MaintWordInfo.sWordId);
 }
 
 void MiniGameLayer::clickCollect(Object* sender)

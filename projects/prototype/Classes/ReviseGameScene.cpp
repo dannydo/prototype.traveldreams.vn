@@ -7,6 +7,7 @@
 #include "Database\ChapterTable.h"
 #include "SoundManager.h"
 #include "FlashCardCollection.h"
+#include "Database\TrackingTable.h"
 
 USING_NS_CC;
 
@@ -109,6 +110,8 @@ bool ReviseGameLayer::init()
 	this->scheduleUpdate();
 
 	srand(time(NULL));
+
+	m_uTimeLocalCurrent = getTimeLocalCurrent();
 
 	return true;
 }
@@ -214,6 +217,8 @@ void ReviseGameLayer::addPopupEndGame()
 	pLabelNumberBest->setScale(1.5);
 	m_pPopupEndGame->addChild(pLabelNumberBest);
 
+	m_iBestStage = m_chapterInfo.iStageRevise;
+
 	ButtonManagerNode* pButtonManagerNode = ButtonManagerNode::create();
 	m_pPopupEndGame->addChild(pButtonManagerNode);
 
@@ -226,6 +231,8 @@ void ReviseGameLayer::addPopupEndGame()
 	ButtonNode* pButtonClose = ButtonNode::createButtonSprite(m_pButtonCloseImage, CC_CALLBACK_1(ReviseGameLayer::clickClose, this));
 	pButtonClose->setPosition(Point(580.0f, 898.0f));
 	pButtonManagerNode->addButtonNode(pButtonClose);
+
+	TrackingTable::getInstance()->trackingPlayReviseGame(m_uTimeLocalCurrent, m_iStage, m_iBestStage, m_WordIds);
 }
 
 void ReviseGameLayer::clickRetry(Object* sender)
@@ -436,6 +443,8 @@ void ReviseGameLayer::clickChoosePicture(Object* sender)
 		auto actionPlayEffectLose = CallFunc::create(this, callfunc_selector(ReviseGameLayer::playEffectLose));
 		this->runAction(Sequence::create(DelayTime::create(0.3f), actionPlayEffectLose, NULL));
 	}
+
+	m_WordIds.push_back(m_MaintWordInfo.sWordId);
 }
 
 void ReviseGameLayer::playEffectLose()

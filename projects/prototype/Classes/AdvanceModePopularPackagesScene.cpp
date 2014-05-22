@@ -139,15 +139,17 @@ bool AdvanceModePopularPackagesLayer::init()
 	m_pCustomPackageDownloadManager->SetDownloadPackageCompleteCallback(std::bind( &AdvanceModePopularPackagesLayer::OnDownloadPackageComplete, this, std::placeholders::_1));
 
 	IconLoadingNode* iconLoadingNode = IconLoadingNode::create();
-	iconLoadingNode->setTag(1000);
+	iconLoadingNode->setTag(_TAG_ICON_LOADING_);
 	iconLoadingNode->setPosition(320.0f, 400.0f);
-	this->addChild(iconLoadingNode, 1000);
+	this->addChild(iconLoadingNode, _TAG_ICON_LOADING_);
 
 	return true;
 }
 
 void AdvanceModePopularPackagesLayer::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey)
-{	
+{
+	this->removeChildByTag(_TAG_ICON_LOADING_);
+
 	String sTag = "GetPackagePopular";
 	sTag.appendWithFormat("_%d", m_iConnectServer);
 	
@@ -221,8 +223,6 @@ void AdvanceModePopularPackagesLayer::resultHttpRequestCompleted(cs::JsonDiction
 			}
 		}
 	}
-
-	this->removeChildByTag(1000);
 }
 
 void AdvanceModePopularPackagesLayer::clickDownloadPackage(Object* sender)

@@ -93,10 +93,14 @@ void PackageService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *re
 					cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
 					pJsonDict->initWithDescription(strData.c_str());
 					m_callBack->resultHttpRequestCompleted(pJsonDict, sKey);
+
+					return;
 				}
 			}
 		}
-	}	
+	}
+
+	m_callBack->resultHttpRequestCompleted(NULL, sKey);
 }
 
 void PackageService::setInterfaceServiceCallBack(InterfaceService* callBack)

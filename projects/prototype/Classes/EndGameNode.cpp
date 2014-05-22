@@ -15,6 +15,7 @@
 #include "FlashCardNode.h"
 #include "GameTargetNode.h"
 #include "PopupThanksNode.h"
+#include "APIService\TrackingService.h"
 
 USING_NS_CC;
 
@@ -327,6 +328,7 @@ void EndGameNode::generateLayoutStartAndBonusQuest()
 void EndGameNode::updateDatabaseAndSync()
 {
 	SyncDataGame::getInstance()->runSyncDataGame();
+	TrackingService::getInstance()->pushTrackingToServer();
 }
 
 void EndGameNode::sequenceUpdateStar()

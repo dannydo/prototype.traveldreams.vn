@@ -92,6 +92,25 @@ void UserService::getLeaderBoardLevel(const std::string& sChapterId, const int& 
 	m_pRequest = NULL;
 }
 
+void UserService::disableUser(const std::string& sUserToken)
+{
+	String strURL = _CONSTANT_URL_;
+	strURL.append("api/disableUser/");
+	strURL.appendWithFormat("%s", sUserToken.c_str());
+	CCLOG("%s", strURL.getCString());
+
+	m_pRequest = new HttpRequest();
+	m_pRequest->setUrl(strURL.getCString());
+	m_pRequest->setRequestType(HttpRequest::Type::GET);
+	m_pRequest->setTag("DisableUser");
+
+	m_pClient->send(m_pRequest);
+	m_pClient->setTimeoutForConnect(10);
+	m_pClient->setTimeoutForRead(10);
+	m_pRequest->release();
+	m_pRequest = NULL;
+}
+
 void UserService::getLeaderBoardAdvanceMode(const std::string& sPackageId, const int& iTag)
 {
 	UserInfo userInfo = UserTable::getInstance()->getUserInfo();

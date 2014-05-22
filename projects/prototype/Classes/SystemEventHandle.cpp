@@ -56,7 +56,7 @@ void SystemEventHandle::onStartSyncGame(const bool& bIsShowSyncError)
 	// Show popup sync game data
 	m_bIsShowSyncError = bIsShowSyncError ;
 	WaitingNode* pWaitingNode = WaitingNode::createLayout("Loading...");
-	pWaitingNode->setTag(1001);
+	pWaitingNode->setTag(_TAG_LOADING_);
 	Director::getInstance()->getRunningScene()->addChild(pWaitingNode);
 
 	SyncDataGame::getInstance()->runSyncDataGame();
@@ -64,6 +64,8 @@ void SystemEventHandle::onStartSyncGame(const bool& bIsShowSyncError)
 
 void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 {
+	Director::getInstance()->getRunningScene()->removeChildByTag(_TAG_LOADING_);
+
 	if (m_bIsConnectFacebook)
 	{
 		if (bResult)
@@ -71,14 +73,14 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 			FacebookManager::getInstance()->loginByMode();
 		#else
-			Director::getInstance()->getRunningScene()->removeChildByTag(1000);
+			Director::getInstance()->getRunningScene()->removeChildByTag(_TAG_CONNECTING_);
 			//this->onLoginFacebookResult(true);
 		#endif
 		}
 		else
 		{
 			// Show popup error
-			Director::getInstance()->getRunningScene()->removeChildByTag(1000);
+			Director::getInstance()->getRunningScene()->removeChildByTag(_TAG_CONNECTING_);
 			if (m_bIsShowSyncError)
 			{
 				// Show popup error
@@ -90,7 +92,6 @@ void SystemEventHandle::onGameSyncCompleted(const bool& bResult)
 	else
 	{
 		// Destroy popup sync
-		Director::getInstance()->getRunningScene()->removeChildByTag(1001);
 		if(!bResult)
 		{
 			if (m_bIsShowSyncError)
@@ -116,7 +117,7 @@ void SystemEventHandle::onStartConnectFacebook()
 	*/
 #endif
 	WaitingNode* pWaitingNode = WaitingNode::createLayout("Connecting...");
-	pWaitingNode->setTag(1000);
+	pWaitingNode->setTag(_TAG_CONNECTING_);
 	Director::getInstance()->getRunningScene()->addChild(pWaitingNode);
 
 	m_bIsConnectFacebook = true;
@@ -147,14 +148,14 @@ void SystemEventHandle::onLoginFacebookResult(const bool& bResult)
 		else
 		{
 			UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
-			Director::getInstance()->getRunningScene()->removeChildByTag(1000);
+			Director::getInstance()->getRunningScene()->removeChildByTag(_TAG_CONNECTING_);
 		}
 	}
 	else
 	{
 		// Show popup error
 		MessageBox("Login", "Connect facebook error!");
-		Director::getInstance()->getRunningScene()->removeChildByTag(1000);
+		Director::getInstance()->getRunningScene()->removeChildByTag(_TAG_CONNECTING_);
 	}
 
 	m_bIsConnectFacebook = false;
@@ -162,7 +163,7 @@ void SystemEventHandle::onLoginFacebookResult(const bool& bResult)
 
 void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict, std::string sKey)
 {
-	Director::getInstance()->getRunningScene()->removeChildByTag(1000);
+	Director::getInstance()->getRunningScene()->removeChildByTag(_TAG_CONNECTING_);
 
 	if(pJsonDict != NULL)
 	{

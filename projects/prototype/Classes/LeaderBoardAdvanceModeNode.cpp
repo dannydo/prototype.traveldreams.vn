@@ -84,9 +84,9 @@ bool LeaderBoardAdvanceModeNode::init()
 		UserService::getInstance()->getLeaderBoardAdvanceMode(m_sPackageId, m_iConnectServer);
 
 		IconLoadingNode* iconLoadingNode = IconLoadingNode::create();
-		iconLoadingNode->setTag(1000);
+		iconLoadingNode->setTag(_TAG_ICON_LOADING_);
 		iconLoadingNode->setPosition(0.0f, -30.0f);
-		this->addChild(iconLoadingNode, 1000);
+		this->addChild(iconLoadingNode, _TAG_ICON_LOADING_);
 	}
 #endif
 
@@ -196,6 +196,8 @@ void LeaderBoardAdvanceModeNode::parseJsonToLeadeBoard(cs::JsonDictionary* pJson
 
 void LeaderBoardAdvanceModeNode::resultHttpRequestCompleted(cs::JsonDictionary* pJsonDict, std::string sKey)
 {
+	this->removeChildByTag(_TAG_ICON_LOADING_);
+
 	if (pJsonDict != NULL)
 	{
 		UserInfo userInfo = UserTable::getInstance()->getUserInfo();
@@ -286,8 +288,6 @@ void LeaderBoardAdvanceModeNode::resultHttpRequestCompleted(cs::JsonDictionary* 
 			}
 		}
 	}
-
-	this->removeChildByTag(1000);
 }
 
 bool LeaderBoardAdvanceModeNode::onTouchCustomNodeBegan(Touch* pTouch,  Event* pEvent)

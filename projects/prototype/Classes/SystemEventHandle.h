@@ -4,6 +4,9 @@
 #include "cocos2d.h"
 #include "cocos-ext.h"
 
+#define _TAG_LOADING_		1010
+#define _TAG_CONNECTING_	1020
+
 class SystemEventHandle
 {
 public:

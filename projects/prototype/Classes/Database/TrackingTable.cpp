@@ -73,22 +73,26 @@ std::string	TrackingTable::genrateJsonTrackingPushToServer()
 	sql.appendWithFormat("%d", _LIMIT_PUSH_TRACKING_TO_SERVER_);
 	sqlite3_get_table(InitDatabase::getInstance()->getDatabseSqlite(), sql.getCString(), &re, &nRow, &nColumn,NULL);
 
-	String sJsonData = "data=[";
-	for (int iRow=1; iRow<=nRow; iRow++)
+	String sJsonData = "";
+	if (nRow > 0)
 	{
-		sJsonData.append("{");
-		sJsonData.appendWithFormat("\"Device\":%s,", re[iRow*nColumn+1]);
-		sJsonData.appendWithFormat("\"Player\":%s,", re[iRow*nColumn+2]);
-		sJsonData.appendWithFormat("\"StartTime\":%s,", re[iRow*nColumn+3]);
-		sJsonData.appendWithFormat("\"Event\":\"%s\",", re[iRow*nColumn+4]);
-		sJsonData.appendWithFormat("\"Data\":%s", re[iRow*nColumn+5]);
+		sJsonData = "data=[";
+		for (int iRow=1; iRow<=nRow; iRow++)
+		{
+			sJsonData.append("{");
+			sJsonData.appendWithFormat("\"Device\":%s,", re[iRow*nColumn+1]);
+			sJsonData.appendWithFormat("\"Player\":%s,", re[iRow*nColumn+2]);
+			sJsonData.appendWithFormat("\"StartTime\":%s,", re[iRow*nColumn+3]);
+			sJsonData.appendWithFormat("\"Event\":\"%s\",", re[iRow*nColumn+4]);
+			sJsonData.appendWithFormat("\"Data\":%s", re[iRow*nColumn+5]);
 
-		if (iRow == nRow)
-			sJsonData.append("}");
-		else
-			sJsonData.append("},");
+			if (iRow == nRow)
+				sJsonData.append("}");
+			else
+				sJsonData.append("},");
+		}
+		sJsonData.append("]");
 	}
-	sJsonData.append("]");
 	sqlite3_free_table(re);
 
 	return sJsonData.getCString();
@@ -120,6 +124,12 @@ std::string TrackingTable::getStringEventTracking(EventTracking_e eEventTracking
 		break;
 	case _ET_OPEN_GAME_:
 		sEventTracking = "OPEN_GAME";
+		break;
+	case _ET_PLAY_MINI_GAME_:
+		sEventTracking = "PLAY_MINI_GAME";
+		break;
+	case _ET_PLAY_REVISE_GAME_:
+		sEventTracking = "PLAY_REVISE_GAME";
 		break;
 	default:
 		break;
@@ -163,7 +173,8 @@ bool TrackingTable::trackingPlayLevelNormalMode(const unsigned long startTime, c
 	sJsonData.appendWithFormat("\"Star\":%d,", iStar);
 	sJsonData.appendWithFormat("\"TotalMove\":%d,", iTotalMove);
 	sJsonData.appendWithFormat("\"TotalBonusQuest\":%d,", iTotalBonusQuest);
-	sJsonData.appendWithFormat("\"BonusQuestCompleted\":%d", iBonusQuestCompleted);
+	sJsonData.appendWithFormat("\"BonusQuestCompleted\":%d,", iBonusQuestCompleted);
+	sJsonData.appendWithFormat("\"EndTime\":%u", getTimeLocalCurrent());
 	sJsonData.append("}");
 
 	sJsonData.append("}");
@@ -173,7 +184,7 @@ bool TrackingTable::trackingPlayLevelNormalMode(const unsigned long startTime, c
 	return insertTracking(trackingInfo);
 }
 
-bool TrackingTable::trackingPlayAdvanceMode(const unsigned long startTime, const std::string& sPackageId, const int& iStage, const std::vector<std::string>& sCSWordId)
+bool TrackingTable::trackingPlayAdvanceMode(const unsigned long startTime, const std::string& sPackageId, const int& iStage, const std::vector<std::string>& CSWordIds)
 {
 	TrackingInfo trackingInfo;
 	trackingInfo.sDeviceJson = getDeviceJson();
@@ -186,15 +197,93 @@ bool TrackingTable::trackingPlayAdvanceMode(const unsigned long startTime, const
 	sJsonData.append("\"Package\":{");
 	sJsonData.appendWithFormat("\"PackageId\":\"%s\",", sPackageId.c_str());
 	sJsonData.appendWithFormat("\"Stage\":%d,", iStage);
+	sJsonData.appendWithFormat("\"EndTime\":%u,", getTimeLocalCurrent());
 	
 	sJsonData.append("\"WordList\":[");
-	int iSize = sCSWordId.size();
+	int iSize = CSWordIds.size();
 	for (int iIndex = 0; iIndex < iSize; iIndex++)
 	{
 		if (iIndex == iSize-1)
-			sJsonData.appendWithFormat("\"%s\"", sCSWordId[iIndex].c_str());
+			sJsonData.appendWithFormat("\"%s\"", CSWordIds[iIndex].c_str());
 		else
-			sJsonData.appendWithFormat("\"%s\",", sCSWordId[iIndex].c_str());
+			sJsonData.appendWithFormat("\"%s\",", CSWordIds[iIndex].c_str());
+	}
+	sJsonData.append("]");
+	sJsonData.append("}");
+
+	sJsonData.append("}");
+
+	trackingInfo.sDataJson = sJsonData.getCString();
+
+	return insertTracking(trackingInfo);
+}
+
+bool TrackingTable::trackingPlayMiniGame(const unsigned long startTime, const int& iWordChooseRight, const int& iTotalWord, const std::vector<std::string>& WordIds, const std::vector<int>& ResultChooses)
+{
+	TrackingInfo trackingInfo;
+	trackingInfo.sDeviceJson = getDeviceJson();
+	trackingInfo.sPlayerJson = getPlayerJson();
+	trackingInfo.uStartTime = startTime;
+	trackingInfo.eEventTracking = EventTracking_e::_ET_PLAY_MINI_GAME_;
+
+	String sJsonData = "{";
+
+	sJsonData.append("\"MiniGame\":{");
+	sJsonData.appendWithFormat("\"NumberChooseRight\":%d,", iWordChooseRight);
+	sJsonData.appendWithFormat("\"TotalWord\":%d,", iTotalWord);
+	sJsonData.appendWithFormat("\"EndTime\":%u,", getTimeLocalCurrent());
+	
+	sJsonData.append("\"WordList\":[");
+	int iSize = WordIds.size();
+	if (iSize > ResultChooses.size())
+		iSize = ResultChooses.size();
+
+	for (int iIndex = 0; iIndex < iSize; iIndex++)
+	{
+		sJsonData.append("{");
+		sJsonData.appendWithFormat("\"WordId\":\"%s\",", WordIds[iIndex].c_str());
+		sJsonData.appendWithFormat("\"ResultChoose\":%d", ResultChooses[iIndex]);
+		if (iIndex == iSize-1)
+			sJsonData.append("}");
+		else
+			sJsonData.append("},");
+	}
+	sJsonData.append("]");
+	sJsonData.append("}");
+
+	sJsonData.append("}");
+
+	trackingInfo.sDataJson = sJsonData.getCString();
+
+	return insertTracking(trackingInfo);
+}
+
+bool TrackingTable::trackingPlayReviseGame(const unsigned long startTime, const int& iStage, const int& iBestStage, const std::vector<std::string>& WordIds)
+{
+	TrackingInfo trackingInfo;
+	trackingInfo.sDeviceJson = getDeviceJson();
+	trackingInfo.sPlayerJson = getPlayerJson();
+	trackingInfo.uStartTime = startTime;
+	trackingInfo.eEventTracking = EventTracking_e::_ET_PLAY_REVISE_GAME_;
+
+	String sJsonData = "{";
+
+	sJsonData.append("\"MiniGame\":{");
+	sJsonData.appendWithFormat("\"Stage\":%d,", iStage);
+	sJsonData.appendWithFormat("\"BestStage\":%d,", iBestStage);
+	sJsonData.appendWithFormat("\"EndTime\":%u,", getTimeLocalCurrent());
+	
+	sJsonData.append("\"WordList\":[");
+	int iSize = WordIds.size();
+	for (int iIndex = 0; iIndex < iSize; iIndex++)
+	{
+		sJsonData.append("{");
+		sJsonData.appendWithFormat("\"WordId\":\"%s\",", WordIds[iIndex].c_str());
+		sJsonData.appendWithFormat("\"ResultChoose\":%d", 1);
+		if (iIndex == iSize-1)
+			sJsonData.append("}");
+		else
+			sJsonData.append("},");
 	}
 	sJsonData.append("]");
 	sJsonData.append("}");

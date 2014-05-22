@@ -54,27 +54,29 @@ void TrackingService::pushTrackingToServer()
 	{
 		// Load data from database
 		std::string sJsonData = TrackingTable::getInstance()->genrateJsonTrackingPushToServer();
-		
-		//CCLOG("Tracking %s", sJsonData.c_str());	  //can cause crash
-		//CCLOG("%d", sJsonData.length());
+		if (sJsonData != "")
+		{
+			CCLOG("Tracking %s", sJsonData.c_str());	  //can cause crash
+			//CCLOG("%d", sJsonData.length());
 	
-		// Post data to server
-		String strURL = _CONSTANT_URL_;
-		strURL.append("api/tracking");
-		m_pRequest = new HttpRequest();
-		m_pRequest->setUrl(strURL.getCString());
-		m_pRequest->setRequestType(HttpRequest::Type::POST);
-		m_pRequest->setTag("Tracking");
-		m_pRequest->setRequestData(sJsonData.c_str(), sJsonData.length());
-		m_pRequest->setResponseCallback(this, httpresponse_selector(TrackingService::onHttpRequestCompleted));
+			// Post data to server
+			String strURL = _CONSTANT_URL_;
+			strURL.append("api/tracking");
+			m_pRequest = new HttpRequest();
+			m_pRequest->setUrl(strURL.getCString());
+			m_pRequest->setRequestType(HttpRequest::Type::POST);
+			m_pRequest->setTag("Tracking");
+			m_pRequest->setRequestData(sJsonData.c_str(), sJsonData.length());
+			m_pRequest->setResponseCallback(this, httpresponse_selector(TrackingService::onHttpRequestCompleted));
 
-		m_pClient->send(m_pRequest);
-		m_pClient->setTimeoutForConnect(10);
-		m_pClient->setTimeoutForRead(10);
-		m_pRequest->release();
-		m_pRequest = NULL;
+			m_pClient->send(m_pRequest);
+			m_pClient->setTimeoutForConnect(10);
+			m_pClient->setTimeoutForRead(10);
+			m_pRequest->release();
+			m_pRequest = NULL;
 
-		m_bIsFinishTracking = false;
+			m_bIsFinishTracking = false;
+		}
 	}
 }
 
@@ -101,7 +103,11 @@ void TrackingService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *r
 			{
 				if (pJsonData->getItemBoolvalue("result", false))
 				{
-					TrackingTable::getInstance()->deleteTrackingDonePushToServer();
+					if (TrackingTable::getInstance()->deleteTrackingDonePushToServer())
+					{
+						m_bIsFinishTracking = true;
+						this->pushTrackingToServer();
+					}
 				}
 			}
 		}

@@ -15,10 +15,11 @@ public:
 
 	void checkUserFacebook(const std::string strAccessToken, const int& iUserId, const int& iTag);
 	void getLeaderBoardLevel(const std::string& sChapterId, const int& iLevel, const int& iTag);
+	void getLeaderBoardAdvanceMode(const std::string& sPackageId, const int& iTag);
+	void disableUser(const std::string& sUserToken);
+
 	void addCallBackList(InterfaceService* callBack);
 	void removeCallBackList(InterfaceService *callBack);
-
-	void getLeaderBoardAdvanceMode(const std::string& sPackageId, const int& iTag);
 
 	cs::JsonDictionary* parseStringToJson(const char* sJson);
 
