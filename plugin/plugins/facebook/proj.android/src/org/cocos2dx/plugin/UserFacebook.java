@@ -22,8 +22,10 @@ import com.facebook.model.GraphObject;
 import com.facebook.widget.WebDialog;
 import com.facebook.widget.WebDialog.OnCompleteListener;
 
+import android.R;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -96,7 +98,9 @@ public class UserFacebook implements InterfaceUser {
             public void run() {
 				try {
 					mStatusCallback = new SessionStatusCallback();
-		    		appId = curCPInfo.get("FacebookAppId");
+					
+					int iResourceID = mContext.getResources().getIdentifier("app_id", "string", "com.kiss_concept.prototype");
+		    		appId = mContext.getResources().getString(iResourceID);//curCPInfo.get("FacebookAppId");
 		    		scope = curCPInfo.get("FacebookScope");
 		    		LogD(appId);
 		    		
