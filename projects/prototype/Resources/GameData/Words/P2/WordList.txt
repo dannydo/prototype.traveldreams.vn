@@ -1,0 +1,281 @@
+20
+LIVING ROOM
+LIVING ROOM
+phòng khách
+LivingRoom_En
+1.32
+LivingRoom_Vi
+0.93
+LivingRoom.png
+/ˈlɪvɪŋ ruːm/
+Hooray! I found 20 dollars under the sofa in the living room.
+LivingRoom_FS_En
+3.41
+-1
+5 10
+KITCHEN
+KITCHEN
+nhà bếp
+Kitchen_En
+1.3
+Kitchen_Vi
+0.96
+Kitchen.png
+/ˈkɪtʃɪn/
+The kitchen is on fire.
+Kitchen_FS_En
+1.65
+-1
+4 7
+CURTAIN
+CURTAIN
+cái màn
+Curtain_En
+1.18
+Curtain_Vi
+1
+Curtain.png
+/ˈkɜːtn/
+She forgot to close the curtain when she was getting dressed.
+Curtain_FS_En
+3.76
+-1
+4 7
+WARDROBE
+WARDROBE
+tủ quần áo
+Wardrobe_En
+1.3
+Wardrobe_Vi
+1.23
+Wardrobe.png
+/ˈwɔːdrəʊb/
+My husband found the neighbor hidden in our wardrobe.
+Wardrobe_FS_En
+2.95
+-1
+4 8
+MICROWAVE
+MICROWAVE
+lò vi sóng
+Microwave_En
+1.4
+Microwave_Vi
+1.3
+Microwave.png
+/ˈmaɪkrəweɪv/
+He has forgotten the cat in the microwave.
+Microwave_FS_En
+2.35
+-1
+5 9
+FRYING PAN
+FRYING PAN
+cái chảo
+FryingPan_En
+1.5
+FryingPan_Vi
+1.08
+FryingPan.png
+/fraɪɪŋ pæn/
+My mother hit the thief with a frying pan.
+FryingPan_FS_En
+2.67
+-1
+5 9
+CHOPSTICKS
+CHOPSTICKS
+đôi đũa
+Chopsticks_En
+1.3
+Chopsticks_Vi
+1
+Chopsticks.png
+/ˈtʃɒpstɪks/
+The tourist tried to eat his soup with chopsticks.
+Chopsticks_FS_En
+3.02
+-1
+5 10
+HAIRDRYER
+HAIRDRYER
+máy sấy
+Hairdryer_En
+1.2
+Hairdryer_Vi
+1
+Hairdryer.png
+/ˈheədraɪə(r)/
+Jack is trying to heat his coffee with a hair dryer.
+Hairdryer_FS_En
+2.65
+-1
+5 9
+TOILET PAPER
+TOILET PAPER
+giấy vệ sinh
+ToiletPaper_En
+1.4
+ToiletPaper_Vi
+1.3
+ToiletPaper.png
+/ˈtɔɪlət ˈpeɪpə(r)/
+Oh no, there is no more toilet paper! What can I use now?
+ToiletPaper_FS_En
+3.76
+-1
+6 11
+BLOCK OF FLATS
+BLOCK OF FLATS
+chung cư
+BlockOfFlats_En
+1.64
+BlockOfFlats_Vi
+1.04
+BlockOfFlats.png
+/blɒk əv flæts/
+There was a power cut in my block of flats and the delivery man had to walk 30 floors.
+BlockOfFlats_FS_En
+5.18
+9
+6 12
+CLEAR THE TABLE
+CLEAR THE TABLE
+dọn bàn
+ClearTheTable_En
+1.37
+ClearTheTable_Vi
+0.66
+ClearTheTable.png
+/klɪr ðə ˈteɪbl/
+It's so annoying when the waiter wants to clear the table before everyone is done.
+ClearTheTable_FS_En
+5.19
+10
+7 13
+FOLD THE CLOTHES
+FOLD THE CLOTHES
+gập đồ
+FoldTheClothes_En
+1.51
+FoldTheClothes_Vi
+0.66
+FoldTheClothes.png
+/foʊld ðə kloʊðz/
+My wife folded the clothes and found out my pay slip.
+FoldTheClothes_FS_En
+3.82
+9
+7 14
+MAKE THE BED
+MAKE THE BED
+dọn giường
+MakeTheBed_En
+1.15
+MakeTheBed_Vi
+0.66
+MakeTheBed.png
+/meɪk ðə bed/
+Why bother making the bed if I am going back to sleep in it?
+MakeTheBed_FS_En
+3.78
+-1
+5 10
+MATTRESS
+MATTRESS
+cái nệm
+Mattress_En
+1.05
+Mattress_Vi
+0.73
+Mattress.png
+/ˈmætrəs/
+My grandmother hides her money under the mattress.
+Mattress_FS_En
+3.71
+-1
+4 8
+MOP THE FLOOR
+MOP THE FLOOR
+lau nhà
+MopTheFloor_En
+1.23
+MopTheFloor_Vi
+0.84
+MopTheFloor.png
+/mɑːp ðə flɔːr/
+Don’t use my t-shirt to mop the floor!
+MopTheFloor_FS_En
+2.95
+8
+6 11
+SWEEP THE FLOOR
+SWEEP THE FLOOR
+quét nhà
+SweepTheFloor_En
+1.37
+SweepTheFloor_Vi
+0.99
+SweepTheFloor.png
+/swiːp ðə flɔːr/
+I cannot sweep the floor, I am allergic to dust.
+SweepTheFloor_FS_En
+3.82
+10
+7 13
+WASH THE DISHES
+WASH THE DISHES
+rửa chén
+WashTheDishes_En
+1.33
+WashTheDishes_Vi
+0.76
+WashTheDishes.png
+/wɑːʃ ðə dɪʃɪs/
+Why do I always have to wash the dishes?
+WashTheDishes_FS_En
+2.92
+9
+7 13
+AIR CONDITIONER
+AIR CONDITIONER
+máy lạnh
+AirConditioner_En
+1.26
+AirConditioner_Vi
+0.63
+AirConditioner.png
+/er kənˈdɪʃənər/
+The air conditioner is leaking again!
+AirConditioner_FS_En
+2.49
+4
+7 14
+BEDROOM
+BEDROOM
+phòng ngủ
+Bedroom_En
+0.87
+Bedroom_Vi
+0.79
+Bedroom.png
+/ˈbedruːm/
+My apartment is very small so you can share the bedroom with my sister.
+Bedroom_FS_En
+4.83
+-1
+4 7
+VACUUM CLEANER
+VACUUM CLEANER
+máy hút bụi
+VacuumCleaner_En
+1.37
+VacuumCleaner_Vi
+0.97
+VacuumCleaner.png
+/ˈvækjuəm ˈkliːnər/
+The vacuum cleaner swallowed my money.
+VacuumCleaner_FS_En
+2.56
+7
+7 13
