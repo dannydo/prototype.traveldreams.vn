@@ -17,6 +17,7 @@ typedef enum {
 	eYesNo = 0,
     eOK,
 	eConnectFacebook,
+	eUpdateApp,
 } PopupConfirmType;
 
 class PopupConfirmNode : public CustomNode
@@ -38,6 +39,7 @@ private:
 	void clickNo(cocos2d::Object* pSender);
 	void clickOk(cocos2d::Object* pSender);
 	void clickLoginFacebook(cocos2d::Object* pSender);
+	void clickUpdateApp(cocos2d::Object* pSender);
 
 	void runResetGame();
 	void finishResetGame();

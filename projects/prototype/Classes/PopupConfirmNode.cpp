@@ -58,6 +58,12 @@ bool PopupConfirmNode::init()
 	pLabelTitle->setPosition(Point(320.0f, 630.0f));
 	this->addChild(pLabelTitle);
 
+	if (m_sDescription == "")
+	{
+		pLabelTitle->setAnchorPoint(Point(0.5f, 0.5f));
+		pLabelTitle->setPosition(Point(320.0f, 550.0f));
+	}
+
 	LabelBMFont *pLabelDescription= LabelBMFont::create(m_sDescription.c_str(), "fonts/font-small-green-alert.fnt", 420.0f, TextHAlignment::CENTER);
 	pLabelDescription->setAnchorPoint(Point(0.5f, 1.0f));
 	if (pLabelTitle->getContentSize().height <= 70)
@@ -105,6 +111,18 @@ bool PopupConfirmNode::init()
 		ButtonNode* pButtonOkNode = ButtonNode::createButtonSprite(pButtonOkSprite, CC_CALLBACK_1(PopupConfirmNode::clickLoginFacebook, this));
 		pButtonOkNode->setPosition(Point(320.0f, 370.0f));
 		pButtonManagerNode->addButtonNode(pButtonOkNode);
+	}
+	else if (m_popupConfirmType == PopupConfirmType::eUpdateApp)
+	{
+		Sprite* pButtonCloseSprite = Sprite::create("popup/btn_close.png");
+		ButtonNode* pButtonCloseNode = ButtonNode::createButtonSprite(pButtonCloseSprite, CC_CALLBACK_1(PopupConfirmNode::clickNo, this));
+		pButtonCloseNode->setPosition(Point(570.0f, 647.0f));
+		pButtonManagerNode->addButtonNode(pButtonCloseNode);
+
+		Sprite* pButtonUpdateSprite = Sprite::create("popup/btn-update.png");
+		ButtonNode* pButtonUpdateNode = ButtonNode::createButtonSprite(pButtonUpdateSprite, CC_CALLBACK_1(PopupConfirmNode::clickUpdateApp, this));
+		pButtonUpdateNode->setPosition(Point(320.0f, 370.0f));
+		pButtonManagerNode->addButtonNode(pButtonUpdateNode);
 	}
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
@@ -233,7 +251,7 @@ void PopupConfirmNode::runResetGame()
 void PopupConfirmNode::finishResetGame()
 {
 	this->getParent()->removeChildByTag(1000);
-	this->getParent()->removeChild(this);
+	this->removeFromParentAndCleanup(true);
 }
 
 void PopupConfirmNode::update(float dt)
@@ -250,6 +268,12 @@ void PopupConfirmNode::update(float dt)
 		m_pLabelClockMiniGame->setString(formatHMSToDisplay((int)m_iTimeCountDown).getCString());
 	}
 	
+}
+
+void PopupConfirmNode::clickUpdateApp(cocos2d::Object* pSender)
+{
+	openURL(_URL_GOOLE_PLAY_APP_);
+	this->removeFromParentAndCleanup(true);
 }
 
 void PopupConfirmNode::addClockMiniGame(const float& iTimeCountDown)

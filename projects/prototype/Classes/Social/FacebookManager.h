@@ -58,6 +58,9 @@ public:
 	std::string getDeviceName();
 	std::string getOSVersion();
 
+	void openURL(const char* pszUrl);
+	int getAppVersionCode();
+
 	inline bool getFinishRun(){ return m_bIsFinishRun; };
 	void setFinishRun(const bool& bIsFinishRun); 
 

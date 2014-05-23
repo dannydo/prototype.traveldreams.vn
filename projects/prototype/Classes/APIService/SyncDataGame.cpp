@@ -130,7 +130,7 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 	std::string sKey = "";
 	sKey.append(response->getHttpRequest()->getTag());
 	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
-	bool bResult = true;
+	bool bResult = false;
 
 	if (sKey == "SyncGameData")
 	{
@@ -145,53 +145,66 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 				cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
 				pJsonDict->initWithDescription(strData.c_str());
 				//CCLOG("Sync %s", strData.c_str());
-				cs::JsonDictionary *pJsonData = pJsonDict->getSubDictionary("data");
-				if(pJsonData != NULL)
+				if (pJsonDict != NULL)
 				{
-					if (pJsonData->getItemBoolvalue("result", false))
+					cs::JsonDictionary *pJsonData = pJsonDict->getSubDictionary("data");
+					if(pJsonData != NULL)
 					{
-						cs::JsonDictionary *pJsonSync = pJsonData->getSubDictionary("sync");
-						if (pJsonSync != NULL)
+						if (pJsonData->getItemBoolvalue("result", false))
 						{
-							int iVersion = pJsonSync->getItemIntValue("Version", 0);
-							if (!UserTable::getInstance()->updateDataSyncUser(pJsonSync, iVersion))
-								bResult = false;
-				
-							if(!ChapterTable::getInstance()->updateDataSyncChapters(pJsonSync, iVersion))
-								bResult = false;
-
-							if(!LevelTable::getInstance()->updateDataSyncLevels(pJsonSync, iVersion))
-								bResult = false;
-
-							if(!WordTable::getInstance()->updateDataSyncWords(pJsonSync, iVersion))
-								bResult = false;
-
-							if(!WordTable::getInstance()->updateDataSyncMapChapterWords(pJsonSync, iVersion))
-								bResult = false;
-
-							if(bResult)
+							cs::JsonDictionary *pJsonSync = pJsonData->getSubDictionary("sync");
+							if (pJsonSync != NULL)
 							{
-								VersionInfo versionInfo = VersionTable::getInstance()->getVersionInfo();
-								versionInfo.iVersionSync = iVersion;
-								VersionTable::getInstance()->updateVersion(versionInfo);
+								bResult = true;
+								int iVersion = pJsonSync->getItemIntValue("Version", 0);
+								if (!UserTable::getInstance()->updateDataSyncUser(pJsonSync, iVersion))
+									bResult = false;
+				
+								if(!ChapterTable::getInstance()->updateDataSyncChapters(pJsonSync, iVersion))
+									bResult = false;
 
-								UserTable::getInstance()->haveGenerateNextChapter();
+								if(!LevelTable::getInstance()->updateDataSyncLevels(pJsonSync, iVersion))
+									bResult = false;
+
+								if(!WordTable::getInstance()->updateDataSyncWords(pJsonSync, iVersion))
+									bResult = false;
+
+								if(!WordTable::getInstance()->updateDataSyncMapChapterWords(pJsonSync, iVersion))
+									bResult = false;
+
+								if(bResult)
+								{
+									VersionInfo versionInfo = VersionTable::getInstance()->getVersionInfo();
+									versionInfo.iVersionSync = iVersion;
+									VersionTable::getInstance()->updateVersion(versionInfo);
+
+									UserTable::getInstance()->haveGenerateNextChapter();
+								}
 							}
 						}
 						else
-							bResult = false;
+						{
+							cs::JsonDictionary *pJsonList = pJsonData->getSubDictionary("list");
+							if (pJsonList != NULL)
+							{
+								std::string sKey = pJsonList->getItemStringValue("key");
+								if (sKey == "USER_NOT_EXIST");
+								{
+									m_bIsFinishSync = true;
+
+									VersionInfo versionInfo = VersionTable::getInstance()->getVersionInfo();
+									versionInfo.iVersionSync = 0;
+									VersionTable::getInstance()->updateVersion(versionInfo);
+
+									this->~SyncDataGame();
+									return;
+								}
+							}
+						}
 					}
-					else
-						bResult = false;
 				}
-				else
-					bResult = false;
 			}
-			else
-				bResult = false;
 		}
-		else
-			bResult = false;
 
 		m_bIsFinishSync = true;
 		SystemEventHandle::getInstance()->onGameSyncCompleted(bResult);

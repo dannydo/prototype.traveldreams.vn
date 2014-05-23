@@ -22,7 +22,9 @@ private:
 	void clickInviteFriends(cocos2d::Object* sender);
 
 	void addButtonLoginFacebook();
-	void startTimeModeDemo(cocos2d::Object* sender);	
+	void startTimeModeDemo(cocos2d::Object* sender);
+
+	void showPopupUpdateApp();
 
 	cocos2d::CCMenuItemImage* m_pLoginfacebook;
 	cocos2d::MenuItemLabel* m_pItemLogout;

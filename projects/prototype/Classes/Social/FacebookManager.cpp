@@ -181,6 +181,27 @@ void FacebookManager::inviteFriends(const char* message, const char* title, cons
 	}
 }
 
+void FacebookManager::openURL(const char* pszUrl)
+{
+	if (_facebook)
+	{
+		m_bIsFinishRun = false;
+		PluginParam paramURL(pszUrl);
+		PluginParam paramTemp("");
+		_facebook->callFuncWithParam("openURL", &paramURL, &paramTemp, NULL);
+	}
+}
+
+int FacebookManager::getAppVersionCode()
+{
+	if (_facebook)
+	{
+		return _facebook->callIntFuncWithParam("getAppVersionCode", NULL);
+	}
+
+	return 0;
+}
+
 void FacebookManager::autoOpenActiveSession()
 {
 	if (_facebook)

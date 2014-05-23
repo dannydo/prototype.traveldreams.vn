@@ -10,6 +10,7 @@
 #include "APIService\SyncDataGame.h"
 #include "Database\TrackingTable.h"
 #include "APIService\TrackingService.h"
+#include "APIService\UserService.h"
 
 using namespace cocos2d;
 
@@ -171,6 +172,9 @@ void LoadingLayer::initData()
 			FacebookManager::getInstance()->autoOpenActiveSession();
 		#endif
 	}
+
+	// Get Version Game
+	UserService::getInstance()->getVersionGame();
 
 	// Tracking Game
 	TrackingService::getInstance()->pushTrackingToServer();
