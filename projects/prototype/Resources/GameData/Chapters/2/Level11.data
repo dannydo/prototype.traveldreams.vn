@@ -1,37 +1,36 @@
 ;size map
 8	8
 ;number of move
-40
+30
 ;number of color
 6
 ;score of stars
-4000	5000	6000
+12000	14000	16000
 ;map matrix
-0	1	1	1	1	1	1   0
-1	1	1	1	1	1	1   1
-0	1	1	1	1	1	1   0
-1	1	1	1	1	1	1   1
-0	1	1	1	1	1	1   0
-1	1	1	1	1	1	1   1
-0	1	1	1	1	1	1   0
-1	1	1	1	1	1	1   1
+1	1	1	0	0	1	1   1
+1	1	1	0	0	1	1   1
+1	1	1	0	0	1	1   1
+1	1	1	0	0	1	1   1
+1	1	1	0	0	1	1   1
+0	1	0	0	0	0	1   0
+1	1	1	0	0	1	1   1
+1	1	1	0	0	1	1   1
 ;main word
-7
+10
+0
+;init rate, increase after move, decrease when destroyed, decrease when appeared, ratio betweens letters same generation
+20	20	10	50	3
+; config columns appear, 1: all columns, 0: specific columns + column count + columns list
 1
-7 1 5 1 3 1 7 8 5 8 3 8 1 8
 ;end game bonus type
 1
 ;boss
 0
 ;obstacle list: count, list
-2
-SHIELD	3
-8
-1 1 3 1 5 1 7 1 1 8 3 8 5 8 7 8 
-0
-LOCK	0
-8
-1 1 3 1 5 1 7 1 1 8 3 8 5 8 7 8 
+1
+COUNTDOWN	5
+12
+1 1 1 2 1 3 1 6 1 7 1 8 2 1 2 2 2 3 2 6 2 7 2 8
 0
 ;bonus quest
 0

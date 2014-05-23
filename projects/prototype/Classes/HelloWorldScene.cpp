@@ -1954,7 +1954,8 @@ void HelloWorld::ShowWinGamePopup()
 {	
 	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
 	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();	 
-	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+	Word mainWord;
+	mainWord.CopyDataFrom(m_GameBoardManager.GetGameWordManager()->GetMainWord());
 	int iBonusQuestCompleted = m_GameBoardManager.GetBonusQuestManager()->CountBonusQuestCompleted();
 
 	// extra, regenerate word for current level
@@ -1982,7 +1983,8 @@ void HelloWorld::ShowFailGamePopup()
 {
 	std::string sCurrentChapterID = GameConfigManager::getInstance()->GetCurrentChapterID();
 	int iCurrentLevel = GameConfigManager::getInstance()->GetCurrentLevelId();
-	const Word& mainWord = m_GameBoardManager.GetGameWordManager()->GetMainWord();
+	Word mainWord;
+	mainWord.CopyDataFrom(m_GameBoardManager.GetGameWordManager()->GetMainWord());
 
 	/*
 	OutOfMovesNode* pOutOfMoveNode = OutOfMovesNode::createLayout( m_GameBoardManager.GetCurrentScore(), 
