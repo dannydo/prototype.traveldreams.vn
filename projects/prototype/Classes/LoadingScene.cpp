@@ -82,6 +82,7 @@ void LoadingLayer::update(float dt)
 	if (m_bFinishLoad && (SyncDataGame::getInstance()->getIsFinishSync() || m_bIsWaittingSync == false))
 	{
 		MainMenuScene* scene = MainMenuScene::create();
+		scene->getLayer()->showPopupUpdateApp();
 		Director::getInstance()->replaceScene(scene);
 	}
 }

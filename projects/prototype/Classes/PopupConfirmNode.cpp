@@ -272,7 +272,12 @@ void PopupConfirmNode::update(float dt)
 
 void PopupConfirmNode::clickUpdateApp(cocos2d::Object* pSender)
 {
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	openURL(_MARKET_GOOLE_PLAY_APP_);
+#else (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
 	openURL(_URL_GOOLE_PLAY_APP_);
+#endif
+	
 	this->removeFromParentAndCleanup(true);
 }
 

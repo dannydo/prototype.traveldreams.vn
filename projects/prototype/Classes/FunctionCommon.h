@@ -1,6 +1,7 @@
 #include "cocos2d.h"
 
 #define _URL_GOOLE_PLAY_APP_ "https://play.google.com/store/apps/details?id=com.kiss_concept.prototype"
+#define _MARKET_GOOLE_PLAY_APP_ "market://details?id=com.kiss_concept.prototype"
 
 cocos2d::String formatNumber (int n);
 unsigned long getTimeLocalCurrent();

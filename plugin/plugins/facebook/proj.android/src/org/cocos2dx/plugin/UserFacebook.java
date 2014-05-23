@@ -530,16 +530,21 @@ public class UserFacebook implements InterfaceUser {
 	public void openURL(JSONObject shareInfo) {
 		//TODO Auto-generated method stub
 		final JSONObject curShareInfo = shareInfo;
-		try {
-    		String url = curShareInfo.getString("Param1");
-			
-			Intent intent = new Intent(Intent.ACTION_VIEW);  
-			intent.setData(Uri.parse(url));
-	        mContext.startActivity(intent);
-    	}
-    	catch (JSONException e) {
-    		
-    	}
+		PluginWrapper.runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+				try {
+		    		String url = curShareInfo.getString("Param1");
+					
+					Intent intent = new Intent(Intent.ACTION_VIEW);  
+					intent.setData(Uri.parse(url));
+			        mContext.startActivity(intent);
+		    	}
+		    	catch (JSONException e) {
+		    		
+		    	}
+            }
+		});
 	}
 	
 	public int getAppVersionCode() {

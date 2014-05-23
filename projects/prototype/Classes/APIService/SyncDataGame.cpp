@@ -51,6 +51,7 @@ SyncDataGame::SyncDataGame()
 	m_pRequest = NULL;// new HttpRequest();
 	m_pClient = HttpClient::getInstance();
 	m_bIsFinishSync = true;
+	m_iCountSync = 0;
 }
 
 SyncDataGame::~SyncDataGame()
@@ -60,7 +61,7 @@ SyncDataGame::~SyncDataGame()
 
 void SyncDataGame::runSyncDataGame()
 {
-	if (m_bIsFinishSync)
+	if (m_bIsFinishSync && m_iCountSync < 2)
 	{
 		// Load data from database
 		String sJsonData = "data={\"sync\":{";
@@ -192,11 +193,24 @@ void SyncDataGame::onHttpRequestCompleted(HttpClient *sender, HttpResponse *resp
 								{
 									m_bIsFinishSync = true;
 
+									UserInfo userInfo = UserTable::getInstance()->getUserInfo();
+									userInfo.sUserToken = "";
+									userInfo.sUserIdentifier = "";
+									UserTable::getInstance()->updateUser(userInfo);
+
 									VersionInfo versionInfo = VersionTable::getInstance()->getVersionInfo();
 									versionInfo.iVersionSync = 0;
 									VersionTable::getInstance()->updateVersion(versionInfo);
-
-									this->~SyncDataGame();
+									
+									if (m_iCountSync < 2)
+									{
+										m_iCountSync++;
+										this->runSyncDataGame();
+									}
+									else
+									{
+										m_iCountSync = 0;
+									}
 									return;
 								}
 							}

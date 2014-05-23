@@ -112,11 +112,6 @@ bool MainMenuLayer::init()
 	m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
 	this->addChild(m_pSettingNode);
 
-	this->setKeyboardEnabled(true);
-
-	auto actionshowPopupUpdateApp = CallFunc::create(this, callfunc_selector(MainMenuLayer::showPopupUpdateApp));
-	this->runAction(Sequence::create(DelayTime::create(0.05f), actionshowPopupUpdateApp, NULL));
-
 	return true;
 }
 
@@ -309,11 +304,10 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 
 void MainMenuLayer::showPopupUpdateApp()
 {
-	PopupConfirmNode* pPopupConfirmNode = PopupConfirmNode::createLayout("New Version Available!", "Please update now.", PopupConfirmActionType::eNone, PopupConfirmType::eUpdateApp);
-		this->addChild(pPopupConfirmNode);
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	int iVersionCode = FacebookManager::getInstance()->getAppVersionCode();
-	CCLOG("%d", iVersionCode);
+	CCLOG("Version %d", iVersionCode);
+	CCLOG("Version %d", UserDefault::getInstance()->getIntegerForKey("VersionGame", 0));
 	if (iVersionCode < UserDefault::getInstance()->getIntegerForKey("VersionGame", 0))
 	{
 		PopupConfirmNode* pPopupConfirmNode = PopupConfirmNode::createLayout("New Version Available!", "Please update now.", PopupConfirmActionType::eNone, PopupConfirmType::eUpdateApp);

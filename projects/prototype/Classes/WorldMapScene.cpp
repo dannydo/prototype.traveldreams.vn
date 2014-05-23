@@ -118,7 +118,15 @@ bool WorldMapLayer::init()
 	}
 
 	Sprite* pCommingSoon = Sprite::create("World-Map/ComingSoon.png");
-	pCommingSoon->setPosition(Point(320.0f, m_maxHeight-130.0f));
+	if (m_maxHeight > 650)
+	{
+	   m_maxHeight += 200;
+		pCommingSoon->setPosition(Point(320.0f, m_maxHeight - 130.0f));
+	}
+	else
+	{
+		pCommingSoon->setPosition(Point(320.0f, m_maxHeight-130.0f));
+	}
 	m_pBackgroundNode->addChild(pCommingSoon);
 
 	m_pFooterNode = FooterNode::create();

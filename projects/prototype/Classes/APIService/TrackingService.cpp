@@ -56,7 +56,7 @@ void TrackingService::pushTrackingToServer()
 		std::string sJsonData = TrackingTable::getInstance()->genrateJsonTrackingPushToServer();
 		if (sJsonData != "")
 		{
-			CCLOG("Tracking %s", sJsonData.c_str());	  //can cause crash
+			//CCLOG("Tracking %s", sJsonData.c_str());	  //can cause crash
 			//CCLOG("%d", sJsonData.length());
 	
 			// Post data to server
