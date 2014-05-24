@@ -54,7 +54,8 @@ bool LifeSystemNode::init()
 		m_pLabelSecondsRemaing->setString("Full");
 	}
 
-	this->schedule(schedule_selector(LifeSystemNode::updateWhenTimeChange), 1.0f);
+	this->scheduleUpdate();
+
 	return true;
 }
 
@@ -69,27 +70,24 @@ void LifeSystemNode::clickGetLife(cocos2d::Object* sender)
 	this->getParent()->addChild(pPopup);
 }
 
-void LifeSystemNode::updateWhenTimeChange(float dt)
+void LifeSystemNode::update(float dt)
 {
-	m_userInfo.iLifeTimeRemaining--;
-	if(m_userInfo.iLifeTimeRemaining == 0)
+	int iDeltaSeconds = getTimeLocalCurrent() - m_userInfo.ulLifeTimeBeginRemain;
+	int iDeltaRemainning = m_userInfo.iLifeTimeRemaining - iDeltaSeconds;
+
+	if (iDeltaRemainning <=  0)
 	{
-		m_userInfo.iLife++;
-		if (m_userInfo.iLife < _MAX_LIFE_)
+		UserTable::getInstance()->updateLife(0);
+		m_userInfo = UserTable::getInstance()->getUserInfo();
+		if (m_userInfo.iLife == _MAX_LIFE_)
 		{
-			m_userInfo.iLifeTimeRemaining = _SECONDS_FOR_NEW_LIFE_;
-		}
-		else
-		{
-			m_userInfo.iLife = _MAX_LIFE_;
-			this->unschedule(schedule_selector(LifeSystemNode::updateWhenTimeChange));
+			this->unscheduleUpdate();
 		}
 
-		m_userInfo.ulLifeTimeBeginRemain = getTimeLocalCurrent();
-		UserTable::getInstance()->updateUser(m_userInfo);
+		iDeltaRemainning = m_userInfo.iLifeTimeRemaining;
 	}
-
-	String clock = formatSecondsToDiaplay(m_userInfo.iLifeTimeRemaining);
+	
+	String clock = formatSecondsToDiaplay(iDeltaRemainning);
 	char sLife[2];
 	sprintf(sLife, "%d", m_userInfo.iLife);
 	m_pLabelSecondsRemaing->setString(clock.getCString());

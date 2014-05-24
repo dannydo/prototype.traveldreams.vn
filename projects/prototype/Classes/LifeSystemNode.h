@@ -11,10 +11,9 @@ public:
 	virtual ~LifeSystemNode();
 	bool init() override;
 	CREATE_FUNC(LifeSystemNode);
-
+	void update(float dt) override;
 
 private:
-	void updateWhenTimeChange(float dt);
 	cocos2d::String formatSecondsToDiaplay(const int& iSeconds);
 	void clickGetLife(cocos2d::Object* sender);
 
