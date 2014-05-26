@@ -57,7 +57,9 @@ bool LevelMapLayer::init()
 	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
 
 	ChapterConfig chapterConfig = GameConfigManager::getInstance()->GetChapterConfig(m_sChapterId);
-	WordlMapConfig::WordMapChapterConfig wordMapChapterConfig =  GameConfigManager::getInstance()->GetWordMapChapterConfig(m_sChapterId);
+	WordlMapConfig::WordMapChapterConfig* wordMapChapterConfig =  GameConfigManager::getInstance()->GetWordMapChapterConfig(m_sChapterId);
+	if (wordMapChapterConfig == NULL)
+		return false;
 
 	m_pBackgroundNode = Node::create();
 	m_pBackgroundNode->setAnchorPoint(Point(0.5f, 0.0f));
@@ -71,7 +73,7 @@ bool LevelMapLayer::init()
 		char sBGChapter[10];
 		sprintf(sBGChapter, "/bg%d.png", iIndex);
 
-		sPathFile = wordMapChapterConfig.m_sPathData;
+		sPathFile = wordMapChapterConfig->m_sPathData;
 		sPathFile.append(sBGChapter);
 
 		Sprite* pBGImage = Sprite::create(sPathFile.c_str());

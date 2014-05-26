@@ -60,9 +60,11 @@ const ObstacleLevelDescription& GameConfigManager::GetObstacleLevelDescription(c
 
 void GameConfigManager::LoadConfigOfLevel(const std::string& sChapterID, const int& iLevelId)
 {
-	WordlMapConfig::WordMapChapterConfig wordMapChapterConfig = this->GetWordMapChapterConfig(sChapterID);
+	WordlMapConfig::WordMapChapterConfig* wordMapChapterConfig = this->GetWordMapChapterConfig(sChapterID);
+	if (wordMapChapterConfig == NULL)
+		return;
 
-	std::string sPathFileData = wordMapChapterConfig.m_sPathData;
+	std::string sPathFileData = wordMapChapterConfig->m_sPathData;
 	char sFileName[25];
 	sprintf(sFileName, "/Level%d.data", iLevelId);
 	sPathFileData.append(sFileName);
@@ -614,11 +616,14 @@ ChapterConfig& GameConfigManager::GetChapterConfig(const std::string& sChapterID
 
 void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID)
 {
-	WordlMapConfig::WordMapChapterConfig wordMapChapterConfig = this->GetWordMapChapterConfig(sChapterID);
+	WordlMapConfig::WordMapChapterConfig* wordMapChapterConfig = this->GetWordMapChapterConfig(sChapterID);
+	if (wordMapChapterConfig == NULL)
+		return;
+
 	ChapterConfig& chapterConfig = m_ChapterConfig;
 	chapterConfig.m_WordIDList.clear();
 
-	std::string sPathFileData = wordMapChapterConfig.m_sPathData;
+	std::string sPathFileData = wordMapChapterConfig->m_sPathData;
 	sPathFileData.append("/ChapterConfig.data");
 
 	unsigned long iDataSize;
@@ -629,7 +634,7 @@ void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID)
 	std::istream inputStream(&dataBuf);
 
 	inputStream >> chapterConfig.m_iTotalBackgroundImage;
-	chapterConfig.m_iTotalevel = wordMapChapterConfig.m_iTotalevel;
+	chapterConfig.m_iTotalevel = wordMapChapterConfig->m_iTotalevel;
 
 	std::string sTemp;
 	int iIndex;
@@ -849,10 +854,12 @@ void GameConfigManager::UpdateNewWordForLevel(const std::string& sChapterID, con
 	}	
 }
 
-WordlMapConfig::WordMapChapterConfig& GameConfigManager::GetWordMapChapterConfig(const std::string& sChapterID)
+WordlMapConfig::WordMapChapterConfig* GameConfigManager::GetWordMapChapterConfig(const std::string& sChapterID)
 {
+	if ( m_WordlMapConfig.m_WorlMapChapterConfigMap.find(sChapterID) == m_WordlMapConfig.m_WorlMapChapterConfigMap.end()) //this chapter not exist
+		return NULL;
 	int iIndex = m_WordlMapConfig.m_WorlMapChapterConfigMap[sChapterID];
-	return m_WordlMapConfig.m_WorlMapChapterConfigs[iIndex];
+	return &m_WordlMapConfig.m_WorlMapChapterConfigs[iIndex];
 }
 
 int GameConfigManager::CountLevelOfPreviousChapters(const std::string& sChapterID)

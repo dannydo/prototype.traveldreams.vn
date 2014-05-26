@@ -173,14 +173,19 @@ std::string	LevelTable::syncGetLevels()
 
 bool LevelTable::updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& iVersion)
 {
-	int iIndexCurrentChapter = 0;
+	int iIndexCurrentChapter = -1;
 	int iCurrentLevel = 1;
 	cs::JsonDictionary *pJsonUser = pJsonSync->getSubDictionary("User");
 	WordlMapConfig worldMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
 	if (pJsonUser != NULL)
 	{
-		iIndexCurrentChapter = worldMapConfig.m_WorlMapChapterConfigMap[pJsonUser->getItemStringValue("CurrentChapter")];
-		iCurrentLevel = pJsonUser->getItemIntValue("CurrentLevel", 1);
+		CCLOG(pJsonUser->getItemStringValue("CurrentChapter"));
+		WordlMapConfig::WordMapChapterConfig* wordMapChapterConfig = GameConfigManager::getInstance()->GetWordMapChapterConfig(pJsonUser->getItemStringValue("CurrentChapter"));
+		if (wordMapChapterConfig != NULL)
+		{
+			iIndexCurrentChapter = worldMapConfig.m_WorlMapChapterConfigMap[pJsonUser->getItemStringValue("CurrentChapter")];
+			iCurrentLevel = pJsonUser->getItemIntValue("CurrentLevel", 1);
+		}
 	}
 
 	String sqlRun = "";
@@ -223,10 +228,13 @@ bool LevelTable::updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& 
 
 		int iIndexChapter = worldMapConfig.m_WorlMapChapterConfigMap[sChapterId];
 		int isUnlock = 1;
-		if(iIndexChapter > iIndexCurrentChapter)
-			isUnlock = 0;
-		else if (iIndexChapter == iIndexCurrentChapter && iCurrentLevel <= iLevel)
-			isUnlock = 0;
+		if (iIndexCurrentChapter != -1)
+		{
+			if(iIndexChapter > iIndexCurrentChapter)
+				isUnlock = 0;
+			else if (iIndexChapter == iIndexCurrentChapter && iCurrentLevel <= iLevel)
+				isUnlock = 0;
+		}
 
 		if (isInsert)
 		{

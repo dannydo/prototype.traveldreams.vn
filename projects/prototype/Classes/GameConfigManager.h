@@ -275,7 +275,7 @@ public:
 
 	LevelConfig& GetLevelConfig(const std::string& sChapterID, const int& iLevelId);
 	ChapterConfig& GetChapterConfig(const std::string& sChapterID);
-	WordlMapConfig::WordMapChapterConfig& GetWordMapChapterConfig(const std::string& sChapterID);	
+	WordlMapConfig::WordMapChapterConfig* GetWordMapChapterConfig(const std::string& sChapterID);	
 
 	inline const GameConfig& GetGameConfig() { return m_GameConfig;}	
 	inline int GetObstacleTypeCount() { return m_ObstacleDescriptionArray.size();}
