@@ -202,10 +202,10 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 						// User have account facebook and account login facebook has link other user
 						// Load data of user map current facebook from server 
 						// Delete and init data, update user and Sync data
+						UserDefault::getInstance()->setIntegerForKey("InitDatabase", 0);
+
 						if(InitDatabase::getInstance()->resetDatabase())
 						{
-							userInfo.iCurrentLevel = 1;
-							userInfo.sCurrentChapterId = "";
 							userInfo.sFirstName = "";
 							userInfo.sLastName = "";
 							userInfo.iMonney = 0;
@@ -213,9 +213,13 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 							userInfo.iLifeTimeRemaining = 0;
 							userInfo.iVersion = 1;
 
-							UserTable::getInstance()->updateUser(userInfo);
-							this->onStartSyncGame(true);
-							UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
+							// Create data for chapter 1
+							if (InitDatabase::getInstance()->initDataChapter1AndLevel(userInfo))
+							{
+								this->onStartSyncGame(true);
+								UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
+								UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
+							}
 						}
 					}
 					else if (sKey == "MAPPED_HAS_FB_AND_FB_LINK_THIS_USER" || sKey == "MAPPED_NO_FB_AND_NEW_FB")
@@ -234,32 +238,21 @@ void SystemEventHandle::onCheckUserFacebookResult(cs::JsonDictionary* pJsonDict,
 						{
 							UserDefault::getInstance()->setIntegerForKey("InitDatabase", 0);
 
-							WordlMapConfig worldMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
-							WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[0];
-
 							UserInfo userInfoNew = UserTable::getInstance()->getUserInfo();
-							userInfoNew.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
-							userInfoNew.iCurrentLevel = 1;
 
 							std::string sFacebookToken = "";
 							#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 								sFacebookToken = FacebookManager::getInstance()->getAccessToken();
 							#endif
 							userInfoNew.sFacebookToken = sFacebookToken;
-							UserTable::getInstance()->updateUser(userInfoNew);
 
-							// Create data for chapter 1
-							std::vector<std::string> wordList;
-							std::vector<int> mapLevels;
-							GameConfigManager::getInstance()->GenerateWordsForNewChapter(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
-
-							if(InitDatabase::getInstance()->createDataChapterAndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels))
+							// Create data for one chapter
+							if(InitDatabase::getInstance()->initDataChapter1AndLevel(userInfoNew))
 							{
-								UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
 								this->onStartSyncGame(true);
+								UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
+								UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
 							}
-
-							UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);
 						}
 					}
 				}

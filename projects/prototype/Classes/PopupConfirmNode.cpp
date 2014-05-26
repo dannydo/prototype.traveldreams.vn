@@ -231,16 +231,9 @@ void PopupConfirmNode::runResetGame()
 		WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[0];
 
 		UserInfo userInfoNew = UserTable::getInstance()->getUserInfo();
-		userInfoNew.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
-		userInfoNew.iCurrentLevel = 1;
-		UserTable::getInstance()->updateUser(userInfoNew);
-
+		
 		// Create data for one chapter
-		std::vector<std::string> wordList;
-		std::vector<int> mapLevels;
-		GameConfigManager::getInstance()->GenerateWordsForNewChapter(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
-
-		if(InitDatabase::getInstance()->createDataChapterAndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels))
+		if(InitDatabase::getInstance()->initDataChapter1AndLevel(userInfoNew))
 		{
 			UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
 			SystemEventHandle::getInstance()->onStartSyncGame(true);

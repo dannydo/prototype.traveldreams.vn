@@ -156,18 +156,13 @@ bool EndGameNode::initWin()
 
 		if (m_iCurrentLevel >= worldMapChapterConfig.m_iTotalevel)
 		{
-			// Create data for new chapter
-			std::vector<std::string> wordList;
-			std::vector<int> mapLevels;
-
 			//userInfo.iCurrentLevel = worldMapChapterConfig.m_iTotalevel;
 
+			// Create data for new chapter
 			std::string sNextChapterID;
 			if ( GameConfigManager::getInstance()->GetNextChapterID(worldMapChapterConfig.m_sChapterId, sNextChapterID))
 			{
-				GameConfigManager::getInstance()->GenerateWordsForNewChapter( sNextChapterID, wordList, mapLevels);
-				InitDatabase::getInstance()->createDataChapterAndLevel( sNextChapterID, wordList, mapLevels);
-				ChapterTable::getInstance()->refreshChapters();
+				InitDatabase::getInstance()->createDataChapterAndLevel(sNextChapterID);
 
 				userInfo.sCurrentChapterId = sNextChapterID;
 				userInfo.iCurrentLevel = 1;

@@ -1,6 +1,7 @@
 #include "InitDatabase.h"
 #include "VersionTable.h"
-#include "UserTable.h"
+#include "GameConfigManager.h"
+#include "ChapterTable.h"
 
 USING_NS_CC; 
 
@@ -117,9 +118,14 @@ bool InitDatabase::createDatabase()
 	return bCreateSuccess;
 }
 
-bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std::vector<std::string>& wordList, std::vector<int>& mapLevels)
+bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId)
 {
 	bool bCreateSuccess = true;
+
+	std::vector<std::string> wordList;
+	std::vector<int> mapLevels;
+
+	GameConfigManager::getInstance()->GenerateWordsForNewChapter(sChapterId, wordList, mapLevels);
 
 	if(wordList.size() > 0)
 	{
@@ -184,12 +190,26 @@ bool InitDatabase::createDataChapterAndLevel(const std::string& sChapterId, std:
 		}
 	}
 
+	ChapterTable::getInstance()->refreshChapters();
+
 	return bCreateSuccess;
 }
 
-bool InitDatabase::initDataChapter1AndLevel(const std::string& sChapterId, std::vector<std::string>& wordList, std::vector<int>& mapLevels)
+bool InitDatabase::initDataChapter1AndLevel(UserInfo& userInfo)
 {
 	bool bCreateSuccess = true;
+
+	WordlMapConfig worldMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
+	WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[0];
+
+	userInfo.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
+	userInfo.iCurrentLevel = 1;
+	UserTable::getInstance()->updateUser(userInfo);
+
+	// Create data for one chapter
+	std::vector<std::string> wordList;
+	std::vector<int> mapLevels;
+	GameConfigManager::getInstance()->GenerateWordsForNewChapter(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
 
 	if(wordList.size() > 0)
 	{
@@ -199,7 +219,7 @@ bool InitDatabase::initDataChapter1AndLevel(const std::string& sChapterId, std::
 		sprintf(sVersion, "%d", iVersion);
 
 		sqlRun.append("insert into Chapters values('");
-		sqlRun.append(sChapterId.c_str());
+		sqlRun.append(userInfo.sCurrentChapterId.c_str());
 		sqlRun.append("', 0, 0, 1, ");
 		sqlRun.appendWithFormat("%d,", iVersion);
 		sqlRun.append("0,");
@@ -211,7 +231,7 @@ bool InitDatabase::initDataChapter1AndLevel(const std::string& sChapterId, std::
 			countCollected = 0;
 
 			sqlRun.append("insert into MapChapterWords (ChapterId,WordId,Version) values(");
-			sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
+			sqlRun.appendWithFormat("'%s',", userInfo.sCurrentChapterId.c_str());
 			sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
 			sqlRun.appendWithFormat("%d);", iVersion);
 
@@ -219,7 +239,7 @@ bool InitDatabase::initDataChapter1AndLevel(const std::string& sChapterId, std::
 			{
 				countCollected = 1;
 				sqlRun.append("insert into Levels (ChapterId,Level,WordId,Star,Score,BonusQuest,TotalBonusQuest,IsUnlock,Version) values(");
-				sqlRun.appendWithFormat("'%s',", sChapterId.c_str());
+				sqlRun.appendWithFormat("'%s',", userInfo.sCurrentChapterId.c_str());
 				sqlRun.appendWithFormat("%d,", mapLevels[iIndex]);
 				sqlRun.appendWithFormat("'%s',", wordList[iIndex].c_str());
 				sqlRun.append("0,0,0,0,0,");
@@ -236,6 +256,8 @@ bool InitDatabase::initDataChapter1AndLevel(const std::string& sChapterId, std::
 		if(iResult != SQLITE_OK && iResult != SQLITE_CONSTRAINT)
 			bCreateSuccess = false;
 	}
+
+	ChapterTable::getInstance()->refreshChapters();
 
 	return bCreateSuccess;
 }

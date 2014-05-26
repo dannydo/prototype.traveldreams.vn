@@ -269,13 +269,7 @@ void UserTable::haveGenerateNextChapter()
 				std::string sNextChapterID;
 				if ( GameConfigManager::getInstance()->GetNextChapterID(m_userInfo.sCurrentChapterId, sNextChapterID))
 				{
-					std::vector<std::string> wordList;
-					std::vector<int> mapLevels;
-
-					GameConfigManager::getInstance()->GenerateWordsForNewChapter( sNextChapterID, wordList, mapLevels);
-					InitDatabase::getInstance()->createDataChapterAndLevel( sNextChapterID, wordList, mapLevels);
-					ChapterTable::getInstance()->refreshChapters();
-
+					InitDatabase::getInstance()->createDataChapterAndLevel(sNextChapterID);
 					m_userInfo.sCurrentChapterId = sNextChapterID;
 					m_userInfo.iCurrentLevel = 1;
 

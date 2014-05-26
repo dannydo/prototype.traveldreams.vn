@@ -141,16 +141,9 @@ void LoadingLayer::initData()
 			WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[0];
 	
 			UserInfo userInfo =  UserTable::getInstance()->getUserInfo();
-			userInfo.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
-			userInfo.iCurrentLevel = 1;
-			UserTable::getInstance()->updateUser(userInfo);
 
 			// Create data for chapter 1
-			std::vector<std::string> wordList;
-			std::vector<int> mapLevels;
-			GameConfigManager::getInstance()->GenerateWordsForNewChapter(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
-
-			if(InitDatabase::getInstance()->initDataChapter1AndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels))
+			if(InitDatabase::getInstance()->initDataChapter1AndLevel(userInfo))
 			{
 				UserDefault::getInstance()->setIntegerForKey("InitDatabase", 1);
 			}

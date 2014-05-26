@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "sqlite3.h"
+#include "UserTable.h"
 
 class InitDatabase
 {
@@ -12,8 +13,8 @@ public:
 	bool init();
 	static void releaseInstance();
 
-	bool createDataChapterAndLevel(const std::string& sChapterId, std::vector<std::string>& wordList, std::vector<int>& mapLevels);
-	bool initDataChapter1AndLevel(const std::string& sChapterId, std::vector<std::string>& wordList, std::vector<int>& mapLevels);
+	bool createDataChapterAndLevel(const std::string& sChapterId);
+	bool initDataChapter1AndLevel(UserInfo& userInfo);
 
 	inline sqlite3* getDatabseSqlite() { return m_DatabaseSqlite; };
 	bool resetDatabase();
