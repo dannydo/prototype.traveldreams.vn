@@ -237,9 +237,9 @@ bool UserTable::updateDataSyncUser(cs::JsonDictionary* pJsonSync, const int& iVe
 		sql.appendWithFormat(" LastName='%s',", pJsonUser->getItemStringValue("LastName"));
 		sql.appendWithFormat(" CurrentChapter='%s',", pJsonUser->getItemStringValue("CurrentChapter"));
 		sql.appendWithFormat(" CurrentLevel=%d,", pJsonUser->getItemIntValue("CurrentLevel", 1));
-		sql.appendWithFormat(" Life=%d,", pJsonUser->getItemIntValue("Life", 0));
-		sql.appendWithFormat(" LifeTimeRemaining=%d,", pJsonUser->getItemIntValue("LifeTimeRemaining", 0));
-		sql.appendWithFormat(" LifeTimeBeginRemain=%u,", getTimeLocalCurrent());
+		//sql.appendWithFormat(" Life=%d,", pJsonUser->getItemIntValue("Life", 0));
+		//sql.appendWithFormat(" LifeTimeRemaining=%d,", pJsonUser->getItemIntValue("LifeTimeRemaining", 0));
+		//sql.appendWithFormat(" LifeTimeBeginRemain=%u,", getTimeLocalCurrent());
 		sql.appendWithFormat(" Monney=%d,", pJsonUser->getItemIntValue("Money", 0));
 		sql.appendWithFormat(" Version=%d,", iVersion);
 		sql.appendWithFormat(" UserIdentifier=%d,", pJsonUser->getItemIntValue("UserId", 0));

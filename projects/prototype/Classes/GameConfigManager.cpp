@@ -608,6 +608,7 @@ ChapterConfig& GameConfigManager::GetChapterConfig(const std::string& sChapterID
 	if (sChapterID != m_sCurrentChapterID)
 	{
 		m_sCurrentChapterID = sChapterID;
+		m_iCurrentLevelID = -1; //reset levelID because we change chapter
 		this->LoadConfigOfChapter(sChapterID);
 	}
 

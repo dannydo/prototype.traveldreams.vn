@@ -179,7 +179,6 @@ bool LevelTable::updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& 
 	WordlMapConfig worldMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
 	if (pJsonUser != NULL)
 	{
-		CCLOG(pJsonUser->getItemStringValue("CurrentChapter"));
 		WordlMapConfig::WordMapChapterConfig* wordMapChapterConfig = GameConfigManager::getInstance()->GetWordMapChapterConfig(pJsonUser->getItemStringValue("CurrentChapter"));
 		if (wordMapChapterConfig != NULL)
 		{
