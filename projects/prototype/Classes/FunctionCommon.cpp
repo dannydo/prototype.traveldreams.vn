@@ -2,6 +2,11 @@
 
 USING_NS_CC;
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "Social\FacebookManager.h"
+using namespace cocos2d::plugin;
+#endif
+
 String formatNumber (int n)
 {
 	String sNumber="";
@@ -75,4 +80,14 @@ String formatHMSToDisplay(const int& iSeconds)
 	str.appendWithFormat("%d", iSecondsTemp%60);
 
 	return str;
+}
+
+void openURL(const char* pszUrl)
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	FacebookManager::getInstance()->loadPlugin();
+	FacebookManager::getInstance()->openURL(pszUrl);
+#else (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+	ShellExecuteA(NULL, "open", pszUrl, NULL, NULL, SW_SHOWNORMAL);
+#endif
 }

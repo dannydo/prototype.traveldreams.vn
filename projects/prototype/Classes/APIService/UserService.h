@@ -17,6 +17,7 @@ public:
 	void getLeaderBoardLevel(const std::string& sChapterId, const int& iLevel, const int& iTag);
 	void getLeaderBoardAdvanceMode(const std::string& sPackageId, const int& iTag);
 	void disableUser(const std::string& sUserToken);
+	void getVersionGame();
 
 	void addCallBackList(InterfaceService* callBack);
 	void removeCallBackList(InterfaceService *callBack);
@@ -26,6 +27,7 @@ public:
 private:
 	void onHttpRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
 	void onCheckUserFacebookCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
+	void onGetVersionGameCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
 
 	static UserService* m_UserService;
 	std::vector<InterfaceService*> m_callBackList;

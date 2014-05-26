@@ -9,6 +9,11 @@
 USING_NS_CC; 
 USING_NS_CC_EXT;
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "Social\FacebookManager.h"
+using namespace cocos2d::plugin;
+#endif
+
 UserTable* UserTable::m_UserTable = NULL;
 
 UserTable::UserTable()
@@ -194,7 +199,21 @@ std::string UserTable::syncGetUser()
 		sJsonData.appendWithFormat("\"lLifeTimeBeginRemain\":%s,", re[nColumn+9]);
 		sJsonData.appendWithFormat("\"Money\":%s,", re[nColumn+10]);
 		sJsonData.appendWithFormat("\"Version\":%s,", re[nColumn+11]);
-		sJsonData.appendWithFormat("\"UserToken\":\"%s\"", re[nColumn+12]);
+		sJsonData.appendWithFormat("\"UserToken\":\"%s\",", re[nColumn+12]);
+
+		std::string sDeviceId = "windows";
+		std::string sDeviceName = "PC";
+		std::string sOSVersion = "windows 8";
+
+		#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+			sDeviceId = FacebookManager::getInstance()->getDeviceId();
+			sDeviceName = FacebookManager::getInstance()->getDeviceName();
+			sOSVersion = FacebookManager::getInstance()->getOSVersion();
+		#endif
+
+		sJsonData.appendWithFormat("\"DeviceId\":\"%s\",", sDeviceId.c_str());
+		sJsonData.appendWithFormat("\"DeviceName\":\"%s\",", sDeviceName.c_str());
+		sJsonData.appendWithFormat("\"OSVersion\":\"%s\"", sOSVersion.c_str());
 	}
 	sJsonData.append("}");
 	sqlite3_free_table(re);

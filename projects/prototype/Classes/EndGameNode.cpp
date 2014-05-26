@@ -160,7 +160,7 @@ bool EndGameNode::initWin()
 			std::vector<std::string> wordList;
 			std::vector<int> mapLevels;
 
-			userInfo.iCurrentLevel = worldMapChapterConfig.m_iTotalevel;
+			//userInfo.iCurrentLevel = worldMapChapterConfig.m_iTotalevel;
 
 			std::string sNextChapterID;
 			if ( GameConfigManager::getInstance()->GetNextChapterID(worldMapChapterConfig.m_sChapterId, sNextChapterID))

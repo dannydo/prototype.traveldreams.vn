@@ -27,5 +27,6 @@ private:
 	static cocos2d::extension::HttpClient* m_pClient;
 
 	bool m_bIsFinishSync;
+	int m_iCountSync;
 };
 #endif

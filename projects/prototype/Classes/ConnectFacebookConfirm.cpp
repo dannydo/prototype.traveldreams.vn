@@ -3,6 +3,7 @@
 #include "Database\InitDatabase.h"
 #include "WaitingNode.h"
 #include "APIService\UserService.h"
+#include "GameConfigManager.h"
 
 USING_NS_CC;
 
@@ -81,15 +82,25 @@ void ConnectFacebookConfirm::runProcess()
 {
 	if(InitDatabase::getInstance()->resetDatabase())
 	{
-		m_UserInfo.iCurrentLevel = 1;
-		m_UserInfo.sCurrentChapterId = "Chapter1";
 		m_UserInfo.sFirstName = "";
 		m_UserInfo.sLastName = "";
 		m_UserInfo.iMonney = 0;
 		m_UserInfo.iLife = 5;
 		m_UserInfo.iLifeTimeRemaining = 0;
 		m_UserInfo.iVersion = 1;
+
+		WordlMapConfig worldMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
+		WordlMapConfig::WordMapChapterConfig worldMapChapterConfig = worldMapConfig.m_WorlMapChapterConfigs[0];
+	
+		m_UserInfo.sCurrentChapterId = worldMapChapterConfig.m_sChapterId;
+		m_UserInfo.iCurrentLevel = 1;
 		UserTable::getInstance()->updateUser(m_UserInfo);
+
+		// Create data for chapter 1
+		std::vector<std::string> wordList;
+		std::vector<int> mapLevels;
+		GameConfigManager::getInstance()->GenerateWordsForNewChapter(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
+		InitDatabase::getInstance()->initDataChapter1AndLevel(worldMapChapterConfig.m_sChapterId, wordList, mapLevels);
 
 		SystemEventHandle::getInstance()->onStartSyncGame(true);
 		UserDefault::getInstance()->setIntegerForKey("IsLoginFacebook", 1);

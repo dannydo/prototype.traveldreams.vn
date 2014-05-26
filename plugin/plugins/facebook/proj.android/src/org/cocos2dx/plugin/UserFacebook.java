@@ -7,7 +7,6 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.facebook.AccessToken;
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
 import com.facebook.FacebookRequestError;
@@ -22,16 +21,17 @@ import com.facebook.model.GraphObject;
 import com.facebook.widget.WebDialog;
 import com.facebook.widget.WebDialog.OnCompleteListener;
 
-import android.R;
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -185,45 +185,44 @@ public class UserFacebook implements InterfaceUser {
         });
 	}
 
-public void requestPermissions() {
-	LogD("Request Permissions");
-	
-	if (mContext == null) {
-		LogD("mContext null");
-		UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Activity/context hasn't been initialized");
-		return;
+	public void requestPermissions() {
+		LogD("Request Permissions");
+		
+		if (mContext == null) {
+			LogD("mContext null");
+			UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Activity/context hasn't been initialized");
+			return;
+		}
+		
+		 PluginWrapper.runOnMainThread(new Runnable() {
+	        @Override
+	        public void run() {
+	        	Session session = Session.getActiveSession();
+	        	if (session == null) {
+	            	session = new Session.Builder(mContext).setApplicationId(appId).build();
+	            	LogD("Set active session");
+	        	}
+	        	Session.setActiveSession(session);
+	        	
+	        	if (session.isOpened()) {
+	    			mStatusCallback.mCallByMode = SessionStatusCallback.CallByLogin;
+					mStatusCallback.mCallbackIndex = 1;
+					if (mNeedPublishPermissions) {
+						session.requestNewPublishPermissions(new Session.NewPermissionsRequest(
+								mContext, Arrays.asList(permissions)));
+					} else {
+						session.requestNewReadPermissions(new Session.NewPermissionsRequest(
+								mContext, Arrays.asList(permissions)));
+					}
+					isRequestPermission = true;
+	        	}
+	        	else
+	        	{
+	        		UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Session not open!");
+	        	}
+	        }
+	    });
 	}
-	
-	 PluginWrapper.runOnMainThread(new Runnable() {
-        @Override
-        public void run() {
-        	Session session = Session.getActiveSession();
-        	if (session == null) {
-            	session = new Session.Builder(mContext).setApplicationId(appId).build();
-            	LogD("Set active session");
-        	}
-        	Session.setActiveSession(session);
-        	
-        	if (session.isOpened()) {
-    			mStatusCallback.mCallByMode = SessionStatusCallback.CallByLogin;
-				mStatusCallback.mCallbackIndex = 1;
-				if (mNeedPublishPermissions) {
-					session.requestNewPublishPermissions(new Session.NewPermissionsRequest(
-							mContext, Arrays.asList(permissions)));
-				} else {
-					session.requestNewReadPermissions(new Session.NewPermissionsRequest(
-							mContext, Arrays.asList(permissions)));
-				}
-				isRequestPermission = true;
-        	}
-        	else
-        	{
-        		UserWrapper.onActionResult(facebook, UserWrapper.ACTION_RET_LOGIN_FAILED, "Session not open!");
-        	}
-        }
-    });
-}
-
 
 	@Override
 	public void logout() {
@@ -348,7 +347,6 @@ public void requestPermissions() {
 		LogD("Share");
 		if (isLogined()) {
 			final JSONObject curShareInfo = shareInfo;
-			LogD("shareFacebookApi invoked! event : " + curShareInfo.toString());
 			
 			PluginWrapper.runOnMainThread(new Runnable() {
 	            @Override
@@ -407,7 +405,7 @@ public void requestPermissions() {
 		LogD("ShareDialog");
 		if (isLogined()) {
 			final JSONObject curShareInfo = shareInfo;
-			LogD("shareFacebookDialog invoked! event : " + curShareInfo.toString());
+			
 			PluginWrapper.runOnMainThread(new Runnable() {
 	            @Override
 	            public void run() {
@@ -465,14 +463,12 @@ public void requestPermissions() {
 	    	});
 		}
 	}
-
 	
 	public void requestDialog(JSONObject shareInfo) {
 		//TODO Auto-generated method stub
 		LogD("RequestDialog");
 		if (isLogined()) {
 			final JSONObject curShareInfo = shareInfo;
-			LogD("requestDialog invoked! event : " + curShareInfo.toString());
 			
 			PluginWrapper.runOnMainThread(new Runnable() {
 	            @Override
@@ -484,11 +480,7 @@ public void requestPermissions() {
 						String to = curShareInfo.getString("Param3");
 						String suggestions = curShareInfo.getString("Param3");
 						String data = curShareInfo.getString("Param3");
-						
-						UserFacebook.LogD(message);
-						UserFacebook.LogD(title);
-						UserFacebook.LogD(filters);
-		        		
+								        		
 		        		Bundle params = new Bundle();
 						params.putString(UserFacebook.Parameters.MESSAGE, message);
 					    params.putString(UserFacebook.Parameters.TITLE, title);
@@ -534,6 +526,38 @@ public void requestPermissions() {
 				}
 	    	});
 		}
+	}
+	
+	public void openURL(JSONObject shareInfo) {
+		//TODO Auto-generated method stub
+		final JSONObject curShareInfo = shareInfo;
+		PluginWrapper.runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+				try {
+		    		String url = curShareInfo.getString("Param1");
+					
+					Intent intent = new Intent(Intent.ACTION_VIEW);  
+					intent.setData(Uri.parse(url));
+			        mContext.startActivity(intent);
+		    	}
+		    	catch (JSONException e) {
+		    		
+		    	}
+            }
+		});
+	}
+	
+	public int getAppVersionCode() {
+		int version = -1;
+	    try {
+	        PackageInfo pInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_META_DATA);
+	        version = pInfo.versionCode;
+	    }catch(Exception e) {
+		    e.printStackTrace();
+		}
+	    
+	    return version;
 	}
 	
 	@Override

@@ -14,6 +14,8 @@ public:
 	CREATE_FUNC(MainMenuLayer);
 
 	void update(float dt) override;
+	
+	void showPopupUpdateApp();
 
 private:
 	void playGame(cocos2d::Object* sender);
@@ -22,7 +24,7 @@ private:
 	void clickInviteFriends(cocos2d::Object* sender);
 
 	void addButtonLoginFacebook();
-	void startTimeModeDemo(cocos2d::Object* sender);	
+	void startTimeModeDemo(cocos2d::Object* sender);
 
 	cocos2d::CCMenuItemImage* m_pLoginfacebook;
 	cocos2d::MenuItemLabel* m_pItemLogout;

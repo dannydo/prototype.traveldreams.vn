@@ -135,6 +135,24 @@ void UserService::getLeaderBoardAdvanceMode(const std::string& sPackageId, const
 	m_pRequest = NULL;
 }
 
+void UserService::getVersionGame()
+{
+	String strURL = _CONSTANT_URL_;
+	strURL.append("api/getVersionGame/");
+
+	m_pRequest = new HttpRequest();
+	m_pRequest->setUrl(strURL.getCString());
+	m_pRequest->setRequestType(HttpRequest::Type::GET);
+	m_pRequest->setTag("GetVersionGame");
+
+	m_pRequest->setResponseCallback(this, httpresponse_selector(UserService::onGetVersionGameCompleted));
+	m_pClient->send(m_pRequest);
+	m_pClient->setTimeoutForConnect(10);
+	m_pClient->setTimeoutForRead(10);
+	m_pRequest->release();
+	m_pRequest = NULL;
+}
+
 void UserService::onCheckUserFacebookCompleted(HttpClient *sender, HttpResponse *response)
 {
 	std::string sKey = "";
@@ -154,7 +172,46 @@ void UserService::onCheckUserFacebookCompleted(HttpClient *sender, HttpResponse 
 
 	//MessageBox(strData.getCString(), "Error");
 	SystemEventHandle::getInstance()->onCheckUserFacebookResult(this->parseStringToJson(strData.c_str()), sKey);
-	
+}
+
+void UserService::onGetVersionGameCompleted(HttpClient *sender, HttpResponse *response)
+{
+	std::string sKey = "";
+	string strData = "";
+	sKey.append(response->getHttpRequest()->getTag());
+	std::vector<std::string> header = response->getHttpRequest()->getHeaders();
+
+	if (response)
+    {
+		if (response->isSucceed()) 
+		{
+			std::vector<char> *buffer = response->getResponseData();
+			if ( buffer->size() > 0)
+			{
+				string strData(buffer->begin(), buffer->end());
+
+				cs::JsonDictionary *pJsonDict = new cs::JsonDictionary();
+				pJsonDict->initWithDescription(strData.c_str());
+				
+				if (pJsonDict != NULL)
+				{
+					cs::JsonDictionary *pJsonData = pJsonDict->getSubDictionary("data");
+					if(pJsonData != NULL)
+					{
+						if (pJsonData->getItemBoolvalue("result", false))
+						{
+							cs::JsonDictionary *pJsonList = pJsonData->getSubDictionary("list");
+							if (pJsonList != NULL)
+							{
+								int iVersionGame = pJsonList->getItemIntValue("VersionGame", 0);
+								UserDefault::getInstance()->setIntegerForKey("VersionGame", iVersionGame);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void UserService::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response)

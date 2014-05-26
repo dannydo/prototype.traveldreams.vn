@@ -10,6 +10,7 @@
 #include "APIService\SyncDataGame.h"
 #include "Database\TrackingTable.h"
 #include "APIService\TrackingService.h"
+#include "APIService\UserService.h"
 
 using namespace cocos2d;
 
@@ -81,6 +82,7 @@ void LoadingLayer::update(float dt)
 	if (m_bFinishLoad && (SyncDataGame::getInstance()->getIsFinishSync() || m_bIsWaittingSync == false))
 	{
 		MainMenuScene* scene = MainMenuScene::create();
+		scene->getLayer()->showPopupUpdateApp();
 		Director::getInstance()->replaceScene(scene);
 	}
 }
@@ -171,6 +173,9 @@ void LoadingLayer::initData()
 			FacebookManager::getInstance()->autoOpenActiveSession();
 		#endif
 	}
+
+	// Get Version Game
+	UserService::getInstance()->getVersionGame();
 
 	// Tracking Game
 	TrackingService::getInstance()->pushTrackingToServer();

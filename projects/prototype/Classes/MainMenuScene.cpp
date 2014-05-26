@@ -112,8 +112,6 @@ bool MainMenuLayer::init()
 	m_pSettingNode->addButtonSetting(m_pButtonSettingNode);
 	this->addChild(m_pSettingNode);
 
-	this->setKeyboardEnabled(true);
-
 	return true;
 }
 
@@ -271,7 +269,7 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 	auto sceneX = HelloWorld::createScene( _GMT_TIME_MODE_);
 	Director::getInstance()->replaceScene(sceneX);		  */
 
-	
+/*
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	if(!FacebookManager::getInstance()->isLogined() || UserDefault::getInstance()->getIntegerForKey("IsLoginFacebook", 0) != 1)
 	{
@@ -280,6 +278,7 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 		return;
 	}
 #endif
+*/
 
 	std::vector<CSPackageInfo> csPackageInfos;
 	CSPackageTable::getAllCSPackages(csPackageInfos);
@@ -301,4 +300,18 @@ void MainMenuLayer::startTimeModeDemo(cocos2d::Object* sender)
 	pNode->setPosition(Point(40.f, 200.f));
 	this->addChild(pNode, 1000);
 	*/
+}
+
+void MainMenuLayer::showPopupUpdateApp()
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	int iVersionCode = FacebookManager::getInstance()->getAppVersionCode();
+	CCLOG("Version %d", iVersionCode);
+	CCLOG("Version %d", UserDefault::getInstance()->getIntegerForKey("VersionGame", 0));
+	if (iVersionCode < UserDefault::getInstance()->getIntegerForKey("VersionGame", 0))
+	{
+		PopupConfirmNode* pPopupConfirmNode = PopupConfirmNode::createLayout("New Version Available!", "Please update now.", PopupConfirmActionType::eNone, PopupConfirmType::eUpdateApp);
+		this->addChild(pPopupConfirmNode);
+	}
+#endif
 }
