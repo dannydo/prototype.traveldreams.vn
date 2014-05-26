@@ -99,7 +99,8 @@ public class UserFacebook implements InterfaceUser {
 				try {
 					mStatusCallback = new SessionStatusCallback();
 					
-					int iResourceID = mContext.getResources().getIdentifier("app_id", "string", "com.kiss_concept.prototype");
+					int iResourceID = mContext.getResources().getIdentifier("app_id", "string",
+							mContext.getPackageName());
 		    		appId = mContext.getResources().getString(iResourceID);//curCPInfo.get("FacebookAppId");
 		    		scope = curCPInfo.get("FacebookScope");
 		    		LogD(appId);
