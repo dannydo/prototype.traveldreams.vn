@@ -1,7 +1,7 @@
 ;size map
 8	8
 ;number of move
-30
+40
 ;number of color
 6
 ;score of stars
@@ -28,7 +28,7 @@
 0
 ;obstacle list: count, list
 1
-COUNTDOWN	5
+COUNTDOWN	9
 12
 1 1 1 2 1 3 1 6 1 7 1 8 2 1 2 2 2 3 2 6 2 7 2 8
 0

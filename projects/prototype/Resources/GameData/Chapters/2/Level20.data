@@ -16,7 +16,7 @@
 0	1	1	1	1	1	1   0
 1	0	1	1	1	1	0   1
 ;main word
-10
+6
 0
 ;init rate, increase after move, decrease when destroyed, decrease when appeared, ratio betweens letters same generation
 100	10	1	1	100

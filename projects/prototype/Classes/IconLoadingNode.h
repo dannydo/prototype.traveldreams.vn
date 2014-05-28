@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 
-#define _TAG_ICON_LOADING_ 1000
+#define _TAG_ICON_LOADING_ 1111
 
 USING_NS_CC;
 
