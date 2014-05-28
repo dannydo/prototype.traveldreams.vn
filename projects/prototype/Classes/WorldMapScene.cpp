@@ -6,6 +6,7 @@
 #include "SoundManager.h"
 #include "Database\ChapterTable.h"
 #include "HeaderNode.h"
+#include "APIService\SyncDataGame.h"
 
 USING_NS_CC;
 
@@ -42,6 +43,8 @@ bool WorldMapLayer::init()
 	{
 		return false;
 	}
+
+    SyncDataGame::getInstance()->reloadDataAfterSync();
 
 	m_wordMapConfig = GameConfigManager::getInstance()->GetWordlMapConfig();
 	std::string sPathFile = "GameData/";

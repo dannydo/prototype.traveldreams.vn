@@ -73,6 +73,12 @@ void LevelTable::fetchLevelsForChapter(const std::string& sChapterId)
 	sqlite3_free_table(re);
 }
 
+void LevelTable::refeshChapterLevels()
+{
+    if (m_sCurrentChapterId != "")
+        this->fetchLevelsForChapter(m_sCurrentChapterId);
+}
+
 std::vector<LevelInfo>& LevelTable::getAllLevelsForChapter(std::string& sChapterId)
 {
 	if(m_sCurrentChapterId != sChapterId)
@@ -271,8 +277,7 @@ bool LevelTable::updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& 
 	CCLOG("sync Level true");
     if (pJsonSync->getArrayItemCount("Levels") > 0)
     {
-	    if (m_sCurrentChapterId != "")
-		    this->fetchLevelsForChapter(m_sCurrentChapterId);
+        UserDefault::getInstance()->setIntegerForKey("ReloadDataAfterSync", 1);
     }
 
 	return true;

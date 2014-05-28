@@ -230,10 +230,10 @@ WordInfo WordTable::getWordInfoOnChapter(const std::string& sChapterId, const st
 	return WordInfo();
 }
 
-void WordTable::refreshWordsForChapter(const std::string& sChapterId)
+void WordTable::refreshWordsForChapter()
 {
-	this->fetchWordsForChapter(sChapterId);
-    m_sCurrentChapterId = sChapterId;
+    if (m_sCurrentChapterId != "")
+	    this->fetchWordsForChapter(m_sCurrentChapterId);
 }
 
 
@@ -436,8 +436,7 @@ bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iV
 
     if (pJsonSync->getArrayItemCount("Words") > 0)
     {
-	    if (m_sCurrentChapterId != "")
-		    this->fetchWordsForChapter(m_sCurrentChapterId);
+	    UserDefault::getInstance()->setIntegerForKey("ReloadDataAfterSync", 1);
     }
 
 	return true;
@@ -502,8 +501,7 @@ bool WordTable::updateDataSyncMapChapterWords(cs::JsonDictionary* pJsonSync, con
 
     if (pJsonSync->getArrayItemCount("MapChapterWords") > 0)
     {
-	    if (m_sCurrentChapterId != "")
-		    this->fetchWordsForChapter(m_sCurrentChapterId);
+	    UserDefault::getInstance()->setIntegerForKey("ReloadDataAfterSync", 1);
     }
 
 	return true;

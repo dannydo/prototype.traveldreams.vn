@@ -81,6 +81,8 @@ void LoadingLayer::update(float dt)
 {
 	if (m_bFinishLoad && (SyncDataGame::getInstance()->getIsFinishSync() || m_bIsWaittingSync == false))
 	{
+        SyncDataGame::getInstance()->reloadDataAfterSync();
+
 		MainMenuScene* scene = MainMenuScene::create();
 		scene->getLayer()->showPopupUpdateApp();
 		Director::getInstance()->replaceScene(scene);
@@ -126,6 +128,11 @@ void LoadingLayer::initData()
 	if(UserDefault::getInstance()->getIntegerForKey("IsUnlockALlLevel", -1) == -1)
 	{
 		UserDefault::getInstance()->setIntegerForKey("IsUnlockALlLevel", 0);
+	}
+
+    if(UserDefault::getInstance()->getIntegerForKey("ReloadDataAfterSync", -1) == -1)
+	{
+		UserDefault::getInstance()->setIntegerForKey("ReloadDataAfterSync", 0);
 	}
 
 	UserDefault::getInstance()->setIntegerForKey("NumberConnectServer", 0);

@@ -40,7 +40,7 @@ public:
 	WordInfo getWordInfoOnChapter(const std::string& sChapterId, const std::string& sWordId);
 	bool updateWord(const WordInfo& wordInfo);
 	bool insertWord(const WordInfo& wordInfo);
-	void refreshWordsForChapter(const std::string& sChapterId);
+	void refreshWordsForChapter();
 
 	std::string	syncGetWords();
 	std::string	syncGetMapChapterWords();

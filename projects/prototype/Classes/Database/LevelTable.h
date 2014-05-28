@@ -32,6 +32,7 @@ public:
 
 	std::string	syncGetLevels();
 	bool updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& iVersion);
+    void refeshChapterLevels();
 
 private:
 	void fetchLevelsForChapter(const std::string& sChapterId);

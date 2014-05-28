@@ -14,6 +14,7 @@
 #include "GetMoreLifeNode.h"
 #include "EndGameNode.h"
 #include "QuitLevelFailedNode.h"
+#include "APIService\SyncDataGame.h"
 
 using namespace cocos2d;
 
@@ -52,6 +53,8 @@ bool LevelMapLayer::init()
 	{
 		return false;
 	}
+
+    SyncDataGame::getInstance()->reloadDataAfterSync();
 
 	m_sChapterId = UserDefault::getInstance()->getStringForKey("ChapterPlayGame");
 	CCSize winSize = CCDirector::sharedDirector()->getWinSize();

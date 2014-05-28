@@ -9,6 +9,7 @@
 #include "PopupConfirmNode.h"
 #include "Database\CSPackageTable.h"
 #include "AdvanceModePopularPackagesScene.h"
+#include "APIService\SyncDataGame.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -52,6 +53,8 @@ bool MainMenuLayer::init()
 	{
 		return false;
 	}
+
+    SyncDataGame::getInstance()->reloadDataAfterSync();
 
 	SoundManager::PlayBackgroundMusic(SoundManager::StateBackGroundMusic::kIntroMusic);
 	CCSize winSize = CCDirector::sharedDirector()->getWinSize();

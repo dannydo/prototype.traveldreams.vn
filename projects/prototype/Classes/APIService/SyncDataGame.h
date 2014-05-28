@@ -18,6 +18,8 @@ public:
 
 	void pushDataCustomGameMode(const std::string& sPackageId);
 
+    void reloadDataAfterSync();
+
 private:
 	void onHttpRequestCompleted(cocos2d::extension::HttpClient *sender, cocos2d::extension::HttpResponse *response);
 

@@ -227,7 +227,7 @@ bool ChapterTable::updateDataSyncChapters(cs::JsonDictionary* pJsonSync, const i
 
 	CCLOG("sync Chapter true");
     if (pJsonSync->getArrayItemCount("Chapters") > 0)
-	    this->fetchAllChapter();
+	    UserDefault::getInstance()->setIntegerForKey("ReloadDataAfterSync", 1);
 
 	return true;
 }

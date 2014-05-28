@@ -292,3 +292,15 @@ void SyncDataGame::pushDataCustomGameMode(const std::string& sPackageId)
     m_pRequest->release();
     m_pRequest = NULL;
 }
+
+void SyncDataGame::reloadDataAfterSync()
+{
+    if (UserDefault::getInstance()->getIntegerForKey("ReloadDataAfterSync", 0) == 1)
+    {
+        ChapterTable::getInstance()->refreshChapters();
+        LevelTable::getInstance()->refeshChapterLevels();
+        WordTable::getInstance()->refreshWordsForChapter();
+    }
+
+    UserDefault::getInstance()->setIntegerForKey("ReloadDataAfterSync", 0);
+}
