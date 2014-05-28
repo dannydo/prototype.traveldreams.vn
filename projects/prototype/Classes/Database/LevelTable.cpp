@@ -41,10 +41,7 @@ bool LevelTable::init()
 
 void LevelTable::fetchLevelsForChapter(const std::string& sChapterId)
 {
-	while(!m_ChapterLevels.empty())
-	{
-		m_ChapterLevels.pop_back();
-	}
+	std::vector<LevelInfo> tempChapterLevels;
 
 	char **re;
 	int nRow, nColumn;
@@ -68,8 +65,10 @@ void LevelTable::fetchLevelsForChapter(const std::string& sChapterId)
 		levelInfo.bIsUnlock = bool(strtod(re[iRow*nColumn+8], 0));
 		levelInfo.iVersion = int(strtod(re[iRow*nColumn+9], 0));
 
-		m_ChapterLevels.push_back(levelInfo);
+		tempChapterLevels.push_back(levelInfo);
 	}
+
+    m_ChapterLevels = tempChapterLevels;
 
 	sqlite3_free_table(re);
 }
@@ -270,8 +269,11 @@ bool LevelTable::updateDataSyncLevels(cs::JsonDictionary* pJsonSync, const int& 
 		return false;
 
 	CCLOG("sync Level true");
+    if (pJsonSync->getArrayItemCount("Levels") > 0)
+    {
+	    if (m_sCurrentChapterId != "")
+		    this->fetchLevelsForChapter(m_sCurrentChapterId);
+    }
 
-	if (m_sCurrentChapterId != "")
-		this->fetchLevelsForChapter(m_sCurrentChapterId);
 	return true;
 }

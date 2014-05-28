@@ -275,6 +275,7 @@ public:
 
 	LevelConfig& GetLevelConfig(const std::string& sChapterID, const int& iLevelId);
 	ChapterConfig& GetChapterConfig(const std::string& sChapterID);
+    bool GetChapterConfigDirectly(  const std::string& sChapterID, ChapterConfig* chapterConfig);
 	WordlMapConfig::WordMapChapterConfig* GetWordMapChapterConfig(const std::string& sChapterID);	
 
 	inline const GameConfig& GetGameConfig() { return m_GameConfig;}	
@@ -313,7 +314,7 @@ public:
 	void UpdateNewWordForLevel(const std::string& sChapterID, const int& iLevel);
 private:
 	void LoadConfigOfLevel(const std::string& sChapterID, const int& iLevelId);
-	void LoadConfigOfChapter(const std::string& sChapterID);
+    void LoadConfigOfChapter(const std::string& sChapterID, ChapterConfig*pOutputChapter);
 private:
 	LevelConfig m_LevelConfig;
 	int m_iCurrentLevelID;

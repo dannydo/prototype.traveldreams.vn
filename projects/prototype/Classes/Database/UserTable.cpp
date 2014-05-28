@@ -260,7 +260,8 @@ void UserTable::haveGenerateNextChapter()
 	ChapterInfo chapterInfo = ChapterTable::getInstance()->getChapterInfo(m_userInfo.sCurrentChapterId);
 	if (chapterInfo.sChapterId != "" && chapterInfo.bIsUnlock)
 	{
-		ChapterConfig chapterConfig = GameConfigManager::getInstance()->GetChapterConfig(m_userInfo.sCurrentChapterId);
+		ChapterConfig chapterConfig;
+        GameConfigManager::getInstance()->GetChapterConfigDirectly(m_userInfo.sCurrentChapterId, &chapterConfig);
 		if (chapterConfig.m_iTotalevel <= m_userInfo.iCurrentLevel)
 		{
 			LevelInfo levelInfo = LevelTable::getInstance()->getLevel(m_userInfo.sCurrentChapterId, chapterConfig.m_iTotalevel);

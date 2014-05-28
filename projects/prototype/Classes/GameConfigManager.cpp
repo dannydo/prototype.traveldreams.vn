@@ -609,19 +609,26 @@ ChapterConfig& GameConfigManager::GetChapterConfig(const std::string& sChapterID
 	{
 		m_sCurrentChapterID = sChapterID;
 		m_iCurrentLevelID = -1; //reset levelID because we change chapter
-		this->LoadConfigOfChapter(sChapterID);
+        this->LoadConfigOfChapter(sChapterID, NULL);
 	}
 
 	return m_ChapterConfig;
 }
 
-void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID)
+bool GameConfigManager::GetChapterConfigDirectly(  const std::string& sChapterID, ChapterConfig* pChapterConfig)
+{
+    this->LoadConfigOfChapter(sChapterID, pChapterConfig);
+    return true;
+}
+
+void GameConfigManager::LoadConfigOfChapter(const std::string& sChapterID, ChapterConfig* pOutputChapter)
 {
 	WordlMapConfig::WordMapChapterConfig* wordMapChapterConfig = this->GetWordMapChapterConfig(sChapterID);
 	if (wordMapChapterConfig == NULL)
 		return;
 
-	ChapterConfig& chapterConfig = m_ChapterConfig;
+    ChapterConfig& chapterConfig = (pOutputChapter==NULL)? m_ChapterConfig:*pOutputChapter;
+    
 	chapterConfig.m_WordIDList.clear();
 
 	std::string sPathFileData = wordMapChapterConfig->m_sPathData;

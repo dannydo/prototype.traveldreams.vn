@@ -58,10 +58,7 @@ ChapterInfo ChapterTable::getChapterInfo(const std::string sChapterId)
 
 void ChapterTable::fetchAllChapter()
 {
-	while(!m_Chapters.empty())
-	{
-		m_Chapters.pop_back();
-	}
+    std::vector<ChapterInfo> tempChapterInfos;
 
 	char **re;
 	int nRow, nColumn;
@@ -80,11 +77,14 @@ void ChapterTable::fetchAllChapter()
 		chapterInfo.iTotalFlashCard = int(strtod(re[iRow*nColumn+6], 0));
 		chapterInfo.iStageRevise = int(strtod(re[iRow*nColumn+7], 0));
 
-		m_Chapters.push_back(chapterInfo);
-
-		ChapterConfig chapterConfig = GameConfigManager::getInstance()->GetChapterConfig(chapterInfo.sChapterId);
+		ChapterConfig chapterConfig;
+        GameConfigManager::getInstance()->GetChapterConfigDirectly(chapterInfo.sChapterId, &chapterConfig);
 		chapterInfo.iTotalFlashCard = chapterConfig.m_WordIDList.size();
+
+        tempChapterInfos.push_back(chapterInfo);
 	}
+
+    m_Chapters = tempChapterInfos;
 
 	sqlite3_free_table(re);
 }
@@ -226,7 +226,8 @@ bool ChapterTable::updateDataSyncChapters(cs::JsonDictionary* pJsonSync, const i
 		return false;
 
 	CCLOG("sync Chapter true");
-	this->fetchAllChapter();
+    if (pJsonSync->getArrayItemCount("Chapters") > 0)
+	    this->fetchAllChapter();
 
 	return true;
 }

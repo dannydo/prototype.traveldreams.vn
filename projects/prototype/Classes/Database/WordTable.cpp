@@ -171,10 +171,7 @@ std::vector<WordInfo> WordTable::getAllWordNew(const unsigned long& iTimeCurrent
 
 void WordTable::fetchWordsForChapter(const std::string& sChapterId)
 {
-	while(!m_ChapterWords.empty())
-	{
-		m_ChapterWords.pop_back();
-	}
+	std::vector<WordInfo> tempChapterWords;
 
 	char **re;
 	int nRow, nColumn;
@@ -195,8 +192,10 @@ void WordTable::fetchWordsForChapter(const std::string& sChapterId)
 		wordInfo.iMapChapterWordId = int(strtod(re[iRow*nColumn+5], 0));
 		wordInfo.sChapterId = re[iRow*nColumn+6];
 
-		m_ChapterWords.push_back(wordInfo);
+		tempChapterWords.push_back(wordInfo);
 	}
+
+    m_ChapterWords = tempChapterWords;
 
 	sqlite3_free_table(re);
 }
@@ -206,6 +205,7 @@ std::vector<WordInfo>& WordTable::getAllWordsForChapter(const std::string& sChap
 	if(m_sCurrentChapterId != sChapterId)
 	{
 		this->fetchWordsForChapter(sChapterId);
+        m_sCurrentChapterId = sChapterId;
 	}
 
 	return m_ChapterWords;
@@ -233,6 +233,7 @@ WordInfo WordTable::getWordInfoOnChapter(const std::string& sChapterId, const st
 void WordTable::refreshWordsForChapter(const std::string& sChapterId)
 {
 	this->fetchWordsForChapter(sChapterId);
+    m_sCurrentChapterId = sChapterId;
 }
 
 
@@ -433,8 +434,12 @@ bool WordTable::updateDataSyncWords(cs::JsonDictionary* pJsonSync, const int& iV
 	CCLOG("sync Word true");
 	m_iTotalFlashCardCollected = getNumberWordCollected();
 
-	if (m_sCurrentChapterId != "")
-		this->fetchWordsForChapter(m_sCurrentChapterId);
+    if (pJsonSync->getArrayItemCount("Words") > 0)
+    {
+	    if (m_sCurrentChapterId != "")
+		    this->fetchWordsForChapter(m_sCurrentChapterId);
+    }
+
 	return true;
 }
 
@@ -495,7 +500,11 @@ bool WordTable::updateDataSyncMapChapterWords(cs::JsonDictionary* pJsonSync, con
 
 	CCLOG("sync Map Chapter true");
 
-	if (m_sCurrentChapterId != "")
-		this->fetchWordsForChapter(m_sCurrentChapterId);
+    if (pJsonSync->getArrayItemCount("MapChapterWords") > 0)
+    {
+	    if (m_sCurrentChapterId != "")
+		    this->fetchWordsForChapter(m_sCurrentChapterId);
+    }
+
 	return true;
 }
