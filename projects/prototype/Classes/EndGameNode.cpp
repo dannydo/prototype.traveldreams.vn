@@ -116,10 +116,6 @@ bool EndGameNode::initWin()
 	pLabelNumScore->setScale(1.4f);
 	this->addChild(pLabelNumScore);
 
-	LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel, m_sChapterId);
-	pLeaderBoard->setPosition(Point(320.0f, 114.0f));
-	this->addChild(pLeaderBoard);
-
 	Sprite* pButtonNextGameSprite = Sprite::create("Target-End-Game/btn_next.png");
 	ButtonNode* buttonNextNode = ButtonNode::createButtonSprite(pButtonNextGameSprite, CC_CALLBACK_1(EndGameNode::menuNextLevelCallBack, this));
 	buttonNextNode->setPosition(Point(425.0f, 279.0f));
@@ -205,13 +201,17 @@ bool EndGameNode::initWin()
 	WordTable::getInstance()->updateWord(wordInfo);
 	ChapterTable::getInstance()->updateChapter(m_chapterInfo);
 	
-	auto actionupdateDatabaseAndSync = CallFunc::create(this, callfunc_selector(EndGameNode::updateDatabaseAndSync));
-	this->runAction(Sequence::create(DelayTime::create(0.01f), actionupdateDatabaseAndSync, NULL));
-
 	m_iCountYellowStar = 0;
 	m_iCountBonusQuest = 0;
 
 	this->sequenceUpdateStar();
+
+    LeaderBoardtNode* pLeaderBoard = LeaderBoardtNode::createLayout(m_iCurrentLevel, m_sChapterId);
+	pLeaderBoard->setPosition(Point(320.0f, 114.0f));
+	this->addChild(pLeaderBoard);
+
+    auto actionupdateDatabaseAndSync = CallFunc::create(this, callfunc_selector(EndGameNode::updateDatabaseAndSync));
+	this->runAction(Sequence::create(DelayTime::create(0.01f), actionupdateDatabaseAndSync, NULL));
 
 	return true;
 }
